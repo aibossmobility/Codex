@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Find Your Fatherhood Stage</title>
+    <meta name="robots" content="noindex" />
+    <script
+      src="https://links.isharehow.app/js/external-tracking.js"
+      data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
+    </script>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const source = params.get("src") || "site";
+      const url = new URL("https://fatherhood5-c3sirayz.manus.space/");
+      url.searchParams.set("utm_source", source);
+      url.searchParams.set("utm_medium", "bossmobile_site");
+      url.searchParams.set("utm_campaign", "fatherhood_stage_tool");
+      fetch("/api/traffic-click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        keepalive: true,
+        body: JSON.stringify({
+          doorway: "stage",
+          source,
+          referrer: document.referrer || "",
+          user_agent: navigator.userAgent || "",
+        }),
+      }).finally(() => window.location.replace(url.toString()));
+    </script>
+  </head>
+  <body>
+    <p>Opening the fatherhood stage tool...</p>
+  </body>
+</html>

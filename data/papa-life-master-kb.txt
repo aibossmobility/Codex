@@ -1,0 +1,861 @@
+================================================================
+BRIAN KEITH HILL — COMPLETE MASTER KNOWLEDGE BASE v23
+Single Source of Truth for All AI Agents (ORACLE & All ElevenLabs Agents)
+Last Updated: May 22, 2026
+================================================================
+
+** CRITICAL: v23 SUPERSEDES v22. New additions in v23:
+   - Section 20: Oral History — "A Journey from Chicago to California"
+     (biographical narrative from May 21, 2026 audio recordings)
+
+Previous v22 additions:
+   - Collaborative Conversations facilitation program
+   - Social infrastructure / platform presence data
+   - YouTube channel and cinematic video asset
+   - Testimonials registry
+   - Music asset (F.O.A.D.C. — New Ground)
+   - USC research study integration
+   - iShareProposals / GHL integration details
+   - Marlee assessment platform
+   - Human Design and learning style
+   - Expanded credentials and background **
+
+================================================================
+SECTION 1: IDENTITY & PERSONAL BACKGROUND
+================================================================
+
+Full Name: Brian Keith Hill
+Title: Father-Adult Child Relationship Coach | AI Business Consultant
+         Certified Peer Support Specialist
+Location: San Leandro, CA
+Primary Email: brian@bossmobility.net
+Booking: https://calendly.com/briankeithhill
+
+EDUCATION:
+- B.S. in Recreation, CSUEB (1985)
+- M.S. in Education, CSUEB (2000)
+
+CREDENTIALS & EXPERIENCE:
+- Certified Peer Support Specialist
+- 20+ years of peer advocacy experience
+- 40 years of church, community, and faith-based facilitation
+- Extensive rideshare miles documented as human connection fieldwork
+
+MARRIAGE:
+- Married since May 21, 1977 — 49 years (as of 2026)
+- Married in Richmond, CA
+- Core authority pillar in the Papa Life brand: speaking to fathers
+  with complicated histories from a place of covenant faithfulness
+  rather than condemnation
+
+ORIGIN STORY:
+Brian watched his father leave at age 11. Years later, he experienced a
+15-20 year emotional distance from his oldest daughter, with the 2020
+pandemic intensifying those emotions. His personal testimony of restoring
+that relationship is central to Papa Life's credibility. A client he
+coached in 2023-2024 named the framework "Papa Life," crystallizing his
+mission. Signature message: "I watched my father leave at 11; Papa Life
+exists so fewer carry that wound."
+
+Faith is integrated throughout Brian's methodology — a grace-based
+assertiveness model with scriptural foundations running through all
+content.
+
+Signature phrase: "As long as you're both alive, it's never too late."
+Keynote title: "Closing Silent Emotional Distance with Adult Children"
+Mission anchor: "Wrestling the silence away."
+
+HUMAN DESIGN:
+Type: 6/2 Projector
+- Role Model (6th Line): People naturally seek Brian's wisdom
+- Hermit (2nd Line): Deep insights emerge in solitude; needs alone time
+- Strategy: Wait for recognition and invitation before leading
+
+LEARNING & COMMUNICATION STYLE:
+- Auditory learner — processes information outwardly through writing
+- Prefers written communication over verbal for important ideas
+- Motivational assessments via Marlee: getmarlee.com/app/spaces/brian-keith-hill
+  (Always say "Marlee" — never F4S, Fingerprint for Success, or Fingerprint)
+
+FAMILY:
+- Father of three
+- Grandson: Jacoby
+
+================================================================
+SECTION 2: BUSINESS ENTITIES & WEB PROPERTIES
+================================================================
+
+PRIMARY PLATFORMS (TWO DISTINCT PRODUCTS):
+
+A. PAPA LIFE — bossmobilelifecoach.com (also papalifecoach.com)
+   - The flagship coaching platform for fathers of adult children
+   - Subscription: $4.99/month
+   - Includes: 7 live courses, free resource library, Papa Life Circles
+
+B. BOSS MOBILITY — bossmobility.net
+   - The AI agents marketplace
+   - Each agent: $299/month standalone
+   - Separate from Papa Life subscription
+
+C. Brian Keith Hill personal: briankeithhill.com
+
+PAPA LIFE SITE ASSETS:
+- Main site: https://frqohyqm.gensparkspace.com | Custom: https://papalifecoach.com
+- Workshop: https://frqohyqm.gensparkspace.com/workshop/index.html
+- Scripts: https://frqohyqm.gensparkspace.com/workshop/scripts.html
+- Free resources: https://afcdmbri.gensparkspace.com/resources/
+- One Clear Path funnel: https://aacsezvf.gensparkspace.com/
+- Operator Command Center (internal): https://aozducgd.gensparkspace.com/
+- Live Meeting Room: https://meetn.com/briankeithhill (The Papa Life Circle Room)
+
+BRAND COLORS:
+- Black: #0A0A0A (backgrounds, navbar, footer)
+- Red: #E53935 (CTAs, headings, borders)
+- Yellow: #F9A825 (accents, hover)
+- Green: #388E3C (BIPOC section, free badges)
+
+OFFICIAL LOGOS:
+- Papa Life: https://imagedelivery.net/o4mWYROcO-l6Q05X-a5wtg/9d6f1f6f-1a42-4731-cea6-2c9706cb5800/public
+- Boss Mobility: https://imagedelivery.net/o4mWYROcO-l6Q05X-a5wtg/03870821-17a2-44c0-f3d8-025d4b682600/public
+
+YOUTUBE CHANNEL:
+- Channel: Brian K Hill (@bossmobilelifecoach)
+- Email: brian@bossmobility.net
+- Cinematic intro video: https://youtu.be/bwroJYT0kaM
+  ("The Evolving Father: Connecting with Your Adult Children")
+
+RELATED VENTURES:
+- P2P (Prospect 2 Partner) — separate venture
+- P2P Digital Dojo: p2pdojo.cloud (coin economy, 50+ vetted entrepreneurs)
+- Digital Dojo for Dads (30-day course)
+- Papa Life x ATM combined offering: PAPA framework + AI business
+  automation tools (subscription)
+
+================================================================
+SECTION 3: TECHNICAL TEAM
+================================================================
+
+Jamel EL EliYah: jamel@jameleliyah.com
+- Handles web implementation
+- Owns the Papa Life MCP course content workflow (April 12, 2026)
+- All future Papa Life course content creation goes through MCP tool chain
+  — NOT manual Google Doc updates
+
+Abdalla Ibrahim: abdalllla00@gmail.com
+- Manages knowledge base distribution to ElevenLabs agents
+
+TECHNICAL INFRASTRUCTURE:
+- Hosting: Genspark | Storage: Google Drive | Voice Agents: ElevenLabs
+- Automation: Make.com | Scheduling: Calendly | Live Meetings: Meetn
+- Video Production: HeyGen | Course Management: bossmobilelifecoach.com MCP
+- CRM: iShareProposals / GoHighLevel (GHL)
+
+NOTE: bossmobilelifecoach.com subpages are blocked server-side (403) for
+web fetch. Brian should paste content directly when needed. Embeds run via
+browser artifact.
+
+DOCUMENT DELIVERY PREFERENCE:
+- Plain text (.txt) files
+- Avoid .docx (corruption issues)
+- Avoid Isharehow Google Docs tool
+
+MAKE.COM MCP PROTOCOL:
+When Brian requests an action on a third-party system Claude lacks a native
+tool for, offer to dynamically build a custom module via Make.com MCP
+(3,500+ SaaS apps). Flow: (1) inform Brian and ask permission, (2) wait for
+explicit confirmation, (3) invoke Make.com MCP tool creation, (4) confirm
+success, (5) immediately invoke the new tool to fulfill the request.
+Make.com pipeline is also used for multi-platform content distribution
+with UTM-tagged URLs.
+
+ISHAREHOWPROPOSALS / GHL INTEGRATION:
+- Orchestrator platform: built-in one-click GHL OAuth integration in CRM Hub
+  (no manual API key entry needed — Brian clicks GHL OAuth button)
+- Claude-to-iShareProposals connection confirmed via ishareproposals.com/mcp
+- Colleague Alpha referenced for backend access
+
+================================================================
+SECTION 4: HEYGEN PRODUCTION ASSETS
+================================================================
+
+HEYGEN AVATAR & VOICE:
+- Avatar ID: 582d2d1ed418492bb070507f35ef61cd (Brian Keith Hill)
+- Voice ID: 1d5b92d8097541f881d1be4a061b6559 (Brian Keith Hill)
+- Talking Photo ID (Video Series): 1b07dc1968aa4ec2a25a39ef3d5a0eb2
+
+INTRO VIDEO:
+- Title: "The Evolving Father: Connecting with Your Adult Children"
+- HeyGen URL: https://app.heygen.com/videos/e0919c0ef5f54baead1bfe23bdc695a0
+- Embed: https://app.heygen.com/embeds/e0919c0ef5f54baead1bfe23bdc695a0
+- YouTube (cinematic version): https://youtu.be/bwroJYT0kaM
+- Maps to: Video Series Lesson 31 (Course 4)
+
+----------------------------------------------------------------
+PAPA LIFE 10-EPISODE VIDEO SERIES (course_id 4)
+ALL 10 COMPLETE — April 23, 2026
+Access: https://app.heygen.com/videos/{id}
+----------------------------------------------------------------
+Ep1: 07c2fa0d | Ep2: d081a8da | Ep3: 6e42cfda | Ep4: bd439b24
+Ep5: 90300176 | Ep6: 873a1a54 | Ep7: 33c26d63 | Ep8: 6cd62c6a
+Ep9: da311476 | Ep10: 9d2e3c39
+
+----------------------------------------------------------------
+6-MODULE COURSE RE-RENDER VIDEOS (Correct Brian Keith Hill Avatar)
+ALL 6 COMPLETE — April 23, 2026
+----------------------------------------------------------------
+M1: b5194fb1 | M2: fc5d4491 | M3: 9f7d7e56
+M4: 2ac1a89b | M5: b02f7780 | M6: fb113be0
+
+================================================================
+SECTION 5: PODCAST AUDIO ASSETS (GOOGLE DRIVE)
+================================================================
+
+Access: https://drive.google.com/file/d/{id}/view
+
+Ep1: 1NXRQTkr | Ep2: 1k93XFt6 | Ep3: 1BD7lW3c | Ep4: 112tAkn2
+Ep5: 119xBLNb | Ep6: 1MT6uvml | Ep7: 1mfp9Fsm | Ep8: 18pPnFvM
+Ep9: 1tfkO8uq | Ep10: 1ObwYygC
+
+================================================================
+SECTION 6: WORKSHOP AUDIO ASSETS (GOOGLE DRIVE)
+================================================================
+
+PAPA LIFE WORKSHOP — 6 audio sessions
+Access: https://drive.google.com/file/d/{id}/view
+
+Session 1: 1QxwxmC3u_2EGHry-kHd4TSRE0v4Hb2-U
+Session 2: 1UK83vGcjKwxr6pr7H_wi8lUXdsruFK08
+Session 3: 12xSRWVlm5FqcKMf5pAc6MejCLOjp3nx-
+Session 4: 1iCmrrkAY9dNOHjtujxEZMsbt-VrahDxK
+Session 5: 1vxIi0mu9AXDMzUJIgULIm51h6ZhhY1m4
+Session 6: 1XaWMccsX-N-C3okFrkt6OomzsKVNn_zh6
+
+================================================================
+SECTION 7: PAPA LIFE LIVE PLATFORM CONTENT INVENTORY
+(bossmobilelifecoach.com — confirmed via MCP get_content_tree, April 28, 2026)
+================================================================
+
+LIVE COURSES (7) — included with $4.99/month Papa Life subscription:
+
+1. Wrestling the Silence Away — The Book (18 chapters)
+2. The 8-Week Relationship Reset Curriculum
+3. Wrestling the Silence Away — Podcast (10 episodes)
+4. Wrestling the Silence Away — Video Series (10 episodes, course_id 4)
+5. The Interactive Papa Life Journey — 5-Step Self-Guided Experience
+6. Papa Life Core Video Course — 6 Modules
+7. iShareProposals — Getting Started
+
+PAPA LIFE CORE VIDEO COURSE — Module Structure:
+- Module 1: How Did We Get Here (Sessions 1, 7)
+- Module 2: Who Are You Now (Session 2)
+- Module 3: The Patterns That Push Them Away (Sessions 3, 8)
+- Module 4: Showing Up Without Pushing (Sessions 4, 9)
+- Module 5: Making Peace With What Is (Sessions 5, 10)
+- Module 6: The First Real Conversation (Sessions 6, 11, 12)
+
+FREE RESOURCE LIBRARY (https://afcdmbri.gensparkspace.com/resources/):
+- PAPA Workbook | Self-Assessment | Letter Template
+- Weekly Reset Journal | About Brian
+
+EMAIL CAPTURE FORM (/forms/papa_lead):
+3 fields — first name, email, "What's happening between you and your
+adult child?" — feeds CRM at bossmobilelifecoach.com/crm-console.
+Drip schedule releases episodes every 2 days.
+
+================================================================
+SECTION 7B: OFFICIAL OFFERINGS RESPONSE (PAPA LIFE)
+(Use this exactly when anyone asks "What does Brian offer?" or similar)
+================================================================
+
+Brian Keith Hill helps fathers of adult children close the silent
+emotional distance between them and their grown sons and daughters.
+The work is built on the PAPA Framework — Purpose, Authority, Presence,
+Alignment — and a 5-Step Path: Regret to Reflection, Confusion to
+Understanding, Humility to Listening, Courage to Conversation,
+Reconnection to Peace.
+
+Signature phrase: "As long as you're both alive, it's never too late."
+
+----------------------------------------------------------------
+PAPA LIFE — bossmobilelifecoach.com
+SUBSCRIPTION: $4.99 / MONTH
+----------------------------------------------------------------
+One subscription. Full access to the Papa Life ecosystem.
+24-hour free trial. Cancel anytime.
+
+INCLUDED WITH SUBSCRIPTION:
+- 7 live courses (see Section 7)
+- All podcast episodes, video series, and workshop audio
+- Full resource library
+- Papa Life Circle community access
+
+----------------------------------------------------------------
+FREE RESOURCES (no subscription needed)
+----------------------------------------------------------------
+PAPA Workbook · Self-Assessment · Letter Template · Weekly Reset
+Journal · About Brian
+
+----------------------------------------------------------------
+COMING SOON (will be added to Papa Life subscription)
+----------------------------------------------------------------
+- Built to Last (8-module fitness course)
+- Defended Father's Heart (6-session micro-workshop)
+- Three-Course Biblical Curriculum
+
+----------------------------------------------------------------
+COMMUNITY
+----------------------------------------------------------------
+Papa Life Circles — 8-12 fathers, in coffee shops, barbershops, and
+online. The Papa Life Circle Room is at meetn.com/briankeithhill.
+
+================================================================
+SECTION 7C: BOSS MOBILITY AI AGENTS (SEPARATE PRODUCT)
+================================================================
+
+The Boss Mobility AI agents are a SEPARATE product line on
+bossmobility.net. They are NOT included with the Papa Life
+$4.99/month subscription.
+
+PRICING: $299/month per agent (each agent purchased standalone)
+LOCATION: bossmobility.net
+PLATFORM: ElevenLabs
+
+AVAILABLE AGENTS:
+- BRIAN — primary voice agent
+- MR. HILL — formal coaching persona
+- KEITH — relational and personal persona
+- BOSS — business strategy agent
+- PAPA LIFE — father-adult child relationship agent
+- MIND SPRING — mental wellness agent
+- OMEGAGO — strategic systems agent
+- ORACLE — master knowledge agent
+
+RESPONSE GUIDANCE FOR AGENTS:
+- If user asks about Papa Life: lead with $4.99/month subscription
+- If user asks about AI agents specifically: $299/month each on bossmobility.net
+- If user asks "what does Brian offer" generally: mention BOTH product
+  lines, lead with Papa Life ($4.99/month), frame AI agents as separate
+  Boss Mobility offering at $299/month
+
+================================================================
+SECTION 8: COMING SOON / IN DEVELOPMENT
+================================================================
+
+A. "BUILT TO LAST" — 8-module fitness course (added April 26, 2026)
+   STATUS: Scripts complete; awaiting HeyGen avatar selection
+   Module Arc: The Father's Body | The Mobility Reset | Strength That
+   Carries | The Tired Father | Eating to Show Up | Faith and the Body |
+   Pain, Honesty, Limits | Built to Last
+   AUDIENCE: F.O.A.D.C. dads 50+ focused on strength, mobility, longevity
+
+B. "DEFENDED FATHER'S HEART" — 6-session micro-workshop (April 2026)
+   STATUS: Content developed from Brian's personal written material
+   on defensive patterns, trigger words, and protective vows.
+
+C. THREE-COURSE BIBLICAL CURRICULUM
+   STATUS: Actively in development — must use Jamel's MCP tool chain
+   1. Identity & Purpose as a Father
+   2. Emotional Wisdom & Relational Leadership
+   3. Impact & Legacy — Leading Adult Children Well
+   Each course includes biblical anchors, reflection questions, action steps.
+
+D. USC RESEARCH STUDY INTEGRATION
+   STATUS: In development — Papa Life framework mapped against USC
+   research study for potential BIPPOC father-focused workshop application.
+
+================================================================
+SECTION 9: GOOGLE DRIVE — KEY DOCUMENT REGISTRY
+================================================================
+
+Papa Life Operating System KB: 16YrZeeSyejrgfntIqJvf4viB6aYeBZXL
+Alignable Recommendations (241 verified): 16NvJjw9UguVWsxlnAsJsvcq6x78NeAuFsHtziQnY64o
+Master KB v18: 1fetWeDj-CIvP-A-Qysmah9_iYhq4zHmv (DEPRECATED)
+Master KB v19: 14yJdFO2VQU4Bset9hihMcCqZWU3TwyYn (DEPRECATED — pricing errors)
+Master KB v20: 12EvuIQ4Z0VlWLpSPRptwfZzyI6-LqhKv (DEPRECATED — agents/subscription error)
+Master KB v21: 1Q4kNor_G38vhIt-7pSqRYHo3pOhwuT1i (DEPRECATED — superseded by v22)
+Master KB v22: 1Z4OLp5WDkIVN1jCqVGknxJ0b32vE7sM2 (DEPRECATED — superseded by v23)
+Master KB v23 (this document): CURRENT
+Voice Overs for Alpha and Abdullah folder: 1NSuENGLu0ldjjQf6ldmsX51xm38Feygg
+
+================================================================
+SECTION 10: PRICING (AUTHORITATIVE — DO NOT DEVIATE)
+================================================================
+
+TWO LEGITIMATE PRICE POINTS:
+
+1. PAPA LIFE — $4.99 / month
+   Platform: bossmobilelifecoach.com
+   Product: Full Papa Life ecosystem (7 courses, podcast, video series,
+   workshop, free resources, community)
+   Trial: 24-hour free
+   Stripe checkout: agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444
+
+2. BOSS MOBILITY AI AGENTS — $299 / month per agent
+   Platform: bossmobility.net
+   Product: Standalone AI agents (8 available — see Section 7C)
+   Each agent purchased separately at $299/month
+
+NEVER QUOTE THESE PRICES (deprecated/never valid):
+- $4.95/subscriber (typo — was never valid)
+- $97/month, $197/month, $297/month, $447/month coaching tiers
+- $500/$997 one-time P2P Digital Dojo pricing
+- $19.99/month, $25/month, $3/month (orphaned old Stripe records)
+- ANY one-time payment tiers for Papa Life
+
+If a prospect asks about partnerships, sponsorships, B2B, enterprise,
+or special arrangements, route them to Brian directly:
+brian@bossmobility.net or calendly.com/briankeithhill.
+
+================================================================
+SECTION 11: AI AGENTS ECOSYSTEM (BOSS MOBILITY)
+================================================================
+
+Platform: ElevenLabs (all agents are ElevenLabs-powered)
+Sold at: bossmobility.net
+Pricing: $299/month per agent (standalone purchase)
+
+AGENTS:
+1. Brian — primary voice agent
+2. Mr. Hill — formal coaching persona
+3. Keith — relational/personal persona
+4. BOSS — business strategy agent
+5. Papa Life — father-adult child relationship agent
+6. Mind Spring — mental wellness agent
+7. OmegaGO — strategic systems agent
+8. ORACLE — master knowledge agent (built on 12 organized KB text files)
+
+ORACLE AGENT:
+- Built on ElevenLabs with 12 organized KB text files
+- This Master KB v23 is the single source of truth for ORACLE and all agents
+- KB files must be updated in ElevenLabs whenever this document is revised
+
+NOTE ON CROSS-PRODUCT CONFUSION:
+There is a "Papa Life" AI agent on bossmobility.net ($299/month) —
+this is DIFFERENT from the Papa Life subscription on
+bossmobilelifecoach.com ($4.99/month). The AI agent is a tool;
+the subscription is the full coaching ecosystem. Do not conflate them.
+
+================================================================
+SECTION 12: PAPA LIFE METHODOLOGY & FRAMEWORK
+================================================================
+
+TARGET: Fathers of Adult Children (F.O.A.D.C.)
+APPROACH: Relationship systems — dynamics between fathers and their adult
+children (not individual father-focused)
+
+THE PAPA FRAMEWORK:
+- P — Purpose (Who you are now as a father)
+- A — Authority (How you lead without controlling)
+- P — Presence (How you show up consistently)
+- A — Alignment (Living what you say matters)
+
+5-STEP PATH:
+1. Regret > Reflection
+2. Confusion > Understanding
+3. Humility > Listening (the doorway to connection)
+4. Courage > Conversation
+5. Reconnection > Peace
+
+GRACE-BASED ASSERTIVENESS MODEL:
+- Scriptural foundations integrated throughout
+- Faith-centered approach to reconciliation
+- Covenant faithfulness as authority anchor (49-year marriage)
+
+CONTENT FORMAT PHILOSOPHY:
+Brian strongly prefers SHORT, DIGESTIBLE, AUDIO-FIRST content in
+bite-sized sessions (8-12 minutes typical).
+
+================================================================
+SECTION 13: COURSE STRUCTURE & WORKFLOW
+================================================================
+
+COURSE BUILD WORKFLOW (CRITICAL — follow without exception):
+1. All Papa Life course content creation goes through Jamel's MCP tool chain
+2. Reference: papalife_course_content_workflow_brief
+3. Do NOT use manual Google Doc updates for course content
+4. Do NOT use Isharehow tool (service account issues)
+5. Reference: bossmobile_lessons_normalize_all to verify lesson content URLs
+
+PAPA LIFE CIRCLES MODEL:
+- 8-12 fathers per circle
+- Venues: coffee shops, barbershops, online (via Meetn)
+- Live online room: meetn.com/briankeithhill
+- Facilitator-multiplier model targeting 100K fathers via 10K groups
+- Three leadership layers: Mentors, Trainers, Ambassadors
+
+================================================================
+SECTION 14: CONTENT & CURRICULUM ASSETS REGISTRY
+================================================================
+
+16 VISION DOCUMENTS (March 2026):
+Full Papa Life strategic arc — origin story through movement architecture.
+Scaling to 100,000 fathers via trainer/facilitator model.
+
+BOOK MANUSCRIPT (Boss Mobility):
+"Boss Mobility: Faith, Recovery, and the Journey of a Life Coach
+in the Digital Age" — 18 chapters complete
+
+KNOWLEDGE BASE (TF-IDF vector):
+- v14 build: 1,375+ items
+- Sources: ChatGPT exports, Gmail (3 accounts), Google Drive,
+  3 websites, 14+ social media platforms
+
+FATHER'S PATH DIAGNOSTIC TOOL:
+Complete HTML diagnostic tool for father-adult child relationship assessment.
+
+MARKETING ASSETS:
+- 12 social copy variants (LinkedIn/Facebook/Instagram/TikTok)
+- One Clear Path funnel placement spec
+- Drop-in hero HTML for papalifecoach.com
+- Daily post calendar (Mon-Sun themes)
+- Make.com pipeline for multi-platform content distribution with UTM-tagged URLs
+
+================================================================
+SECTION 15: SOCIAL INFRASTRUCTURE & PLATFORM PRESENCE
+================================================================
+
+LINKEDIN:
+- 30,000 connections
+- Primary B2B and professional outreach platform
+
+FACEBOOK:
+- 4,000 followers
+- Community and awareness platform
+
+ALIGNABLE:
+- 3,000 referrals
+- 241 verified recommendations
+- Google Drive record: 16NvJjw9UguVWsxlnAsJsvcq6x78NeAuFsHtziQnY64o
+
+YOUTUBE:
+- Channel: Brian K Hill (@bossmobilelifecoach)
+- Email: brian@bossmobility.net
+- Cinematic intro video: https://youtu.be/bwroJYT0kaM
+
+TESTIMONIALS (deployed on bossmobilelifecoach.com):
+- Terrence Harris
+- Mike Miller
+- David Earl Spencer
+
+================================================================
+SECTION 16: COLLABORATIVE CONVERSATIONS PROGRAM
+================================================================
+
+PROGRAM TYPE: Contracted trainer/facilitator offering
+PURPOSE: Facilitation of structured conversations in professional and
+community settings, drawing on Brian's 40 years of community and
+faith-based facilitation experience.
+
+TARGET ORGANIZATIONS (active outreach, 2026):
+
+1. PEER ADVOCATES TRAINING AND CONSULTING
+   Director: Dr. Angela Cleo Smith
+   Status: Angela has confirmed she will forward Brian's information.
+   She personally invited Brian to the SEEDS Common Ground relaunch
+   event (May 11, 2026) at Block Community Hub, 1955 Broadway,
+   Oakland, CA 94612 (full day, 9AM-6PM).
+
+2. SEEDS COMMUNITY RESOLUTION CENTER
+   Owner: Johnathan
+   Focus: Conflict transformation and community resolution.
+   Brian's outreach uses earth/green palette language aligned with
+   conflict transformation messaging.
+
+DELIVERABLES CREATED:
+- Two HTML one-pagers:
+  * Peer Advocates version: black/red/yellow palette
+  * SEEDS version: earth/green palette with conflict transformation language
+- LinkedIn and email outreach drafts for both contacts
+
+================================================================
+SECTION 17: MUSIC ASSET
+================================================================
+
+"F.O.A.D.C. — NEW GROUND"
+- Duration: 3:56
+- BPM: 172
+- Key: D major
+- Production: Mozart AI with Brian's voice
+- Pitch-shifted versions produced: +3, +5, +12 semitones
+- Status: Download and Google Drive upload incomplete at last session —
+  confirm with Brian before referencing as live asset
+
+================================================================
+SECTION 18: VISION & SCALE
+================================================================
+
+LONG-TERM VISION:
+National voice for F.O.A.D.C. through speaking, writing, media, and
+communities.
+
+SCALING MODEL:
+- Papa Life Circles as core community structure
+- Trainer/facilitator model: 10K groups x 10 fathers = 100,000 fathers
+- Brian as elder voice and vision keeper
+
+SPEAKING:
+- Keynote: "Closing Silent Emotional Distance with Adult Children"
+- Signature phrase: "Wrestling the silence away."
+
+PLATFORM ARCHITECTURE:
+- Boss Mobility = broader brand and AI agents marketplace
+- Papa Life = flagship coaching platform (subscription)
+
+================================================================
+SECTION 19: VERSION HISTORY
+================================================================
+
+v22 — May 22, 2026 (CURRENT)
+- ADDED: Collaborative Conversations facilitation program (Section 16)
+- ADDED: Social infrastructure / platform presence (Section 15)
+- ADDED: YouTube channel and cinematic video asset
+- ADDED: Testimonials registry (Terrence Harris, Mike Miller, David Earl Spencer)
+- ADDED: Music asset — F.O.A.D.C. — New Ground (Section 17)
+- ADDED: USC research study integration (Section 8D)
+- ADDED: iShareProposals / GHL integration details (Section 3)
+- ADDED: Marlee assessment platform (Section 1)
+- ADDED: Human Design 6/2 Projector, learning/communication style (Section 1)
+- ADDED: Certified Peer Support Specialist, 20+ years peer advocacy,
+         40 years church/community facilitation (Section 1)
+- ADDED: Make.com MCP protocol (Section 3)
+- UPDATED: Section 9 document registry includes v21 Drive ID
+- v21 marked DEPRECATED
+
+v21 — May 8, 2026 (DEPRECATED)
+Drive ID: 1Q4kNor_G38vhIt-7pSqRYHo3pOhwuT1i
+- Corrected AI agents / subscription separation
+- Fixed pricing model
+
+v20 — May 8, 2026 (DEPRECATED)
+Drive ID: 12EvuIQ4Z0VlWLpSPRptwfZzyI6-LqhKv
+- Incorrectly claimed AI agents included with subscription
+
+v19 — April 28, 2026 (DEPRECATED)
+Drive ID: 14yJdFO2VQU4Bset9hihMcCqZWU3TwyYn
+- Contained $4.95 typo and $500/$997 P2P pricing errors
+
+v18 — April 23, 2026 (DEPRECATED)
+Drive ID: 1fetWeDj-CIvP-A-Qysmah9_iYhq4zHmv
+- Older HeyGen ID corrections
+
+================================================================
+SECTION 20: ORAL HISTORY — A JOURNEY FROM CHICAGO TO CALIFORNIA
+The Life of Brian Keith Hill (Recorded May 21, 2026)
+================================================================
+
+Source: Six self-narrated audio recordings made on Brian and Felice's
+49th wedding anniversary. Transcribed, cleaned, and synthesized
+into a biographical narrative on May 22, 2026.
+
+Recording titles:
+- Economically
+- Life Was Like Before Things Changed
+- Socially, Community and Work
+- What Was It Like Politically
+- What Was the Hardest Part of Starting Over — 1980
+- When Did We Arrive — 1979
+
+Google Drive folder: interview-deliverables
+Deliverables produced: Cleaned Transcripts (6), Summaries, Combined
+Organized Document, Interview Notes, Themes, Story Outline
+
+----------------------------------------------------------------
+FULL BIOGRAPHICAL NARRATIVE:
+----------------------------------------------------------------
+
+Early Life in Chicago
+
+Brian Keith Hill was born in 1958 in Chicago, Illinois, and spent his
+formative years on the west and south sides of the city. His mother
+worked for the Chicago Public School District, a steady and respected
+position that anchored the family economically. His father was a man of
+many ambitions — he owned a store, worked for United Airlines, harbored
+a passion for television camera work (the kind done behind the news desk,
+not in front of it), and eventually settled into a long-term role with
+the Chicago Public School District as well. The household was modest but
+purposeful, and education was spoken of as the only reliable ladder out
+of the circumstances that surrounded them.
+
+From kindergarten through fifth grade, Brian attended Morris Elementary
+School. He moved on to Morton Upper Grade Center for sixth through eighth
+grade, then to Orr High School for his ninth year, and finally to Dunbar
+Vocational High School from 1972 to 1976. These were the years of water
+hydrants in the summer, of playing with friends in a neighborhood that
+was simultaneously home and hazard. The family was among the first
+African American families on their block on Sawyer Street — a distinction
+that carried its own weight in a city still sorting itself out along
+racial lines in the early 1960s. As children, they played together across
+those lines without the overt racism that adults navigated. But the
+community was underserved, financially strained, and marked by crime.
+The uncertainty was constant.
+
+Music was a refuge and a passion. Brian was a music major in high school,
+and the Church of Christ was the spiritual center of family life. Both
+would remain foundational throughout his entire story.
+
+When Brian was approximately eleven years old, his father left the family
+home. It was a rupture that sent a tremor through everything. "What life
+was like is fear for me everywhere," he would later say. "Everywhere I
+looked, it was internal, but nonetheless it was fear." That fear —
+quiet, pervasive, internalized — became the engine of a decision that
+would define the next decade of his life: I am going to leave this
+community.
+
+----------------------------------------------------------------
+
+The Political World He Grew Up In
+
+Brian came of age during one of the most turbulent periods in American
+political history. Born in 1958, he was a child when John F. Kennedy was
+assassinated, a young teenager when Robert F. Kennedy and Martin Luther
+King Jr. were killed — three assassinations in a single decade that left
+deep wounds in the African American community. The Voting Rights Act of
+1964 had only just begun to open political doors, and the cost of that
+legislation had been measured in lives.
+
+In 1968, Chicago erupted in riots. The Black Panthers were active in both
+California and Chicago. The Vietnam War was consuming young men from
+underserved communities. Congress was, in the speaker's words, "all
+white." Police were a source of danger rather than protection for Black
+and brown people. Richard Nixon's presidency ended in impeachment. "I
+just remember feeling afraid about everything," Brian recalls. "My
+little young eyes and ears was taking in and seeing. It was really highly
+charged."
+
+He notes, with a clarity that carries no bitterness but considerable
+weight, that the same conditions persist today: "The same things are
+going on today. 60 years ago was going on then."
+
+----------------------------------------------------------------
+
+The Choice and the Departure
+
+By the time Brian reached his late teens, the choice before him was
+stark. "The choices I had in life before college was gangs and death or
+ministry and education," he would later say. "I chose ministry and
+education." In August 1976, at eighteen years old, he left Chicago for
+Southwestern Christian College in Terrell, Texas. It was his first real
+departure from Chicago, and it was permanent.
+
+On the first day of school, he met Felice. She was seventeen. He was
+eighteen. Nine months later, they were married. After college, Brian
+served in the Army for six to seven months of training, spending 1977
+and 1978 in service. He was discharged on March 23, 1978. Felice arrived
+in Berkeley, California in January 1979. Brian followed in March. Their
+daughter Simone was eight or nine months old. Their son Isaac would be
+born in December of that same year. Brian was twenty years old. They had
+almost nothing. They had each other. They had California.
+
+----------------------------------------------------------------
+
+Starting Over — Building a Family in the Bay Area
+
+From 1979 to 1985, Brian enrolled in nine colleges pursuing a degree in
+education: Laney College, Merritt College, College of Alameda,
+Southwestern Christian College, and others. He worked as a weight
+training fitness instructor at the Berkeley YMCA and Nautilus of Alameda.
+He competed in the Mr. Oakland bodybuilding contest and placed second.
+He pursued racquetball with enough intensity to go professional. He sang.
+
+In 1981, Brian and Felice moved to Vacaville, California, to work at
+Sierra Children's Home, where they took in eight children who were wards
+of the state. At twenty-one and twenty-two years old, they were parenting
+ten children — their own two plus eight others.
+
+In 1982-1983, they moved to Valparaiso, Indiana, to work at another
+children's home. Then came a job offer at Crow Canyon Athletic Club in
+San Ramon, California. Brian and Felice packed everything they owned into
+the car and drove from Indiana to California. He arrived for the in-
+person interview. The woman told him he did not have the job.
+
+"I remember walking to the car from the Crow Canyon Athletic Club and
+having to tell Felice, I don't have a job. We have all our belongings in
+the car. We drove six, seven, eight days to get there, and the next thing
+I know, I don't have a job. I remember just crying, trying to figure out
+what are we going to do now. That was very hard. Very hard."
+
+----------------------------------------------------------------
+
+The Values That Carried Him Through
+
+Four words remained constant throughout all of it: giving, listening,
+loving, and serving. "Just like the sun, the moon, the stars, the water,
+the fire, it never goes out," Brian says. "They always do those four
+things."
+
+Faith was not incidental. The Church of Christ, the Bible, and a belief
+that God was the reason he arrived where he did are woven throughout
+every recording. "I really realized God was the one that allowed us to
+come where we had come."
+
+----------------------------------------------------------------
+
+Legacy, Roots, and the Gift of Memory
+
+Brian and Felice raised Simone and Isaac in California. In 2017, Brian
+learned that the Hill family homestead traces back nine generations —
+to Lakeland, Florida and Decatur, Georgia. Before Chicago, before
+California, there was a family in the South.
+
+In the Socially recording, he speaks directly to his grandchild Jacoby:
+"Since mom and dad were born in Berkeley and in Chicago, now that we've
+grown up and you're growing up, you're looking back and seeing there is
+really a 60 to 90 year history that you never knew about, but you're
+learning some of it now."
+
+On May 21, 2026 — the forty-ninth wedding anniversary of Brian and
+Felice Hill — these six audio recordings were made. They are a
+transmission: one man's deliberate act of giving the next generation the
+map he had to draw himself, one decision at a time, from the west side
+of Chicago to the shores of California.
+
+Signature quote from recordings:
+"The choices I had in life before college was gangs and death or ministry
+and education. I chose ministry and education."
+— Brian Keith Hill
+
+================================================================
+SECTION 19: VERSION HISTORY
+================================================================
+
+v23 — May 22, 2026 (CURRENT)
+- ADDED: Section 20 — Oral History: "A Journey from Chicago to
+  California" (biographical narrative from May 21, 2026 audio recordings)
+- Source: Six self-narrated audio files transcribed and synthesized
+- Deliverables in Google Drive folder: interview-deliverables
+- v22 marked DEPRECATED
+
+v22 — May 22, 2026 (DEPRECATED)
+Drive ID: 1Z4OLp5WDkIVN1jCqVGknxJ0b32vE7sM2
+- ADDED: Collaborative Conversations facilitation program (Section 16)
+- ADDED: Social infrastructure / platform presence (Section 15)
+- ADDED: YouTube channel and cinematic video asset
+- ADDED: Testimonials registry
+- ADDED: Music asset — F.O.A.D.C. — New Ground (Section 17)
+- ADDED: USC research study integration (Section 8D)
+- ADDED: iShareProposals / GHL integration details (Section 3)
+- ADDED: Marlee assessment platform (Section 1)
+- ADDED: Human Design 6/2 Projector, learning/communication style
+- ADDED: Certified Peer Support Specialist credentials
+- ADDED: Make.com MCP protocol (Section 3)
+
+v21 — May 8, 2026 (DEPRECATED)
+Drive ID: 1Q4kNor_G38vhIt-7pSqRYHo3pOhwuT1i
+- Corrected AI agents / subscription separation
+- Fixed pricing model
+
+v20 — May 8, 2026 (DEPRECATED)
+Drive ID: 12EvuIQ4Z0VlWLpSPRptwfZzyI6-LqhKv
+- Incorrectly claimed AI agents included with subscription
+
+v19 — April 28, 2026 (DEPRECATED)
+Drive ID: 14yJdFO2VQU4Bset9hihMcCqZWU3TwyYn
+- Contained $4.95 typo and $500/$997 P2P pricing errors
+
+v18 — April 23, 2026 (DEPRECATED)
+Drive ID: 1fetWeDj-CIvP-A-Qysmah9_iYhq4zHmv
+- Older HeyGen ID corrections
+
+================================================================
+END OF MASTER KB v23
+================================================================

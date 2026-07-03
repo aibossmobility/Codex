@@ -1,0 +1,212 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Montserrat", sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-brand-red: var(--brand-red);
+  --color-brand-green: var(--brand-green);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-black: var(--brand-black);
+}
+
+/*
+  PAPA Life × Boss Mobility brand palette: yellow, red, and green on true black.
+  Primary actions: green; emphasis: red; highlights / focus ring: yellow.
+*/
+
+:root {
+  --color-black: #000000;
+  --color-yellow: #FFD60A;
+  --color-red: #EF2B2D;
+  --color-green: #22C55E;
+  --color-white: #FFFFFF;
+  --color-muted: #9A9690;
+  --color-card: #111111;
+  --color-border: #222222;
+
+  --brand-black: var(--color-black);
+  --brand-yellow: var(--color-yellow);
+  --brand-red: var(--color-red);
+  --brand-green: var(--color-green);
+  --brand-gold: var(--color-yellow);
+
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+
+  --card: var(--color-card);
+  --card-foreground: var(--color-white);
+
+  --popover: var(--color-card);
+  --popover-foreground: var(--color-white);
+
+  --primary: var(--brand-green);
+  --primary-foreground: var(--color-black);
+
+  --secondary: var(--color-card);
+  --secondary-foreground: var(--color-white);
+
+  --muted: var(--color-card);
+  --muted-foreground: var(--color-muted);
+
+  --accent: var(--brand-red);
+  --accent-foreground: var(--color-white);
+
+  --destructive: var(--brand-red);
+  --destructive-foreground: var(--color-white);
+
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--brand-yellow);
+
+  --radius: 0.5rem;
+
+  --chart-1: var(--brand-green);
+  --chart-2: var(--brand-red);
+  --chart-3: var(--brand-yellow);
+  --chart-4: var(--color-muted);
+  --chart-5: var(--color-white);
+}
+
+.dark {
+  --brand-black: var(--color-black);
+  --brand-yellow: var(--color-yellow);
+  --brand-red: var(--color-red);
+  --brand-green: var(--color-green);
+  --brand-gold: var(--color-yellow);
+
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+  --card: var(--color-card);
+  --card-foreground: var(--color-white);
+  --popover: var(--color-card);
+  --popover-foreground: var(--color-white);
+  --primary: var(--brand-green);
+  --primary-foreground: var(--color-black);
+  --secondary: var(--color-card);
+  --secondary-foreground: var(--color-white);
+  --muted: var(--color-card);
+  --muted-foreground: var(--color-muted);
+  --accent: var(--brand-red);
+  --accent-foreground: var(--color-white);
+  --destructive: var(--brand-red);
+  --destructive-foreground: var(--color-white);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--brand-yellow);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold tracking-tight;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+  
+  .text-glow {
+    text-shadow:
+      0 0 28px rgba(255, 214, 10, 0.45),
+      0 0 48px rgba(239, 43, 45, 0.25),
+      0 0 64px rgba(34, 197, 94, 0.2);
+  }
+
+  .papa-hero-radial {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 35%, rgba(255, 214, 10, 0.18), transparent 55%),
+      radial-gradient(ellipse 60% 45% at 85% 15%, rgba(239, 43, 45, 0.22), transparent 50%),
+      radial-gradient(ellipse 55% 50% at 10% 85%, rgba(34, 197, 94, 0.18), transparent 50%);
+  }
+
+  .glass-panel {
+    @apply bg-background/85 backdrop-blur-md border border-white/10;
+    box-shadow: 0 0 0 1px rgba(255, 214, 10, 0.06);
+  }
+}

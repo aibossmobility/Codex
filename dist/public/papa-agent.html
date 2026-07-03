@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Talk to the PAPA Life AI coach — guidance for fathers of adult children. Powered by ElevenLabs conversational AI." />
+  <title>PAPA Life AI Coach — Fathers of Adult Children</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #0A0A0A;
+      --red: #E53935;
+      --yellow: #F9A825;
+      --green: #388E3C;
+      --white: #F5F5F5;
+      --muted: #9E9E9E;
+      --card: #141414;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--black);
+      color: var(--white);
+      font-family: "Source Sans 3", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-mark {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      border: 1px solid rgba(249, 168, 37, 0.45);
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 0 18px rgba(249, 168, 37, 0.24);
+    }
+
+    .brand-text h1 {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--yellow);
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .hero {
+      width: min(42rem, 100%);
+      text-align: center;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .pill-red { color: var(--red); border-color: rgba(229, 57, 53, 0.35); }
+    .pill-yellow { color: var(--yellow); border-color: rgba(249, 168, 37, 0.35); }
+    .pill-green { color: var(--green); border-color: rgba(56, 142, 60, 0.35); }
+
+    .hero h2 {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .hero h2 em {
+      font-style: normal;
+      color: var(--yellow);
+    }
+
+    .hero > p {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 34rem;
+      margin: 0 auto 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    }
+
+    .card h3 {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card .hint {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin: 1.5rem auto 0;
+      max-width: 25rem;
+    }
+
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.75rem 1rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .contact-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .contact-button-call {
+      background: var(--yellow);
+      color: var(--black);
+      box-shadow: 0 12px 24px rgba(249, 168, 37, 0.18);
+    }
+
+    .contact-button-text {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(249, 168, 37, 0.35);
+      color: var(--yellow);
+    }
+
+    .live-note {
+      margin: 0.85rem auto 0;
+      max-width: 25rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .mic-ring {
+      width: 5rem;
+      height: 5rem;
+      margin: 0 auto 1.25rem;
+      border-radius: 999px;
+      background: rgba(56, 142, 60, 0.15);
+      border: 2px solid rgba(56, 142, 60, 0.4);
+      display: grid;
+      place-items: center;
+      animation: pulse 2.5s ease-in-out infinite;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      text-decoration: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .mic-ring svg {
+      width: 2rem;
+      height: 2rem;
+      fill: var(--green);
+    }
+
+    .mic-ring:hover {
+      transform: translateY(-2px);
+      border-color: rgba(249, 168, 37, 0.65);
+      background: rgba(249, 168, 37, 0.16);
+    }
+
+    .voice-start {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      min-height: 3rem;
+      border-radius: 999px;
+      border: 0;
+      padding: 0.8rem 1.4rem;
+      background: var(--green);
+      color: var(--white);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+      line-height: 1.2;
+      text-decoration: none;
+      box-shadow: 0 12px 24px rgba(56, 142, 60, 0.18);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .voice-start:hover {
+      transform: translateY(-1px);
+      background: #43a047;
+    }
+
+    .voice-start[hidden] {
+      display: none;
+    }
+
+    .voice-widget-slot {
+      display: grid;
+      place-items: center;
+      min-height: 4.5rem;
+      margin: 0 auto 0.85rem;
+    }
+
+    .voice-status {
+      max-width: 24rem;
+      margin: 0 auto 1rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 142, 60, 0.35); }
+      50% { box-shadow: 0 0 0 12px rgba(56, 142, 60, 0); }
+    }
+
+    .cta-note {
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .cta-note a {
+      color: var(--yellow);
+      text-decoration: none;
+    }
+
+    .cta-note a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 420px) {
+      .contact-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script
+    src="https://links.isharehow.app/js/external-tracking.js"
+    data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
+  </script>
+  <script src="/vendor/elevenlabs-convai-widget.js" async></script>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a class="brand" href="/">
+        <img
+          class="brand-mark"
+          src="images/papa-ai-promos/logos/papa-life-voice-logo.png"
+          alt="PAPA Life"
+        />
+        <div class="brand-text">
+          <h1>PAPA Life</h1>
+          <p>Fathers of Adult Children</p>
+        </div>
+      </a>
+      <a class="nav-link" href="/papa-journey">Explore the Journey</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="pill-row" aria-hidden="true">
+          <span class="pill pill-red">Purpose</span>
+          <span class="pill pill-yellow">Authority</span>
+          <span class="pill pill-green">Presence</span>
+        </div>
+
+        <h2>Talk to Your <em>PAPA</em> AI Coach</h2>
+        <p>
+          A private conversation space for fathers navigating the shift from provider to guide.
+          Ask anything — about your relationship, your identity, or your next step forward.
+        </p>
+
+        <div class="card">
+          <button
+            class="mic-ring"
+            id="voiceMicButton"
+            type="button"
+            aria-label="Start the Papa Life voice AI agent"
+          >
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+          <h3>Start the Conversation</h3>
+          <p class="hint">Tap the voice coach below to speak with the Papa Life AI agent in Brian Keith Hill's AI voice.</p>
+          <div id="voiceWidgetSlot" class="voice-widget-slot" aria-live="polite"></div>
+          <p id="voiceStatus" class="voice-status">Preparing the private voice session...</p>
+          <button class="voice-start" id="voiceStartButton" type="button">
+            Start Voice Coach
+          </button>
+          <a
+            class="voice-start"
+            id="voiceFallbackLink"
+            href="https://elevenlabs.io/app/talk-to?agent_id=agent_7601kt209ptbe0qrd9b3e4gezyv6"
+            target="_blank"
+            rel="noopener noreferrer"
+            hidden
+          >
+            Open Backup Voice Page
+          </a>
+          <div class="contact-actions" aria-label="Contact Brian Keith Hill">
+            <a class="contact-button contact-button-call" href="tel:+15104152098">Call Brian Live</a>
+            <a class="contact-button contact-button-text" href="sms:+15104152098">Text Brian</a>
+          </div>
+          <p class="live-note">
+            If Brian is not available, leave a voicemail so he can hear your question and call you back.
+          </p>
+          <p class="cta-note">
+            Ready for the full journey?
+            <a href="/papa-journey">Join PAPA Life membership</a>
+            or email
+            <a href="mailto:admin@bossmobilelifecoach.com">admin@bossmobilelifecoach.com</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      &copy; <span id="year"></span> Boss Mobile Life Coach &middot;
+      <a href="/">bossmobilelifecoach.com</a>
+    </footer>
+  </div>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    var voiceCoachFallbackUrl = "https://elevenlabs.io/app/talk-to?agent_id=agent_7601kt209ptbe0qrd9b3e4gezyv6";
+    var voiceCoachReady = false;
+    var voiceCoachFailed = false;
+
+    function setVoiceMessage(message) {
+      var slot = document.getElementById("voiceWidgetSlot");
+      var status = document.getElementById("voiceStatus");
+      if (slot) slot.textContent = message;
+      if (status) status.textContent = message;
+    }
+
+    function openBackupVoiceCoach() {
+      window.open(voiceCoachFallbackUrl, "_blank", "noopener,noreferrer");
+    }
+
+    function clickWidgetCallButton(widget) {
+      if (!widget || !widget.shadowRoot) return false;
+      var buttons = Array.from(widget.shadowRoot.querySelectorAll("button, [role='button']"));
+      var preferred = buttons.find(function (button) {
+        var label = (
+          button.getAttribute("aria-label") ||
+          button.textContent ||
+          ""
+        ).toLowerCase();
+        return (
+          label.includes("start") ||
+          label.includes("call") ||
+          label.includes("voice") ||
+          label.includes("chat") ||
+          label.includes("open")
+        );
+      });
+      var button = preferred || buttons[0];
+      if (button && typeof button.click === "function") {
+        button.click();
+        return true;
+      }
+      return false;
+    }
+
+    function openEmbeddedVoiceCoach() {
+      var slot = document.getElementById("voiceWidgetSlot");
+      var status = document.getElementById("voiceStatus");
+      var fallback = document.getElementById("voiceFallbackLink");
+      var widget = slot ? slot.querySelector("elevenlabs-convai") : null;
+      if (voiceCoachFailed || (fallback && !fallback.hidden && !widget)) {
+        openBackupVoiceCoach();
+        return;
+      }
+      if (slot) {
+        slot.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      if (!widget) {
+        if (status) status.textContent = "Preparing the private voice session. Try again in a few seconds.";
+        return;
+      }
+
+      document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", {
+        bubbles: true,
+        composed: true,
+        detail: { action: "expand" }
+      }));
+      widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", {
+        bubbles: true,
+        composed: true,
+        detail: { action: "expand" }
+      }));
+
+      window.setTimeout(function () {
+        var clicked = clickWidgetCallButton(widget);
+        if (!clicked) {
+          widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", {
+            bubbles: true,
+            composed: true,
+            detail: { action: "toggle" }
+          }));
+        }
+        if (status) {
+          status.textContent = "Use the voice control above. Your browser may ask for microphone permission.";
+        }
+      }, 250);
+    }
+
+    function showVoiceFallback(message) {
+      var fallback = document.getElementById("voiceFallbackLink");
+      var startButton = document.getElementById("voiceStartButton");
+      var status = document.getElementById("voiceStatus");
+      voiceCoachFailed = true;
+      if (fallback) fallback.hidden = false;
+      if (startButton) {
+        startButton.textContent = "Open Backup Voice Coach";
+        startButton.setAttribute("aria-label", "Open the Papa Life backup voice coach");
+      }
+      if (status) {
+        status.textContent = message || "The embedded voice coach is not available here. Use the backup button to open Brian Keith Hill's voice agent.";
+      }
+    }
+
+    document.getElementById("voiceMicButton")?.addEventListener("click", openEmbeddedVoiceCoach);
+    document.getElementById("voiceStartButton")?.addEventListener("click", openEmbeddedVoiceCoach);
+
+    async function loadVoiceCoach() {
+      var slot = document.getElementById("voiceWidgetSlot");
+      var status = document.getElementById("voiceStatus");
+      var fallback = document.getElementById("voiceFallbackLink");
+      if (!slot || !status) return;
+
+      try {
+        var response = await fetch("/api/ai/voice/signed-url", {
+          credentials: "same-origin"
+        });
+        var data = await response.json();
+        if (!response.ok || !data.ok || !data.signed_url) {
+          throw new Error(data.error || "Voice session unavailable");
+        }
+
+        var widget = document.createElement("elevenlabs-convai");
+        widget.setAttribute("agent-id", data.agent_id || "agent_7601kt209ptbe0qrd9b3e4gezyv6");
+        widget.setAttribute("signed-url", data.signed_url);
+        if (data.widget_config) {
+          widget.setAttribute("override-config", JSON.stringify(data.widget_config));
+        }
+        widget.setAttribute("variant", "expandable");
+        widget.addEventListener("error", function () {
+          showVoiceFallback("The embedded voice coach hit a browser error. Use the backup button to open the voice agent.");
+        });
+        slot.replaceChildren(widget);
+        voiceCoachReady = true;
+        voiceCoachFailed = false;
+        if (fallback) fallback.hidden = true;
+        status.textContent = "Voice coach is ready. Tap the microphone or Start Voice Coach.";
+
+        if (window.customElements && typeof window.customElements.whenDefined === "function") {
+          window.customElements.whenDefined("elevenlabs-convai").catch(function () {
+            showVoiceFallback("The voice widget did not finish loading. Use the backup button to open the voice agent.");
+          });
+        }
+
+        window.setTimeout(function () {
+          if (!customElements.get("elevenlabs-convai")) {
+            showVoiceFallback("The voice widget did not load. Use the backup button to open the voice agent.");
+          }
+        }, 8000);
+      } catch (error) {
+        console.warn("Voice coach fallback:", error);
+        showVoiceFallback("The private voice session could not start here. Use the backup button to open Brian Keith Hill's voice agent.");
+      }
+    }
+
+    loadVoiceCoach();
+  </script>
+</body>
+</html>

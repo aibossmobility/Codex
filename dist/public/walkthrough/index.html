@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P2P Digital Dojo Walkthrough</title>
+  <style>
+    :root {
+      --black: #080806;
+      --charcoal: #171713;
+      --gold: #f6c74a;
+      --red: #d9362b;
+      --green: #1fa463;
+      --cream: #fff8e6;
+      --white: #ffffff;
+      --muted: #c9c2a9;
+      --line: rgba(255, 255, 255, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--black);
+      color: var(--cream);
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hero {
+      min-height: 88vh;
+      display: grid;
+      align-items: center;
+      padding: 56px 20px 32px;
+      background:
+        linear-gradient(120deg, rgba(8, 8, 6, 0.82), rgba(8, 8, 6, 0.5)),
+        radial-gradient(circle at 20% 20%, rgba(246, 199, 74, 0.24), transparent 32%),
+        radial-gradient(circle at 85% 18%, rgba(31, 164, 99, 0.18), transparent 30%),
+        linear-gradient(135deg, #11110d, #080806 60%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 740px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      margin: 22px 0 0;
+      max-width: 680px;
+      color: rgba(255, 248, 230, 0.86);
+      font-size: 19px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--cream);
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #161204;
+    }
+
+    .feature-video {
+      width: 100%;
+      max-width: 420px;
+      justify-self: center;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      border: 1px solid rgba(246, 199, 74, 0.5);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+    }
+
+    .video-frame video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .feature-caption {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    main {
+      background: #0d0d0a;
+    }
+
+    .section {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 52px 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 26px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      margin: 0;
+      max-width: 460px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .clip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .clip-card {
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+    }
+
+    .clip-card .video-frame {
+      border: 0;
+      box-shadow: none;
+    }
+
+    .clip-body {
+      padding: 16px;
+    }
+
+    .clip-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .clip-topic {
+      margin: 0 0 8px;
+      color: var(--white);
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .clip-text {
+      margin: 0;
+      color: rgba(255, 248, 230, 0.76);
+      font-size: 14px;
+    }
+
+    .full-band {
+      background: linear-gradient(90deg, rgba(246, 199, 74, 0.11), rgba(31, 164, 99, 0.11));
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .full-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+      gap: 34px;
+      align-items: center;
+    }
+
+    .callout {
+      display: grid;
+      gap: 12px;
+      padding: 26px;
+      background: rgba(255, 255, 255, 0.06);
+      border-left: 5px solid var(--red);
+    }
+
+    .callout p {
+      margin: 0;
+      color: rgba(255, 248, 230, 0.82);
+      font-size: 17px;
+    }
+
+    footer {
+      padding: 28px 20px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      background: #080806;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner,
+      .full-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-video {
+        width: min(360px, 100%);
+      }
+
+      .section-header {
+        display: block;
+      }
+
+      .section-note {
+        margin-top: 12px;
+      }
+
+      .clip-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero {
+        min-height: auto;
+        padding-top: 42px;
+      }
+
+      .hero-copy {
+        font-size: 17px;
+      }
+
+      .clip-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+  <script
+    src="https://links.isharehow.app/js/external-tracking.js"
+    data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
+  </script>
+</head>
+<body>
+  <!--
+    Upload the 13 MP4 files, then update DEPLOY_MEDIA_BASE_URL if needed:
+    const DEPLOY_MEDIA_BASE_URL = "/walkthrough/videos/";
+
+    WordPress example:
+    const DEPLOY_MEDIA_BASE_URL = "https://bossmobilelifecoach.com/wp-content/uploads/2026/06/";
+  -->
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Tuesday Live Walkthrough</p>
+        <h1>P2P Digital Dojo</h1>
+        <p class="hero-copy">
+          A guided tour through the virtual mall for entrepreneurs: the ATM Portal, AI tools,
+          agent library, marketing suite, advanced lab, mall zones, coin economy, community,
+          and the VIP penthouse experience.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#full-walkthrough">Play Full Walkthrough</a>
+          <a class="button" href="#clips">View All Clips</a>
+        </div>
+      </div>
+
+      <div class="feature-video">
+        <div class="video-frame">
+          <video controls playsinline preload="metadata" data-video-file="P2P_Dojo_FULL_Walkthrough.mp4"></video>
+        </div>
+        <p class="feature-caption">Full stitched walkthrough, ready to play straight through.</p>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="section" id="clips">
+      <div class="section-header">
+        <h2>Show Clips</h2>
+        <p class="section-note">
+          Cue each short segment during a live presentation, or use the full walkthrough above
+          when you want the complete story in one pass.
+        </p>
+      </div>
+
+      <div class="clip-grid" id="clip-grid"></div>
+    </section>
+
+    <section class="full-band" id="full-walkthrough">
+      <div class="section full-layout">
+        <div class="video-frame">
+          <video controls playsinline preload="metadata" data-video-file="P2P_Dojo_FULL_Walkthrough.mp4"></video>
+        </div>
+        <div>
+          <p class="eyebrow">Complete Tour</p>
+          <h2>Play the whole Dojo walkthrough.</h2>
+          <div class="callout">
+            <p>
+              Use this when the audience needs the big picture before you break down the separate rooms,
+              tools, and opportunities inside the P2P Digital Dojo.
+            </p>
+            <p>
+              The short clips below give you control during live teaching. The full video gives you flow.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    P2P Digital Dojo | Brian Keith Hill | bossmobilelifecoach.com/walkthrough
+  </footer>
+
+  <script>
+    const DEPLOY_MEDIA_BASE_URL = "/walkthrough/videos/";
+    const LOCAL_MEDIA_BASE_URL = "./videos/";
+    const MEDIA_BASE_URL = window.location.protocol === "file:"
+      ? LOCAL_MEDIA_BASE_URL
+      : DEPLOY_MEDIA_BASE_URL;
+
+    const clips = [
+      {
+        number: "01",
+        file: "P2P_Dojo_01_Welcome.mp4",
+        topic: "Welcome / Grand Entrance",
+        text: "Welcome to the P2P Digital Dojo, your all-in-one virtual mall built for entrepreneurs."
+      },
+      {
+        number: "02",
+        file: "P2P_Dojo_02_Navigate.mp4",
+        topic: "Navigating the 8 Wings",
+        text: "From the central elevator, explore eight distinct wings packed with tools and resources."
+      },
+      {
+        number: "03",
+        file: "P2P_Dojo_03_ATM_Portal.mp4",
+        topic: "The ATM Portal",
+        text: "The core powerhouse where you create, customize, and deploy AI tools."
+      },
+      {
+        number: "04",
+        file: "P2P_Dojo_04_AI_Tools.mp4",
+        topic: "AI Creation Tools",
+        text: "Website Builder plus image, video, and audio generation tools."
+      },
+      {
+        number: "05",
+        file: "P2P_Dojo_05_AI_Agents.mp4",
+        topic: "AI Agents Library",
+        text: "Choose pre-built specialty agents or build your own."
+      },
+      {
+        number: "06",
+        file: "P2P_Dojo_06_Marketing.mp4",
+        topic: "Marketing Suite",
+        text: "SMS, email, social media, and SEO in one connected strategy."
+      },
+      {
+        number: "07",
+        file: "P2P_Dojo_07_Advanced_Lab.mp4",
+        topic: "Advanced Agent Lab",
+        text: "Multi-step agents with memory, plus object detection for deeper analysis."
+      },
+      {
+        number: "08",
+        file: "P2P_Dojo_08_Mall_Zones.mp4",
+        topic: "The Mall Zones",
+        text: "Food Court, retail showrooms, and coworking spaces."
+      },
+      {
+        number: "09",
+        file: "P2P_Dojo_09_Coin_Economy.mp4",
+        topic: "The Coin Economy",
+        text: "Use coins to create agents and unlock premium features, and earn more."
+      },
+      {
+        number: "10",
+        file: "P2P_Dojo_10_Community.mp4",
+        topic: "Community & Connection",
+        text: "Real community, collaboration, and powerful partnerships."
+      },
+      {
+        number: "11",
+        file: "P2P_Dojo_11_VIP_Penthouse.mp4",
+        topic: "VIP Penthouses",
+        text: "Exclusive VIP access, with the mall always evolving."
+      },
+      {
+        number: "12",
+        file: "P2P_Dojo_12_Join_Dojo.mp4",
+        topic: "Join the Dojo",
+        text: "The future of your business starts here."
+      }
+    ];
+
+    function mediaUrl(file) {
+      return MEDIA_BASE_URL.replace(/\/?$/, "/") + file;
+    }
+
+    document.querySelectorAll("[data-video-file]").forEach((video) => {
+      video.src = mediaUrl(video.dataset.videoFile);
+    });
+
+    const grid = document.getElementById("clip-grid");
+
+    clips.forEach((clip) => {
+      const card = document.createElement("article");
+      card.className = "clip-card";
+      card.innerHTML = `
+        <div class="video-frame">
+          <video controls playsinline preload="metadata" src="${mediaUrl(clip.file)}"></video>
+        </div>
+        <div class="clip-body">
+          <div class="clip-kicker">
+            <span>Clip ${clip.number}</span>
+            <span>${clip.file.replace(".mp4", "")}</span>
+          </div>
+          <h3 class="clip-topic">${clip.topic}</h3>
+          <p class="clip-text">${clip.text}</p>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>

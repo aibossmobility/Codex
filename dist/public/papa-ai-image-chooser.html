@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Papa Life AI Coach Image Chooser</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --black: #000;
+        --card: #111;
+        --line: #2a2a2a;
+        --yellow: #ffd60a;
+        --green: #22c55e;
+        --red: #ef2b2d;
+        --white: #fff;
+        --muted: #b7b7b7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--black);
+        color: var(--white);
+        font-family: Inter, Arial, sans-serif;
+      }
+      header {
+        border-bottom: 1px solid var(--line);
+        padding: 24px;
+      }
+      main {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        padding: 24px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 56px);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+      }
+      .media {
+        display: grid;
+        min-height: 340px;
+        place-items: center;
+        background:
+          linear-gradient(90deg, rgba(239, 43, 45, 0.18), transparent 35%),
+          linear-gradient(180deg, rgba(255, 214, 10, 0.1), transparent 40%),
+          #050505;
+      }
+      img {
+        display: block;
+        max-width: 100%;
+        max-height: 560px;
+        object-fit: contain;
+      }
+      .body {
+        padding: 18px;
+      }
+      .label {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        border-radius: 999px;
+        background: var(--yellow);
+        color: #000;
+        font-weight: 900;
+        padding: 0 14px;
+      }
+      h2 {
+        margin: 14px 0 8px;
+        font-size: 24px;
+      }
+      code {
+        color: var(--green);
+        word-break: break-all;
+      }
+      .note {
+        margin-top: 14px;
+        border-left: 4px solid var(--red);
+        padding-left: 12px;
+        color: var(--white);
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Choose the Website Graphic</h1>
+      <p>Tell Codex A, B, or C and I will put that image into the Papa Life AI Coach weekly promo spot today.</p>
+    </header>
+    <main>
+      <article class="card">
+        <div class="media">
+          <img src="/images/papa-life-logo.png" alt="Papa Life logo" />
+        </div>
+        <div class="body">
+          <span class="label">Option A</span>
+          <h2>Papa Life Logo</h2>
+          <p><code>/images/papa-life-logo.png</code></p>
+          <p class="note">Best as the logo mark, not as the full promo hero by itself.</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="media">
+          <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" />
+        </div>
+        <div class="body">
+          <span class="label">Option B</span>
+          <h2>Brian Keith Hill</h2>
+          <p><code>/images/brian-keith-hill.png</code></p>
+          <p class="note">Best if you want the AI Coach page to feel personal and founder-led.</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="media">
+          <img src="/media/papa-life-distance-reconnection-infographic.png" alt="Papa Life distance to reconnection infographic" />
+        </div>
+        <div class="body">
+          <span class="label">Option C</span>
+          <h2>Distance to Reconnection Infographic</h2>
+          <p><code>/media/papa-life-distance-reconnection-infographic.png</code></p>
+          <p class="note">Best if you want the page to teach the fatherhood transformation visually.</p>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>

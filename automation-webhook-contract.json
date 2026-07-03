@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Boss Mobile / Papa Life — Cloud ↔ Server webhook contract",
+  "version": "1.0.0",
+  "description": "Back-and-forth JSON between bossmobilelifecoach.com and Brian's cloud (Make.com Scenario 5259335, Claude, or MCP).",
+  "base_url": "https://bossmobilelifecoach.com",
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "value_format": "Bearer <GHL_WEBHOOK_SECRET>",
+    "env_keys": ["GHL_WEBHOOK_SECRET", "MAKE_WEBHOOK_SECRET", "AUTOMATION_WEBHOOK_SECRET"]
+  },
+  "outbound": {
+    "description": "Server → cloud when a new contact is saved (GHL webhook, Make Scenario 1 follow-up, or site intake).",
+    "method": "POST",
+    "url_env": "AUTOMATION_CLOUD_WEBHOOK_URL",
+    "example_url": "https://hook.us2.make.com/xxxxxxxx",
+    "body": {
+      "event": "ghl_new_contact",
+      "prompt": "Required. Natural-language task for the cloud (includes contact summary).",
+      "contact": {
+        "ghl_contact_id": "string | null",
+        "first_name": "string | null",
+        "last_name": "string | null",
+        "email": "string | null",
+        "phone": "string | null",
+        "source": "string | null",
+        "tags": ["string"]
+      },
+      "outreach_note": "string — 3-sentence Papa Life note for GHL",
+      "voice_prompt": "string — short script for Brian's Claude voice mode",
+      "alert_id": "number",
+      "lead_id": "number",
+      "site_origin": "https://bossmobilelifecoach.com",
+      "inbound": {
+        "claude_prompt_url": "https://bossmobilelifecoach.com/api/automation/claude-prompt",
+        "claude_prompt_body": { "prompt": "string", "context": "string (optional)" },
+        "claude_prompt_response": { "ok": true, "response": "string", "model": "string", "prompt": "string" }
+      }
+    },
+    "example": {
+      "event": "ghl_new_contact",
+      "prompt": "New Papa Life lead: Marcus Reed, marcus@example.com, 410-555-0199, source Facebook. Draft a warm follow-up text in Brian's voice and suggest one next step.",
+      "contact": {
+        "ghl_contact_id": "abc123",
+        "first_name": "Marcus",
+        "last_name": "Reed",
+        "email": "marcus@example.com",
+        "phone": "410-555-0199",
+        "source": "Facebook",
+        "tags": ["papa-journey"]
+      },
+      "outreach_note": "Hey Marcus, I'm Brian...",
+      "voice_prompt": "Marcus Reed just came in from Facebook...",
+      "alert_id": 12,
+      "lead_id": 45,
+      "site_origin": "https://bossmobilelifecoach.com",
+      "inbound": {
+        "claude_prompt_url": "https://bossmobilelifecoach.com/api/automation/claude-prompt",
+        "claude_prompt_body": { "prompt": "..." },
+        "claude_prompt_response": { "ok": true, "response": "...", "model": "claude-haiku-4-5-20251001" }
+      }
+    }
+  },
+  "inbound": {
+    "description": "Cloud → server. POST JSON; Claude answers in Brian's Papa Life voice in the HTTP response body.",
+    "endpoints": [
+      {
+        "path": "/api/automation/claude-prompt",
+        "method": "POST",
+        "body": {
+          "prompt": "required string — what Claude should process",
+          "context": "optional string — CRM/GHL context prepended to prompt"
+        },
+        "response": {
+          "ok": true,
+          "prompt": "echo of request prompt",
+          "response": "Claude text in Papa Life voice",
+          "model": "anthropic model id",
+          "voice": "papa_life"
+        }
+      },
+      {
+        "path": "/api/webhooks/ghl-new-contact",
+        "method": "POST",
+        "body": "GHL contact fields or { contact: { ... } }; optional outreach_note if Claude already ran in Make"
+      }
+    ],
+    "minimal_example": {
+      "request": { "prompt": "Summarize this lead and suggest the next outreach step in Brian's voice." },
+      "response": {
+        "ok": true,
+        "prompt": "Summarize this lead and suggest the next outreach step in Brian's voice.",
+        "response": "Here's what I'd do next, brother...",
+        "model": "claude-haiku-4-5-20251001",
+        "voice": "papa_life"
+      }
+    }
+  }
+}

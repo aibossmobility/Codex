@@ -997,6 +997,32 @@ async function getElevenLabsWidgetConfig(conversationSignature: string) {
   return data.widget_config;
 }
 
+async function proxyElevenLabsConvaiRest(req: Request, res: Response) {
+  if (!ELEVENLABS_API_KEY) {
+    return res.status(503).json({ ok: false, error: "Voice coach is not configured yet." });
+  }
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ ok: false, error: "Method not allowed" });
+  }
+
+  try {
+    const upstreamUrl = new URL(`https://api.elevenlabs.io/v1/convai${req.url || ""}`);
+    const response = await fetch(upstreamUrl, {
+      headers: elevenLabsApiHeaders(),
+    });
+    const body = Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get("content-type");
+    const cacheControl = response.headers.get("cache-control");
+    if (contentType) res.setHeader("Content-Type", contentType);
+    if (cacheControl) res.setHeader("Cache-Control", cacheControl);
+    res.status(response.status).send(body);
+  } catch (error) {
+    console.error("[elevenlabs] REST proxy error", error);
+    res.status(502).json({ ok: false, error: "Voice coach proxy failed." });
+  }
+}
+
 function publicVoiceWebSocketUrl(req: Request, signedUrl: string) {
   const upstream = new URL(signedUrl);
   const forwardedProto = String(req.get("x-forwarded-proto") || req.protocol || "https")
@@ -4254,6 +4280,7 @@ async function startServer() {
         throw new Error("ElevenLabs signed URL is missing conversation_signature.");
       }
       const widgetConfig = await getElevenLabsWidgetConfig(conversationSignature);
+      widgetConfig.file_input_config = { enabled: false, max_files_per_conversation: 0 };
 
       res.json({
         ok: true,
@@ -5171,6 +5198,8 @@ async function startServer() {
   app.use("/api", (_req, res) => {
     res.status(404).json({ ok: false, error: "Not found" });
   });
+
+  app.use("/v1/convai", proxyElevenLabsConvaiRest);
 
   // ── Static + server-rendered app shell ────────────────────────────────────
 

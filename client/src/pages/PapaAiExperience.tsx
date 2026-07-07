@@ -183,7 +183,7 @@ const relatedLinks: Array<{ title: string; copy: string; Icon: LucideIcon; href:
     title: "Tuesday Live",
     copy: "Ask before Tuesday or submit during the live show.",
     Icon: CalendarDays,
-    href: "/tuesday-live",
+    href: "/tuesday",
   },
   {
     title: "Membership",
@@ -234,7 +234,6 @@ const modeCopy: Record<Mode, { title: string; prompt: string; icon: typeof Bot }
 function currentModeFromPath(): Mode {
   const path = window.location.pathname;
   if (path.includes("resources")) return "resource";
-  if (path.includes("tuesday-live")) return "tuesday";
   if (path.includes("membership")) return "membership";
   if (path.includes("contact")) return "coach";
   return "coach";

@@ -6400,6 +6400,9 @@ async function startServer() {
   app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
     res.sendFile(tuesdayHostControlRoomPage);
   });
+  app.get(["/tuesday-live", "/tuesday-live/", "/tuesday-live/index.html"], (_req, res) => {
+    res.redirect(301, "/tuesday/");
+  });
   app.use(express.static(staticPath));
   const papaAgentPage = path3.join(staticPath, "papa-agent.html");
   app.get("/papa", (_req, res) => {

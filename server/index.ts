@@ -5221,6 +5221,10 @@ async function startServer() {
     res.sendFile(tuesdayHostControlRoomPage);
   });
 
+  app.get(["/tuesday-live", "/tuesday-live/", "/tuesday-live/index.html"], (_req, res) => {
+    res.redirect(301, "/tuesday/");
+  });
+
   app.use(express.static(staticPath));
 
   const papaAgentPage = path.join(staticPath, "papa-agent.html");

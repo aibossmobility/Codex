@@ -395,6 +395,21 @@
       window.open(voiceCoachFallbackUrl, "_blank", "noopener,noreferrer");
     }
 
+    function getDirectElevenLabsSignedUrl(signedUrl) {
+      try {
+        var url = new URL(signedUrl, window.location.href);
+        if (url.hostname === window.location.hostname && url.pathname === "/api/ai/voice/ws") {
+          url.protocol = "wss:";
+          url.hostname = "api.elevenlabs.io";
+          url.pathname = "/v1/convai/conversation";
+        }
+        return url.toString();
+      } catch (error) {
+        console.warn("Voice signed URL normalization failed:", error);
+        return signedUrl;
+      }
+    }
+
     function clickWidgetCallButton(widget) {
       if (!widget || !widget.shadowRoot) return false;
       var buttons = Array.from(widget.shadowRoot.querySelectorAll("button, [role='button']"));
@@ -489,7 +504,7 @@
         }
 
         var widget = document.createElement("elevenlabs-convai");
-        widget.setAttribute("signed-url", data.signed_url);
+        widget.setAttribute("signed-url", getDirectElevenLabsSignedUrl(data.signed_url));
         if (data.widget_config) {
           widget.setAttribute("override-config", JSON.stringify(data.widget_config));
         }

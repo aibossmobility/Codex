@@ -4284,7 +4284,7 @@ async function startServer() {
 
       res.json({
         ok: true,
-        signed_url: publicVoiceWebSocketUrl(req, data.signed_url),
+        signed_url: data.signed_url,
         agent_id: ELEVENLABS_AGENT_ID,
         widget_config: widgetConfig,
         tts: voiceConfig,

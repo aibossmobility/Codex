@@ -308,7 +308,20 @@
     src="https://links.isharehow.app/js/external-tracking.js"
     data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
   </script>
-  <script src="/vendor/elevenlabs-convai-widget.js" async></script>
+  <script>
+    (function () {
+      var widgetScript = document.createElement("script");
+      widgetScript.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+      widgetScript.async = true;
+      widgetScript.onerror = function () {
+        var fallbackScript = document.createElement("script");
+        fallbackScript.src = "/vendor/elevenlabs-convai-widget.js";
+        fallbackScript.async = true;
+        document.head.appendChild(fallbackScript);
+      };
+      document.head.appendChild(widgetScript);
+    })();
+  </script>
 </head>
 <body>
   <div class="page">
@@ -395,21 +408,6 @@
       window.open(voiceCoachFallbackUrl, "_blank", "noopener,noreferrer");
     }
 
-    function getDirectElevenLabsSignedUrl(signedUrl) {
-      try {
-        var url = new URL(signedUrl, window.location.href);
-        if (url.hostname === window.location.hostname && url.pathname === "/api/ai/voice/ws") {
-          url.protocol = "wss:";
-          url.hostname = "api.elevenlabs.io";
-          url.pathname = "/v1/convai/conversation";
-        }
-        return url.toString();
-      } catch (error) {
-        console.warn("Voice signed URL normalization failed:", error);
-        return signedUrl;
-      }
-    }
-
     function clickWidgetCallButton(widget) {
       if (!widget || !widget.shadowRoot) return false;
       var buttons = Array.from(widget.shadowRoot.querySelectorAll("button, [role='button']"));
@@ -484,7 +482,7 @@
       voiceCoachFailed = true;
       if (fallback) fallback.hidden = false;
       if (status) {
-        status.textContent = message || "The embedded voice coach is not available here. Use the backup button to open Brian Keith Hill's voice agent.";
+        status.textContent = message || "The embedded voice coach connection closed before the microphone session could start. Use the backup button to open Brian Keith Hill's voice agent.";
       }
     }
 
@@ -504,7 +502,7 @@
         }
 
         var widget = document.createElement("elevenlabs-convai");
-        widget.setAttribute("signed-url", getDirectElevenLabsSignedUrl(data.signed_url));
+        widget.setAttribute("signed-url", data.signed_url);
         if (data.widget_config) {
           widget.setAttribute("override-config", JSON.stringify(data.widget_config));
         }

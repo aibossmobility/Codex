@@ -2914,19 +2914,6 @@ async function proxyElevenLabsConvaiRest(req, res) {
     res.status(502).json({ ok: false, error: "Voice coach proxy failed." });
   }
 }
-function publicVoiceWebSocketUrl(req, signedUrl) {
-  const upstream = new URL(signedUrl);
-  const forwardedProto = String(req.get("x-forwarded-proto") || req.protocol || "https").split(",")[0].trim();
-  const host = req.get("host");
-  if (!host) throw new Error("Missing host header");
-  const isLocalHost = /^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(host);
-  const protocol = isLocalHost && forwardedProto === "http" ? "ws" : "wss";
-  const proxied = new URL(`${protocol}://${host}/api/ai/voice/ws`);
-  upstream.searchParams.forEach((value, key) => {
-    proxied.searchParams.append(key, value);
-  });
-  return proxied.toString();
-}
 function rejectVoiceSocket(socket, statusCode, statusText) {
   if (socket.destroyed) return;
   socket.write(
@@ -5591,7 +5578,7 @@ async function startServer() {
       widgetConfig.file_input_config = { enabled: false, max_files_per_conversation: 0 };
       res.json({
         ok: true,
-        signed_url: publicVoiceWebSocketUrl(req, data.signed_url),
+        signed_url: data.signed_url,
         agent_id: ELEVENLABS_AGENT_ID,
         widget_config: widgetConfig,
         tts: voiceConfig
@@ -6399,6 +6386,9 @@ async function startServer() {
   const tuesdayHostControlRoomPage = path3.join(staticPath, "tuesday-host-control-room", "index.html");
   app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
     res.sendFile(tuesdayHostControlRoomPage);
+  });
+  app.get(["/tuesday-live", "/tuesday-live/", "/tuesday-live/index.html"], (_req, res) => {
+    res.redirect(301, "/tuesday/");
   });
   app.use(express.static(staticPath));
   const papaAgentPage = path3.join(staticPath, "papa-agent.html");

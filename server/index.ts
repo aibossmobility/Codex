@@ -4284,7 +4284,7 @@ async function startServer() {
 
       res.json({
         ok: true,
-        signed_url: publicVoiceWebSocketUrl(req, data.signed_url),
+        signed_url: data.signed_url,
         agent_id: ELEVENLABS_AGENT_ID,
         widget_config: widgetConfig,
         tts: voiceConfig,
@@ -5219,6 +5219,10 @@ async function startServer() {
   const tuesdayHostControlRoomPage = path.join(staticPath, "tuesday-host-control-room", "index.html");
   app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
     res.sendFile(tuesdayHostControlRoomPage);
+  });
+
+  app.get(["/tuesday-live", "/tuesday-live/", "/tuesday-live/index.html"], (_req, res) => {
+    res.redirect(301, "/tuesday/");
   });
 
   app.use(express.static(staticPath));

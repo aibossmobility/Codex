@@ -117,6 +117,49 @@
       font-size: clamp(18px, 2.4vw, 23px);
     }
 
+    .series-poster {
+      margin: 0 auto 34px;
+      padding: 18px;
+      border: 2px solid rgba(246, 199, 74, .65);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(31, 164, 99, .22), transparent 18%, transparent 82%, rgba(217, 54, 43, .22)),
+        var(--charcoal);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .32);
+    }
+    .poster-frame {
+      display: block;
+      overflow: hidden;
+      border: 6px solid var(--gold);
+      border-radius: 8px;
+      background: #000;
+    }
+    .poster-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .poster-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .poster-actions strong {
+      color: var(--gold);
+      font-size: 18px;
+    }
+    .poster-actions a {
+      color: var(--black);
+      background: var(--gold);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
     .choices {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -347,10 +390,20 @@
         <p>One simple experience for fathers who want encouragement, coaching, and a practical next step toward reconnection.</p>
       </section>
 
+      <section class="series-poster" aria-label="Papa Life Tuesday Live 12 week teaching poster">
+        <a class="poster-frame" href="/images/papa-life-tuesday-live-12-week-scripture-poster-2026.png" target="_blank" rel="noopener">
+          <img src="/images/papa-life-tuesday-live-12-week-scripture-poster-2026.png" alt="Papa Life Tuesday Live 12 week scripture poster with dates, teaching topics, and Bible verses from July 7 through September 22.">
+        </a>
+        <div class="poster-actions">
+          <strong>12 weeks of teaching, scripture, and reconnection steps.</strong>
+          <a href="/images/papa-life-tuesday-live-12-week-scripture-poster-2026.png" target="_blank" rel="noopener">Open Poster</a>
+        </div>
+      </section>
+
       <section class="choices" aria-label="Tuesday Live participation choices">
         <article class="choice">
           <h2>Listen to Today's Coaching</h2>
-          <p>No live session? No problem. Listen to today's complete coaching session from beginning to end.</p>
+          <p>No live session? No problem. Listen to today's complete coaching session from beginning to end. On Tuesdays at 1:03 PM Pacific, this page will try to start the replay automatically as a backup.</p>
           <ul class="track-list" aria-label="Today's audio tracks">
             <li>Track 1 – Welcome & Teaching</li>
             <li>Track 2 – Prayer & Reflection</li>
@@ -360,7 +413,7 @@
 
         <article class="choice">
           <h2>Join Today's Live Session</h2>
-          <p>Participate in today's live coaching. Ask questions, interact with other fathers, and join the conversation in real time.</p>
+          <p>Participate in today's live coaching. Ask questions, interact with other fathers, and join the conversation in real time. Start the recording inside the room before teaching.</p>
           <a class="btn red" href="https://meetn.com/briankeithhill" target="_blank" rel="noopener">Join Live Session</a>
         </article>
       </section>
@@ -494,6 +547,34 @@
       playCurrentTrack();
     });
 
+    function getPacificParts() {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        weekday: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        hourCycle: "h23"
+      });
+      return Object.fromEntries(formatter.formatToParts(new Date()).map((part) => [part.type, part.value]));
+    }
+
+    function maybeStartTuesdayBackupReplay() {
+      const parts = getPacificParts();
+      const hour = Number(parts.hour);
+      const minute = Number(parts.minute);
+      const minutes = hour * 60 + minute;
+      const inBackupWindow = parts.weekday === "Tuesday" && minutes >= 13 * 60 + 3 && minutes <= 14 * 60 + 15;
+      const key = `papa-life-tuesday-backup-${new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" })}`;
+      if (!inBackupWindow || sessionStorage.getItem(key)) return;
+
+      sessionStorage.setItem(key, "started");
+      loadTrack(0);
+      playCurrentTrack();
+      trackStatus.textContent = "Backup replay is ready. If your browser blocks automatic playback, tap Listen Now.";
+      playerPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
     audio.addEventListener("loadedmetadata", () => {
       duration.textContent = formatTime(audio.duration);
     });
@@ -520,6 +601,9 @@
       finishedPanel.classList.add("visible");
       finishedPanel.scrollIntoView({ behavior: "smooth", block: "center" });
     });
+
+    maybeStartTuesdayBackupReplay();
+    setInterval(maybeStartTuesdayBackupReplay, 30000);
   </script>
 </body>
 </html>

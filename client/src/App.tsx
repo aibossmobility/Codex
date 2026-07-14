@@ -60,7 +60,6 @@ function Router() {
       <Route path="/resources" component={PapaAiExperience} />
       <Route path="/books" component={PapaAiExperience} />
       <Route path="/podcast" component={PapaAiExperience} />
-      <Route path="/tuesday-live" component={PapaAiExperience} />
       <Route path="/membership" component={PapaAiExperience} />
       <Route path="/contact" component={PapaAiExperience} />
       <Route path="/privacy-policy" component={PrivacyPage} />
@@ -102,7 +101,6 @@ function GlobalPapaAiWidget() {
     "/resources",
     "/books",
     "/podcast",
-    "/tuesday-live",
     "/membership",
     "/contact",
     "/crm",

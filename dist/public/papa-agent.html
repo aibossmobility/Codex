@@ -308,20 +308,7 @@
     src="https://links.isharehow.app/js/external-tracking.js"
     data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
   </script>
-  <script>
-    (function () {
-      var widgetScript = document.createElement("script");
-      widgetScript.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
-      widgetScript.async = true;
-      widgetScript.onerror = function () {
-        var fallbackScript = document.createElement("script");
-        fallbackScript.src = "/vendor/elevenlabs-convai-widget.js";
-        fallbackScript.async = true;
-        document.head.appendChild(fallbackScript);
-      };
-      document.head.appendChild(widgetScript);
-    })();
-  </script>
+  <script src="/vendor/elevenlabs-convai-widget.js" async></script>
 </head>
 <body>
   <div class="page">

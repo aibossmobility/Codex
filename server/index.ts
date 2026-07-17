@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 import connectSqlite3 from "connect-sqlite3";
 import multer from "multer";
 import { nanoid } from "nanoid";
+import { createHash } from "crypto";
 import dotenv from "dotenv";
 import {
   ensureResearchTables,
@@ -162,6 +163,8 @@ const mediaUpload = multer({
 const dbPath = path.resolve(__dirname, "..", "leads.db");
 const db = new Database(dbPath);
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
+const PAPA_LIFE_MEMBERSHIP_COURSE_ID = Number(process.env.PAPA_LIFE_MEMBERSHIP_COURSE_ID || "11");
+const MEMBER_ACCOUNT_ACTIVATION_HOURS = 72;
 const ISHAREPROPOSALS_STEP_3_VIDEO_URL = "/walkthrough/videos/P2P_Dojo_04_AI_Tools.mp4";
 const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID || "agent_7601kt209ptbe0qrd9b3e4gezyv6";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
@@ -475,6 +478,16 @@ db.exec(`
     payload_json TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS member_account_activations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    purpose TEXT NOT NULL DEFAULT 'set_password',
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 // Guarded migrations
@@ -589,6 +602,9 @@ try {
 } catch {}
 try {
   db.exec("CREATE INDEX IF NOT EXISTS idx_notification_events_created ON notification_events(created_at)");
+} catch {}
+try {
+  db.exec("CREATE INDEX IF NOT EXISTS idx_member_account_activations_lookup ON member_account_activations(token_hash, expires_at, used_at)");
 } catch {}
 try { db.exec("ALTER TABLE papa_ai_interactions ADD COLUMN source_page TEXT"); } catch {}
 try { db.exec("ALTER TABLE papa_ai_interactions ADD COLUMN conversation_summary TEXT"); } catch {}
@@ -1391,6 +1407,92 @@ async function sendAdminNotification(input: {
   }
 }
 
+async function sendMemberAccountActivationEmail(input: {
+  recipient: string;
+  firstName: string;
+  activationUrl: string;
+  expiresAt: string;
+  memberId: number;
+  transactionId?: string | null;
+}) {
+  const provider = adminNotificationProvider();
+  const subject = "Your Papa Life Membership is active — set your portal password";
+  const text = `Hello ${input.firstName || "Papa Life member"},\n\nYour $4.99 Papa Life Membership is active. Set your portal password, then sign in to access Course 11 immediately:\n${input.activationUrl}\n\nThis secure link expires ${input.expiresAt}. If you did not complete this purchase, contact support.\n\nPapa Life`;
+  if (!provider || !isValidEmail(input.recipient)) {
+    logNotificationEvent({
+      event_type: "member_account_activation",
+      provider,
+      recipient: isValidEmail(input.recipient) ? input.recipient : null,
+      subject,
+      status: "skipped",
+      error: !isValidEmail(input.recipient)
+        ? "A valid paid-member email is required"
+        : "No supported transactional email sender is configured",
+      payload: { member_id: input.memberId, transaction_id: input.transactionId || null },
+    });
+    return { ok: false, skipped: true };
+  }
+
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  try {
+    const controller = new AbortController();
+    timeout = setTimeout(() => controller.abort(), 8000);
+    const from = process.env.MEMBER_NOTIFICATION_FROM?.trim() || adminNotificationFrom();
+    let response: globalThis.Response;
+    if (provider === "resend") {
+      response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY?.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ from, to: [input.recipient], subject, text }),
+      });
+    } else {
+      response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${process.env.SENDGRID_API_KEY?.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: input.recipient }] }],
+          from: { email: extractEmailAddress(from) },
+          subject,
+          content: [{ type: "text/plain", value: text }],
+        }),
+      });
+    }
+    if (timeout) clearTimeout(timeout);
+    const responseText = await response.text().catch(() => "");
+    logNotificationEvent({
+      event_type: "member_account_activation",
+      provider,
+      recipient: input.recipient,
+      subject,
+      status: response.ok ? "sent" : "error",
+      response_status: response.status,
+      error: response.ok ? null : responseText.slice(0, 1000) || `HTTP ${response.status}`,
+      payload: { member_id: input.memberId, transaction_id: input.transactionId || null },
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (error: any) {
+    if (timeout) clearTimeout(timeout);
+    logNotificationEvent({
+      event_type: "member_account_activation",
+      provider,
+      recipient: input.recipient,
+      subject,
+      status: "error",
+      error: error?.message || "Account activation email failed",
+      payload: { member_id: input.memberId, transaction_id: input.transactionId || null },
+    });
+    return { ok: false, error: error?.message || "Account activation email failed" };
+  }
+}
+
 function buildPapaDailyReportMarkdown(date: string, fields: ReturnType<typeof normalizeReportFields>, outcomes: string[]) {
   return `## Papa Life Daily Work Report - ${date}
 
@@ -1650,6 +1752,70 @@ function markMemberPaid(memberId: number, paidAt = new Date().toISOString()) {
     )
     .run(paidAt, memberId);
   return result.changes > 0;
+}
+
+function isMembershipCourse(course: { id?: number | string } | null | undefined) {
+  return Number(course?.id) === PAPA_LIFE_MEMBERSHIP_COURSE_ID;
+}
+
+function splitPaidMemberName(rawName: unknown, firstName: unknown, lastName: unknown) {
+  const first = cleanPublicText(firstName, 80);
+  const last = cleanPublicText(lastName, 80);
+  if (first && last) return { firstName: first, lastName: last };
+  const parts = cleanPublicText(rawName, 160).split(/\s+/).filter(Boolean);
+  return {
+    firstName: first || parts[0] || "Papa",
+    lastName: last || parts.slice(1).join(" ") || "Life Member",
+  };
+}
+
+function findOrCreatePaidMembershipMember(input: {
+  memberId?: number | null;
+  email: string;
+  firstName?: unknown;
+  lastName?: unknown;
+  displayName?: unknown;
+}) {
+  let member = Number.isFinite(Number(input.memberId)) ? loadMemberById(Number(input.memberId)) : null;
+  if (!member && isValidEmail(input.email)) member = loadMemberByEmail(input.email);
+  if (member) return { member, created: false };
+  if (!isValidEmail(input.email)) throw new Error("A valid customer email is required to create the Papa Life account.");
+
+  const names = splitPaidMemberName(input.displayName, input.firstName, input.lastName);
+  const temporaryPasswordHash = bcrypt.hashSync(nanoid(48), 12);
+  const enrolledAt = new Date().toISOString();
+  const result = db.prepare(
+    `INSERT INTO members
+     (first_name, last_name, email, password_hash, status, payment_status, trial_started_at, trial_expires_at, enrolled_at)
+     VALUES (?, ?, ?, ?, 'active', 'payment_required', NULL, NULL, ?)`
+  ).run(names.firstName, names.lastName, input.email.trim().toLowerCase(), temporaryPasswordHash, enrolledAt);
+  member = loadMemberById(Number(result.lastInsertRowid));
+  if (!member) throw new Error("Unable to create the paid Papa Life member account.");
+  return { member, created: true };
+}
+
+function issueMemberAccountActivation(memberId: number) {
+  const rawToken = nanoid(48);
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + MEMBER_ACCOUNT_ACTIVATION_HOURS * 60 * 60 * 1000).toISOString();
+  db.prepare(
+    "UPDATE member_account_activations SET used_at = COALESCE(used_at, datetime('now')) WHERE member_id = ? AND purpose = 'set_password' AND used_at IS NULL"
+  ).run(memberId);
+  db.prepare(
+    "INSERT INTO member_account_activations (member_id, token_hash, purpose, expires_at) VALUES (?, ?, 'set_password', ?)"
+  ).run(memberId, tokenHash, expiresAt);
+  return { rawToken, expiresAt };
+}
+
+function memberActivationByToken(rawToken: string) {
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  return db.prepare(
+    `SELECT a.id, a.member_id, a.expires_at, a.used_at, m.email, m.first_name, m.last_name, m.status, m.payment_status
+     FROM member_account_activations a
+     JOIN members m ON m.id = a.member_id
+     WHERE a.token_hash = ? AND a.purpose = 'set_password'
+     LIMIT 1`
+  ).get(tokenHash) as any;
 }
 
 function recentMemberPaymentEvents(limit = 25) {
@@ -3082,6 +3248,54 @@ async function startServer() {
     });
   });
 
+  app.get("/api/member/auth/activate", (req, res) => {
+    const token = cleanPublicText(req.query?.token, 200);
+    if (!token) return res.status(400).json({ ok: false, error: "Activation token is required" });
+    const activation = memberActivationByToken(token);
+    const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+      return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
+    }
+    return res.json({
+      ok: true,
+      first_name: activation.first_name,
+      email: activation.email,
+      expires_at: activation.expires_at,
+    });
+  });
+
+  app.post("/api/member/auth/activate", async (req, res) => {
+    const token = cleanPublicText(req.body?.token, 200);
+    const password = String(req.body?.password || "");
+    const confirmPassword = String(req.body?.confirm_password || "");
+    if (!token || !password) return res.status(400).json({ ok: false, error: "Activation token and password are required" });
+    if (password.length < 8) return res.status(400).json({ ok: false, error: "Password must be at least 8 characters" });
+    if (password !== confirmPassword) return res.status(400).json({ ok: false, error: "Passwords do not match" });
+
+    const activation = memberActivationByToken(token);
+    const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+      return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
+    }
+
+    const hash = await bcrypt.hash(password, 12);
+    const update = db.prepare(
+      "UPDATE member_account_activations SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL"
+    ).run(activation.id);
+    if (!update.changes) return res.status(400).json({ ok: false, error: "This activation link has already been used" });
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(hash, activation.member_id);
+    const member = loadMemberById(Number(activation.member_id));
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+    return res.json({
+      ok: true,
+      user: memberSessionPayload(member),
+      billing: getMemberAccessState(member),
+      access: memberAccessScopes(member),
+      redirect: "/portal",
+    });
+  });
+
   app.post("/api/member/auth/logout", (req, res) => {
     req.session.destroy(() => res.json({ ok: true }));
   });
@@ -3223,7 +3437,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/webhooks/member-paid", (req, res) => {
+  app.post("/api/webhooks/member-paid", async (req, res) => {
     if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
       return res.status(503).json({
         ok: false,
@@ -3237,79 +3451,89 @@ async function startServer() {
     try {
       const body = (req.body || {}) as Record<string, any>;
       const memberIdRaw =
-        body.member_id ??
-        body.memberId ??
-        body.client_reference_id ??
-        body.metadata?.member_id ??
-        body.data?.object?.client_reference_id ??
-        body.data?.object?.metadata?.member_id;
-      const memberId = Number(memberIdRaw);
+        body.member_id ?? body.memberId ?? body.client_reference_id ?? body.metadata?.member_id ??
+        body.data?.object?.client_reference_id ?? body.data?.object?.metadata?.member_id;
       const email = cleanPublicText(
-        body.email ??
-          body.customer_email ??
-          body.customer?.email ??
-          body.data?.object?.customer_email ??
-          body.data?.object?.customer_details?.email,
+        body.email ?? body.customer_email ?? body.customer?.email ??
+        body.data?.object?.customer_email ?? body.data?.object?.customer_details?.email,
         160
       ).toLowerCase();
-
-      if (!Number.isFinite(memberId) && !isValidEmail(email)) {
-        return res.status(400).json({ ok: false, error: "member_id or valid email is required" });
+      if (!isValidEmail(email) && !Number.isFinite(Number(memberIdRaw))) {
+        return res.status(400).json({ ok: false, error: "A valid paid-customer email or member_id is required" });
       }
 
-      let member = Number.isFinite(memberId) ? loadMemberById(memberId) : null;
-      if (!member && isValidEmail(email)) member = loadMemberByEmail(email);
-      if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+      const provider = cleanPublicText(
+        body.provider ?? body.source ?? body.type ?? body.data?.object?.object ?? "external", 80
+      ) || "external";
+      const transactionId = cleanPublicText(
+        body.transaction_id ?? body.transactionId ?? body.payment_id ?? body.paymentId ??
+        body.session_id ?? body.id ?? body.data?.object?.id, 160
+      ) || null;
+      if (transactionId) {
+        const duplicate = db.prepare(
+          "SELECT member_id FROM member_payment_events WHERE provider = ? AND transaction_id = ? LIMIT 1"
+        ).get(provider, transactionId) as { member_id?: number } | undefined;
+        if (duplicate?.member_id) {
+          const existingMember = loadMemberById(Number(duplicate.member_id));
+          return res.json({
+            ok: true,
+            duplicate: true,
+            member_id: existingMember?.id || Number(duplicate.member_id),
+            payment_status: existingMember?.payment_status || "paid",
+          });
+        }
+      }
 
-      const provider =
-        cleanPublicText(
-          body.provider ?? body.source ?? body.type ?? body.data?.object?.object ?? "external",
-          80
-        ) || "external";
-      const transactionId =
-        cleanPublicText(
-          body.transaction_id ??
-            body.transactionId ??
-            body.payment_id ??
-            body.paymentId ??
-            body.session_id ??
-            body.id ??
-            body.data?.object?.id,
-          160
-        ) || null;
-      const amountCentsRaw =
-        body.amount_cents ??
-        body.amountCents ??
-        body.amount_total ??
-        body.data?.object?.amount_total ??
-        null;
+      const account = findOrCreatePaidMembershipMember({
+        memberId: Number.isFinite(Number(memberIdRaw)) ? Number(memberIdRaw) : null,
+        email,
+        firstName: body.first_name ?? body.firstName ?? body.customer?.name?.split?.(/\s+/)?.[0] ?? body.data?.object?.customer_details?.name?.split?.(/\s+/)?.[0],
+        lastName: body.last_name ?? body.lastName,
+        displayName: body.name ?? body.customer_name ?? body.customer?.name ?? body.data?.object?.customer_details?.name,
+      });
+      const member = account.member;
+      const amountCentsRaw = body.amount_cents ?? body.amountCents ?? body.amount_total ?? body.data?.object?.amount_total ?? null;
       const amountCents = Number.isFinite(Number(amountCentsRaw)) ? Number(amountCentsRaw) : null;
-      const paidAt = new Date().toISOString();
+      if (amountCents !== null && amountCents < 499) {
+        return res.status(400).json({ ok: false, error: "Membership payment amount is below the approved $4.99 base price" });
+      }
 
+      const paidAt = new Date().toISOString();
       markMemberPaid(member.id, paidAt);
       db.prepare(
         `INSERT INTO member_payment_events
          (member_id, provider, transaction_id, email, amount_cents, raw_payload_json)
          VALUES (?, ?, ?, ?, ?, ?)`
-      ).run(
-        member.id,
-        provider,
-        transactionId,
-        isValidEmail(email) ? email : member.email,
-        amountCents,
-        JSON.stringify(body).slice(0, 20000)
-      );
+      ).run(member.id, provider, transactionId, isValidEmail(email) ? email : member.email, amountCents, JSON.stringify(body).slice(0, 20000));
+
+      let activationDelivery: { requested: boolean; sent?: boolean; skipped?: boolean } = { requested: false };
+      if (account.created) {
+        const activation = issueMemberAccountActivation(member.id);
+        const activationUrl = `${appBaseUrl(req)}/member-activate?token=${encodeURIComponent(activation.rawToken)}`;
+        const delivery = await sendMemberAccountActivationEmail({
+          recipient: member.email,
+          firstName: member.first_name,
+          activationUrl,
+          expiresAt: activation.expiresAt,
+          memberId: Number(member.id),
+          transactionId,
+        });
+        activationDelivery = { requested: true, sent: Boolean(delivery.ok), skipped: Boolean((delivery as any).skipped) };
+      }
 
       const updated = loadMemberById(member.id);
       return res.json({
         ok: true,
         member_id: member.id,
+        account_created: account.created,
         email: updated.email,
         payment_status: updated.payment_status,
         paid_at: updated.paid_at,
+        course_access: { course_id: PAPA_LIFE_MEMBERSHIP_COURSE_ID, granted: true },
+        activation_delivery: activationDelivery,
       });
     } catch (error: any) {
-      return res.status(500).json({ ok: false, error: error?.message || "Unable to record payment" });
+      return res.status(500).json({ ok: false, error: error?.message || "Unable to record paid membership" });
     }
   });
 
@@ -3797,14 +4021,16 @@ async function startServer() {
     `).all() as any[];
 
     const visible = courses.filter((course) => {
-      const isAudioCurriculum = course.title === "Papa Life Audio Curriculum";
+      const membershipCourse = isMembershipCourse(course);
+      const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
       if (isAudioCurriculum) {
+        if (membershipCourse && communityAccess) return true;
         if (legacyCourseIds.has(Number(course.id))) return true;
         const lessonIds = db.prepare("SELECT id FROM lessons WHERE course_id = ?")
           .all(course.id) as Array<{ id: number }>;
         return lessonIds.some((lesson) => entitledDigitalLessonIds.has(Number(lesson.id)));
       }
-      return communityAccess || legacyCourseIds.has(Number(course.id));
+      return (membershipCourse && communityAccess) || legacyCourseIds.has(Number(course.id));
     });
     res.json(visible);
   });
@@ -3821,24 +4047,25 @@ async function startServer() {
       WHERE member_id = ? AND course_id = ? AND granted = 1
       LIMIT 1
     `).get(memberId, course.id));
-    const isAudioCurriculum = course.title === "Papa Life Audio Curriculum";
+    const membershipCourse = isMembershipCourse(course);
+    const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
     const rawLessons = db.prepare(
       "SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC"
     ).all(course.id) as any[];
 
-    if (!isAudioCurriculum && !communityAccess && !legacyGrant) {
+    if (!isAudioCurriculum && !(membershipCourse && communityAccess) && !legacyGrant) {
       return res.status(403).json({ ok: false, error: "An active Papa Life Membership is required for this course." });
     }
 
     if (isAudioCurriculum) {
-      const hasAnyDigitalModule = legacyGrant || rawLessons.some((lesson) =>
+      const hasAnyDigitalModule = (membershipCourse && communityAccess) || legacyGrant || rawLessons.some((lesson) =>
         memberCanAccessLesson(db, memberId, Number(lesson.id))
       );
       if (!hasAnyDigitalModule) {
-        return res.status(403).json({ ok: false, error: "Purchase a Papa Life digital module to access this curriculum." });
+        return res.status(403).json({ ok: false, error: "An active Papa Life Membership or a purchased digital module is required for this curriculum." });
       }
       const lessons = rawLessons.map((lesson) => {
-        const entitled = legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        const entitled = (membershipCourse && communityAccess) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
         const repairedAudioUrl = protectedPapaAudioUrl(Number(lesson.id), Number(lesson.sort_order));
         return {
           ...lesson,
@@ -3874,11 +4101,18 @@ async function startServer() {
       course_title: string;
     } | undefined;
 
-    if (!lesson || lesson.course_title !== "Papa Life Audio Curriculum") {
+    if (!lesson) {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy not found" });
+    }
+    const isMembershipAudioCourse = isMembershipCourse({ id: lesson.course_id })
+      || lesson.course_title === "Papa Life Audio Curriculum";
+    if (!isMembershipAudioCourse) {
       return res.status(404).json({ ok: false, error: "Audio delivery copy not found" });
     }
 
-    const allowed = memberCanAccessLesson(db, memberId, lesson.id)
+    const member = loadMemberById(memberId);
+    const allowed = (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community)
+      || memberCanAccessLesson(db, memberId, lesson.id)
       || memberHasLegacyCourseGrant(db, memberId, lesson.course_id);
     if (!allowed) {
       return res.status(403).json({ ok: false, error: "You do not have access to this audio module." });
@@ -3907,19 +4141,22 @@ async function startServer() {
     const memberId = Number((req.session as any).memberId);
     const lessonId = Number(req.body?.lesson_id);
     const lesson = db.prepare(`
-      SELECT l.id, c.title AS course_title
+      SELECT l.id, l.course_id, c.title AS course_title
       FROM lessons l JOIN courses c ON c.id = l.course_id
       WHERE l.id = ?
-    `).get(lessonId) as { id: number; course_title: string } | undefined;
+    `).get(lessonId) as { id: number; course_id: number; course_title: string } | undefined;
     if (!lesson) return res.status(404).json({ ok: false, error: "Lesson not found" });
     const member = loadMemberById(memberId);
-    const allowed = lesson.course_title === "Papa Life Audio Curriculum"
-      ? memberCanAccessLesson(db, memberId, lessonId) || Boolean(db.prepare(`
+    const isMembershipAudioCourse = isMembershipCourse({ id: lesson.course_id })
+      || lesson.course_title === "Papa Life Audio Curriculum";
+    const allowed = isMembershipAudioCourse
+      ? (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community)
+        || memberCanAccessLesson(db, memberId, lessonId) || Boolean(db.prepare(`
           SELECT 1 FROM member_course_access mca
           JOIN lessons l ON l.course_id = mca.course_id
           WHERE mca.member_id = ? AND mca.granted = 1 AND l.id = ? LIMIT 1
         `).get(memberId, lessonId))
-      : memberAccessScopes(member).community;
+      : isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community;
     if (!allowed) return res.status(403).json({ ok: false, error: "You do not have access to this lesson." });
     db.prepare("INSERT OR IGNORE INTO member_progress (member_id, lesson_id) VALUES (?, ?)").run(memberId, lessonId);
     res.json({ ok: true });
@@ -5615,7 +5852,11 @@ async function startServer() {
     sendServerRenderedApp(req, res, staticPath);
   });
 
-  await assertElevenLabsVoiceConfig("startup");
+  if (process.env.NODE_ENV === "test") {
+    console.info("[elevenlabs] external voice verification skipped in isolated test mode");
+  } else {
+    await assertElevenLabsVoiceConfig("startup");
+  }
 
   const port = process.env.PORT || 3000;
   server.listen(port, () => {

@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Boss Mobile / Papa Life — Cloud ↔ Server webhook contract",
-  "version": "1.0.0",
-  "description": "Back-and-forth JSON between bossmobilelifecoach.com and Brian's cloud (Make.com Scenario 5259335, Claude, or MCP).",
+  "title": "Boss Mobile / Papa Life — Legacy Lead-Intake Cloud ↔ Server Contract",
+  "version": "1.1.0",
+  "description": "This legacy contract documents optional lead-intake synchronization between bossmobilelifecoach.com and a cloud automation service. It is not part of the Papa Life Commercial System launch path, payment-to-access flow, production verification, or launch-readiness workflow.",
+  "commercial_system_status": "out_of_scope_for_membership_checkout_to_course_11",
   "base_url": "https://bossmobilelifecoach.com",
   "auth": {
     "type": "bearer",
@@ -11,13 +12,13 @@
     "env_keys": ["GHL_WEBHOOK_SECRET", "MAKE_WEBHOOK_SECRET", "AUTOMATION_WEBHOOK_SECRET"]
   },
   "outbound": {
-    "description": "Server → cloud when a new contact is saved (GHL webhook, Make Scenario 1 follow-up, or site intake).",
+    "description": "Server → cloud when a new contact is saved through GHL or site intake. This contact workflow must not grant membership, create Course 11 access, or determine payment success.",
     "method": "POST",
     "url_env": "AUTOMATION_CLOUD_WEBHOOK_URL",
     "example_url": "https://hook.us2.make.com/xxxxxxxx",
     "body": {
       "event": "ghl_new_contact",
-      "prompt": "Required. Natural-language task for the cloud (includes contact summary).",
+      "prompt": "Optional natural-language task for the cloud, including a contact summary.",
       "contact": {
         "ghl_contact_id": "string | null",
         "first_name": "string | null",
@@ -27,16 +28,10 @@
         "source": "string | null",
         "tags": ["string"]
       },
-      "outreach_note": "string — 3-sentence Papa Life note for GHL",
-      "voice_prompt": "string — short script for Brian's Claude voice mode",
+      "outreach_note": "string — optional Papa Life note for GHL",
       "alert_id": "number",
       "lead_id": "number",
-      "site_origin": "https://bossmobilelifecoach.com",
-      "inbound": {
-        "claude_prompt_url": "https://bossmobilelifecoach.com/api/automation/claude-prompt",
-        "claude_prompt_body": { "prompt": "string", "context": "string (optional)" },
-        "claude_prompt_response": { "ok": true, "response": "string", "model": "string", "prompt": "string" }
-      }
+      "site_origin": "https://bossmobilelifecoach.com"
     },
     "example": {
       "event": "ghl_new_contact",
@@ -51,50 +46,20 @@
         "tags": ["papa-journey"]
       },
       "outreach_note": "Hey Marcus, I'm Brian...",
-      "voice_prompt": "Marcus Reed just came in from Facebook...",
       "alert_id": 12,
       "lead_id": 45,
-      "site_origin": "https://bossmobilelifecoach.com",
-      "inbound": {
-        "claude_prompt_url": "https://bossmobilelifecoach.com/api/automation/claude-prompt",
-        "claude_prompt_body": { "prompt": "..." },
-        "claude_prompt_response": { "ok": true, "response": "...", "model": "claude-haiku-4-5-20251001" }
-      }
+      "site_origin": "https://bossmobilelifecoach.com"
     }
   },
   "inbound": {
-    "description": "Cloud → server. POST JSON; Claude answers in Brian's Papa Life voice in the HTTP response body.",
+    "description": "Cloud → server legacy contact notification. It is not a commercial payment or entitlement endpoint.",
     "endpoints": [
-      {
-        "path": "/api/automation/claude-prompt",
-        "method": "POST",
-        "body": {
-          "prompt": "required string — what Claude should process",
-          "context": "optional string — CRM/GHL context prepended to prompt"
-        },
-        "response": {
-          "ok": true,
-          "prompt": "echo of request prompt",
-          "response": "Claude text in Papa Life voice",
-          "model": "anthropic model id",
-          "voice": "papa_life"
-        }
-      },
       {
         "path": "/api/webhooks/ghl-new-contact",
         "method": "POST",
-        "body": "GHL contact fields or { contact: { ... } }; optional outreach_note if Claude already ran in Make"
+        "body": "GHL contact fields or { contact: { ... } }; optional outreach_note"
       }
-    ],
-    "minimal_example": {
-      "request": { "prompt": "Summarize this lead and suggest the next outreach step in Brian's voice." },
-      "response": {
-        "ok": true,
-        "prompt": "Summarize this lead and suggest the next outreach step in Brian's voice.",
-        "response": "Here's what I'd do next, brother...",
-        "model": "claude-haiku-4-5-20251001",
-        "voice": "papa_life"
-      }
-    }
-  }
+    ]
+  },
+  "commercial_flow_rule": "The $4.99 membership checkout-to-Course-11 journey must be traced through its authenticated billing event and entitlement path. Do not infer commercial completion from this legacy cloud contract or AUTOMATION_CLOUD_WEBHOOK_URL."
 }

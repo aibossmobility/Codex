@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import MemberLogin from "./pages/MemberLogin";
 import MemberRegister from "./pages/MemberRegister";
+import MemberActivate from "./pages/MemberActivate";
 import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
 import Join from "./pages/Join";
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/terms" component={TermsPage} />
       <Route path={"/member-login"} component={MemberLogin} />
       <Route path={"/member-register"} component={MemberRegister} />
+      <Route path={"/member-activate"} component={MemberActivate} />
       <Route path={"/member-billing"} component={MemberBilling} />
       <Route path={"/portal"} component={MemberPortal} />
       <Route path={"/join"} component={Join} />
@@ -113,6 +115,7 @@ function GlobalPapaAiWidget() {
     "/login",
     "/member-login",
     "/member-register",
+    "/member-activate",
     "/member-billing",
     "/portal",
     "/join",

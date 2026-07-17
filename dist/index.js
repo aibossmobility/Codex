@@ -2342,6 +2342,27 @@ var __dirname2 = path3.dirname(__filename2);
 var appRoot = path3.resolve(__dirname2, "..");
 dotenv.config({ path: path3.resolve(__dirname2, "..", ".env") });
 var mediaUploadRoot = path3.resolve(__dirname2, "..", "uploads", "media");
+var papaAudioDeliveryFilesByOrder = /* @__PURE__ */ new Map([
+  [1, "01-listening-without-defending.mp3"],
+  [3, "03-the-first-repair-sentence.mp3"],
+  [4, "04-presence-over-pressure.mp3"],
+  [7, "07-apology-without-explanation.mp3"],
+  [11, "11-leading-with-purpose-not-panic.mp3"]
+]);
+function protectedPapaAudioPath(sortOrder) {
+  const filename = papaAudioDeliveryFilesByOrder.get(sortOrder);
+  return filename ? path3.join(appRoot, "server", "private-resources", "papa-life-audio", filename) : null;
+}
+function protectedPapaAudioUrl(lessonId, sortOrder) {
+  return papaAudioDeliveryFilesByOrder.has(sortOrder) ? `/api/member/audio/${lessonId}` : null;
+}
+function memberHasLegacyCourseGrant(db2, memberId, courseId) {
+  return Boolean(db2.prepare(`
+    SELECT 1 AS ok FROM member_course_access
+    WHERE member_id = ? AND course_id = ? AND granted = 1
+    LIMIT 1
+  `).get(memberId, courseId));
+}
 function trainingContentTypeFromMime(mimetype) {
   if (mimetype.startsWith("video/")) return "video";
   if (mimetype.startsWith("audio/")) return "audio";
@@ -5557,9 +5578,10 @@ async function startServer() {
       }
       const lessons = rawLessons.map((lesson) => {
         const entitled = legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        const repairedAudioUrl = protectedPapaAudioUrl(Number(lesson.id), Number(lesson.sort_order));
         return {
           ...lesson,
-          content_url: entitled ? lesson.content_url : null,
+          content_url: entitled ? repairedAudioUrl || lesson.content_url : null,
           entitled,
           locked: !entitled
         };
@@ -5567,6 +5589,34 @@ async function startServer() {
       return res.json({ ...course, lessons });
     }
     res.json({ ...course, lessons: rawLessons.map((lesson) => ({ ...lesson, entitled: true, locked: false })) });
+  });
+  app.get("/api/member/audio/:lessonId", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const lessonId = Number(req.params.lessonId);
+    if (!Number.isInteger(lessonId) || lessonId <= 0) {
+      return res.status(400).json({ ok: false, error: "Invalid lesson ID" });
+    }
+    const lesson = db.prepare(`
+      SELECT l.id, l.course_id, l.sort_order, c.title AS course_title
+      FROM lessons l
+      JOIN courses c ON c.id = l.course_id
+      WHERE l.id = ?
+    `).get(lessonId);
+    if (!lesson || lesson.course_title !== "Papa Life Audio Curriculum") {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy not found" });
+    }
+    const allowed = memberCanAccessLesson(db, memberId, lesson.id) || memberHasLegacyCourseGrant(db, memberId, lesson.course_id);
+    if (!allowed) {
+      return res.status(403).json({ ok: false, error: "You do not have access to this audio module." });
+    }
+    const audioPath = protectedPapaAudioPath(Number(lesson.sort_order));
+    if (!audioPath || !fs3.existsSync(audioPath)) {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy unavailable" });
+    }
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Cache-Control", "private, max-age=3600");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    return res.sendFile(audioPath);
   });
   app.get("/api/member/progress", requireMemberPortalAccess, (req, res) => {
     const memberId = req.session.memberId;

@@ -81,6 +81,12 @@ Authenticated buyers retrieve their available manuscripts from `GET /api/member/
 
 The production build runs `scripts/copy-private-resources.mjs` before bundling the server. This preserves the protected delivery files under `dist/private-resources` without placing them in `dist/public`.
 
+## Secure Audio Delivery Repair
+
+Five canonical audio masters—modules 1, 3, 4, 7, and 11—were not playable to unauthenticated customers through their existing Google Drive preview URLs. Approved delivery copies are stored under `server/private-resources/papa-life-audio`; the Google Drive production masters and their permissions remain unchanged.
+
+For an entitled buyer, the course response substitutes the protected endpoint `GET /api/member/audio/:lessonId` for those five modules. The endpoint validates an exact digital-module entitlement or an explicit legacy course grant before streaming the MP3 from private server storage. Unentitled buyers receive no content URL, and the audio files are not placed under `dist/public`.
+
 ## Administrative Controls
 
 Authenticated administrators can inspect the canonical catalog, list a member's product entitlements, grant an approved product entitlement, or revoke a product entitlement. Product grants do not change community membership status. Community membership changes do not grant curriculum or manuscript products.
@@ -104,6 +110,6 @@ No live curriculum checkout should be marketed until all provider IDs, links, ta
 
 ## Validation
 
-The implementation passes TypeScript validation, the full production build, protected-resource packaging verification for twelve PDFs, and isolated commerce tests. The deterministic test suite verifies the twenty-seven-product catalog, approved prices, tax-exclusive behavior, individual digital access, individual manuscript access, $59 bundle expansion, $99 bundle expansion, revocation, and payment-event idempotency.
+The implementation passes TypeScript validation, the full production build, protected-resource packaging verification for twelve PDFs and five repaired MP3 delivery copies, audio file-type validation, and isolated commerce tests. The deterministic test suite verifies the twenty-seven-product catalog, approved prices, tax-exclusive behavior, individual digital access, individual manuscript access, $59 bundle expansion, $99 bundle expansion, revocation, and payment-event idempotency.
 
 The final live acceptance test must use provider test mode or an approved real purchase/refund sequence. It must verify intake, checkout, tax display, successful charge, receipt, welcome email, account access, exact lesson/PDF access, duplicate-event safety, and clean status tracking.

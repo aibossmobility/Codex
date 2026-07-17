@@ -97,3 +97,11 @@ A fresh clean-checkout validation was completed after the production directive w
 | Deployment conclusion | Production is still running the legacy release. The connected repository exposes no workflow or deployment descriptor, the available browser session exposes no authenticated host control, and no source-release/restart integration is available. |
 
 The exact deployment block is host-level access to the Express origin for `bossmobilelifecoach.com`, or an authorized CI/CD release trigger wired to that origin. After that access is supplied, deploy the current `main` head and run the provider-controlled live acceptance test.
+
+## Authorized Chrome Deployment-Path Audit — 2026-07-17
+
+The owner’s Chrome session provided authenticated access to the Cloudflare account for `Brian@bossmobility.net`. Direct inspection found zero Workers/Pages projects and zero domains or subdomains in that account. The connected GitHub repository also returned no commit statuses and no workflow runs for the current remote head. Browser history contained no identifiable VPS-host dashboard.
+
+Repository runbooks identify the actual deployment target as an SSH-managed server: user `brian`, application directory `/var/www/html/bossmobilelifecoach.com`, PM2 applications `papalife` and `papalife-mcp-http`, and the release command `bash scripts/restart.sh`. The repository does not identify the SSH hostname or IP address and the available controls expose no SSH credential or authorized terminal session.
+
+This exhausts the newly available Chrome path. The exact missing access is the production server’s SSH hostname/IP plus an authorized login method for user `brian` (or an owner-provided terminal already connected to that server). No Cloudflare deployment action can substitute for that access because the authenticated account does not own the domain or an application project.

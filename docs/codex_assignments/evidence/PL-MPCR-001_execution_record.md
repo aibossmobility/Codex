@@ -105,3 +105,22 @@ The owner’s Chrome session provided authenticated access to the Cloudflare acc
 Repository runbooks identify the actual deployment target as an SSH-managed server: user `brian`, application directory `/var/www/html/bossmobilelifecoach.com`, PM2 applications `papalife` and `papalife-mcp-http`, and the release command `bash scripts/restart.sh`. The repository does not identify the SSH hostname or IP address and the available controls expose no SSH credential or authorized terminal session.
 
 This exhausts the newly available Chrome path. The exact missing access is the production server’s SSH hostname/IP plus an authorized login method for user `brian` (or an owner-provided terminal already connected to that server). No Cloudflare deployment action can substitute for that access because the authenticated account does not own the domain or an application project.
+
+## Production Deployment and Live Acceptance — 2026-07-17
+
+The machine’s SSH configuration supplied the authorized production alias `site-server` for user `brian`. Codex created a recoverable source backup at `backups/codex-predeploy-20260717.tar.gz`, synchronized the validated application source without deleting or changing `.env`, databases, sessions, uploads, or historical backups, verified locked dependencies, and ran the documented `scripts/restart.sh` procedure.
+
+The production Vite and server builds completed successfully. PM2 restarted `papalife` and `papalife-mcp-http`, and both processes reported online. Initial live probes found that `/join` and `/member-activate` returned 404 because the server-rendered page map omitted two existing client routes. Codex added both routes to the server map, passed TypeScript and production-build validation, redeployed the repaired server source, and restarted both services again.
+
+| Live checkpoint | Result |
+|---|---|
+| Health | `/api/health` returned `ok: true`, SQLite database, and the live service identity. |
+| Enrollment entry | `/go/join` returned 302 to `/join?src=site&campaign=papa_life_intake_first_enrollment`. |
+| Enrollment UI | `/join` returned 200 and rendered the Papa Life intake form with “Continue to Checkout.” |
+| Activation UI | `/member-activate` returned 200 and rendered the activation experience; an absent token correctly displayed the invalid/incomplete-link state. |
+| No-trial configuration | `/api/public/pricing` returned `member_trial_hours: 0`, price 499 cents, USD, and the approved payment link. |
+| Public trial copy | `/assessment` no longer exposed the prior “24-hour trial” claim. |
+| Checkout | FastPayDirect rendered “Fathers Subscription for PAPA LIFE” at `$4.99 / month`, recurring-payment authorization, and cancellation wording with no visible trial. |
+| Protected audio boundary | An unauthenticated request to `/api/member/audio/75` returned HTTP 401 JSON. |
+
+Deployment and public-route acceptance are **VERIFIED LIVE**. A real or provider-sandbox payment was not submitted. Subscription creation, external email delivery, paid-member login, entitled Lessons 75 and 86 playback, renewal, failure, and cancellation remain blocked pending a provider-approved disposable test path.

@@ -80,3 +80,20 @@ The isolated result proves the repaired source path is **BUILT**. It does not pr
 2. Obtain authenticated provider test-mode or other explicitly authorized safe payment-test access.
 3. Complete one controlled non-production provider transaction and verify one subscription, one member record, one activation email/inbox receipt, Course 11, and both Lesson 01 and Lesson 12 playback.
 4. Verify cancellation, renewal, failure, and live no-trial copy behavior without changing existing customer records.
+
+## Final Technical Revalidation — 2026-07-17
+
+A fresh clean-checkout validation was completed after the production directive was received. No financial action, customer-data mutation, provider configuration change, or protected-record access occurred.
+
+| Check | Result |
+|---|---|
+| Repository release | `main` contains Course 11 release `76f39ec`, no-trial hotfix `5846a74`, and the subsequent evidence commits. |
+| TypeScript validation | `pnpm check` passed. |
+| Production build | `pnpm build` passed; static pages, protected-resource copy, client bundle, server bundle, and MCP bundle completed. |
+| Isolated controlled journey | Passed again on port `3112` with a disposable database: $4.99 signed event, one account, activation/login, Course 11, 12 entitled lessons, protected audio, progress, and duplicate-event idempotency. External email and provider billing remained disabled. |
+| Live checkout | `/go/join` still redirected to the FastPayDirect product “Fathers Subscription for PAPA LIFE” at $4.99/month with recurring and cancellation language and no visible trial. |
+| Live activation route | Both `/activate` and the source-defined `/member-activate` returned the production 404 page. |
+| Live no-trial policy | `/assessment` still displayed “24-hour trial”, “$4.99/month”, and “Cancel anytime”. |
+| Deployment conclusion | Production is still running the legacy release. The connected repository exposes no workflow or deployment descriptor, the available browser session exposes no authenticated host control, and no source-release/restart integration is available. |
+
+The exact deployment block is host-level access to the Express origin for `bossmobilelifecoach.com`, or an authorized CI/CD release trigger wired to that origin. After that access is supplied, deploy the current `main` head and run the provider-controlled live acceptance test.

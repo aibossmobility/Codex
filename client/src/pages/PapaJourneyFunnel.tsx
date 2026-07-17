@@ -287,7 +287,7 @@ function Hero() {
 
         {/* Trust signals */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 text-xs">
-          {["24-Hour Trial", "$4.99/month Access", "Cancel Anytime", "Private & Secure"].map((item) => (
+          {["Membership Access", "$4.99/month", "Cancel Anytime", "Private & Secure"].map((item) => (
             <span key={item} className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> {item}
             </span>
@@ -1119,15 +1119,15 @@ function ProgramSection() {
                 <Star className="w-3.5 h-3.5 text-primary" />
                 <span className="text-primary text-xs font-semibold">Join PAPA Life</span>
               </div>
-              <h3 className="text-white text-3xl font-extrabold mb-3">24-Hour Trial</h3>
+              <h3 className="text-white text-3xl font-extrabold mb-3">Papa Life Membership</h3>
               <p className="text-gray-400 text-base max-w-md mx-auto mb-8 leading-relaxed">
-                Start your PAPA Journey Journal and 30-Day Dad Dojo today. Full access is $4.99/month and includes a 24-hour trial so fathers can begin the work right away.
+                Join the Papa Life community and member area for $4.99/month. Curriculum lessons and manuscripts are separate purchases, so you choose the products that fit your journey.
               </p>
               <a href={PAPA_PAYMENT_LINK} className="group inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold text-lg px-10 py-4 rounded-full transition-all shadow-[0_0_40px_rgba(56,189,248,0.3)] hover:shadow-[0_0_60px_rgba(56,189,248,0.5)]">
                 Join PAPA Life — $4.99/mo
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </a>
-              <p className="text-gray-600 text-xs mt-4">24-hour trial · Cancel anytime · Your data is private</p>
+              <p className="text-gray-600 text-xs mt-4">No free trial · Cancel anytime · Your data is private</p>
             </div>
           </div>
         </Reveal>
@@ -1285,7 +1285,7 @@ function FreeResourcesSection() {
           >
             <div className="text-left">
               <p className="text-lg">Continue Into PAPA Life</p>
-              <p className="text-sm mt-1 opacity-80">Unlock the full journey for $4.99/month.</p>
+              <p className="text-sm mt-1 opacity-80">Join the community and member area for $4.99/month.</p>
             </div>
             <ArrowRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1" />
           </a>
@@ -1334,10 +1334,10 @@ function FinalCTA() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-brand-yellow">Pick up the phone. Begin.</span>
             </h2>
             <p className="text-gray-400 text-xl leading-relaxed mb-2">
-              Full access for <span className="text-brand-yellow font-bold">$4.99/month</span>
+              Papa Life Membership for <span className="text-brand-yellow font-bold">$4.99/month</span>
             </p>
             <p className="text-gray-500 text-base max-w-xl mx-auto mb-10">
-              Includes a 24-hour trial. The book, the courses, the journey — all of it.
+              No free trial. Membership includes the community and member area; curriculum lessons and manuscripts are purchased separately.
             </p>
           </div>
 
@@ -1356,7 +1356,7 @@ function FinalCTA() {
               Talk to Brian first
             </a>
           </div>
-          <p className="text-gray-600 text-sm">24-hour trial · Cancel anytime</p>
+          <p className="text-gray-600 text-sm">No free trial · Cancel anytime</p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-gray-600 text-xs">
             {["Purpose", "Authority", "Presence", "Alignment"].map((p, i) => (

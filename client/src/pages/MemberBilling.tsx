@@ -123,7 +123,7 @@ export default function MemberBilling() {
             <div className="text-center space-y-1">
               <h2 className="text-white text-xl font-bold">Membership Billing</h2>
               <p className="text-gray-400 text-sm">
-                New members get {billing?.trial_hours ?? 24} hours of free access. After that, payment is required.
+                Papa Life membership is $4.99 per month with no free trial. Payment is required to activate membership access.
               </p>
             </div>
 

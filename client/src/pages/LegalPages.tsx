@@ -193,9 +193,9 @@ export function TermsPage() {
       </p>
       <h2>3. Membership and Payment</h2>
       <p>
-        Papa Life membership costs $4.99 per month after any free trial period. Your card will be billed
-        automatically each month until you cancel. You can cancel anytime in two clicks with no phone call
-        required. We do not offer refunds for partial months already paid, unless required by law.
+Papa Life membership costs $4.99 per month with no free trial. Your card will be billed
+automatically each month until you cancel. You can cancel anytime in two clicks with no phone call
+required. We do not offer refunds for partial months already paid, unless required by law.
       </p>
       <h2>4. Text Messages and Communication</h2>
       <p>

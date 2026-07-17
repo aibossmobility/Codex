@@ -315,7 +315,7 @@ const pages = [
       "By using bossmobilelifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership bills monthly after any free trial period until canceled."],
+      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
     ],
   },
   {
@@ -328,7 +328,7 @@ const pages = [
       "By using bossmobilelifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership bills monthly after any free trial period until canceled."],
+      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
     ],
   },
 ];

@@ -1,0 +1,12 @@
+bee79292aad9c5a305a795fd64f2eccfc79fbdbbb2f290d8b30d45d175da0351  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/01-listening-without-defending.pdf
+ed68aea4f98f28cb9cd3f21f9770581e873b8a967f577ab899cc7c28b1f95005  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/02-owning-impact-without-shame.pdf
+75d7432725b20073bee7cd64a40d42eacb8e9566be3ba0a91e83976da7385cbc  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/03-the-first-repair-sentence.pdf
+16371bade2d529dab11607f90f4da2ce68be68cebe5811595d91f886d94ca206  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/04-presence-over-pressure.pdf
+9ca3abeb36330d51f32e9e12483b4bd1c718a1246b4c010cc6194302e8690ca9  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/05-when-your-adult-child-pulls-away.pdf
+5260c9511201e02d34d812e40f8be3f464e088292a497b7b2d8517655954e754  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/06-authority-without-control.pdf
+a767cb19876aafb9347ed2d1ac607ee97f248fbd1d2d8316aa15c65449642e4c  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/07-apology-without-explanation.pdf
+02d0620e158f5d887f646e2dedf286375949b87a12204208eb105a677c1b611c  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/08-consistency-after-the-conversation.pdf
+b3a47fb93a9b6aab2036a2c57d37004b816c7435bd38da2e8b49c2978593d8fa  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/09-rebuilding-trust-in-small-deposits.pdf
+6193c5cd826fa1709c408806d172e3b4fa6dea2ca4d628400ef15a87a4af7182  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/10-when-silence-feels-personal.pdf
+4c6e04f511a2084c51ee253c45ff37f931e58cb592f1a541344042f3c6661806  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/11-leading-with-purpose-not-panic.pdf
+0bb0294e991163d7cd3d7b3080be01a424d5e1229b0ae28c46129f60cdb991d1  /home/ubuntu/Codex/server/private-resources/papa-life-manuscripts/12-becoming-safe-to-talk-to.pdf

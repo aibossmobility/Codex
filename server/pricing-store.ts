@@ -14,7 +14,7 @@ const DEFAULT_CHECKOUT_PAYMENT_LINK =
 
 function defaults(): PricingSettings {
   return {
-    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS || 24),
+    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS ?? 0),
     member_price_usd_cents: Number(process.env.MEMBER_PRICE_USD_CENTS || 499),
     member_currency: (process.env.MEMBER_PRICE_CURRENCY || "usd").trim().toLowerCase(),
     member_product_name: (process.env.MEMBER_PRODUCT_NAME || "PAPA Life Member Access").trim(),
@@ -26,6 +26,11 @@ function defaults(): PricingSettings {
 function asPositiveInt(input: unknown, fallback: number) {
   const n = Number(input);
   return Number.isInteger(n) && n > 0 ? n : fallback;
+}
+
+function asNonNegativeInt(input: unknown, fallback: number) {
+  const n = Number(input);
+  return Number.isInteger(n) && n >= 0 ? n : fallback;
 }
 
 function normalizeCurrency(input: unknown, fallback: string) {
@@ -49,6 +54,11 @@ export function ensurePricingSettingsTable(db: Database.Database) {
   );
   const d = defaults();
   insert.run("member_trial_hours", String(d.member_trial_hours));
+  db.prepare(
+    `UPDATE pricing_settings
+     SET value = '0', updated_at = datetime('now')
+     WHERE key = 'member_trial_hours' AND value <> '0'`
+  ).run();
   insert.run("member_price_usd_cents", String(d.member_price_usd_cents));
   insert.run("member_currency", d.member_currency);
   insert.run("member_product_name", d.member_product_name);
@@ -63,7 +73,7 @@ export function getPricingSettings(db: Database.Database): PricingSettings {
   const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   const d = defaults();
   return {
-    member_trial_hours: asPositiveInt(map.member_trial_hours, d.member_trial_hours),
+    member_trial_hours: asNonNegativeInt(map.member_trial_hours, d.member_trial_hours),
     member_price_usd_cents: asPositiveInt(map.member_price_usd_cents, d.member_price_usd_cents),
     member_currency: normalizeCurrency(map.member_currency, d.member_currency),
     member_product_name: String(map.member_product_name || d.member_product_name).trim(),
@@ -80,7 +90,7 @@ export function updatePricingSettings(
   const merged: PricingSettings = {
     member_trial_hours:
       patch.member_trial_hours !== undefined
-        ? asPositiveInt(patch.member_trial_hours, current.member_trial_hours)
+        ? asNonNegativeInt(patch.member_trial_hours, current.member_trial_hours)
         : current.member_trial_hours,
     member_price_usd_cents:
       patch.member_price_usd_cents !== undefined

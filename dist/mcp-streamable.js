@@ -392,7 +392,7 @@ function deleteSiteMedia(db2, placement) {
 var DEFAULT_CHECKOUT_PAYMENT_LINK = "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
 function defaults() {
   return {
-    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS || 24),
+    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS ?? 0),
     member_price_usd_cents: Number(process.env.MEMBER_PRICE_USD_CENTS || 499),
     member_currency: (process.env.MEMBER_PRICE_CURRENCY || "usd").trim().toLowerCase(),
     member_product_name: (process.env.MEMBER_PRODUCT_NAME || "PAPA Life Member Access").trim(),
@@ -403,6 +403,10 @@ function defaults() {
 function asPositiveInt(input, fallback) {
   const n = Number(input);
   return Number.isInteger(n) && n > 0 ? n : fallback;
+}
+function asNonNegativeInt(input, fallback) {
+  const n = Number(input);
+  return Number.isInteger(n) && n >= 0 ? n : fallback;
 }
 function normalizeCurrency(input, fallback) {
   const c = String(input ?? "").trim().toLowerCase();
@@ -423,6 +427,11 @@ function ensurePricingSettingsTable(db2) {
   );
   const d = defaults();
   insert.run("member_trial_hours", String(d.member_trial_hours));
+  db2.prepare(
+    `UPDATE pricing_settings
+     SET value = '0', updated_at = datetime('now')
+     WHERE key = 'member_trial_hours' AND value <> '0'`
+  ).run();
   insert.run("member_price_usd_cents", String(d.member_price_usd_cents));
   insert.run("member_currency", d.member_currency);
   insert.run("member_product_name", d.member_product_name);
@@ -434,7 +443,7 @@ function getPricingSettings(db2) {
   const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   const d = defaults();
   return {
-    member_trial_hours: asPositiveInt(map.member_trial_hours, d.member_trial_hours),
+    member_trial_hours: asNonNegativeInt(map.member_trial_hours, d.member_trial_hours),
     member_price_usd_cents: asPositiveInt(map.member_price_usd_cents, d.member_price_usd_cents),
     member_currency: normalizeCurrency(map.member_currency, d.member_currency),
     member_product_name: String(map.member_product_name || d.member_product_name).trim(),
@@ -445,7 +454,7 @@ function getPricingSettings(db2) {
 function updatePricingSettings(db2, patch) {
   const current = getPricingSettings(db2);
   const merged = {
-    member_trial_hours: patch.member_trial_hours !== void 0 ? asPositiveInt(patch.member_trial_hours, current.member_trial_hours) : current.member_trial_hours,
+    member_trial_hours: patch.member_trial_hours !== void 0 ? asNonNegativeInt(patch.member_trial_hours, current.member_trial_hours) : current.member_trial_hours,
     member_price_usd_cents: patch.member_price_usd_cents !== void 0 ? asPositiveInt(patch.member_price_usd_cents, current.member_price_usd_cents) : current.member_price_usd_cents,
     member_currency: patch.member_currency !== void 0 ? normalizeCurrency(patch.member_currency, current.member_currency) : current.member_currency,
     member_product_name: patch.member_product_name !== void 0 ? String(patch.member_product_name || "").trim() || current.member_product_name : current.member_product_name,

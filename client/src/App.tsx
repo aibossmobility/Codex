@@ -12,6 +12,7 @@ import MemberLogin from "./pages/MemberLogin";
 import MemberRegister from "./pages/MemberRegister";
 import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
+import Join from "./pages/Join";
 import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
 import Strategist from "./pages/Strategist";
 import ThemeMatrix from "./pages/ThemeMatrix";
@@ -71,6 +72,7 @@ function Router() {
       <Route path={"/member-register"} component={MemberRegister} />
       <Route path={"/member-billing"} component={MemberBilling} />
       <Route path={"/portal"} component={MemberPortal} />
+      <Route path={"/join"} component={Join} />
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/assessment" component={RelationshipAssessment} />
       <Route path="/relationship-assessment" component={RelationshipAssessment} />
@@ -113,6 +115,7 @@ function GlobalPapaAiWidget() {
     "/member-register",
     "/member-billing",
     "/portal",
+    "/join",
     "/research-lab",
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));

@@ -412,7 +412,7 @@ function deleteSiteMedia(db2, placement) {
 var DEFAULT_CHECKOUT_PAYMENT_LINK = "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
 function defaults() {
   return {
-    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS || 24),
+    member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS ?? 0),
     member_price_usd_cents: Number(process.env.MEMBER_PRICE_USD_CENTS || 499),
     member_currency: (process.env.MEMBER_PRICE_CURRENCY || "usd").trim().toLowerCase(),
     member_product_name: (process.env.MEMBER_PRODUCT_NAME || "PAPA Life Member Access").trim(),
@@ -423,6 +423,10 @@ function defaults() {
 function asPositiveInt(input, fallback) {
   const n = Number(input);
   return Number.isInteger(n) && n > 0 ? n : fallback;
+}
+function asNonNegativeInt(input, fallback) {
+  const n = Number(input);
+  return Number.isInteger(n) && n >= 0 ? n : fallback;
 }
 function normalizeCurrency(input, fallback) {
   const c = String(input ?? "").trim().toLowerCase();
@@ -443,6 +447,11 @@ function ensurePricingSettingsTable(db2) {
   );
   const d = defaults();
   insert.run("member_trial_hours", String(d.member_trial_hours));
+  db2.prepare(
+    `UPDATE pricing_settings
+     SET value = '0', updated_at = datetime('now')
+     WHERE key = 'member_trial_hours' AND value <> '0'`
+  ).run();
   insert.run("member_price_usd_cents", String(d.member_price_usd_cents));
   insert.run("member_currency", d.member_currency);
   insert.run("member_product_name", d.member_product_name);
@@ -454,13 +463,351 @@ function getPricingSettings(db2) {
   const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   const d = defaults();
   return {
-    member_trial_hours: asPositiveInt(map.member_trial_hours, d.member_trial_hours),
+    member_trial_hours: asNonNegativeInt(map.member_trial_hours, d.member_trial_hours),
     member_price_usd_cents: asPositiveInt(map.member_price_usd_cents, d.member_price_usd_cents),
     member_currency: normalizeCurrency(map.member_currency, d.member_currency),
     member_product_name: String(map.member_product_name || d.member_product_name).trim(),
     member_stripe_price_id: String(map.member_stripe_price_id || d.member_stripe_price_id).trim(),
     checkout_payment_link: String(map.checkout_payment_link || d.checkout_payment_link).trim()
   };
+}
+
+// server/commerce-entitlements.ts
+var PAPA_CURRICULUM_LESSONS = [
+  "Listening Without Defending",
+  "Owning Impact Without Shame",
+  "The First Repair Sentence",
+  "Presence Over Pressure",
+  "When Your Adult Child Pulls Away",
+  "Authority Without Control",
+  "Apology Without Explanation",
+  "Consistency After the Conversation",
+  "Rebuilding Trust in Small Deposits",
+  "When Silence Feels Personal",
+  "Leading With Purpose, Not Panic",
+  "Becoming Safe to Talk To"
+];
+var manuscriptFiles = [
+  "01-listening-without-defending.pdf",
+  "02-owning-impact-without-shame.pdf",
+  "03-the-first-repair-sentence.pdf",
+  "04-presence-over-pressure.pdf",
+  "05-when-your-adult-child-pulls-away.pdf",
+  "06-authority-without-control.pdf",
+  "07-apology-without-explanation.pdf",
+  "08-consistency-after-the-conversation.pdf",
+  "09-rebuilding-trust-in-small-deposits.pdf",
+  "10-when-silence-feels-personal.pdf",
+  "11-leading-with-purpose-not-panic.pdf",
+  "12-becoming-safe-to-talk-to.pdf"
+];
+function moduleCode(kind, moduleNumber) {
+  return `curriculum.${kind}.module.${String(moduleNumber).padStart(2, "0")}`;
+}
+function ensureCommerceEntitlementTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS commerce_products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT NOT NULL UNIQUE,
+      canonical_name TEXT NOT NULL,
+      format TEXT NOT NULL CHECK (format IN ('membership','digital','manuscript','bundle')),
+      module_number INTEGER,
+      price_cents INTEGER NOT NULL,
+      currency TEXT NOT NULL DEFAULT 'usd',
+      billing_type TEXT NOT NULL CHECK (billing_type IN ('recurring','one_time')),
+      tax_behavior TEXT NOT NULL DEFAULT 'exclusive' CHECK (tax_behavior = 'exclusive'),
+      lesson_id INTEGER REFERENCES lessons(id) ON DELETE SET NULL,
+      document_filename TEXT,
+      external_provider TEXT,
+      external_product_id TEXT,
+      external_price_id TEXT,
+      checkout_url TEXT,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS commerce_product_components (
+      bundle_product_id INTEGER NOT NULL REFERENCES commerce_products(id) ON DELETE CASCADE,
+      component_product_id INTEGER NOT NULL REFERENCES commerce_products(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (bundle_product_id, component_product_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS member_product_entitlements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+      product_id INTEGER NOT NULL REFERENCES commerce_products(id) ON DELETE CASCADE,
+      source TEXT NOT NULL DEFAULT 'purchase',
+      external_order_id TEXT,
+      metadata_json TEXT,
+      granted_at TEXT NOT NULL DEFAULT (datetime('now')),
+      revoked_at TEXT,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(member_id, product_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS commerce_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_key TEXT NOT NULL UNIQUE,
+      provider TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      external_customer_id TEXT,
+      external_order_id TEXT,
+      member_email TEXT,
+      product_code TEXT,
+      payload_json TEXT,
+      status TEXT NOT NULL DEFAULT 'received',
+      error TEXT,
+      received_at TEXT NOT NULL DEFAULT (datetime('now')),
+      processed_at TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_member_product_entitlements_member
+      ON member_product_entitlements(member_id, revoked_at);
+    CREATE INDEX IF NOT EXISTS idx_commerce_products_lesson
+      ON commerce_products(lesson_id, active);
+    CREATE INDEX IF NOT EXISTS idx_commerce_events_order
+      ON commerce_events(provider, external_order_id);
+  `);
+  const lessonByTitle = db2.prepare("SELECT id FROM lessons WHERE title = ? ORDER BY id DESC LIMIT 1");
+  const upsert = db2.prepare(`
+    INSERT INTO commerce_products (
+      code, canonical_name, format, module_number, price_cents, currency,
+      billing_type, tax_behavior, lesson_id, document_filename, active, updated_at
+    ) VALUES (
+      @code, @canonical_name, @format, @module_number, @price_cents, 'usd',
+      @billing_type, 'exclusive', @lesson_id, @document_filename, 1, datetime('now')
+    )
+    ON CONFLICT(code) DO UPDATE SET
+      canonical_name = excluded.canonical_name,
+      format = excluded.format,
+      module_number = excluded.module_number,
+      price_cents = excluded.price_cents,
+      currency = excluded.currency,
+      billing_type = excluded.billing_type,
+      tax_behavior = excluded.tax_behavior,
+      lesson_id = excluded.lesson_id,
+      document_filename = excluded.document_filename,
+      active = 1,
+      updated_at = datetime('now')
+  `);
+  upsert.run({
+    code: "membership.community.monthly",
+    canonical_name: "Papa Life Membership",
+    format: "membership",
+    module_number: null,
+    price_cents: 499,
+    billing_type: "recurring",
+    lesson_id: null,
+    document_filename: null
+  });
+  PAPA_CURRICULUM_LESSONS.forEach((title, index) => {
+    const moduleNumber = index + 1;
+    const lesson = lessonByTitle.get(title);
+    upsert.run({
+      code: moduleCode("digital", moduleNumber),
+      canonical_name: `Papa Life Audio Curriculum \u2014 Module ${String(moduleNumber).padStart(2, "0")} \u2014 ${title}`,
+      format: "digital",
+      module_number: moduleNumber,
+      price_cents: 999,
+      billing_type: "one_time",
+      lesson_id: lesson?.id || null,
+      document_filename: null
+    });
+    upsert.run({
+      code: moduleCode("manuscript", moduleNumber),
+      canonical_name: `Papa Life Manuscript \u2014 Module ${String(moduleNumber).padStart(2, "0")} \u2014 ${title}`,
+      format: "manuscript",
+      module_number: moduleNumber,
+      price_cents: 999,
+      billing_type: "one_time",
+      lesson_id: null,
+      document_filename: manuscriptFiles[index]
+    });
+  });
+  upsert.run({
+    code: "curriculum.digital.complete",
+    canonical_name: "Papa Life Audio Curriculum \u2014 Complete 12-Module Digital Program",
+    format: "bundle",
+    module_number: null,
+    price_cents: 5900,
+    billing_type: "one_time",
+    lesson_id: null,
+    document_filename: null
+  });
+  upsert.run({
+    code: "curriculum.bundle.complete",
+    canonical_name: "Papa Life Audio Curriculum \u2014 Complete Digital Program + All Manuscripts",
+    format: "bundle",
+    module_number: null,
+    price_cents: 9900,
+    billing_type: "one_time",
+    lesson_id: null,
+    document_filename: null
+  });
+  const productId = db2.prepare("SELECT id FROM commerce_products WHERE code = ?");
+  const insertComponent = db2.prepare(`
+    INSERT INTO commerce_product_components (bundle_product_id, component_product_id)
+    VALUES (?, ?)
+    ON CONFLICT(bundle_product_id, component_product_id) DO NOTHING
+  `);
+  const digitalBundle = productId.get("curriculum.digital.complete");
+  const completeBundle = productId.get("curriculum.bundle.complete");
+  for (let moduleNumber = 1; moduleNumber <= 12; moduleNumber += 1) {
+    const digital = productId.get(moduleCode("digital", moduleNumber));
+    const manuscript = productId.get(moduleCode("manuscript", moduleNumber));
+    insertComponent.run(digitalBundle.id, digital.id);
+    insertComponent.run(completeBundle.id, digital.id);
+    insertComponent.run(completeBundle.id, manuscript.id);
+  }
+}
+function listCommerceProducts(db2) {
+  return db2.prepare(`
+      SELECT id, code, canonical_name, format, module_number, price_cents, currency,
+             billing_type, tax_behavior, lesson_id, document_filename,
+             external_provider, external_product_id, external_price_id, checkout_url, active
+      FROM commerce_products
+      WHERE active = 1
+      ORDER BY
+        CASE code
+          WHEN 'membership.community.monthly' THEN 0
+          WHEN 'curriculum.digital.complete' THEN 1
+          WHEN 'curriculum.bundle.complete' THEN 2
+          ELSE 3
+        END,
+        module_number ASC,
+        format ASC
+    `).all();
+}
+function getCommerceProductByCode(db2, code) {
+  return db2.prepare(`
+      SELECT id, code, canonical_name, format, module_number, price_cents, currency,
+             billing_type, tax_behavior, lesson_id, document_filename,
+             external_provider, external_product_id, external_price_id, checkout_url, active
+      FROM commerce_products WHERE code = ? AND active = 1
+    `).get(code);
+}
+function getMemberEntitledProducts(db2, memberId) {
+  return db2.prepare(`
+      WITH entitled_products AS (
+        SELECT mpe.product_id
+        FROM member_product_entitlements mpe
+        WHERE mpe.member_id = ? AND mpe.revoked_at IS NULL
+        UNION
+        SELECT cpc.component_product_id
+        FROM member_product_entitlements mpe
+        JOIN commerce_product_components cpc ON cpc.bundle_product_id = mpe.product_id
+        WHERE mpe.member_id = ? AND mpe.revoked_at IS NULL
+      )
+      SELECT DISTINCT p.id, p.code, p.canonical_name, p.format, p.module_number,
+             p.price_cents, p.currency, p.billing_type, p.tax_behavior, p.lesson_id,
+             p.document_filename, p.external_provider, p.external_product_id,
+             p.external_price_id, p.checkout_url, p.active
+      FROM commerce_products p
+      JOIN entitled_products ep ON ep.product_id = p.id
+      WHERE p.active = 1
+      ORDER BY p.module_number ASC, p.format ASC
+    `).all(memberId, memberId);
+}
+function memberHasAnyCurriculumEntitlement(db2, memberId) {
+  const row = db2.prepare(`
+      SELECT 1 AS ok
+      FROM member_product_entitlements mpe
+      JOIN commerce_products p ON p.id = mpe.product_id
+      WHERE mpe.member_id = ?
+        AND mpe.revoked_at IS NULL
+        AND p.code LIKE 'curriculum.%'
+      LIMIT 1
+    `).get(memberId);
+  return row?.ok === 1;
+}
+function memberCanAccessLesson(db2, memberId, lessonId) {
+  const row = db2.prepare(`
+      WITH entitled_products AS (
+        SELECT mpe.product_id
+        FROM member_product_entitlements mpe
+        WHERE mpe.member_id = ? AND mpe.revoked_at IS NULL
+        UNION
+        SELECT cpc.component_product_id
+        FROM member_product_entitlements mpe
+        JOIN commerce_product_components cpc ON cpc.bundle_product_id = mpe.product_id
+        WHERE mpe.member_id = ? AND mpe.revoked_at IS NULL
+      )
+      SELECT 1 AS ok
+      FROM commerce_products p
+      JOIN entitled_products ep ON ep.product_id = p.id
+      WHERE p.lesson_id = ? AND p.format = 'digital' AND p.active = 1
+      LIMIT 1
+    `).get(memberId, memberId, lessonId);
+  return row?.ok === 1;
+}
+function getMemberManuscripts(db2, memberId) {
+  return getMemberEntitledProducts(db2, memberId).filter(
+    (product) => product.format === "manuscript" && Boolean(product.document_filename)
+  );
+}
+function memberCanAccessManuscript(db2, memberId, productCode) {
+  return getMemberManuscripts(db2, memberId).some((product) => product.code === productCode);
+}
+function grantMemberProductEntitlement(db2, input) {
+  const product = getCommerceProductByCode(db2, input.productCode);
+  if (!product) throw new Error(`Unknown commerce product code: ${input.productCode}`);
+  db2.prepare(`
+    INSERT INTO member_product_entitlements (
+      member_id, product_id, source, external_order_id, metadata_json,
+      granted_at, revoked_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, datetime('now'), NULL, datetime('now'))
+    ON CONFLICT(member_id, product_id) DO UPDATE SET
+      source = excluded.source,
+      external_order_id = COALESCE(excluded.external_order_id, member_product_entitlements.external_order_id),
+      metadata_json = COALESCE(excluded.metadata_json, member_product_entitlements.metadata_json),
+      revoked_at = NULL,
+      updated_at = datetime('now')
+  `).run(
+    input.memberId,
+    product.id,
+    input.source || "purchase",
+    input.externalOrderId || null,
+    input.metadata === void 0 ? null : JSON.stringify(input.metadata)
+  );
+  return product;
+}
+function revokeMemberProductEntitlement(db2, memberId, productCode) {
+  const product = getCommerceProductByCode(db2, productCode);
+  if (!product) throw new Error(`Unknown commerce product code: ${productCode}`);
+  const result = db2.prepare(`
+    UPDATE member_product_entitlements
+    SET revoked_at = datetime('now'), updated_at = datetime('now')
+    WHERE member_id = ? AND product_id = ? AND revoked_at IS NULL
+  `).run(memberId, product.id);
+  return result.changes > 0;
+}
+function recordCommerceEvent(db2, input) {
+  const result = db2.prepare(`
+    INSERT INTO commerce_events (
+      event_key, provider, event_type, external_customer_id, external_order_id,
+      member_email, product_code, payload_json, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'received')
+    ON CONFLICT(event_key) DO NOTHING
+  `).run(
+    input.eventKey,
+    input.provider,
+    input.eventType,
+    input.externalCustomerId || null,
+    input.externalOrderId || null,
+    input.memberEmail?.trim().toLowerCase() || null,
+    input.productCode || null,
+    input.payload === void 0 ? null : JSON.stringify(input.payload)
+  );
+  return result.changes > 0;
+}
+function completeCommerceEvent(db2, eventKey, status, error) {
+  db2.prepare(`
+    UPDATE commerce_events
+    SET status = ?, error = ?, processed_at = datetime('now')
+    WHERE event_key = ?
+  `).run(status, error || null, eventKey);
 }
 
 // server/sync-intake-to-crm.ts
@@ -2580,6 +2927,7 @@ ensureResearchTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
+ensureCommerceEntitlementTables(db);
 var intakeQuestionCount = db.prepare("SELECT COUNT(*) as c FROM form_questions WHERE form_key = 'intake_submission'").get().c;
 if (intakeQuestionCount === 0) {
   const insertQ = db.prepare(
@@ -2752,10 +3100,6 @@ var SQLiteStore = connectSqlite3(session);
 function requireAuth(req, res, next) {
   if (req.session.adminId) return next();
   res.status(401).json({ ok: false, error: "Unauthorized" });
-}
-function addHours(iso, hours) {
-  const start = new Date(iso);
-  return new Date(start.getTime() + hours * 60 * 60 * 1e3).toISOString();
 }
 function formatAmountDisplay(amountCents, currency) {
   return new Intl.NumberFormat("en-US", {
@@ -3300,6 +3644,16 @@ function requireMemberSession(req, res, next) {
   if (req.session.memberId) return next();
   res.status(401).json({ ok: false, error: "Unauthorized" });
 }
+function memberAccessScopes(member) {
+  const memberId = Number(member?.id);
+  const billing = getMemberAccessState(member);
+  const curriculum = memberId > 0 && memberHasAnyCurriculumEntitlement(db, memberId);
+  return {
+    community: Boolean(billing.hasPortalAccess),
+    curriculum,
+    portal: Boolean(billing.hasPortalAccess) || curriculum
+  };
+}
 function requireMemberAuth(req, res, next) {
   const memberId = Number(req.session.memberId);
   if (!memberId) return res.status(401).json({ ok: false, error: "Unauthorized" });
@@ -3312,9 +3666,31 @@ function requireMemberAuth(req, res, next) {
   if (!billing.hasPortalAccess) {
     return res.status(402).json({
       ok: false,
-      error: "Trial expired. Complete payment to continue.",
+      error: "An active Papa Life Membership is required for this community feature.",
       billing_required: true,
-      billing
+      billing,
+      access: memberAccessScopes(member)
+    });
+  }
+  next();
+}
+function requireMemberPortalAccess(req, res, next) {
+  const memberId = Number(req.session.memberId);
+  if (!memberId) return res.status(401).json({ ok: false, error: "Unauthorized" });
+  const member = loadMemberById(memberId);
+  if (!member || member.status !== "active") {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
+  req.session.memberUser = memberSessionPayload(member);
+  const billing = getMemberAccessState(member);
+  const access = memberAccessScopes(member);
+  if (!access.portal) {
+    return res.status(402).json({
+      ok: false,
+      error: "An active membership or a purchased Papa Life curriculum product is required.",
+      billing_required: true,
+      billing,
+      access
     });
   }
   next();
@@ -4525,11 +4901,13 @@ async function startServer() {
     req.session.memberId = member.id;
     req.session.memberUser = memberSessionPayload(member);
     const billing = getMemberAccessState(member);
+    const access = memberAccessScopes(member);
     res.json({
       ok: true,
       user: memberSessionPayload(member),
       billing,
-      billing_required: !billing.hasPortalAccess
+      access,
+      billing_required: !access.portal
     });
   });
   app.post("/api/member/auth/register", async (req, res) => {
@@ -4543,30 +4921,28 @@ async function startServer() {
       return res.status(409).json({ ok: false, error: "An account with this email already exists" });
     }
     const hash = await bcrypt.hash(String(password), 10);
-    const pricing = getPricingSettings(db);
-    const trialStartedAt = (/* @__PURE__ */ new Date()).toISOString();
-    const trialExpiresAt = addHours(trialStartedAt, pricing.member_trial_hours);
+    const enrolledAt = (/* @__PURE__ */ new Date()).toISOString();
     const result = db.prepare(
-      "INSERT INTO members (first_name, last_name, email, password_hash, status, payment_status, trial_started_at, trial_expires_at, enrolled_at) VALUES (?, ?, ?, ?, 'active', 'trial', ?, ?, ?)"
+      "INSERT INTO members (first_name, last_name, email, password_hash, status, payment_status, trial_started_at, trial_expires_at, enrolled_at) VALUES (?, ?, ?, ?, 'active', 'payment_required', NULL, NULL, ?)"
     ).run(
       String(first_name).trim(),
       String(last_name).trim(),
       normalizedEmail,
       hash,
-      trialStartedAt,
-      trialExpiresAt,
-      trialStartedAt
+      enrolledAt
     );
     const memberId = Number(result.lastInsertRowid);
     const member = loadMemberById(memberId);
     req.session.memberId = member.id;
     req.session.memberUser = memberSessionPayload(member);
     const billing = getMemberAccessState(member);
+    const access = memberAccessScopes(member);
     res.status(201).json({
       ok: true,
       user: memberSessionPayload(member),
       billing,
-      billing_required: !billing.hasPortalAccess
+      access,
+      billing_required: !access.portal
     });
   });
   app.post("/api/member/auth/logout", (req, res) => {
@@ -4580,10 +4956,11 @@ async function startServer() {
     const user = memberSessionPayload(member);
     req.session.memberUser = user;
     const billing = getMemberAccessState(member);
-    if (!billing.hasPortalAccess) {
-      return res.status(402).json({ ok: false, user, billing_required: true, billing });
+    const access = memberAccessScopes(member);
+    if (!access.portal) {
+      return res.status(402).json({ ok: false, user, billing_required: true, billing, access });
     }
-    res.json({ ok: true, user, billing });
+    res.json({ ok: true, user, billing, access });
   });
   app.get("/api/member/billing/status", requireMemberSession, (req, res) => {
     const memberId = Number(req.session.memberId);
@@ -4744,6 +5121,85 @@ async function startServer() {
       return res.status(500).json({ ok: false, error: error?.message || "Unable to record payment" });
     }
   });
+  app.post("/api/webhooks/commerce-paid", (req, res) => {
+    if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
+      return res.status(503).json({ ok: false, error: "PAYMENT_WEBHOOK_SECRET is not configured" });
+    }
+    if (!verifyPaymentWebhookAuth(req)) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+    const body = req.body || {};
+    const provider = cleanPublicText(body.provider ?? body.source ?? "external", 80) || "external";
+    const sourceEventId = cleanPublicText(
+      body.event_id ?? body.eventId ?? body.transaction_id ?? body.transactionId ?? body.payment_id ?? body.paymentId ?? body.session_id ?? body.id ?? body.data?.object?.id,
+      180
+    );
+    if (!sourceEventId) {
+      return res.status(400).json({ ok: false, error: "A unique payment event or transaction id is required." });
+    }
+    const eventKey = `${provider}:${sourceEventId}`;
+    const eventCreated = recordCommerceEvent(db, {
+      eventKey,
+      provider,
+      eventType: cleanPublicText(body.type ?? body.event_type ?? "payment.completed", 100),
+      externalOrderId: sourceEventId,
+      payload: body
+    });
+    if (!eventCreated) {
+      const existingEvent = db.prepare(
+        "SELECT status FROM commerce_events WHERE event_key = ?"
+      ).get(eventKey);
+      if (existingEvent?.status === "processed") {
+        return res.json({ ok: true, duplicate: true, event_key: eventKey });
+      }
+    }
+    try {
+      const productCode = cleanPublicText(
+        body.product_code ?? body.productCode ?? body.metadata?.product_code ?? body.data?.object?.metadata?.product_code,
+        120
+      );
+      const product = getCommerceProductByCode(db, productCode);
+      if (!product || !product.active) {
+        throw new Error("A valid active Papa Life product_code is required.");
+      }
+      const memberIdRaw = body.member_id ?? body.memberId ?? body.metadata?.member_id ?? body.client_reference_id ?? body.data?.object?.metadata?.member_id ?? body.data?.object?.client_reference_id;
+      const email = cleanPublicText(
+        body.email ?? body.customer_email ?? body.customer?.email ?? body.data?.object?.customer_details?.email ?? body.data?.object?.customer_email,
+        160
+      ).toLowerCase();
+      let member = Number.isFinite(Number(memberIdRaw)) ? loadMemberById(Number(memberIdRaw)) : null;
+      if (!member && isValidEmail(email)) member = loadMemberByEmail(email);
+      if (!member) throw new Error("Member not found. Complete intake and account creation before payment.");
+      const paidStatus = String(
+        body.payment_status ?? body.status ?? body.data?.object?.payment_status ?? "paid"
+      ).toLowerCase();
+      if (!["paid", "complete", "completed", "succeeded", "success"].includes(paidStatus)) {
+        throw new Error(`Payment is not complete: ${paidStatus}`);
+      }
+      const subtotalRaw = body.amount_subtotal ?? body.subtotal_cents ?? body.subtotal ?? body.data?.object?.amount_subtotal ?? null;
+      if (subtotalRaw !== null && Number(subtotalRaw) !== product.price_cents) {
+        throw new Error(`Pre-tax subtotal does not match ${product.canonical_name}.`);
+      }
+      grantMemberProductEntitlement(db, {
+        memberId: Number(member.id),
+        productCode: product.code,
+        source: provider,
+        externalOrderId: sourceEventId,
+        metadata: { event_key: eventKey, provisioned_by: "commerce_webhook" }
+      });
+      completeCommerceEvent(db, eventKey, "processed");
+      return res.json({
+        ok: true,
+        event_key: eventKey,
+        member_id: member.id,
+        product_code: product.code,
+        access: memberAccessScopes(loadMemberById(Number(member.id)))
+      });
+    } catch (error) {
+      completeCommerceEvent(db, eventKey, "failed", error?.message || "Commerce provisioning failed");
+      return res.status(400).json({ ok: false, event_key: eventKey, error: error?.message || "Commerce provisioning failed" });
+    }
+  });
   app.get("/api/members", requireAuth, (_req, res) => {
     const members = db.prepare(
       `SELECT id, lead_id, first_name, last_name, email, status, payment_status,
@@ -4797,6 +5253,62 @@ async function startServer() {
        VALUES (?, 'admin', NULL, NULL, NULL, ?)`
     ).run(Number(req.params.id), JSON.stringify({ source: "admin_mark_paid" }));
     res.json({ ok: true, paid_at: now });
+  });
+  app.get("/api/commerce/products", requireAuth, (_req, res) => {
+    res.json({ products: listCommerceProducts(db) });
+  });
+  app.get("/api/members/:id/commerce-entitlements", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    res.json({
+      member_id: memberId,
+      access: memberAccessScopes(member),
+      products: getMemberEntitledProducts(db, memberId)
+    });
+  });
+  app.post("/api/members/:id/commerce-entitlements", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    const productCode = cleanPublicText(req.body?.product_code, 120);
+    const product = getCommerceProductByCode(db, productCode);
+    if (!product || !product.active) {
+      return res.status(400).json({ ok: false, error: "A valid active product_code is required" });
+    }
+    grantMemberProductEntitlement(db, {
+      memberId,
+      productCode,
+      source: cleanPublicText(req.body?.source ?? "admin", 80) || "admin",
+      externalOrderId: cleanPublicText(req.body?.source_event_id, 180) || void 0,
+      metadata: {
+        granted_by: cleanPublicText(req.session?.user?.email ?? "admin", 160) || "admin"
+      }
+    });
+    res.status(201).json({
+      ok: true,
+      member_id: memberId,
+      product_code: productCode,
+      access: memberAccessScopes(loadMemberById(memberId)),
+      products: getMemberEntitledProducts(db, memberId)
+    });
+  });
+  app.delete("/api/members/:id/commerce-entitlements/:productCode", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    const productCode = String(req.params.productCode || "");
+    if (!getCommerceProductByCode(db, productCode)) {
+      return res.status(404).json({ ok: false, error: "Product not found" });
+    }
+    revokeMemberProductEntitlement(db, memberId, productCode);
+    res.json({
+      ok: true,
+      member_id: memberId,
+      product_code: productCode,
+      access: memberAccessScopes(loadMemberById(memberId)),
+      products: getMemberEntitledProducts(db, memberId)
+    });
   });
   app.delete("/api/members/:id", requireAuth, (req, res) => {
     db.prepare("DELETE FROM members WHERE id = ?").run(req.params.id);
@@ -4988,61 +5500,99 @@ async function startServer() {
     ).run(lessonId, releaseDays);
     res.json({ ok: true });
   });
-  app.get("/api/member/courses", requireMemberAuth, (_req, res) => {
-    const memberId = _req.session.memberId;
-    const member = loadMemberById(Number(memberId));
-    const isPaidMember = String(member?.payment_status || "") === "paid";
+  app.get("/api/member/courses", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const member = loadMemberById(memberId);
+    const communityAccess = memberAccessScopes(member).community;
+    const entitledDigitalLessonIds = new Set(
+      getMemberEntitledProducts(db, memberId).filter((product) => product.format === "digital" && product.lesson_id).map((product) => Number(product.lesson_id))
+    );
+    const legacyCourseIds = new Set(
+      db.prepare(
+        "SELECT course_id FROM member_course_access WHERE member_id = ? AND granted = 1"
+      ).all(memberId).map((row) => Number(row.course_id))
+    );
     const courses = db.prepare(`
       SELECT c.*, COUNT(l.id) as lesson_count
       FROM courses c
       LEFT JOIN lessons l ON l.course_id = c.id
-      WHERE
-        ? = 1
-        OR
-        NOT EXISTS (SELECT 1 FROM member_course_access mca WHERE mca.member_id = ?)
-        OR EXISTS (
-          SELECT 1 FROM member_course_access mca2
-          WHERE mca2.member_id = ? AND mca2.course_id = c.id AND mca2.granted = 1
-        )
       GROUP BY c.id
       ORDER BY c.sort_order ASC, c.created_at DESC
-    `).all(isPaidMember ? 1 : 0, memberId, memberId);
-    res.json(courses);
+    `).all();
+    const visible = courses.filter((course) => {
+      const isAudioCurriculum = course.title === "Papa Life Audio Curriculum";
+      if (isAudioCurriculum) {
+        if (legacyCourseIds.has(Number(course.id))) return true;
+        const lessonIds = db.prepare("SELECT id FROM lessons WHERE course_id = ?").all(course.id);
+        return lessonIds.some((lesson) => entitledDigitalLessonIds.has(Number(lesson.id)));
+      }
+      return communityAccess || legacyCourseIds.has(Number(course.id));
+    });
+    res.json(visible);
   });
-  app.get("/api/member/courses/:id", requireMemberAuth, (req, res) => {
-    const memberId = req.session.memberId;
-    const member = loadMemberById(Number(memberId));
-    const isPaidMember = String(member?.payment_status || "") === "paid";
-    const course = db.prepare(`
-      SELECT c.*
-      FROM courses c
-      WHERE c.id = ?
-        AND (
-          ? = 1
-          OR
-          NOT EXISTS (SELECT 1 FROM member_course_access mca WHERE mca.member_id = ?)
-          OR EXISTS (
-            SELECT 1 FROM member_course_access mca2
-            WHERE mca2.member_id = ? AND mca2.course_id = c.id AND mca2.granted = 1
-          )
-        )
-    `).get(req.params.id, isPaidMember ? 1 : 0, memberId, memberId);
+  app.get("/api/member/courses/:id", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const member = loadMemberById(memberId);
+    const communityAccess = memberAccessScopes(member).community;
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(req.params.id);
     if (!course) return res.status(404).json({ ok: false, error: "Not found" });
-    const lessons = db.prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC").all(req.params.id);
-    res.json({ ...course, lessons });
+    const legacyGrant = Boolean(db.prepare(`
+      SELECT 1 AS ok FROM member_course_access
+      WHERE member_id = ? AND course_id = ? AND granted = 1
+      LIMIT 1
+    `).get(memberId, course.id));
+    const isAudioCurriculum = course.title === "Papa Life Audio Curriculum";
+    const rawLessons = db.prepare(
+      "SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC"
+    ).all(course.id);
+    if (!isAudioCurriculum && !communityAccess && !legacyGrant) {
+      return res.status(403).json({ ok: false, error: "An active Papa Life Membership is required for this course." });
+    }
+    if (isAudioCurriculum) {
+      const hasAnyDigitalModule = legacyGrant || rawLessons.some(
+        (lesson) => memberCanAccessLesson(db, memberId, Number(lesson.id))
+      );
+      if (!hasAnyDigitalModule) {
+        return res.status(403).json({ ok: false, error: "Purchase a Papa Life digital module to access this curriculum." });
+      }
+      const lessons = rawLessons.map((lesson) => {
+        const entitled = legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        return {
+          ...lesson,
+          content_url: entitled ? lesson.content_url : null,
+          entitled,
+          locked: !entitled
+        };
+      });
+      return res.json({ ...course, lessons });
+    }
+    res.json({ ...course, lessons: rawLessons.map((lesson) => ({ ...lesson, entitled: true, locked: false })) });
   });
-  app.get("/api/member/progress", requireMemberAuth, (req, res) => {
+  app.get("/api/member/progress", requireMemberPortalAccess, (req, res) => {
     const memberId = req.session.memberId;
     const progress = db.prepare("SELECT lesson_id, completed_at FROM member_progress WHERE member_id = ?").all(memberId);
     res.json(progress);
   });
-  app.post("/api/member/progress", requireMemberAuth, (req, res) => {
-    const memberId = req.session.memberId;
-    const { lesson_id } = req.body;
-    db.prepare("INSERT OR IGNORE INTO member_progress (member_id, lesson_id) VALUES (?, ?)").run(memberId, lesson_id);
+  app.post("/api/member/progress", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const lessonId = Number(req.body?.lesson_id);
+    const lesson = db.prepare(`
+      SELECT l.id, c.title AS course_title
+      FROM lessons l JOIN courses c ON c.id = l.course_id
+      WHERE l.id = ?
+    `).get(lessonId);
+    if (!lesson) return res.status(404).json({ ok: false, error: "Lesson not found" });
+    const member = loadMemberById(memberId);
+    const allowed = lesson.course_title === "Papa Life Audio Curriculum" ? memberCanAccessLesson(db, memberId, lessonId) || Boolean(db.prepare(`
+          SELECT 1 FROM member_course_access mca
+          JOIN lessons l ON l.course_id = mca.course_id
+          WHERE mca.member_id = ? AND mca.granted = 1 AND l.id = ? LIMIT 1
+        `).get(memberId, lessonId)) : memberAccessScopes(member).community;
+    if (!allowed) return res.status(403).json({ ok: false, error: "You do not have access to this lesson." });
+    db.prepare("INSERT OR IGNORE INTO member_progress (member_id, lesson_id) VALUES (?, ?)").run(memberId, lessonId);
     res.json({ ok: true });
   });
-  app.delete("/api/member/progress/:lesson_id", requireMemberAuth, (req, res) => {
+  app.delete("/api/member/progress/:lesson_id", requireMemberPortalAccess, (req, res) => {
     const memberId = req.session.memberId;
     db.prepare("DELETE FROM member_progress WHERE member_id = ? AND lesson_id = ?").run(memberId, req.params.lesson_id);
     res.json({ ok: true });
@@ -5212,6 +5762,39 @@ async function startServer() {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `inline; filename="${resourceFile.filename}"`
+      }
+    });
+  });
+  app.get("/api/member/manuscripts", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const manuscripts = getMemberManuscripts(db, memberId).map((product) => ({
+      code: product.code,
+      title: product.canonical_name,
+      module_number: product.module_number,
+      download_url: `/api/member/manuscripts/${encodeURIComponent(product.code)}/download`
+    }));
+    res.json(manuscripts);
+  });
+  app.get("/api/member/manuscripts/:code/download", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const productCode = String(req.params.code || "");
+    if (!memberCanAccessManuscript(db, memberId, productCode)) {
+      return res.status(403).json({ ok: false, error: "Purchase of this manuscript is required." });
+    }
+    const product = getCommerceProductByCode(db, productCode);
+    const filename = product?.document_filename ? path3.basename(product.document_filename) : "";
+    if (!filename) return res.status(404).json({ ok: false, error: "Manuscript file is not configured." });
+    const folder = path3.join(appRoot, "server", "private-resources", "papa-life-manuscripts");
+    const filePath = path3.join(folder, filename);
+    if (!fs3.existsSync(filePath)) {
+      return res.status(404).json({ ok: false, error: "Manuscript delivery copy is missing." });
+    }
+    res.sendFile(filePath, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff"
       }
     });
   });
@@ -6281,14 +6864,35 @@ async function startServer() {
     const pricing = getPricingSettings(db);
     res.json({
       checkout_payment_link: pricing.checkout_payment_link,
-      member_trial_hours: pricing.member_trial_hours,
+      member_trial_hours: 0,
       member_price_usd_cents: pricing.member_price_usd_cents,
       member_currency: pricing.member_currency,
-      member_product_name: pricing.member_product_name,
+      member_product_name: "Papa Life Membership",
       member_price_display: formatAmountDisplay(
         pricing.member_price_usd_cents,
         pricing.member_currency
-      )
+      ),
+      tax_behavior: "exclusive",
+      tax_notice: "Applicable tax is calculated and displayed before payment confirmation."
+    });
+  });
+  app.get("/api/public/commerce-catalog", (_req, res) => {
+    const products = listCommerceProducts(db).map((product) => ({
+      code: product.code,
+      canonical_name: product.canonical_name,
+      format: product.format,
+      module_number: product.module_number,
+      price_cents: product.price_cents,
+      price_display: formatAmountDisplay(product.price_cents, product.currency),
+      currency: product.currency,
+      billing_type: product.billing_type,
+      tax_behavior: product.tax_behavior,
+      checkout_url: product.checkout_url || null
+    }));
+    res.json({
+      products,
+      tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
+      membership_scope: "Community and membership area only; curriculum products are purchased separately."
     });
   });
   app.get("/api/daily-theme", (_req, res) => {
@@ -6373,17 +6977,11 @@ async function startServer() {
     );
   });
   app.get("/go/join", (req, res) => {
-    const destination = "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
-    const campaign = "papa_life_paid_access";
+    const destination = "/join";
+    const campaign = "papa_life_intake_first_enrollment";
     logTrafficClick(req, "join", destination, campaign);
-    res.redirect(
-      302,
-      campaignRedirectUrl(
-        destination,
-        String(req.query.src || "site"),
-        campaign
-      )
-    );
+    const source = encodeURIComponent(String(req.query.src || "site"));
+    res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);
   });
   app.use("/api", (_req, res) => {
     res.status(404).json({ ok: false, error: "Not found" });

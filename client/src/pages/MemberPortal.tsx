@@ -61,6 +61,8 @@ interface Lesson {
   content_url: string | null;
   content_type: string;
   duration_minutes: number | null;
+  entitled?: boolean;
+  locked?: boolean;
 }
 
 interface JournalPrompt {
@@ -118,6 +120,19 @@ interface Resource {
   file_url: string | null;
   type: string;
   is_free: number;
+}
+
+interface PurchasedManuscript {
+  code: string;
+  title: string;
+  module_number: number;
+  download_url: string;
+}
+
+interface PortalAccess {
+  community: boolean;
+  curriculum: boolean;
+  portal: boolean;
 }
 
 interface DailyReflection {
@@ -319,22 +334,27 @@ function PortalSidebar({
   view,
   setView,
   user,
+  access,
   onLogout,
 }: {
   view: PortalView;
   setView: (v: PortalView) => void;
   user: MemberUser | null;
+  access: PortalAccess;
   onLogout: () => void;
 }) {
-  const items: { id: PortalView; label: string; Icon: typeof LayoutDashboard }[] = [
+  const communityItems: { id: PortalView; label: string; Icon: typeof LayoutDashboard }[] = [
     { id: "home", label: "My Journey", Icon: LayoutDashboard },
-    { id: "courses", label: "Courses", Icon: GraduationCap },
     { id: "journal", label: "Journal", Icon: BookMarked },
     { id: "brotherhood", label: "Brotherhood", Icon: Users2 },
     { id: "events", label: "Events", Icon: CalendarDays },
-    { id: "library", label: "Resources", Icon: Library },
+  ];
+  const productItems: { id: PortalView; label: string; Icon: typeof LayoutDashboard }[] = [
+    { id: "courses", label: "My Curriculum", Icon: GraduationCap },
+    { id: "library", label: "My Manuscripts", Icon: Library },
     { id: "profile", label: "Profile", Icon: User },
   ];
+  const items = access.community ? [...communityItems.slice(0, 1), ...productItems.slice(0, 1), ...communityItems.slice(1), ...productItems.slice(1)] : productItems;
 
   return (
     <aside className="w-56 min-h-screen bg-[#0d0d0d] border-r border-white/10 flex flex-col">
@@ -610,21 +630,23 @@ function CoursesView({
                     ) : (
                       courseLessons.map((lesson) => {
                         const done = completedIds.includes(lesson.id);
+                        const locked = lesson.locked === true;
                         return (
-                          <div key={lesson.id} className="bg-white/5 rounded-xl px-4 py-3 space-y-3 border border-white/5">
+                          <div key={lesson.id} className={`rounded-xl px-4 py-3 space-y-3 border ${locked ? "bg-black/20 border-white/5 opacity-70" : "bg-white/5 border-white/5"}`}>
                             <div className="flex items-center gap-3">
-                              <button type="button" onClick={() => onToggleComplete(lesson.id, done)} className="shrink-0">
-                                <CheckCircle2 className={`w-5 h-5 transition-colors ${done ? "text-green-400" : "text-gray-600 hover:text-gray-400"}`} />
+                              <button type="button" disabled={locked} onClick={() => onToggleComplete(lesson.id, done)} className="shrink-0 disabled:cursor-not-allowed">
+                                {locked ? <Lock className="w-5 h-5 text-gray-600" /> : <CheckCircle2 className={`w-5 h-5 transition-colors ${done ? "text-green-400" : "text-gray-600 hover:text-gray-400"}`} />}
                               </button>
-                              <Video className="w-4 h-4 text-gray-500 shrink-0" />
+                              {locked ? <Lock className="w-4 h-4 text-gray-600 shrink-0" /> : <Video className="w-4 h-4 text-gray-500 shrink-0" />}
                               <div className="flex-1 min-w-0">
                                 <p className={`text-sm font-medium ${done ? "line-through text-gray-600" : "text-gray-200"}`}>{lesson.title}</p>
                                 {lesson.description && <p className="text-gray-600 text-xs mt-0.5 whitespace-pre-wrap">{lesson.description}</p>}
                                 {lesson.duration_minutes != null && lesson.duration_minutes > 0 && (
                                   <p className="text-gray-600 text-[10px] mt-0.5">{lesson.duration_minutes} min</p>
                                 )}
+                                {locked && <p className="text-brand-yellow text-[10px] mt-1">Purchase this digital module to unlock playback.</p>}
                               </div>
-                              {lesson.content_url && (
+                              {!locked && lesson.content_url && (
                                 <a
                                   href={lesson.content_url}
                                   target="_blank"
@@ -635,7 +657,7 @@ function CoursesView({
                                 </a>
                               )}
                             </div>
-                            {lesson.content_url && (
+                            {!locked && lesson.content_url && (
                               <div className="pl-0 sm:pl-0 space-y-4">
                                 <LessonMediaPlayer url={lesson.content_url} contentType={lesson.content_type} />
                                 <SiteCtaBlocks placement="member_lesson" />
@@ -996,62 +1018,106 @@ function EventsView() {
 
 // ─── Library View ─────────────────────────────────────────────────────────────
 
-function LibraryView({ user }: { user: MemberUser | null }) {
+function LibraryView({ user, access }: { user: MemberUser | null; access: PortalAccess }) {
   const [resources, setResources] = useState<Resource[]>([]);
+  const [manuscripts, setManuscripts] = useState<PurchasedManuscript[]>([]);
   const [filterPillar, setFilterPillar] = useState("All");
   const isPaidMember = user?.payment_status === "paid";
 
   useEffect(() => {
-    fetch("/api/member/library").then((r) => r.json()).then(setResources);
-  }, []);
+    fetch("/api/member/manuscripts")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setManuscripts);
+    if (access.community) {
+      fetch("/api/member/library")
+        .then((r) => (r.ok ? r.json() : []))
+        .then(setResources);
+    }
+  }, [access.community]);
 
   const filtered = filterPillar === "All" ? resources : resources.filter((r) => r.pillar === filterPillar);
-  const typeIcons: Record<string, string> = { pdf: "📄", video: "🎥", audio: "🎧", worksheet: "📝", guide: "📚" };
+  const typeIcons: Record<string, string> = { pdf: "PDF", video: "Video", audio: "Audio", worksheet: "Worksheet", guide: "Guide" };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-white">Resource Library</h2>
-        <p className="text-sm text-gray-500 mt-1">Guides, worksheets, and tools to accelerate your journey</p>
+        <h2 className="text-xl font-bold text-white">My Manuscripts and Resources</h2>
+        <p className="text-sm text-gray-500 mt-1">Secure access to purchased manuscript PDFs and membership resources.</p>
       </div>
       <SiteCtaBlocks placement="member_library" />
-      <div className="flex gap-1.5 flex-wrap">
-        {["All", "Purpose", "Authority", "Presence", "Alignment", "General"].map((p) => (
-          <button key={p} onClick={() => setFilterPillar(p)} className={`text-xs px-2.5 py-1 rounded-full transition-colors ${filterPillar === p ? "bg-primary text-primary-foreground font-bold" : "bg-white/5 text-gray-400 hover:text-white"}`}>{p}</button>
-        ))}
-      </div>
-      {filtered.length === 0 ? (
-        <Card className="bg-[#111] border-white/10"><CardContent className="py-16 text-center text-gray-500">No resources yet.</CardContent></Card>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          {filtered.map((resource) => {
-            const colors = pillarColors[resource.pillar] || pillarColors.General;
-            return (
-              <div key={resource.id} className="bg-[#111] border border-white/10 rounded-xl p-5 flex flex-col">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <span className="text-xl">{typeIcons[resource.type] || "📄"}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${colors.badge}`}>{resource.pillar}</span>
-                    {!resource.is_free && <Lock className="w-3.5 h-3.5 text-gray-500" />}
+
+      <section className="space-y-3">
+        <div>
+          <h3 className="text-white font-semibold">Purchased Papa Life Manuscripts</h3>
+          <p className="text-xs text-gray-500 mt-1">PDF delivery copies for the individual modules or complete manuscript bundle you purchased.</p>
+        </div>
+        {manuscripts.length === 0 ? (
+          <Card className="bg-[#111] border-white/10"><CardContent className="py-10 text-center text-gray-500">No purchased manuscripts are available for this account.</CardContent></Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {manuscripts.map((manuscript) => (
+              <div key={manuscript.code} className="bg-[#111] border border-brand-yellow/20 rounded-xl p-5">
+                <div className="flex items-start gap-3">
+                  <BookOpen className="w-5 h-5 text-brand-yellow shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500">Module {manuscript.module_number}</p>
+                    <h4 className="text-white font-semibold text-sm mt-1">{manuscript.title}</h4>
+                    <a href={manuscript.download_url} className="inline-flex items-center gap-1.5 text-xs text-brand-yellow hover:text-brand-yellow/80 font-medium mt-3">
+                      <BookOpen className="w-3.5 h-3.5" /> Download PDF
+                    </a>
                   </div>
                 </div>
-                <h3 className="text-white font-semibold text-sm leading-snug">{resource.title}</h3>
-                {resource.description && <p className="text-gray-500 text-xs mt-1.5 leading-relaxed flex-1">{resource.description}</p>}
-                <div className="mt-4">
-                  {resource.file_url && (resource.is_free || isPaidMember) ? (
-                    <a href={resource.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/90 font-medium">
-                      <BookOpen className="w-3.5 h-3.5" /> Access Resource
-                    </a>
-                  ) : !resource.is_free ? (
-                    <span className="text-xs text-gray-600 flex items-center gap-1"><Lock className="w-3 h-3" /> Upgrade to access</span>
-                  ) : (
-                    <span className="text-xs text-gray-600">Coming soon</span>
-                  )}
-                </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {access.community && (
+        <section className="space-y-4">
+          <div>
+            <h3 className="text-white font-semibold">Community Resource Library</h3>
+            <p className="text-xs text-gray-500 mt-1">Guides, worksheets, and tools included with the $4.99 monthly Papa Life Membership.</p>
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {["All", "Purpose", "Authority", "Presence", "Alignment", "General"].map((p) => (
+              <button key={p} onClick={() => setFilterPillar(p)} className={`text-xs px-2.5 py-1 rounded-full transition-colors ${filterPillar === p ? "bg-primary text-primary-foreground font-bold" : "bg-white/5 text-gray-400 hover:text-white"}`}>{p}</button>
+            ))}
+          </div>
+          {filtered.length === 0 ? (
+            <Card className="bg-[#111] border-white/10"><CardContent className="py-16 text-center text-gray-500">No resources yet.</CardContent></Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filtered.map((resource) => {
+                const colors = pillarColors[resource.pillar] || pillarColors.General;
+                return (
+                  <div key={resource.id} className="bg-[#111] border border-white/10 rounded-xl p-5 flex flex-col">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-500">{typeIcons[resource.type] || "Resource"}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${colors.badge}`}>{resource.pillar}</span>
+                        {!resource.is_free && <Lock className="w-3.5 h-3.5 text-gray-500" />}
+                      </div>
+                    </div>
+                    <h3 className="text-white font-semibold text-sm leading-snug">{resource.title}</h3>
+                    {resource.description && <p className="text-gray-500 text-xs mt-1.5 leading-relaxed flex-1">{resource.description}</p>}
+                    <div className="mt-4">
+                      {resource.file_url && (resource.is_free || isPaidMember) ? (
+                        <a href={resource.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/90 font-medium">
+                          <BookOpen className="w-3.5 h-3.5" /> Access Resource
+                        </a>
+                      ) : !resource.is_free ? (
+                        <span className="text-xs text-gray-600 flex items-center gap-1"><Lock className="w-3 h-3" /> Membership required</span>
+                      ) : (
+                        <span className="text-xs text-gray-600">Coming soon</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
       )}
     </div>
   );
@@ -1144,6 +1210,7 @@ export default function MemberPortal() {
   const [, navigate] = useLocation();
   const [view, setView] = useState<PortalView>("home");
   const [user, setUser] = useState<MemberUser | null>(null);
+  const [access, setAccess] = useState<PortalAccess>({ community: false, curriculum: false, portal: false });
   const [authChecked, setAuthChecked] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [completedIds, setCompletedIds] = useState<number[]>([]);
@@ -1157,7 +1224,10 @@ export default function MemberPortal() {
           return;
         }
         if (data.data?.ok) {
+          const nextAccess = data.data.access || { community: false, curriculum: false, portal: false };
           setUser(data.data.user);
+          setAccess(nextAccess);
+          if (!nextAccess.community && nextAccess.curriculum) setView("courses");
           fetchData();
         } else {
           navigate("/member-login");
@@ -1213,22 +1283,22 @@ export default function MemberPortal() {
 
   if (!user) return null;
 
-  const showOnboarding = !user.onboarding_completed && view === "home";
+  const showOnboarding = access.community && !user.onboarding_completed && view === "home";
 
   return (
     <div className="flex min-h-screen bg-[#0a0a0a] text-white">
-      <PortalSidebar view={view} setView={setView} user={user} onLogout={handleLogout} />
+      <PortalSidebar view={view} setView={setView} user={user} access={access} onLogout={handleLogout} />
       <main className="flex-1 p-8 overflow-y-auto max-w-5xl">
         {showOnboarding ? (
           <OnboardingWizard user={user} onComplete={handleOnboardingComplete} />
         ) : (
           <>
-            {view === "home" && <MyJourney user={user} onNavigate={setView} />}
+            {view === "home" && access.community && <MyJourney user={user} onNavigate={setView} />}
             {view === "courses" && <CoursesView courses={courses} completedIds={completedIds} onToggleComplete={handleToggleComplete} />}
-            {view === "journal" && <JournalView />}
-            {view === "brotherhood" && <BrotherhoodView currentMemberId={user?.id || 0} />}
-            {view === "events" && <EventsView />}
-            {view === "library" && <LibraryView user={user} />}
+            {view === "journal" && access.community && <JournalView />}
+            {view === "brotherhood" && access.community && <BrotherhoodView currentMemberId={user?.id || 0} />}
+            {view === "events" && access.community && <EventsView />}
+            {view === "library" && <LibraryView user={user} access={access} />}
             {view === "profile" && <ProfileView user={user} />}
           </>
         )}

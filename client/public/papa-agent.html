@@ -490,6 +490,8 @@
 
         var widget = document.createElement("elevenlabs-convai");
         widget.setAttribute("signed-url", data.signed_url);
+        widget.setAttribute("worklet-path-raw-audio-processor", "/vendor/elevenlabs-worklets/rawAudioProcessor.js");
+        widget.setAttribute("worklet-path-audio-concat-processor", "/vendor/elevenlabs-worklets/audioConcatProcessor.js");
         if (data.widget_config) {
           widget.setAttribute("override-config", JSON.stringify(data.widget_config));
         }

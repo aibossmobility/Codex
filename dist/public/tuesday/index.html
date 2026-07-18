@@ -3,523 +3,55 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#050504">
-  <title>Papa Life Tuesday Live | Brian Keith Hill</title>
-  <meta name="description" content="Choose how to join Papa Life Tuesday Live: listen to today's coaching or join the live coaching session.">
+  <meta name="theme-color" content="#f2c230">
+  <title>Papa Life Tuesday Live — Listen, Learn, and Choose</title>
+  <meta name="description" content="Join Papa Life Tuesday Live, listen to today's coaching, and explore all 12 Papa Life audio lessons with optional membership pricing.">
   <style>
-    :root {
-      --black: #050504;
-      --charcoal: #141410;
-      --panel: #1d1c17;
-      --gold: #f6c74a;
-      --green: #1fa463;
-      --green-dark: #147346;
-      --red: #d9362b;
-      --red-dark: #9f2018;
-      --white: #ffffff;
-      --cream: #fff7df;
-      --muted: #c9c0a7;
-      --line: rgba(255, 255, 255, .15);
-      --focus: 0 0 0 4px rgba(246, 199, 74, .28);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background: var(--black);
-      color: var(--cream);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.5;
-    }
-    a, button { font: inherit; }
-    button { cursor: pointer; }
-    a { color: inherit; }
-    a:focus-visible, button:focus-visible { outline: none; box-shadow: var(--focus); }
-
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      padding: 16px max(20px, calc((100vw - 1120px) / 2));
-      border-bottom: 1px solid var(--line);
-      background: rgba(5, 5, 4, .96);
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-    .brand img {
-      width: 72px;
-      height: 44px;
-      object-fit: cover;
-      border: 1px solid rgba(246, 199, 74, .55);
-      border-radius: 6px;
-      background: #000;
-      flex: 0 0 auto;
-    }
-    .brand strong {
-      display: block;
-      color: var(--gold);
-      font-size: 18px;
-      line-height: 1.1;
-    }
-    .brand span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .live-note {
-      color: var(--muted);
-      font-weight: 700;
-      white-space: nowrap;
-      font-size: 14px;
-    }
-
-    main {
-      width: min(1120px, calc(100% - 36px));
-      margin: 0 auto;
-      padding: 46px 0 52px;
-      flex: 1;
-    }
-    .hero {
-      text-align: center;
-      max-width: 860px;
-      margin: 0 auto 34px;
-    }
-    .eyebrow {
-      margin: 0 0 12px;
-      color: var(--gold);
-      font-weight: 900;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-size: 15px;
-    }
-    h1 {
-      margin: 0;
-      color: var(--white);
-      font-size: clamp(42px, 7vw, 76px);
-      line-height: 1;
-      letter-spacing: 0;
-    }
-    .hero p {
-      margin: 18px auto 0;
-      max-width: 640px;
-      color: rgba(255, 247, 223, .84);
-      font-size: clamp(18px, 2.4vw, 23px);
-    }
-
-    .choices {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      align-items: stretch;
-      margin-top: 30px;
-    }
-    .choice {
-      min-height: 100%;
-      padding: 26px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--charcoal);
-    }
-    .choice h2 {
-      margin: 0;
-      color: var(--gold);
-      font-size: clamp(28px, 3.4vw, 38px);
-      line-height: 1.05;
-    }
-    .choice p {
-      margin: 14px 0 0;
-      color: rgba(255, 247, 223, .86);
-      font-size: 18px;
-    }
-    .track-list {
-      margin: 18px 0 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 10px;
-      color: var(--white);
-      font-weight: 800;
-    }
-    .track-list li {
-      padding: 10px 12px;
-      border: 1px solid rgba(246, 199, 74, .24);
-      border-radius: 6px;
-      background: rgba(246, 199, 74, .07);
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      min-height: 58px;
-      margin-top: 22px;
-      padding: 15px 18px;
-      border: 0;
-      border-radius: 8px;
-      color: var(--white);
-      font-weight: 900;
-      text-decoration: none;
-      text-align: center;
-      font-size: 18px;
-    }
-    .btn.green { background: var(--green); }
-    .btn.green:hover { background: var(--green-dark); }
-    .btn.red { background: var(--red); }
-    .btn.red:hover { background: var(--red-dark); }
-    .btn.gold {
-      background: var(--gold);
-      color: #171204;
-    }
-    .btn.secondary {
-      background: rgba(255, 255, 255, .08);
-      border: 1px solid var(--line);
-    }
-
-    .player {
-      display: none;
-      margin: 28px auto 0;
-      padding: 22px;
-      border: 1px solid rgba(246, 199, 74, .45);
-      border-radius: 8px;
-      background: var(--panel);
-      max-width: 760px;
-    }
-    .player.active { display: block; }
-    .player-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .now {
-      color: var(--gold);
-      font-weight: 900;
-      font-size: 18px;
-    }
-    .status {
-      color: var(--muted);
-      font-weight: 700;
-    }
-    .bar {
-      height: 12px;
-      margin: 18px 0 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .12);
-      overflow: hidden;
-    }
-    .fill {
-      width: 0%;
-      height: 100%;
-      background: var(--gold);
-      transition: width .2s linear;
-    }
-    .times {
-      display: flex;
-      justify-content: space-between;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-      font-size: 14px;
-    }
-    .player-controls {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .player-controls .btn { margin: 0; min-height: 48px; font-size: 16px; }
-
-    .finished {
-      display: none;
-      margin-top: 22px;
-      padding-top: 22px;
-      border-top: 1px solid var(--line);
-      text-align: center;
-    }
-    .finished.visible { display: block; }
-    .finished h2 {
-      margin: 0;
-      color: var(--gold);
-      font-size: clamp(28px, 4vw, 42px);
-    }
-    .finished p {
-      margin: 8px auto 0;
-      color: var(--cream);
-      font-size: 18px;
-    }
-    .finish-actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-    .finish-actions .btn { margin: 0; min-height: 52px; }
-
-    .resources {
-      margin-top: 38px;
-      padding-top: 30px;
-      border-top: 1px solid var(--line);
-    }
-    .resources h2 {
-      margin: 0 0 16px;
-      color: var(--gold);
-      font-size: clamp(30px, 4vw, 44px);
-      text-align: center;
-    }
-    .resource-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-    .resource {
-      display: block;
-      min-height: 100%;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #10100d;
-      text-decoration: none;
-    }
-    .resource strong {
-      display: block;
-      color: var(--white);
-      font-size: 18px;
-    }
-    .resource span {
-      display: block;
-      margin-top: 8px;
-      color: var(--muted);
-    }
-    footer {
-      padding: 24px 18px 34px;
-      color: var(--muted);
-      text-align: center;
-      border-top: 1px solid var(--line);
-    }
-
-    @media (max-width: 820px) {
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .live-note { white-space: normal; }
-      main { padding-top: 32px; }
-      .choices, .resource-grid, .finish-actions { grid-template-columns: 1fr; }
-      .choice { padding: 22px; }
-    }
-    @media (max-width: 520px) {
-      .player-controls { grid-template-columns: 1fr; }
-      h1 { font-size: clamp(38px, 14vw, 58px); }
-      .brand img { width: 60px; height: 38px; }
-    }
+    :root{--green:#145b35;--green-dark:#0e4528;--gold:#f2c230;--cream:#f4dea0;--paper:#f8f0db;--red:#b33a32;--red-dark:#922d27;--ink:#17231c;--muted:#5b655e;--white:#fff;--line:rgba(23,35,28,.18);--focus:0 0 0 4px rgba(20,91,53,.22)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.5}a,button{font:inherit}button{cursor:pointer}a{color:inherit}a:focus-visible,button:focus-visible{outline:none;box-shadow:var(--focus)}
+    .page{min-height:100vh}.wrap{width:min(1160px,calc(100% - 36px));margin:0 auto}.topbar{background:var(--gold);border-bottom:1px solid var(--line)}.topbar .wrap{min-height:80px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 0}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand img{width:72px;height:44px;object-fit:cover;border:2px solid var(--green);border-radius:7px}.brand strong{display:block;color:var(--green);font-size:18px}.brand span{display:block;color:var(--ink);font-size:13px}.nav{display:flex;align-items:center;gap:16px;font-weight:800}.nav a{text-decoration:none}.nav .join{padding:11px 15px;border-radius:7px;background:var(--green);color:var(--white)}
+    .hero{background:var(--green);color:var(--white);text-align:center;padding:62px 0}.eyebrow{margin:0 0 12px;color:var(--gold);font-size:14px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.hero h1{max-width:900px;margin:0 auto;font-size:clamp(42px,7vw,72px);line-height:1}.hero>div>p:last-child{max-width:720px;margin:20px auto 0;color:rgba(255,255,255,.86);font-size:clamp(18px,2.3vw,22px)}
+    .choice-band{background:var(--red);padding:34px 0}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.choice{display:flex;flex-direction:column;padding:25px;border-radius:11px;background:var(--paper);border:4px solid var(--green)}.choice h2{margin:0;font-size:clamp(27px,3vw,36px);line-height:1.08}.choice p{margin:13px 0;color:var(--muted);font-size:17px}.track-list{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:8px}.track-select{width:100%;padding:11px 13px;border:2px solid transparent;border-radius:6px;background:rgba(242,194,48,.38);color:var(--ink);font-weight:900;text-align:left}.track-select:hover,.track-select.active{border-color:var(--green);background:var(--gold)}.track-select span{float:right;color:var(--green)}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;margin-top:auto;padding:14px 18px;border:0;border-radius:7px;color:var(--white);font-weight:900;text-align:center;text-decoration:none}.btn.green{background:var(--green)}.btn.green:hover{background:var(--green-dark)}.btn.red{background:var(--red)}.btn.red:hover{background:var(--red-dark)}.btn.gold{background:var(--gold);color:var(--ink)}.choice .btn{margin-top:20px}
+    .player{display:none;margin:30px auto 0;padding:24px;border:4px solid var(--green);border-radius:11px;background:var(--paper);max-width:800px}.player.active{display:block}.player-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.now{color:var(--green);font-size:19px;font-weight:900}.status{color:var(--muted);font-weight:700}.bar{height:12px;margin:18px 0 8px;border-radius:999px;background:rgba(23,35,28,.15);overflow:hidden}.fill{width:0;height:100%;background:var(--gold);transition:width .2s linear}.times{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}.player-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}.player-controls .btn{margin:0;background:var(--green)}.finished{display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--line);text-align:center}.finished.visible{display:block}.finished h2{margin:0;color:var(--green)}
+    .catalog{padding:56px 0}.catalog-head{text-align:center;max-width:820px;margin:0 auto 28px}.catalog-head h2{margin:0;font-size:clamp(34px,5vw,52px);line-height:1.05}.catalog-head p{margin:15px auto 0;color:var(--muted);font-size:18px}.choice-explainer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:28px 0}.explain{padding:20px;border-radius:9px;background:var(--paper)}.explain:first-child{border-left:8px solid var(--red)}.explain:last-child{background:var(--gold);border-left:8px solid var(--green)}.explain h3{margin:0 0 6px;font-size:23px}.explain p{margin:0;color:var(--muted)}.explain:last-child p{color:var(--ink)}
+    .lesson-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.lesson{display:flex;flex-direction:column;padding:22px;border:4px solid var(--green);border-radius:12px;background:var(--paper);box-shadow:0 4px 12px rgba(23,35,28,.08)}.lesson-number{margin:0;color:var(--red);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.lesson h3{margin:10px 0 0;min-height:58px;font-size:21px;line-height:1.25}.prices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}.price{padding:11px;border:1px solid var(--line);border-radius:7px}.price.member{background:var(--gold);border-color:transparent}.price span{display:block;color:var(--muted);font-size:12px;font-weight:800}.price.member span{color:var(--green)}.price strong{display:block;margin-top:2px;font-size:22px}.price.member strong{color:var(--green)}.lesson .btn{margin-top:auto}.lesson .member-link{display:block;margin-top:11px;color:var(--green);font-size:14px;font-weight:900;text-align:center}.loading{grid-column:1/-1;padding:30px;text-align:center;font-weight:800}.bundle{margin-top:34px;padding:28px;border-radius:12px;background:var(--green);color:var(--white)}.bundle h2{margin:0;color:var(--gold);font-size:30px}.bundle p{margin:10px 0 20px;color:rgba(255,255,255,.84)}.bundle-actions{display:flex;flex-wrap:wrap;gap:12px}.bundle-actions .btn{margin:0;width:auto}.resources{padding:40px 0;background:var(--red);color:var(--white)}.resources h2{margin:0 0 18px;text-align:center;color:var(--gold);font-size:34px}.resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.resource{padding:20px;border-radius:9px;background:rgba(255,255,255,.1);text-decoration:none}.resource strong{display:block;font-size:18px}.resource span{display:block;margin-top:7px;color:rgba(255,255,255,.78)}footer{padding:28px 18px;background:var(--green-dark);color:rgba(255,255,255,.8);text-align:center}
+    @media(max-width:900px){.lesson-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.resource-grid{grid-template-columns:1fr}.nav>a:not(.join){display:none}}@media(max-width:700px){.choices,.choice-explainer,.lesson-grid{grid-template-columns:1fr}.topbar .wrap{align-items:flex-start;flex-direction:column}.hero{padding:46px 0}.choice{padding:20px}.player-controls{grid-template-columns:1fr}.lesson h3{min-height:0}.bundle-actions .btn{width:100%}}
   </style>
-  <script
-    src="https://links.isharehow.app/js/external-tracking.js"
-    data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
-  </script>
+  <script src="https://links.isharehow.app/js/external-tracking.js" data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5"></script>
 </head>
 <body>
   <div class="page">
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="Papa Life home">
-        <img src="/images/papa-life-logo.png" alt="Papa Life">
-        <span>
-          <strong>Papa Life Tuesday Live</strong>
-          <span>Brian Keith Hill</span>
-        </span>
-      </a>
-      <div class="live-note">Faith • Fatherhood • Future Readiness</div>
-    </header>
+    <header class="topbar"><div class="wrap"><a class="brand" href="/" aria-label="Papa Life home"><img src="/images/papa-life-logo.png" alt="Papa Life"><span><strong>Papa Life Tuesday Live</strong><span>Brian Keith Hill</span></span></a><nav class="nav" aria-label="Primary"><a href="/shop">Shop</a><a href="/member-login">Member Login</a><a class="join" href="/join">Join for $4.99</a></nav></div></header>
 
-    <main>
-      <section class="hero" aria-labelledby="pageTitle">
-        <p class="eyebrow">Faith • Fatherhood • Future Readiness</p>
-        <h1 id="pageTitle">Choose how you'd like to participate today.</h1>
-        <p>One simple experience for fathers who want encouragement, coaching, and a practical next step toward reconnection.</p>
-      </section>
+    <section class="hero"><div class="wrap"><p class="eyebrow">Faith • Fatherhood • Future Readiness</p><h1>Listen today. Choose your next step.</h1><p>Join Brian live on Tuesday, listen any day of the week, and explore the Papa Life lesson that speaks to what you are facing right now.</p></div></section>
 
-      <section class="choices" aria-label="Tuesday Live participation choices">
-        <article class="choice">
-          <h2>Listen to Today's Coaching</h2>
-          <p>No live session? No problem. Listen to today's complete coaching session from beginning to end.</p>
-          <ul class="track-list" aria-label="Today's audio tracks">
-            <li>Track 1 – Welcome & Teaching</li>
-            <li>Track 2 – Prayer & Reflection</li>
-          </ul>
-          <button class="btn green" type="button" id="listenNow">▶ Listen Now</button>
-        </article>
+    <section class="choice-band"><div class="wrap"><div class="choices">
+      <article class="choice"><p class="eyebrow">Available every day</p><h2>Listen to Today’s Coaching</h2><p>Choose either track separately, or use Listen to Both to hear the complete session in order.</p><ul class="track-list"><li><button class="track-select" type="button" data-track="0">Are You a Father of an Adult Child? (F.O.A.D.C.) <span>▶ Play</span></button></li><li><button class="track-select" type="button" data-track="1">How to Use AI with Your Heart! <span>▶ Play</span></button></li></ul><button class="btn green" type="button" id="listenNow">▶ Listen to Both</button></article>
+      <article class="choice"><p class="eyebrow">Tuesday Live</p><h2>Join Brian’s Live Session</h2><p>Listen, ask questions, interact with other fathers, and take one practical step toward reconnection.</p><a class="btn red" href="https://meetn.com/briankeithhill" target="_blank" rel="noopener">Join Live Session</a></article>
+    </div>
+    <section class="player" id="playerPanel" aria-label="Tuesday coaching audio player" aria-live="polite"><audio id="coachingAudio" preload="metadata"></audio><div class="player-top"><div><div class="now" id="trackTitle">Track 1 — Welcome & Teaching</div><div class="status" id="trackStatus">Ready to begin.</div></div><div class="status" id="trackCounter">Track 1 of 2</div></div><div class="bar" aria-hidden="true"><div class="fill" id="progressFill"></div></div><div class="times"><span id="elapsed">0:00</span><span id="duration">--:--</span></div><div class="player-controls"><button class="btn" type="button" id="pauseButton">Pause</button><button class="btn" type="button" id="restartButton">Restart Track</button></div><div class="finished" id="finishedPanel"><h2>Thank you for joining Papa Life.</h2><p>Choose a lesson below when you are ready for your next step.</p></div></section>
+    </div></section>
 
-        <article class="choice">
-          <h2>Join Today's Live Session</h2>
-          <p>Participate in today's live coaching. Ask questions, interact with other fathers, and join the conversation in real time.</p>
-          <a class="btn red" href="https://meetn.com/briankeithhill" target="_blank" rel="noopener">Join Live Session</a>
-        </article>
-      </section>
+    <main class="catalog"><div class="wrap">
+      <div class="catalog-head"><p class="eyebrow">The Papa Life 12-lesson curriculum</p><h2>Choose the lesson that meets you where you are</h2><p>Listen first, then purchase only what helps you. Membership is optional—not required.</p></div>
+      <div class="choice-explainer"><article class="explain"><h3>Buy Without Membership</h3><p>Pay the regular one-time price and keep permanent access to the audio lesson you purchase.</p></article><article class="explain"><h3>Join and Save</h3><p>Join for $4.99 monthly, receive Course 11 streaming immediately, and unlock the $9.99 member price on permanent lesson purchases.</p></article></div>
+      <section class="lesson-grid" id="lessonGrid" aria-label="Twelve Papa Life audio lessons"><p class="loading">Loading the 12 Papa Life lessons…</p></section>
+      <section class="bundle"><h2>Want the complete journey?</h2><p>Choose the complete digital program for $79 regular / $59 member, or the digital program with all manuscripts for $129 regular / $99 member.</p><div class="bundle-actions"><a class="btn gold" href="/shop">See Bundles and All Products</a><a class="btn red" href="/join">Join for $4.99 Monthly</a></div></section>
+    </div></main>
 
-      <section class="player" id="playerPanel" aria-label="Tuesday coaching audio player" aria-live="polite">
-        <audio id="coachingAudio" preload="metadata"></audio>
-        <div class="player-top">
-          <div>
-            <div class="now" id="trackTitle">Track 1 – Welcome & Teaching</div>
-            <div class="status" id="trackStatus">Ready to begin.</div>
-          </div>
-          <div class="status" id="trackCounter">Track 1 of 2</div>
-        </div>
-        <div class="bar" aria-hidden="true"><div class="fill" id="progressFill"></div></div>
-        <div class="times"><span id="elapsed">0:00</span><span id="duration">--:--</span></div>
-        <div class="player-controls">
-          <button class="btn secondary" type="button" id="pauseButton">Pause</button>
-          <button class="btn secondary" type="button" id="restartButton">Restart Track</button>
-        </div>
-        <div class="finished" id="finishedPanel">
-          <h2>Thank you for joining Papa Life.</h2>
-          <p>Keep the conversation going when you are ready.</p>
-          <div class="finish-actions">
-            <a class="btn gold" href="/ai-coach">Talk with Papa Life AI</a>
-            <a class="btn secondary" href="/assessment">Take the Assessment</a>
-            <a class="btn secondary" href="/resources">Watch Previous Sessions</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="resources" aria-labelledby="resourcesTitle">
-        <h2 id="resourcesTitle">Additional Resources</h2>
-        <div class="resource-grid">
-          <a class="resource" href="/resources">
-            <strong>▶ Watch Previous Coaching Sessions</strong>
-            <span>Browse the replay library.</span>
-          </a>
-          <a class="resource" href="/ai-coach">
-            <strong>Talk with Papa Life AI</strong>
-            <span>Receive encouragement, coaching, and biblical guidance between live sessions.</span>
-          </a>
-          <a class="resource" href="/assessment">
-            <strong>Take the Papa Life Assessment</strong>
-            <span>Discover where you are today and receive personalized next steps.</span>
-          </a>
-        </div>
-      </section>
-    </main>
-
+    <section class="resources"><div class="wrap"><h2>Keep Moving Forward</h2><div class="resource-grid"><a class="resource" href="/resources"><strong>Watch Previous Coaching Sessions</strong><span>Browse the replay library.</span></a><a class="resource" href="/ai-coach"><strong>Talk with Papa Life AI</strong><span>Receive practical, biblical guidance between live sessions.</span></a><a class="resource" href="/assessment"><strong>Take the Papa Life Assessment</strong><span>Discover where you are and receive personalized next steps.</span></a></div></div></section>
     <footer>Boss Mobile Life Coach · Papa Life Tuesday Live</footer>
   </div>
 
   <script>
-    const tracks = [
-      {
-        title: "Track 1 – Welcome & Teaching",
-        src: "/media/Papa_Life_From_Distance_to_Reconnection.mp3"
-      },
-      {
-        title: "Track 2 – Prayer & Reflection",
-        src: "/media/Papa_Life_Prayer_Reflection_Transition.mp3"
-      }
-    ];
-
-    const audio = document.getElementById("coachingAudio");
-    const listenNow = document.getElementById("listenNow");
-    const playerPanel = document.getElementById("playerPanel");
-    const trackTitle = document.getElementById("trackTitle");
-    const trackStatus = document.getElementById("trackStatus");
-    const trackCounter = document.getElementById("trackCounter");
-    const progressFill = document.getElementById("progressFill");
-    const elapsed = document.getElementById("elapsed");
-    const duration = document.getElementById("duration");
-    const pauseButton = document.getElementById("pauseButton");
-    const restartButton = document.getElementById("restartButton");
-    const finishedPanel = document.getElementById("finishedPanel");
-    let currentTrack = 0;
-    let waitingForTrackTwo = false;
-
-    function formatTime(value) {
-      if (!Number.isFinite(value)) return "--:--";
-      const minutes = Math.floor(value / 60);
-      const seconds = Math.floor(value % 60).toString().padStart(2, "0");
-      return `${minutes}:${seconds}`;
-    }
-
-    function loadTrack(index) {
-      currentTrack = index;
-      waitingForTrackTwo = false;
-      audio.src = tracks[index].src;
-      trackTitle.textContent = tracks[index].title;
-      trackCounter.textContent = `Track ${index + 1} of ${tracks.length}`;
-      trackStatus.textContent = index === 0 ? "Playing today's coaching." : "Playing prayer and reflection.";
-      progressFill.style.width = "0%";
-      elapsed.textContent = "0:00";
-      duration.textContent = "--:--";
-      audio.load();
-    }
-
-    function playCurrentTrack() {
-      playerPanel.classList.add("active");
-      finishedPanel.classList.remove("visible");
-      audio.play().then(() => {
-        pauseButton.textContent = "Pause";
-      }).catch(() => {
-        trackStatus.textContent = "Tap Listen Now again if your browser asks for permission to play audio.";
-      });
-    }
-
-    listenNow.addEventListener("click", () => {
-      loadTrack(0);
-      playCurrentTrack();
-      playerPanel.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-
-    pauseButton.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play().then(() => {
-          pauseButton.textContent = "Pause";
-          trackStatus.textContent = currentTrack === 0 ? "Playing today's coaching." : "Playing prayer and reflection.";
-        }).catch(() => {});
-      } else {
-        audio.pause();
-        pauseButton.textContent = "Resume";
-        trackStatus.textContent = "Paused.";
-      }
-    });
-
-    restartButton.addEventListener("click", () => {
-      audio.currentTime = 0;
-      playCurrentTrack();
-    });
-
-    audio.addEventListener("loadedmetadata", () => {
-      duration.textContent = formatTime(audio.duration);
-    });
-
-    audio.addEventListener("timeupdate", () => {
-      elapsed.textContent = formatTime(audio.currentTime);
-      const percent = audio.duration ? Math.min(100, (audio.currentTime / audio.duration) * 100) : 0;
-      progressFill.style.width = `${percent}%`;
-    });
-
-    audio.addEventListener("ended", () => {
-      if (currentTrack === 0 && !waitingForTrackTwo) {
-        waitingForTrackTwo = true;
-        trackStatus.textContent = "Track 2 begins in 3 seconds.";
-        setTimeout(() => {
-          loadTrack(1);
-          playCurrentTrack();
-        }, 3000);
-        return;
-      }
-
-      trackStatus.textContent = "Complete.";
-      pauseButton.textContent = "Pause";
-      finishedPanel.classList.add("visible");
-      finishedPanel.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
+    const tracks=[{title:"Are You a Father of an Adult Child? (F.O.A.D.C.)",src:"/media/Papa_Life_From_Distance_to_Reconnection.mp3"},{title:"How to Use AI with Your Heart!",src:"/media/Papa_Life_Prayer_Reflection_Transition.mp3"}];
+    const audio=document.getElementById("coachingAudio"),listenNow=document.getElementById("listenNow"),playerPanel=document.getElementById("playerPanel"),trackTitle=document.getElementById("trackTitle"),trackStatus=document.getElementById("trackStatus"),trackCounter=document.getElementById("trackCounter"),progressFill=document.getElementById("progressFill"),elapsed=document.getElementById("elapsed"),duration=document.getElementById("duration"),pauseButton=document.getElementById("pauseButton"),restartButton=document.getElementById("restartButton"),finishedPanel=document.getElementById("finishedPanel"),trackButtons=[...document.querySelectorAll(".track-select")];let currentTrack=0,waitingForTrackTwo=false,playBoth=false;
+    function formatTime(value){if(!Number.isFinite(value))return"--:--";const minutes=Math.floor(value/60),seconds=Math.floor(value%60).toString().padStart(2,"0");return `${minutes}:${seconds}`}
+    function loadTrack(index){currentTrack=index;waitingForTrackTwo=false;audio.src=tracks[index].src;trackTitle.textContent=tracks[index].title;trackCounter.textContent=`Track ${index+1} of ${tracks.length}`;trackStatus.textContent=index===0?"Playing today's coaching.":"Playing prayer and reflection.";progressFill.style.width="0%";elapsed.textContent="0:00";duration.textContent="--:--";trackButtons.forEach((button,buttonIndex)=>{button.classList.toggle("active",buttonIndex===index);button.setAttribute("aria-pressed",buttonIndex===index?"true":"false")});audio.load()}
+    function playCurrentTrack(){playerPanel.classList.add("active");finishedPanel.classList.remove("visible");audio.play().then(()=>{pauseButton.textContent="Pause"}).catch(()=>{trackStatus.textContent="Tap Listen Now again if your browser asks for permission to play audio."})}
+    trackButtons.forEach(button=>button.addEventListener("click",()=>{playBoth=false;loadTrack(Number(button.dataset.track));playCurrentTrack();playerPanel.scrollIntoView({behavior:"smooth",block:"center"})}));listenNow.addEventListener("click",()=>{playBoth=true;loadTrack(0);playCurrentTrack();playerPanel.scrollIntoView({behavior:"smooth",block:"center"})});pauseButton.addEventListener("click",()=>{if(audio.paused){audio.play().then(()=>{pauseButton.textContent="Pause";trackStatus.textContent=currentTrack===0?"Playing today's coaching.":"Playing prayer and reflection."}).catch(()=>{})}else{audio.pause();pauseButton.textContent="Resume";trackStatus.textContent="Paused."}});restartButton.addEventListener("click",()=>{audio.currentTime=0;playCurrentTrack()});audio.addEventListener("loadedmetadata",()=>{duration.textContent=formatTime(audio.duration)});audio.addEventListener("timeupdate",()=>{elapsed.textContent=formatTime(audio.currentTime);progressFill.style.width=`${audio.duration?Math.min(100,audio.currentTime/audio.duration*100):0}%`});audio.addEventListener("ended",()=>{if(playBoth&&currentTrack===0&&!waitingForTrackTwo){waitingForTrackTwo=true;trackStatus.textContent="Track 2 begins in 3 seconds.";setTimeout(()=>{loadTrack(1);playCurrentTrack()},3000);return}trackStatus.textContent="Complete.";pauseButton.textContent="Pause";finishedPanel.classList.add("visible");finishedPanel.scrollIntoView({behavior:"smooth",block:"center"})});
+    const lessonGrid=document.getElementById("lessonGrid");
+    fetch("/api/public/commerce-catalog").then(response=>response.json()).then(data=>{const lessons=(data.products||[]).filter(product=>product.format==="digital"&&product.module_number).sort((a,b)=>a.module_number-b.module_number);if(lessons.length!==12)throw new Error("Expected 12 lessons");lessonGrid.innerHTML=lessons.map(product=>`<article class="lesson"><p class="lesson-number">Lesson ${product.module_number}</p><h3>${product.canonical_name.replace(/^Papa Life Audio Curriculum — Module \d+ — /,"")}</h3><div class="prices"><div class="price"><span>Regular price</span><strong>${product.public_price_display}</strong></div><div class="price member"><span>Member price</span><strong>${product.member_price_display}</strong></div></div>${product.public_checkout_url?`<a class="btn red" href="${product.public_checkout_url}">Buy Without Membership</a>`:`<a class="btn red" href="/shop">View Buying Choices</a>`}<a class="member-link" href="/join">Join and save →</a></article>`).join("")}).catch(()=>{lessonGrid.innerHTML='<p class="loading">The lessons could not load right now. <a href="/shop"><strong>Open the Papa Life Shop</strong></a>.</p>'});
   </script>
 </body>
 </html>

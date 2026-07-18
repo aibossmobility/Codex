@@ -1121,7 +1121,7 @@ function ProgramSection() {
               </div>
               <h3 className="text-white text-3xl font-extrabold mb-3">Papa Life Membership</h3>
               <p className="text-gray-400 text-base max-w-md mx-auto mb-8 leading-relaxed">
-                Join the Papa Life community and member area for $4.99/month. Curriculum lessons and manuscripts are separate purchases, so you choose the products that fit your journey.
+                Join Papa Life for $4.99/month with community access and Course 11 streaming. Members may separately purchase permanent digital lessons and manuscript PDFs.
               </p>
               <a href={PAPA_PAYMENT_LINK} className="group inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold text-lg px-10 py-4 rounded-full transition-all shadow-[0_0_40px_rgba(56,189,248,0.3)] hover:shadow-[0_0_60px_rgba(56,189,248,0.5)]">
                 Join PAPA Life — $4.99/mo
@@ -1337,7 +1337,7 @@ function FinalCTA() {
               Papa Life Membership for <span className="text-brand-yellow font-bold">$4.99/month</span>
             </p>
             <p className="text-gray-500 text-base max-w-xl mx-auto mb-10">
-              No free trial. Membership includes the community and member area; curriculum lessons and manuscripts are purchased separately.
+              No free trial. Membership includes the community, member area, and Course 11 streaming; permanent downloads and manuscripts are optional member purchases.
             </p>
           </div>
 

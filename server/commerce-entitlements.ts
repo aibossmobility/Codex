@@ -16,6 +16,10 @@ export type CommerceProduct = {
   external_product_id: string | null;
   external_price_id: string | null;
   checkout_url: string | null;
+  public_price_cents: number | null;
+  public_external_product_id: string | null;
+  public_external_price_id: string | null;
+  public_checkout_url: string | null;
   active: number;
 };
 
@@ -120,6 +124,11 @@ export function ensureCommerceEntitlementTables(db: Database.Database) {
       ON commerce_events(provider, external_order_id);
   `);
 
+  try { db.exec("ALTER TABLE commerce_products ADD COLUMN public_price_cents INTEGER"); } catch {}
+  try { db.exec("ALTER TABLE commerce_products ADD COLUMN public_external_product_id TEXT"); } catch {}
+  try { db.exec("ALTER TABLE commerce_products ADD COLUMN public_external_price_id TEXT"); } catch {}
+  try { db.exec("ALTER TABLE commerce_products ADD COLUMN public_checkout_url TEXT"); } catch {}
+
   const lessonByTitle = db.prepare("SELECT id FROM lessons WHERE title = ? ORDER BY id DESC LIMIT 1");
   const upsert = db.prepare(`
     INSERT INTO commerce_products (
@@ -222,7 +231,8 @@ export function listCommerceProducts(db: Database.Database): CommerceProduct[] {
     .prepare(`
       SELECT id, code, canonical_name, format, module_number, price_cents, currency,
              billing_type, tax_behavior, lesson_id, document_filename,
-             external_provider, external_product_id, external_price_id, checkout_url, active
+             external_provider, external_product_id, external_price_id, checkout_url,
+             public_price_cents, public_external_product_id, public_external_price_id, public_checkout_url, active
       FROM commerce_products
       WHERE active = 1
       ORDER BY
@@ -246,7 +256,8 @@ export function getCommerceProductByCode(
     .prepare(`
       SELECT id, code, canonical_name, format, module_number, price_cents, currency,
              billing_type, tax_behavior, lesson_id, document_filename,
-             external_provider, external_product_id, external_price_id, checkout_url, active
+             external_provider, external_product_id, external_price_id, checkout_url,
+             public_price_cents, public_external_product_id, public_external_price_id, public_checkout_url, active
       FROM commerce_products WHERE code = ? AND active = 1
     `)
     .get(code) as CommerceProduct | undefined;

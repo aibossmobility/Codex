@@ -571,6 +571,22 @@ function ensureCommerceEntitlementTables(db2) {
     CREATE INDEX IF NOT EXISTS idx_commerce_events_order
       ON commerce_events(provider, external_order_id);
   `);
+  try {
+    db2.exec("ALTER TABLE commerce_products ADD COLUMN public_price_cents INTEGER");
+  } catch {
+  }
+  try {
+    db2.exec("ALTER TABLE commerce_products ADD COLUMN public_external_product_id TEXT");
+  } catch {
+  }
+  try {
+    db2.exec("ALTER TABLE commerce_products ADD COLUMN public_external_price_id TEXT");
+  } catch {
+  }
+  try {
+    db2.exec("ALTER TABLE commerce_products ADD COLUMN public_checkout_url TEXT");
+  } catch {
+  }
   const lessonByTitle = db2.prepare("SELECT id FROM lessons WHERE title = ? ORDER BY id DESC LIMIT 1");
   const upsert = db2.prepare(`
     INSERT INTO commerce_products (
@@ -667,7 +683,8 @@ function listCommerceProducts(db2) {
   return db2.prepare(`
       SELECT id, code, canonical_name, format, module_number, price_cents, currency,
              billing_type, tax_behavior, lesson_id, document_filename,
-             external_provider, external_product_id, external_price_id, checkout_url, active
+             external_provider, external_product_id, external_price_id, checkout_url,
+             public_price_cents, public_external_product_id, public_external_price_id, public_checkout_url, active
       FROM commerce_products
       WHERE active = 1
       ORDER BY
@@ -685,7 +702,8 @@ function getCommerceProductByCode(db2, code) {
   return db2.prepare(`
       SELECT id, code, canonical_name, format, module_number, price_cents, currency,
              billing_type, tax_behavior, lesson_id, document_filename,
-             external_provider, external_product_id, external_price_id, checkout_url, active
+             external_provider, external_product_id, external_price_id, checkout_url,
+             public_price_cents, public_external_product_id, public_external_price_id, public_checkout_url, active
       FROM commerce_products WHERE code = ? AND active = 1
     `).get(code);
 }
@@ -4331,6 +4349,24 @@ var STATIC_SERVER_PAGES = {
     sections: [{ heading: "Secure checkout", body: "Follow the on-page steps to complete membership access." }],
     noindex: true
   },
+  "/join": {
+    title: "Join Papa Life | $4.99 Monthly Membership",
+    description: "Start the $4.99 monthly Papa Life Membership enrollment and receive immediate access to Course 11 after payment.",
+    eyebrow: "Papa Life Membership",
+    headline: "Join Papa Life for $4.99 per month.",
+    intro: "Complete the membership intake, continue to secure recurring checkout, and activate your member account to enter Course 11.",
+    sections: [{ heading: "No free trial", body: "Membership bills $4.99 monthly until canceled and includes immediate access to Course 11 after successful payment." }],
+    noindex: true
+  },
+  "/member-activate": {
+    title: "Activate Papa Life Membership",
+    description: "Set your Papa Life member password and activate access to Course 11.",
+    eyebrow: "Member activation",
+    headline: "Activate your Papa Life membership.",
+    intro: "Use the secure activation link sent after successful payment to set your password and enter Course 11.",
+    sections: [{ heading: "Secure activation", body: "Activation links are tied to the paid member account and expire for security." }],
+    noindex: true
+  },
   "/portal": {
     title: "Papa Life Member Portal",
     description: "Member portal for Papa Life courses, progress, journal prompts, events, and resources.",
@@ -7167,6 +7203,30 @@ async function startServer() {
       canonical_name: product.canonical_name,
       format: product.format,
       module_number: product.module_number,
+      member_price_cents: product.price_cents,
+      member_price_display: formatAmountDisplay(product.price_cents, product.currency),
+      public_price_cents: product.public_price_cents ?? (product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.") ? 1499 : product.code === "curriculum.digital.complete" ? 7900 : product.code === "curriculum.bundle.complete" ? 12900 : product.price_cents),
+      public_price_display: formatAmountDisplay(
+        product.public_price_cents ?? (product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.") ? 1499 : product.code === "curriculum.digital.complete" ? 7900 : product.code === "curriculum.bundle.complete" ? 12900 : product.price_cents),
+        product.currency
+      ),
+      currency: product.currency,
+      billing_type: product.billing_type,
+      tax_behavior: product.tax_behavior,
+      public_checkout_url: product.public_checkout_url || null
+    }));
+    res.json({
+      products,
+      tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
+      membership_scope: "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases."
+    });
+  });
+  app.get("/api/member/commerce-catalog", requireMemberPortalAccess, (_req, res) => {
+    const products = listCommerceProducts(db).map((product) => ({
+      code: product.code,
+      canonical_name: product.canonical_name,
+      format: product.format,
+      module_number: product.module_number,
       price_cents: product.price_cents,
       price_display: formatAmountDisplay(product.price_cents, product.currency),
       currency: product.currency,
@@ -7176,8 +7236,7 @@ async function startServer() {
     }));
     res.json({
       products,
-      tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
-      membership_scope: "Community and membership area only; curriculum products are purchased separately."
+      tax_notice: "Applicable tax is calculated and displayed before payment confirmation."
     });
   });
   app.get("/api/daily-theme", (_req, res) => {

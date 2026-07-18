@@ -13,6 +13,7 @@ import MemberRegister from "./pages/MemberRegister";
 import MemberActivate from "./pages/MemberActivate";
 import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
+import Shop from "./pages/Shop";
 import Join from "./pages/Join";
 import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
 import Strategist from "./pages/Strategist";
@@ -74,6 +75,7 @@ function Router() {
       <Route path={"/member-activate"} component={MemberActivate} />
       <Route path={"/member-billing"} component={MemberBilling} />
       <Route path={"/portal"} component={MemberPortal} />
+      <Route path={"/shop"} component={Shop} />
       <Route path={"/join"} component={Join} />
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/assessment" component={RelationshipAssessment} />

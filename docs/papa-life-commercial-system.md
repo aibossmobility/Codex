@@ -2,17 +2,17 @@
 
 ## Canonical Commercial Model
 
-Papa Life operates one recurring community membership and a separately purchased twelve-module curriculum. **Papa Life Membership costs $4.99 per month and grants community-area access only.** It does not include the Papa Life Audio Curriculum. Curriculum purchases grant permanent product-specific access and do not depend on an active community membership.
+Papa Life operates one recurring membership with optional member-only permanent purchases. **Papa Life Membership costs $4.99 per month and includes community access plus protected streaming access to Course 11, Lessons 75–86, while the membership remains active.** After joining, a member may separately purchase permanent/downloadable digital lessons, manuscript PDFs, or complete-program bundles. Those purchases remain available to that buyer independently of later membership status.
 
 All displayed amounts are **base prices before tax**. The payment provider must calculate applicable tax from the customer's location, show that tax before payment confirmation, and charge the displayed subtotal plus tax. Application entitlement checks validate the approved pre-tax subtotal when a provider sends one.
 
 | Product family | Billing | Base price | Access |
 |---|---:|---:|---|
-| Papa Life Membership | Monthly recurring | $4.99 | Community and membership area only |
-| Individual digital/audio module | One time | $9.99 | The purchased lesson only |
-| Individual manuscript PDF | One time | $9.99 | The purchased protected PDF only |
-| Complete 12-module digital curriculum | One time | $59.00 | All twelve digital/audio lessons |
-| Complete digital curriculum plus manuscripts | One time | $99.00 | All twelve digital/audio lessons and all twelve protected PDFs |
+| Papa Life Membership | Monthly recurring | $4.99 | Community plus streaming access to Course 11, Lessons 75–86, while active |
+| Individual permanent digital/audio lesson | Member-only, one time | $9.99 | Permanent/downloadable access to the purchased lesson |
+| Individual manuscript PDF | Member-only, one time | $9.99 | Permanent access to the purchased protected PDF |
+| Complete 12-lesson permanent digital curriculum | Member-only, one time | $59.00 | Permanent/downloadable access to all twelve digital/audio lessons |
+| Complete permanent digital curriculum plus manuscripts | Member-only, one time | $99.00 | Permanent access to all twelve digital/audio lessons and all twelve protected PDFs |
 
 ## Canonical Product Codes
 
@@ -20,7 +20,7 @@ The application seeds twenty-seven active catalog records: one membership, twelv
 
 | Product | Product code | Base price | Billing |
 |---|---|---:|---|
-| Papa Life Membership | `membership.community.monthly` | $4.99 | Monthly recurring |
+| Papa Life Membership | `membership.community.monthly` | $4.99 | Monthly recurring; includes Course 11 streaming while active |
 | Complete 12-module digital curriculum | `curriculum.digital.complete` | $59.00 | One time |
 | Complete digital curriculum plus manuscripts | `curriculum.bundle.complete` | $99.00 | One time |
 | Digital module 01 through 12 | `curriculum.digital.module.01` … `curriculum.digital.module.12` | $9.99 each | One time |
@@ -30,7 +30,7 @@ The two complete-program products are true application bundles. `curriculum.digi
 
 ## Membership, Curriculum, and Legacy Access
 
-The member session exposes separate `community`, `curriculum`, and `manuscripts` scopes. Community pages, journal content, brotherhood features, events, and the general resource library remain restricted to active Papa Life Membership customers. Curriculum-only buyers can authenticate and access purchased lessons or purchased manuscripts without being treated as active community members.
+The member session exposes separate `community`, `curriculum`, and `manuscripts` scopes. Community pages, journal content, brotherhood features, events, the general resource library, and Course 11 streaming remain restricted to active Papa Life Membership customers. Permanent product entitlements supplement membership: a buyer retains purchased digital lessons or manuscripts after cancellation, but does not retain unpurchased community or streaming benefits.
 
 The new model is additive. Historical member, course, lesson, and explicit legacy course-access records are preserved. The product catalog and purchase-event tables do not delete, rename, or overwrite historical customer records.
 
@@ -38,7 +38,7 @@ The new model is additive. Historical member, course, lesson, and explicit legac
 
 The canonical membership entry point is `/go/join`. That route now records campaign attribution and redirects to the native `/join` page instead of bypassing intake. The native page uses the existing Papa Life intake component, saves the lead through `POST /api/leads`, and only then opens the verified $4.99 membership checkout.
 
-> The application intentionally does not fabricate curriculum checkout links. Curriculum product pages and external provider identifiers remain unset until an authenticated Stripe or HighLevel billing administrator creates and verifies the corresponding live objects.
+> Permanent-purchase offers are member-only upsells. They must be displayed after authenticated member login and must not be exposed as unrestricted public-store offers. Provider identifiers and checkout links must be verified before an upsell is marketed.
 
 ## Commerce Tables
 

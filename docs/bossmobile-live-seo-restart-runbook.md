@@ -19,19 +19,26 @@ cd /var/www/html/bossmobilelifecoach.com
 bash scripts/restart.sh
 ```
 
-The script builds the Vite app, regenerates static SEO HTML pages, bundles the server, and restarts the two PM2 services one at a time.
+The script builds the Vite app, regenerates static SEO HTML pages, bundles the server, and restarts only the Papa Life website.
+
+The server's passwordless sudo allowance matches this command exactly:
+
+```bash
+sudo /usr/local/bin/pm2 restart papalife
+```
+
+Do not add flags such as `--update-env`. An altered command falls outside the exact sudo rule and prompts for an unavailable administrator password.
 
 ## Manual restart fallback
 
-If only a restart is needed after a completed build, run these one at a time:
+If only a website restart is needed after a completed build, run:
 
 ```bash
 cd /var/www/html/bossmobilelifecoach.com
 sudo /usr/local/bin/pm2 restart papalife
-sudo /usr/local/bin/pm2 restart papalife-mcp-http
 ```
 
-Do not restart both simultaneously.
+Do not restart `papalife-mcp-http` during a website release. If a separately approved MCP change ever requires an MCP restart, verify `papalife` is healthy first and perform that work as a distinct operation. Never restart both processes together.
 
 ## Post-restart checks
 

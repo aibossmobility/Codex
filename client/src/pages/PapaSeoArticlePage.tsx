@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SiteLogoStacked } from "@/components/SiteLogo";
 import { PageMeta } from "@/components/PageMeta";
 import { ASSESSMENT_CTA, type SeoArticle } from "@/content/papa-seo-content";
+import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import { ArrowRight } from "lucide-react";
 
 type PapaSeoArticlePageProps = {
@@ -9,6 +10,8 @@ type PapaSeoArticlePageProps = {
 };
 
 export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
+  const isBrianProfile = page.slug === "/about-brian-keith-hill";
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <PageMeta
@@ -29,11 +32,21 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
 
       <main className="flex-1 container max-w-3xl mx-auto px-4 py-10 md:py-14">
         <article className="space-y-10">
-          <header className="space-y-4">
-            <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              {page.headline}
-            </h1>
-            <p className="text-lg md:text-xl text-primary font-medium">{page.subheadline}</p>
+          <header className={isBrianProfile ? "grid items-center gap-7 md:grid-cols-[220px_1fr]" : "space-y-4"}>
+            {isBrianProfile ? (
+              <img
+                src={brianKeithHillHeadshot}
+                alt="Brian Keith Hill, founder of Boss Mobility and Papa Life"
+                className="aspect-square w-full rounded-2xl border border-white/10 object-cover object-top shadow-2xl"
+              />
+            ) : null}
+            <div className="space-y-4">
+              {isBrianProfile ? <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-yellow">Meet the founder</p> : null}
+              <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                {page.headline}
+              </h1>
+              <p className="text-lg md:text-xl text-primary font-medium">{page.subheadline}</p>
+            </div>
           </header>
 
           <div className="space-y-10 text-gray-300 text-base md:text-lg leading-relaxed">
@@ -62,6 +75,13 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
           </div>
         </article>
       </main>
+
+      <footer className="border-t border-white/10 bg-black/50">
+        <div className="container mx-auto flex max-w-3xl flex-col gap-3 px-4 py-8 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>Papa Life was founded by Brian Keith Hill through Boss Mobility.</p>
+          <a href="/" className="font-semibold text-brand-yellow hover:text-white">Return to Papa Life</a>
+        </div>
+      </footer>
     </div>
   );
 }

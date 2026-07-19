@@ -4693,7 +4693,11 @@ function renderHtmlDocument(template, page) {
   </head>`);
     }
   }
-  return html.replace('<div id="root"></div>', `<div id="root">${page.bodyHtml}</div>`);
+  return html.replace(
+    /<div id="root">[\s\S]*?<\/body>/i,
+    `<div id="root">${page.bodyHtml}</div>
+  </body>`
+  );
 }
 function sendServerRenderedApp(req, res, staticPath) {
   const page = renderServerPage(req.originalUrl || req.url);

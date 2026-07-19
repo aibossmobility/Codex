@@ -2708,7 +2708,13 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage) {
     }
   }
 
-  return html.replace('<div id="root"></div>', `<div id="root">${page.bodyHtml}</div>`);
+  // The SEO generator writes a prerendered homepage into dist/public/index.html.
+  // Replace that complete root payload so every server-rendered route exposes
+  // its own meaningful content before the client application hydrates.
+  return html.replace(
+    /<div id="root">[\s\S]*?<\/body>/i,
+    `<div id="root">${page.bodyHtml}</div>\n  </body>`
+  );
 }
 
 function sendServerRenderedApp(req: Request, res: Response, staticPath: string) {

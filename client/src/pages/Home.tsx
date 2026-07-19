@@ -206,7 +206,7 @@ export default function Home() {
         <section className="bg-[#f2c230] py-16 md:py-20">
           <div className="container grid items-stretch gap-8 lg:grid-cols-[.9fr_1.1fr]">
             <div className="relative min-h-[360px] overflow-hidden rounded-xl">
-              <img src={heroBackgroundImage} alt="Fathers building connection and community" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={heroBackgroundImage} alt="Fathers rebuilding connection with their adult children" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#17231c]/70 to-transparent" />
             </div>
             <div className="rounded-xl bg-[#f6cf55] p-7 md:p-10">

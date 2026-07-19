@@ -2223,6 +2223,21 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     ],
     cta: { label: "Take the Assessment", href: "/assessment" },
   },
+  "/welcome-to-papa-life": {
+    title: "Papa Life | Help for Fathers of Adult Children",
+    description:
+      "Papa Life helps fathers of adult children move from distance, silence, and regret toward humility, safer communication, renewed hope, and the possibility of reconnection.",
+    keywords: "help for fathers of adult children, family estrangement, reconnect with adult child, Papa Life",
+    eyebrow: "From Distance to Reconnection",
+    headline: "Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.",
+    intro:
+      "If silence, distance, regret, or unresolved hurt has come between you and your adult child, Papa Life was created with fathers like you in mind.",
+    sections: [
+      { heading: "A safer way forward", body: "Papa Life helps fathers listen, accept healthy responsibility, communicate with humility, and rebuild trust through consistent actions." },
+      { heading: "No false promises", body: "We cannot control another person's response. We can change how we show up." },
+    ],
+    cta: { label: "Join Papa Life — Immediate Access", href: "/go/join?src=welcome-to-papa-life" },
+  },
   "/papa-framework": {
     title: "The PAPA Framework for Fathers | Purpose, Authority, Presence, Alignment",
     description:
@@ -5900,6 +5915,11 @@ async function startServer() {
   });
 
   app.use(express.static(staticPath));
+
+  app.get(["/admin/papa-life-outreach", "/admin/papa-life-outreach/"], (req, res, next) => {
+    if ((req.session as any).adminId) return next();
+    res.redirect(302, "/login?returnTo=%2Fadmin%2Fpapa-life-outreach");
+  });
 
   const papaAgentPage = path.join(staticPath, "papa-agent.html");
   app.get("/papa", (_req, res) => {

@@ -157,6 +157,19 @@ export default function Home() {
       </div>
 
       <main>
+        <section aria-labelledby="adult-child-distance-heading" className="bg-[#f8f0db] py-12 md:py-16">
+          <div className="container grid items-center gap-7 lg:grid-cols-[1fr_auto]">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">For fathers of adult children</p>
+              <h2 id="adult-child-distance-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">Is There Distance Between You and Your Adult Child?</h2>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">Papa Life helps fathers move from silence, defensiveness, regret, and confusion toward humility, safer conversations, renewed hope, and the possibility of reconnection.</p>
+            </div>
+            <a href="/welcome-to-papa-life" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-6 py-3 font-extrabold text-white hover:bg-[#0f492a]">
+              See If Papa Life Is for You <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+        </section>
+
         <section id="start-here" className="bg-[#b33a32] px-4 pb-16 pt-10">
           <div className="container rounded-xl bg-[#f2c230] p-6 shadow-2xl md:p-10">
             <div className="mx-auto mb-8 max-w-3xl text-center">

@@ -27,7 +27,8 @@ export default function Login() {
       if (!data.ok) {
         setError(data.error || "Login failed");
       } else {
-        navigate("/crm-console");
+        const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+        navigate(returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/crm-console");
       }
     } catch {
       setError("Server error. Please try again.");

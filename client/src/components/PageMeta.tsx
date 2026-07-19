@@ -7,6 +7,7 @@ type PageMetaProps = {
   description: string;
   keywords?: string;
   jsonLd?: JsonLd;
+  canonicalPath?: string;
 };
 
 function upsertMeta(name: string, content: string, attr: "name" | "property" = "name") {
@@ -19,7 +20,7 @@ function upsertMeta(name: string, content: string, attr: "name" | "property" = "
   tag.setAttribute("content", content);
 }
 
-export function PageMeta({ title, description, keywords, jsonLd }: PageMetaProps) {
+export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }: PageMetaProps) {
   useEffect(() => {
     document.title = title;
     upsertMeta("description", description);
@@ -28,6 +29,16 @@ export function PageMeta({ title, description, keywords, jsonLd }: PageMetaProps
     upsertMeta("og:description", description, "property");
     upsertMeta("og:type", "website", "property");
     upsertMeta("og:url", window.location.href, "property");
+
+    if (canonicalPath) {
+      let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (!canonical) {
+        canonical = document.createElement("link");
+        canonical.rel = "canonical";
+        document.head.appendChild(canonical);
+      }
+      canonical.href = new URL(canonicalPath, window.location.origin).toString();
+    }
 
     const existing = document.querySelectorAll('script[data-page-jsonld="true"]');
     existing.forEach((node) => node.remove());
@@ -43,7 +54,7 @@ export function PageMeta({ title, description, keywords, jsonLd }: PageMetaProps
         document.head.appendChild(script);
       });
     }
-  }, [title, description, keywords, jsonLd]);
+  }, [title, description, keywords, jsonLd, canonicalPath]);
 
   return null;
 }

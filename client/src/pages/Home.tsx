@@ -170,6 +170,18 @@ export default function Home() {
           </div>
         </section>
 
+        <section aria-labelledby="founder-heading" className="bg-white py-14 md:py-18">
+          <div className="container grid items-center gap-8 md:grid-cols-[220px_1fr]">
+            <img src={brianKeithHillHeadshot} alt="Brian Keith Hill, founder of Boss Mobility and Papa Life" className="aspect-square w-full rounded-xl object-cover object-top shadow-lg" />
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Meet the founder</p>
+              <h2 id="founder-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">Brian Keith Hill</h2>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">Brian Keith Hill is the founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.</p>
+              <a href="/about-brian-keith-hill" className="mt-6 inline-flex items-center gap-2 font-extrabold text-[#145b35] hover:text-[#b33a32]">About Brian and the work <ArrowRight className="h-4 w-4" aria-hidden="true" /></a>
+            </div>
+          </div>
+        </section>
+
         <section id="start-here" className="bg-[#b33a32] px-4 pb-16 pt-10">
           <div className="container rounded-xl bg-[#f2c230] p-6 shadow-2xl md:p-10">
             <div className="mx-auto mb-8 max-w-3xl text-center">
@@ -238,7 +250,7 @@ export default function Home() {
 
       <footer className="border-t border-[#f2c230]/30 bg-[#17231c] py-10 text-white">
         <div className="container flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div><SiteLogo size="md" /><p className="mt-3 text-sm text-white/60">Stronger fathers. Healthier relationships. Lasting legacy.</p></div>
+          <div><SiteLogo size="md" /><p className="mt-3 text-sm text-white/60">Stronger fathers. Healthier relationships. Lasting legacy.</p><p className="mt-2 max-w-xl text-xs leading-relaxed text-white/50">Papa Life is a fatherhood initiative founded by <a href="/about-brian-keith-hill" className="underline hover:text-[#f2c230]">Brian Keith Hill</a> through Boss Mobility.</p></div>
           <div className="flex flex-wrap justify-center gap-5 text-sm font-semibold text-white/75">
             <a href="/member-login" className="hover:text-[#f2c230]">Member Login</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>

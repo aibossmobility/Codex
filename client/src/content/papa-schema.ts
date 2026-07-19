@@ -4,14 +4,15 @@ export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Boss Mobile Life Coach",
-  alternateName: "PAPA Life",
+  alternateName: ["Boss Mobility", "Boss Mobile Life Coach", "Papa Life"],
   url: SITE,
-  logo: `${SITE}/media/brian-keith-hill-headshot.jpg`,
+  logo: `${SITE}/images/papa-life-logo.png`,
   description:
     "Faith-informed life coaching for fathers of adult children — helping men rebuild connection, presence, and legacy through the PAPA framework.",
   founder: {
     "@type": "Person",
     name: "Brian Keith Hill",
+    url: `${SITE}/about-brian-keith-hill`,
   },
   contactPoint: {
     "@type": "ContactPoint",
@@ -31,15 +32,16 @@ export const BRIAN_PERSON_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Brian Keith Hill",
-  jobTitle: "Founder & Fatherhood Life Coach",
+  jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach",
   worksFor: {
     "@type": "Organization",
-    name: "Boss Mobile Life Coach",
+    name: "Boss Mobility",
+    alternateName: "Boss Mobile Life Coach",
   },
   url: `${SITE}/about-brian-keith-hill`,
-  image: `${SITE}/media/brian-keith-hill-headshot.jpg`,
+  image: `${SITE}/images/brian-keith-hill.png`,
   description:
-    "Visionary leader dedicated to restoring the heart of fatherhood. Creator of the PAPA framework — Purpose, Authority, Presence, and Alignment.",
+    "Founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",
   sameAs: [
     "https://www.linkedin.com/in/brian-hill-bossmobility",
     "https://briankeithhill.com",
@@ -122,7 +124,7 @@ export function articleSchema(slug: string, headline: string, description: strin
       name: "Boss Mobile Life Coach",
       logo: {
         "@type": "ImageObject",
-        url: `${SITE}/media/brian-keith-hill-headshot.jpg`,
+        url: `${SITE}/images/papa-life-logo.png`,
       },
     },
     mainEntityOfPage: `${SITE}${slug}`,

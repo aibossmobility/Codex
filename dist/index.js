@@ -4299,15 +4299,17 @@ var STATIC_SERVER_PAGES = {
     cta: { label: "Take the Assessment", href: "/assessment" }
   },
   "/about-brian-keith-hill": {
-    title: "About Brian Keith Hill | Founder, Boss Mobile Life Coach",
-    description: "Meet Brian Keith Hill, fatherhood coach, PAPA framework creator, and founder of Boss Mobile Life Coach.",
-    keywords: "Brian Keith Hill, Boss Mobile Life Coach, PAPA Life founder, fatherhood coach",
-    eyebrow: "About Brian",
+    title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
+    description: "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
+    keywords: "Brian Keith Hill, Boss Mobility, Boss Mobile Life Coach, Papa Life founder, fatherhood coach",
+    eyebrow: "Founder of Boss Mobility and Papa Life",
     headline: "Brian Keith Hill",
-    intro: "Brian Keith Hill is the founder of Boss Mobile Life Coach and creator of the PAPA Framework for fathers of adult children.",
+    intro: "Brian Keith Hill is the founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",
     sections: [
+      { heading: "More than a decade of service", body: "For more than ten years, Brian has worked through Boss Mobility as a coach, teacher, mentor, and community builder. Papa Life is the focused expression of that work for fathers facing distance, silence, tension, or unresolved hurt with adult children." },
+      { heading: "One clear family of brands", body: "Brian Keith Hill is the founder and public voice. Boss Mobility is the established company and organizational home. Papa Life is its specialized fatherhood movement and community." },
       { heading: "Why the work is personal", body: "Brian's own fatherhood story and reconciliation journey shape the practical, honest way Papa Life supports fathers." },
-      { heading: "What he brings", body: "Faith-informed coaching, clear language, and frameworks that turn good intentions into daily practice." }
+      { heading: "What he brings", body: "Scripture-centered coaching, clear language, responsible technology, and frameworks that turn good intentions into daily practice." }
     ],
     cta: { label: "Explore Papa Life", href: "/" }
   },

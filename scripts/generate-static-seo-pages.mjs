@@ -19,6 +19,7 @@ const pages = [
       ["Start with clarity", "Take the free relationship assessment to name where things stand and identify the first honest step toward closing the gap."],
       ["Learn the new role", "Use the free workshop and course library to move from pressure and control into listening, humility, consistency, and trust."],
       ["Practice the path", "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships."],
+      ["Founded by Brian Keith Hill", "Brian Keith Hill is the founder of Boss Mobility and Papa Life, its specialized Scripture-centered fatherhood movement for fathers of adult children."],
     ],
   },
   {
@@ -145,15 +146,22 @@ const pages = [
   },
   {
     path: "/about-brian-keith-hill",
-    title: "About Brian Keith Hill | Founder, Boss Mobile Life Coach",
+    title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
     description:
-      "Meet Brian Keith Hill, fatherhood coach, PAPA framework creator, and founder of Boss Mobile Life Coach.",
-    eyebrow: "About Brian",
+      "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
+    keywords: "Brian Keith Hill, Boss Mobility, Boss Mobile Life Coach, Papa Life founder, fatherhood coach",
+    eyebrow: "Founder of Boss Mobility and Papa Life",
     headline: "Brian Keith Hill",
-    intro: "Brian Keith Hill is the founder of Boss Mobile Life Coach and creator of the PAPA Framework for fathers of adult children.",
+    intro: "Brian Keith Hill is the founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",
     sections: [
-      ["Why the work is personal", "Brian's own fatherhood story and reconciliation journey shape the practical, honest way Papa Life supports fathers."],
-      ["What he brings", "Faith-informed coaching, clear language, and frameworks that turn good intentions into daily practice."],
+      ["More than a decade of service", "For more than ten years, Brian has worked through Boss Mobility as a coach, teacher, mentor, and community builder. Papa Life is the focused expression of that work for fathers facing distance, silence, tension, or unresolved hurt with adult children."],
+      ["One clear family of brands", "Brian Keith Hill is the founder and public voice. Boss Mobility is the established company and organizational home. Papa Life is its specialized fatherhood movement and community. Papa Life AI is a technology-assisted extension of Brian's teaching, not a replacement for human care."],
+      ["Why the work is personal", "Brian's own fatherhood story, nearly twenty years of silence with his oldest daughter, and eventual reconciliation shape the practical, honest way Papa Life supports fathers."],
+      ["What he brings", "Scripture-centered coaching, clear language, responsible technology, and the PAPA Framework turn good intentions into daily practice without promising or forcing reconciliation."],
+    ],
+    jsonLd: [
+      { "@context": "https://schema.org", "@type": "Person", name: "Brian Keith Hill", jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach", url: "https://bossmobilelifecoach.com/about-brian-keith-hill", image: "https://bossmobilelifecoach.com/images/brian-keith-hill.png", worksFor: { "@type": "Organization", name: "Boss Mobility", alternateName: "Boss Mobile Life Coach" }, sameAs: ["https://www.linkedin.com/in/brian-hill-bossmobility", "https://briankeithhill.com"] },
+      { "@context": "https://schema.org", "@type": "Organization", name: "Boss Mobile Life Coach", alternateName: ["Boss Mobility", "Boss Mobile Life Coach", "Papa Life"], url: "https://bossmobilelifecoach.com", founder: { "@type": "Person", name: "Brian Keith Hill", url: "https://bossmobilelifecoach.com/about-brian-keith-hill" } },
     ],
   },
   {
@@ -360,13 +368,22 @@ function bodyHtml(page) {
 }
 
 function render(page) {
-  return template
-    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(page.title)}</title>`)
+  let html = template
+    .replace(/<title>[\s\S]*?<\/title>[ \t]*/i, `<title>${escapeHtml(page.title)}</title>`)
     .replace(
       /<meta name="description" content="[^"]*"\s*\/?>/i,
       `<meta name="description" content="${escapeHtml(page.description)}" />`
     )
     .replace('<div id="root"></div>', `<div id="root">${bodyHtml(page)}</div>`);
+
+  const canonical = `<link rel="canonical" href="https://bossmobilelifecoach.com${page.path === "/" ? "" : page.path}" />`;
+  html = html.replace("</head>", `    ${canonical}\n  </head>`);
+  if (page.keywords) html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);
+  if (page.jsonLd) {
+    const scripts = page.jsonLd.map((schema) => `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`).join("\n    ");
+    html = html.replace("</head>", `    ${scripts}\n  </head>`);
+  }
+  return html;
 }
 
 for (const page of pages) {

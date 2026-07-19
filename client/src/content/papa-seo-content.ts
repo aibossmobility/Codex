@@ -232,16 +232,29 @@ export const SEO_PAGES: SeoArticle[] = [
   },
   {
     slug: "/about-brian-keith-hill",
-    title: "About Brian Keith Hill | Founder, Boss Mobile Life Coach",
+    title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
     description:
-      "Meet Brian Keith Hill — fatherhood coach, PAPA framework creator, and founder of Boss Mobile Life Coach.",
-    keywords: "Brian Keith Hill, Boss Mobile Life Coach, PAPA Life founder, fatherhood coach",
+      "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
+    keywords: "Brian Keith Hill, Boss Mobility, Boss Mobile Life Coach, Papa Life founder, fatherhood coach",
     headline: "Brian Keith Hill",
-    subheadline: "Founder of Boss Mobile Life Coach · Creator of the PAPA framework",
+    subheadline: "Founder of Boss Mobility and Papa Life",
     sections: [
       {
         paragraphs: [
-          "Brian Keith Hill is a visionary leader dedicated to restoring the heart of fatherhood. He guides men through the complex transition of parenting adult children — with clarity, presence, and care for mental health.",
+          "Brian Keith Hill is the founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",
+          "For more than ten years, Brian has worked through Boss Mobility as a coach, teacher, mentor, and community builder. Papa Life is the focused expression of that work for fathers experiencing distance, silence, tension, or unresolved hurt with adult sons and daughters.",
+          "Through coaching, practical relationship guidance, Scripture-centered teaching, the PAPA Framework, and responsible use of artificial intelligence, Brian helps fathers begin with the work they can control: how they listen, communicate, accept responsibility, rebuild trust, and show up.",
+        ],
+      },
+      {
+        heading: "One founder, one clear family of brands",
+        paragraphs: [
+          "Brian Keith Hill is the founder, teacher, coach, and public voice. Boss Mobility is the established company and organizational home. Papa Life is its specialized fatherhood movement and community. Papa Life AI is a technology-assisted extension of Brian's teaching—not a replacement for human judgment, pastoral care, coaching, therapy, or emergency support.",
+        ],
+      },
+      {
+        heading: "Why this work is personal",
+        paragraphs: [
           "He watched his father walk out when he was eleven. That wound shaped how he showed up — and the nearly twenty years of silence with his own oldest daughter before reconciliation.",
           "After 20 years and 307,000 rideshare miles of conversations with fathers, Brian built PAPA Life on one truth: as long as you're both alive, it's never too late.",
         ],
@@ -254,7 +267,7 @@ export const SEO_PAGES: SeoArticle[] = [
         ],
       },
     ],
-    jsonLd: [BRIAN_PERSON_SCHEMA, articleSchema("/about-brian-keith-hill", "About Brian Keith Hill", "Founder of Boss Mobile Life Coach and creator of the PAPA framework.")],
+    jsonLd: [BRIAN_PERSON_SCHEMA, ORGANIZATION_SCHEMA, articleSchema("/about-brian-keith-hill", "Brian Keith Hill — Founder of Boss Mobility and Papa Life", "Brian Keith Hill is the founder of Boss Mobility and Papa Life, serving fathers of adult children.")],
   },
 ];
 

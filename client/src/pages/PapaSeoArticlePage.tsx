@@ -15,6 +15,7 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
         title={page.title}
         description={page.description}
         keywords={page.keywords}
+        canonicalPath={page.slug}
         jsonLd={page.jsonLd}
       />
 

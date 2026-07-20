@@ -190,3 +190,8 @@ No financial action, checkout submission, payment-provider configuration change,
 | SSH origin host | **BLOCKED BY ACCESS** | The documented `site-server` alias is absent from the current session. A direct read-only SSH attempt to the public domain reached only the Cloudflare edge, not the Express origin. |
 
 **Release-path conclusion:** The only remaining viable route is an owner-authorized connection to the actual Express origin, or a deployment trigger that targets it. The source release remains intentionally unpublished to the live website until that access is available.
+
+
+### Owner-required restart discipline — 2026-07-20
+
+For this homepage release, **never restart `papalife` and `papalife-mcp-http` together**. If a restart is required, restart **only `papalife`**, confirm its process state, `/api/health`, and the public homepage before considering any other operation. `papalife-mcp-http` must remain untouched unless a separate need is confirmed and separately authorized.

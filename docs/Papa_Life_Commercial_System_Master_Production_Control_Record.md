@@ -178,3 +178,15 @@ No financial action, checkout submission, payment-provider configuration change,
 **Confirmed problem:** Production is still serving the prior homepage because no current authorized origin-host deployment path is available in this session.
 
 **Next action:** Supply the production Express-origin SSH hostname/IP and authorized login for the documented `brian` release procedure, or authorize a connected deployment trigger. Manus must then deploy the current `main` head, restart only `papalife` through the documented procedure, inspect the live homepage, and report evidence-based acceptance or failure.
+
+
+### Supplemental authorized release-path audit — 2026-07-20
+
+| Candidate release path | Result | Evidence |
+|---|---|---|
+| GitHub Actions | **BLOCKED BY ACCESS** | `gh run list --repo aibossmobility/Codex --limit 5` returned no workflow runs. |
+| GitHub Deployments | **BLOCKED BY ACCESS** | `GET /repos/aibossmobility/Codex/deployments` returned an empty deployment list. |
+| Enabled Cloudflare account | **BLOCKED BY ACCESS** | The enabled account’s Workers inventory returned zero Workers, and its active-zone lookup for `bossmobilelifecoach.com` returned zero matching zones. It is not the production-origin deployment control for this domain. |
+| SSH origin host | **BLOCKED BY ACCESS** | The documented `site-server` alias is absent from the current session. A direct read-only SSH attempt to the public domain reached only the Cloudflare edge, not the Express origin. |
+
+**Release-path conclusion:** The only remaining viable route is an owner-authorized connection to the actual Express origin, or a deployment trigger that targets it. The source release remains intentionally unpublished to the live website until that access is available.

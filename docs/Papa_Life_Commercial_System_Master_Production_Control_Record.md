@@ -5,7 +5,7 @@
 > **Control rule:** This is the single source of truth for launch status, testing, repairs, and future products. Historical audits, readiness checklists, and implementation notes are evidence sources only; they must not maintain competing current-status tables. A verified status may change only when new dated evidence proves the production condition changed.
 
 **Record owner:** Manus, Master Operator  
-**Last updated:** 2026-07-17  
+**Last updated:** 2026-07-20  
 **Launch product:** Papa Life Membership — **$4.99 per month**, recurring  
 **Immediate fulfillment scope:** Course 11, Lessons 75–86, comprising 12 audio lessons  
 **Scope boundary:** The Wrestling the Silence Away audiobook and podcast, Run Your Own Race audiobook, legacy courses, unfinished Drive placeholders, unrelated iShareProposals material, and Course 7 material are future products unless Brian explicitly adds them to the active paid offer.
@@ -157,3 +157,24 @@ The complete executable assignment, acceptance criteria, evidence requirements, 
 5. Do not create, charge, refund, cancel, publish, deploy, or activate an external commercial system without the required financial, legal, or deployment authorization.
 6. Do not ask Brian to inspect code, configure webhooks, deploy applications, search Drive, or troubleshoot systems. Bring him only a business decision, unavoidable authorization, credential/account permission, or plain-language status.
 7. End every owner update with: **Working now:**, **Needs testing:**, **Confirmed problem:**, and **Next action:**.
+
+
+## 7. Homepage Positioning Release Evidence — 2026-07-20
+
+| Component | Status | Direct dated evidence | Exact remaining condition |
+|---|---|---|---|
+| Homepage positioning source release | **BUILT** | Commit `baec8c3` (`feat: strengthen Papa Life homepage positioning`) was pushed to the authorized `main` branch. The source implements the approved hero, intake-first enrollment CTA, self-identification, cost-of-waiting, fathers-served, readiness, transformation, benefits, founder, and final-invitation sections. | Release the validated `main` head to the Express origin. |
+| Homepage validation environment | **BUILT** | `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm check`, and `pnpm build` passed. The existing pnpm patch/override declarations were relocated to `pnpm-workspace.yaml` so the frozen-install path is reproducible; no product, price, payment link, customer, entitlement, or member configuration was changed. | None for source validation. |
+| Local production preview | **BUILT** | A cache-busted browser inspection of the local production preview rendered the revised hero, all required content blocks, `/go/join?src=homepage` CTAs, the verified $4.99/month display, the established founder image, and the intended gold/forest/brick/cream visual system. | Public-origin inspection after release. |
+| Live homepage deployment | **BLOCKED BY ACCESS** | A fresh browser inspection of `https://bossmobilelifecoach.com/?release_check=baec8c3` still displayed the prior homepage: navigation and hero CTA said “See If Papa Life Is for You,” the supporting hero copy differed, and the required new sections were absent. The public origin has not consumed commit `baec8c3`. | Authorized SSH hostname/IP and login for the Express origin, or an authorized deployment trigger connected to that origin. |
+| Available release paths | **BLOCKED BY ACCESS** | `site-server` does not resolve in this session; a read-only SSH attempt to the public domain closed at the Cloudflare edge; GitHub reports no workflow runs; the authenticated site-owner integration exposes content, CTA, media, pricing, and course controls but no source-release or host-restart operation. | Provide the production-origin connection or an owner-authorized deployment control. |
+
+No financial action, checkout submission, payment-provider configuration change, customer-data mutation, entitlement change, or member-record action was attempted during this homepage release work.
+
+**Working now:** The validated homepage source is committed and published on `main` at `baec8c3`.
+
+**Needs testing:** Public production rendering, CTA behavior, responsive layout, and the unchanged enrollment handoff after the source release is deployed.
+
+**Confirmed problem:** Production is still serving the prior homepage because no current authorized origin-host deployment path is available in this session.
+
+**Next action:** Supply the production Express-origin SSH hostname/IP and authorized login for the documented `brian` release procedure, or authorize a connected deployment trigger. Manus must then deploy the current `main` head, restart only `papalife` through the documented procedure, inspect the live homepage, and report evidence-based acceptance or failure.

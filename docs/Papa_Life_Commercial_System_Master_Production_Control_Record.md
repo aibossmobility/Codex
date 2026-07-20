@@ -195,3 +195,23 @@ No financial action, checkout submission, payment-provider configuration change,
 ### Owner-required restart discipline — 2026-07-20
 
 For this homepage release, **never restart `papalife` and `papalife-mcp-http` together**. If a restart is required, restart **only `papalife`**, confirm its process state, `/api/health`, and the public homepage before considering any other operation. `papalife-mcp-http` must remain untouched unless a separate need is confirmed and separately authorized.
+
+
+### Superseding live-release verification and restart procedure — 2026-07-20
+
+| Component | Status | Direct dated evidence | Remaining condition |
+|---|---|---|---|
+| Public homepage positioning | **LIVE AND VERIFIED** | A fresh, cache-busted inspection of `https://bossmobilelifecoach.com/?release_check=e639572` returned the approved live title, hero, father-of-adult-children audience language, self-identification content, founder section, clear pathway, Papa Life Membership section, `$4.99 per month`, immediate Course 11 access, and no-free-trial disclosure. | None within homepage-content acceptance. |
+| Live CTA behavior | **VERIFIED** | Deterministic DOM inspection confirmed the primary CTA targets and the `Join Papa Life for $4.99` CTA resolves to `/go/join`. A no-submission navigation check redirected to `/join?src=site&campaign=papa_life_intake_first_enrollment` and displayed the expected intake-first form. | Checkout submission was intentionally not performed. |
+| Live desktop layout | **VERIFIED** | Live DOM inspection reported document `scrollWidth` of `1265` against a `1280`-pixel viewport, with no horizontal overflow. | Real-device/mobile acceptance remains a future regression check. |
+| Sequential restart source repair | **PUBLISHED** | Commit `e639572` (`fix: restart PM2 services sequentially`) is on the authorized `main` branch. `scripts/restart.sh` uses the exact full-path, separately allowlisted commands: first `sudo /usr/local/bin/pm2 restart papalife`, then `sudo /usr/local/bin/pm2 restart papalife-mcp-http`; it does not combine services in one sudo command. | The current public homepage is verified live. The precise external mechanism that consumed the source release was not observable from this session. |
+
+This entry **supersedes** the earlier live-homepage `BLOCKED BY ACCESS` status. No claim is made that a combined PM2 restart is allowed or that the current server restart script was directly executed from this session. For future manual releases, the approved procedure is to run the two restart commands **sequentially**, never together; verify the first service restart before the second is invoked.
+
+**Working now:** The public Papa Life homepage is live and independently verified against the approved positioning, membership disclosure, CTA, intake-first enrollment handoff, and desktop layout criteria.
+
+**Needs testing:** A real-device/mobile regression pass and a deliberately authorized end-to-end checkout test remain outside this completed homepage release verification.
+
+**Confirmed problem:** No active homepage acceptance failure was found. The session still lacks a local SSH identity for future direct origin maintenance, and the automatic/remote production-consumption mechanism is not confirmed.
+
+**Next action:** Preserve the verified source and restart procedure. For any future manual deployment, use the approved sequential commands with the full PM2 path, verify service health after each command, and independently inspect the public page before reporting completion.

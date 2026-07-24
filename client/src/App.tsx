@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { GlobalBookingButton } from "./components/GlobalBookingButton";
 import { PapaAiWidget } from "./components/PapaAiWidget";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -43,7 +44,6 @@ import {
   PapaFrameworkPage,
   WhyAdultChildrenPullAwayPage,
 } from "./pages/papa-seo-routes";
-
 
 function Router() {
   return (
@@ -98,7 +98,6 @@ function Router() {
       <Route path={"/booking"} component={Booking} />
       <Route path={"/research-lab"} component={ResearchLab} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -133,22 +132,14 @@ function GlobalPapaAiWidget() {
   return <PapaAiWidget autoOpen={path === "/"} />;
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />
+          <GlobalBookingButton />
           <GlobalPapaAiWidget />
         </TooltipProvider>
       </ThemeProvider>

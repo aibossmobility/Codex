@@ -28,10 +28,7 @@ function getDriveFileId(url: string): string | null {
   }
 }
 
-function inferDirectPlayer(
-  url: string,
-  contentType: string,
-): "video" | "audio" | null {
+function inferDirectPlayer(url: string, contentType: string): "video" | "audio" | null {
   const pathOnly = url.split("?")[0].toLowerCase();
   if (/\.(mp3|wav|m4a|aac|ogg|flac)$/.test(pathOnly)) return "audio";
   if (/\.(mp4|webm|mov|ogv)$/.test(pathOnly)) return "video";
@@ -45,63 +42,75 @@ type Props = {
   contentType: string;
 };
 
-function ExternalMediaCard({
-  url,
-  label,
-  kind = "video",
-}: {
-  url: string;
-  label: string;
-  kind?: "video" | "audio" | "media";
-}) {
+function EmbeddedMedia({ src, title, originalUrl }: { src: string; title: string; originalUrl: string }) {
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex aspect-video w-full max-w-3xl flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-gradient-to-br from-[#141210] to-black px-6 text-center shadow-lg transition-colors hover:from-[#1a1817] hover:to-[#050505]"
-      aria-label={label}
-    >
-      <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-6 w-6" aria-hidden>
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </span>
-      <span className="text-base font-semibold text-white">{label}</span>
-      <span className="text-sm text-white/55">Open {kind}</span>
-    </a>
+    <div className="w-full max-w-3xl space-y-3">
+      <div className="aspect-video overflow-hidden rounded-xl border border-white/10 bg-black">
+        <iframe
+          src={src}
+          title={title}
+          className="h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+      </div>
+      <a
+        href={originalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex text-sm font-medium text-brand-yellow hover:text-brand-yellow/80"
+      >
+        Open media in a new tab if the player does not load
+      </a>
+    </div>
   );
 }
 
 export function LessonMediaPlayer({ url, contentType }: Props) {
   if (url.includes("heygen.com/embeds")) {
-    return <ExternalMediaCard url={url} label="Lesson video" />;
+    return <EmbeddedMedia src={url} originalUrl={url} title="Papa Life lesson video" />;
   }
 
   const yt = getYoutubeId(url);
   if (yt) {
-    return <ExternalMediaCard url={url} label="Lesson video" />;
+    return (
+      <EmbeddedMedia
+        src={`https://www.youtube-nocookie.com/embed/${yt}`}
+        originalUrl={url}
+        title="Papa Life lesson video"
+      />
+    );
   }
 
   const driveId = getDriveFileId(url);
   if (driveId) {
-    const isAudio = contentType === "audio";
-    return <ExternalMediaCard url={url} label={isAudio ? "Lesson audio" : "Lesson media"} kind={isAudio ? "audio" : "media"} />;
+    return (
+      <EmbeddedMedia
+        src={`https://drive.google.com/file/d/${driveId}/preview`}
+        originalUrl={url}
+        title={contentType === "audio" ? "Papa Life lesson audio" : "Papa Life lesson media"}
+      />
+    );
   }
 
   const direct = inferDirectPlayer(url, contentType);
   if (direct === "video") {
     return (
-      <video
-        controls
-        playsInline
-        className="w-full max-w-3xl rounded-xl border border-white/10 bg-black"
-        src={url}
-      />
+      <video controls playsInline preload="metadata" className="w-full max-w-3xl rounded-xl border border-white/10 bg-black">
+        <source src={url} />
+        Your browser does not support this video. Open the media link in a new tab.
+      </video>
     );
   }
   if (direct === "audio") {
-    return <audio controls className="w-full max-w-3xl" src={url} />;
+    return (
+      <audio controls preload="metadata" className="w-full max-w-3xl">
+        <source src={url} />
+        Your browser does not support this audio file.
+      </audio>
+    );
   }
 
   return (

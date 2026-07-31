@@ -49,6 +49,9 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path="/media-library">
+        <Redirect to="/courses" />
+      </Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />
       <Route path={"/login"} component={Login} />

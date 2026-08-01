@@ -61,7 +61,7 @@ export default function PapaFirstLesson() {
 
       <main className="flex-1 container max-w-3xl mx-auto px-4 py-10 md:py-14 space-y-10">
         <div className="space-y-4 text-gray-200 leading-relaxed border border-primary/25 bg-primary/5 rounded-2xl p-6 md:p-8">
-          <p className="text-brand-yellow text-xs uppercase tracking-widest font-bold">Start here</p>
+          <p className="text-brand-yellow text-xs uppercase tracking-widest font-bold">For Fathers of Adult Children · Start Here</p>
           <h1 className="text-white font-heading font-bold text-3xl md:text-4xl leading-tight">
             From Distance to Reconnection
           </h1>
@@ -157,7 +157,7 @@ export default function PapaFirstLesson() {
               asChild
               className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 text-lg rounded-full"
             >
-              <a href="/go/join">Continue Into PAPA Life</a>
+              <a href="/go/join">Enroll Now — Immediate Access</a>
             </Button>
             <Button
               asChild

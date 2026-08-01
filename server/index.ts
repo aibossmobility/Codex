@@ -102,10 +102,17 @@ const mediaUploadRoot = path.resolve(__dirname, "..", "uploads", "media");
 /** Protected delivery copies for curriculum modules whose Drive previews are not buyer-playable. */
 const papaAudioDeliveryFilesByOrder = new Map<number, string>([
   [1, "01-listening-without-defending.mp3"],
+  [2, "02-owning-impact-without-shame.mp3"],
   [3, "03-the-first-repair-sentence.mp3"],
   [4, "04-presence-over-pressure.mp3"],
+  [5, "05-when-your-adult-child-pulls-away.mp3"],
+  [6, "06-authority-without-control.mp3"],
   [7, "07-apology-without-explanation.mp3"],
+  [8, "08-consistency-after-the-conversation.mp3"],
+  [9, "09-rebuilding-trust-in-small-deposits.mp3"],
+  [10, "10-when-silence-feels-personal.mp3"],
   [11, "11-leading-with-purpose-not-panic.mp3"],
+  [12, "12-becoming-safe-to-talk-to.mp3"],
 ]);
 
 function protectedPapaAudioPath(sortOrder: number): string | null {

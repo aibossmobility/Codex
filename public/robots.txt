@@ -1,0 +1,18 @@
+# Papa Life / AI Boss Mobility crawler policy
+# Public content is available to search engines and AI discovery systems.
+
+User-agent: *
+Allow: /
+
+# Keep private, account, and application endpoints out of crawler indexes.
+Disallow: /api/
+Disallow: /admin/
+Disallow: /crm/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /private/
+Disallow: /account/
+Disallow: /checkout/
+
+Sitemap: https://bossmobilelifecoach.com/sitemap.xml
+Sitemap: https://papalifecoach.com/sitemap.xml

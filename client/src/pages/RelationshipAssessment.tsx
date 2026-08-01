@@ -84,8 +84,8 @@ export default function RelationshipAssessment() {
 
       <main className="container max-w-4xl py-12 md:py-18">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-yellow">
-            Free · Interactive · About 5 minutes
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">
+            For Fathers of Adult Children · Free · Interactive · About 5 minutes
           </p>
           <h1 className="mt-4 text-4xl font-extrabold md:text-6xl">PAPA Self-Assessment</h1>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground md:text-xl">

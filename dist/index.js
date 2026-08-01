@@ -1800,6 +1800,7 @@ function configuredKbPaths() {
 function defaultKbCandidates() {
   return [
     path.resolve(process.cwd(), "server", "papa-life-system-prompt.md"),
+    path.resolve(process.cwd(), "data", "brian-keith-hill-master-knowledge-base-v2.txt"),
     path.resolve(process.cwd(), "data", "papa-life-master-kb.txt"),
     path.resolve(process.cwd(), "data", "Papa_Life_Master_Skill.md")
   ];

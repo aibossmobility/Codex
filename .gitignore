@@ -1,6 +1,17 @@
 node_modules/
+.pnpm-store/
 .DS_Store
 *.log
+*.db
 .env
 .env.*
 !.env.example
+
+# Google Drive conflict copies created inside generated build output.
+dist/public/* (1)/
+
+# Local, one-off visual generation artifacts (not website source).
+Papa Life Tuesday Live Visual - 2026-08-04.png
+render_papa_visual.py
+render_papa_visual.swift
+test.svg

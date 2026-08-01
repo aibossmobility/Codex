@@ -101,9 +101,12 @@ export default function CheckoutForm({ onClose }: CheckoutFormProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <div>
-            <h2 className="text-2xl font-bold text-white">Almost There!</h2>
-            <p className="text-sm text-gray-400 mt-1">
-              Please fill out the form below before proceeding to checkout.
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-yellow">
+              Papa Life · For Fathers of Adult Children
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-white">Enroll Now — Immediate Access</h2>
+            <p className="mt-1 text-sm text-gray-400">
+              Complete this secure form before proceeding to checkout.
             </p>
           </div>
           <button

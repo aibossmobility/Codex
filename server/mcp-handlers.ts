@@ -56,6 +56,12 @@ import {
   cloudWebhookUrl,
 } from "./ghl-automation";
 import { ghlMoveOpportunityStage, ghlNurtureSmsSend, getGhlCredentialsForMcp } from "./ghl-api";
+import {
+  integrationConfigurationSummary,
+  diagnoseGhlConnection,
+  diagnoseMakeWebhook,
+  orchestrationHealthCheck,
+} from "./integration-health";
 
 const dbPath = path.resolve(process.cwd(), "leads.db");
 const db = new Database(dbPath);
@@ -256,6 +262,30 @@ export const PAPALIFE_MCP_TOOL_DEFINITIONS: PapalifeToolDef[] = [
     name: "papalife_course_content_workflow_brief",
     description:
       "CRITICAL for PAPA Life curriculum / Vision Documents: Read this before suggesting any handoff. Tells agents to put learning materials into the on-site courses/lessons system (MCP) so members see them in /portal — NOT to email Google Doc Master KB update steps or ask humans to paste Vision docs into external docs as the delivery path.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "papalife_integration_configuration_summary",
+    description:
+      "Report whether required HighLevel, Make.com, Claude, and MCP environment settings are present. Does NOT return secret values — previews only. Read-only, no side effects.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "papalife_ghl_connection_diagnostic",
+    description:
+      "Read-only HighLevel connection diagnostic. Tests token presence, location ID presence, location API access, and contacts API access. Reports 401/403 scope issues safely. No contacts created or modified.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "papalife_make_webhook_diagnostic",
+    description:
+      "Send a clearly-marked dry_run payload to the configured Make.com webhook. URL is never caller-supplied. Confirms webhook connectivity without triggering real automations.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "papalife_orchestration_health_check",
+    description:
+      "Combined read-only report: HighLevel connectivity, Make.com webhook, Claude key, MCP auth, and dry-run protections. Confirms messages_sent:false, records_mutated:false, secrets_returned:false.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -1092,6 +1122,18 @@ export async function handlePapalifeTool(
         tone: "Decisive — the site is the source of truth for what members see.",
       };
     }
+
+    case "papalife_integration_configuration_summary":
+      return await integrationConfigurationSummary(db);
+
+    case "papalife_ghl_connection_diagnostic":
+      return await diagnoseGhlConnection(db);
+
+    case "papalife_make_webhook_diagnostic":
+      return await diagnoseMakeWebhook();
+
+    case "papalife_orchestration_health_check":
+      return await orchestrationHealthCheck(db);
 
     case "create_brand_research_dump": {
       assertResearchLabMcpEnabled();

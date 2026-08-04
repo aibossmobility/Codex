@@ -1124,16 +1124,16 @@ export async function handlePapalifeTool(
     }
 
     case "papalife_integration_configuration_summary":
-      return await integrationConfigurationSummary(db);
+      return await integrationConfigurationSummary();
 
     case "papalife_ghl_connection_diagnostic":
-      return await diagnoseGhlConnection(db);
+      return await diagnoseGhlConnection();
 
     case "papalife_make_webhook_diagnostic":
       return await diagnoseMakeWebhook();
 
     case "papalife_orchestration_health_check":
-      return await orchestrationHealthCheck(db);
+      return await orchestrationHealthCheck();
 
     case "create_brand_research_dump": {
       assertResearchLabMcpEnabled();

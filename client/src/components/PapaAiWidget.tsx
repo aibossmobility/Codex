@@ -2,7 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Bot, MessageCircle, Mic, Send, Sparkles, X } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  CalendarCheck,
+  ClipboardCheck,
+  MessageCircle,
+  Mic,
+  Send,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type ChatMessage = {
@@ -21,20 +32,51 @@ const quickPrompts = [
   "Help me pray before I reach out.",
 ];
 
+const actionLinks = [
+  {
+    href: "/assessment",
+    label: "Take the Free Reconnection Assessment",
+    detail: "Find your next best step",
+    icon: ClipboardCheck,
+    primary: true,
+  },
+  {
+    href: "/booking",
+    label: "Book a Private Conversation",
+    detail: "Talk directly with Brian",
+    icon: CalendarCheck,
+    primary: false,
+  },
+  {
+    href: "/tuesday-live",
+    label: "Join Tuesday Live",
+    detail: "Learn with other fathers",
+    icon: Users,
+    primary: false,
+  },
+  {
+    href: "/membership",
+    label: "Explore Papa Life Membership",
+    detail: "Get immediate access",
+    icon: ArrowRight,
+    primary: false,
+  },
+];
+
 const PAPA_LIFE_VOICE_AGENT_URL = "/papa-agent.html";
 
 function localPapaReply(text: string) {
   const lower = text.toLowerCase();
   if (lower.includes("pray") || lower.includes("prayer")) {
-    return "Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Help me listen first, own what is mine, and become consistent enough that trust can breathe again. Amen.";
+    return "Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Help me listen first, own what is mine, and become consistent enough that trust can breathe again. Amen. When you are ready, take the free Reconnection Assessment below so Papa Life can guide your next step.";
   }
   if (lower.includes("daughter")) {
-    return "Father, with your daughter, start with safety and listening. Do not lead with a speech. Lead with humility. A simple next step is: \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\"";
+    return "Father, with your daughter, start with safety and listening. Do not lead with a speech. Lead with humility. A simple next step is: \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\" Use the action choices below when you are ready to move forward.";
   }
   if (lower.includes("son")) {
-    return "Father, with your son, respect cannot be forced into the room. It is rebuilt through consistency. Ask yourself: am I trying to be right, or am I trying to become trustworthy? Start with one honest sentence of ownership and one practical action you can repeat.";
+    return "Father, with your son, respect cannot be forced into the room. It is rebuilt through consistency. Ask yourself: am I trying to be right, or am I trying to become trustworthy? Start with one honest sentence of ownership and one practical action you can repeat. The free assessment below can help you identify that action.";
   }
-  return "Father, start here: do not try to fix the whole relationship in one move. Listen first. Own what is yours. Remove pressure from the next message. Presence is not weakness; it is mature fatherhood. Take one small step this week that your adult child can experience as safe and consistent.";
+  return "Father, start here: do not try to fix the whole relationship in one move. Listen first. Own what is yours. Remove pressure from the next message. Presence is not weakness; it is mature fatherhood. Take one small step this week that your adult child can experience as safe and consistent, then choose one action below to continue.";
 }
 
 export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps) {
@@ -46,7 +88,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
     {
       role: "assistant",
       content:
-        "Welcome to the Papa Life AI Coach. I help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment. What's weighing on your heart today?",
+        "Welcome to the Papa Life Action Coach. I help fathers of adult children rebuild connection, restore trust, and choose a practical next step. What's weighing on your heart today?",
     },
   ]);
 
@@ -92,10 +134,10 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
   }
 
   return (
-    <div className={cn("fixed bottom-4 right-4 z-[70] w-[calc(100vw-2rem)] max-w-[420px]", className)}>
+    <div className={cn("fixed bottom-4 right-4 z-[70] w-[calc(100vw-2rem)] max-w-[440px]", className)}>
       {open ? (
         <section
-          aria-label="Papa Life AI Coach"
+          aria-label="Papa Life Action Coach"
           className="overflow-hidden rounded-2xl border border-brand-yellow/35 bg-black shadow-[0_18px_80px_rgba(0,0,0,0.55)]"
         >
           <div className="border-b border-white/10 bg-gradient-to-r from-brand-yellow/18 via-black to-primary/18 p-4">
@@ -105,9 +147,9 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                   <Bot className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-white">Meet the Papa Life AI Coach</h2>
+                  <h2 className="text-base font-extrabold text-white">Papa Life Action Coach</h2>
                   <p className="text-xs font-semibold text-white/62">
-                    Helping fathers rebuild connection, restore trust, and lead with PAPA.
+                    Get guidance, choose a next step, and take action today.
                   </p>
                 </div>
               </div>
@@ -115,14 +157,14 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                 type="button"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/75 hover:border-brand-yellow hover:text-brand-yellow"
                 onClick={() => setOpen(false)}
-                aria-label="Close Papa Life AI Coach"
+                aria-label="Close Papa Life Action Coach"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          <div className="max-h-[360px] space-y-3 overflow-y-auto p-4">
+          <div className="max-h-[300px] space-y-3 overflow-y-auto p-4">
             {messages.map((item, index) => (
               <div
                 key={`${item.role}-${index}`}
@@ -145,6 +187,37 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
           </div>
 
           <div className="border-t border-white/10 p-4">
+            <div className="mb-4 rounded-xl border border-brand-yellow/25 bg-brand-yellow/[0.06] p-3">
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-brand-yellow">
+                Choose your next step
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {actionLinks.map((action) => {
+                  const Icon = action.icon;
+                  return (
+                    <a
+                      key={action.href}
+                      href={action.href}
+                      className={cn(
+                        "flex items-start gap-2 rounded-lg border px-3 py-2.5 transition",
+                        action.primary
+                          ? "border-brand-yellow bg-brand-yellow text-black hover:bg-white"
+                          : "border-white/12 bg-white/[0.04] text-white hover:border-brand-yellow hover:text-brand-yellow"
+                      )}
+                    >
+                      <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span>
+                        <span className="block text-xs font-extrabold leading-tight">{action.label}</span>
+                        <span className={cn("mt-0.5 block text-[11px]", action.primary ? "text-black/65" : "text-white/45")}>
+                          {action.detail}
+                        </span>
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="mb-3 grid gap-2 sm:grid-cols-2">
               <Input
                 value={lead.first_name}
@@ -156,14 +229,14 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
               <Input
                 value={lead.email}
                 onChange={(event) => setLead((current) => ({ ...current, email: event.target.value }))}
-                placeholder="Email optional"
+                placeholder="Email for follow-up"
                 type="email"
-                aria-label="Email optional"
+                aria-label="Email for Papa Life follow-up"
                 className="h-10 border-white/15 bg-white/[0.04]"
               />
             </div>
             <p className="mb-3 text-xs leading-relaxed text-white/45">
-              Contact information is optional and is used only for Papa Life follow-up when you provide it.
+              Share your email when you want Papa Life to follow up with resources and next steps.
             </p>
 
             <div className="mb-3 flex flex-wrap gap-2">
@@ -189,8 +262,8 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                     send();
                   }
                 }}
-                placeholder="Ask me anything..."
-                aria-label="Ask the Papa Life AI Coach"
+                placeholder="Tell me what is happening..."
+                aria-label="Ask the Papa Life Action Coach"
                 className="max-h-28 min-h-12 resize-none border-white/15 bg-white/[0.04]"
               />
               <Button
@@ -232,8 +305,8 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
             <MessageCircle className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
-            <span className="block text-sm font-extrabold text-white">Papa Life AI Coach</span>
-            <span className="block text-xs font-semibold text-white/55">Ask me anything</span>
+            <span className="block text-sm font-extrabold text-white">Papa Life Action Coach</span>
+            <span className="block text-xs font-semibold text-white/55">Get your next step now</span>
           </span>
         </button>
       )}

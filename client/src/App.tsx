@@ -111,12 +111,6 @@ function GlobalPapaAiWidget() {
   const path = location.replace(/\/$/, "") || "/";
   const hiddenPrefixes = [
     "/ai-coach",
-    "/resources",
-    "/books",
-    "/podcast",
-    "/tuesday-live",
-    "/membership",
-    "/contact",
     "/crm",
     "/crm-console",
     "/dashboard",
@@ -128,6 +122,11 @@ function GlobalPapaAiWidget() {
     "/portal",
     "/join",
     "/research-lab",
+    "/admin",
+    "/strategist",
+    "/theme-matrix",
+    "/operators",
+    "/governance",
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 

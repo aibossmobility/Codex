@@ -26,17 +26,33 @@ type PapaAiWidgetProps = {
   className?: string;
 };
 
+type ActionLink = {
+  href: string;
+  label: string;
+  detail: string;
+  interest: "Reconnection Assessment" | "Private Conversation" | "Tuesday Live" | "Membership";
+  icon: typeof ClipboardCheck;
+  primary: boolean;
+};
+
+type LeadState = {
+  first_name: string;
+  email: string;
+  consent: boolean;
+};
+
 const quickPrompts = [
   "I need help reconnecting with my daughter.",
   "What should I say if my son is distant?",
   "Help me pray before I reach out.",
 ];
 
-const actionLinks = [
+const actionLinks: ActionLink[] = [
   {
     href: "/assessment",
     label: "Take the Free Reconnection Assessment",
     detail: "Find your next best step",
+    interest: "Reconnection Assessment",
     icon: ClipboardCheck,
     primary: true,
   },
@@ -44,6 +60,7 @@ const actionLinks = [
     href: "/booking",
     label: "Book a Private Conversation",
     detail: "Talk directly with Brian",
+    interest: "Private Conversation",
     icon: CalendarCheck,
     primary: false,
   },
@@ -51,6 +68,7 @@ const actionLinks = [
     href: "/tuesday-live",
     label: "Join Tuesday Live",
     detail: "Learn with other fathers",
+    interest: "Tuesday Live",
     icon: Users,
     primary: false,
   },
@@ -58,6 +76,7 @@ const actionLinks = [
     href: "/membership",
     label: "Explore Papa Life Membership",
     detail: "Get immediate access",
+    interest: "Membership",
     icon: ArrowRight,
     primary: false,
   },
@@ -65,25 +84,44 @@ const actionLinks = [
 
 const PAPA_LIFE_VOICE_AGENT_URL = "/papa-agent.html";
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function buildConversationSummary(messages: ChatMessage[]) {
+  const recent = messages
+    .slice(-6)
+    .map((item) => `${item.role === "user" ? "Visitor" : "Coach"}: ${item.content}`)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return recent.length > 900 ? `${recent.slice(0, 897)}...` : recent;
+}
+
 function localPapaReply(text: string) {
   const lower = text.toLowerCase();
+  if (/(suicide|kill myself|hurt myself|harm myself|immediate danger|being abused|unsafe)/.test(lower)) {
+    return "Father, your immediate safety and the safety of everyone involved come first. If someone may be in immediate danger, call 911 or your local emergency number now. In the U.S. or Canada, call or text 988 for immediate crisis support. Do not try to carry this moment alone. Papa Life can support a wise next step, but it is not an emergency or clinical service.";
+  }
   if (lower.includes("pray") || lower.includes("prayer")) {
-    return "Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Help me listen first, own what is mine, and become consistent enough that trust can breathe again. Amen. When you are ready, take the free Reconnection Assessment below so Papa Life can guide your next step.";
+    return "Grace Principle: Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Assertive Strategy: Before you reach out, write one sentence that owns your part without asking for a response. Character Call: Let your adult child experience a father who is safe enough to listen. Next step: take the Free Reconnection Assessment below when you are ready.";
   }
   if (lower.includes("daughter")) {
-    return "Father, with your daughter, start with safety and listening. Do not lead with a speech. Lead with humility. A simple next step is: \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\" Use the action choices below when you are ready to move forward.";
+    return "Grace Principle: Your daughter does not need a perfect speech; she needs evidence that you are becoming safer to talk to. Assertive Strategy: Try, \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\" Character Call: Choose Presence over pressure. Next step: take the Free Reconnection Assessment below to identify one consistent action.";
   }
   if (lower.includes("son")) {
-    return "Father, with your son, respect cannot be forced into the room. It is rebuilt through consistency. Ask yourself: am I trying to be right, or am I trying to become trustworthy? Start with one honest sentence of ownership and one practical action you can repeat. The free assessment below can help you identify that action.";
+    return "Grace Principle: Respect cannot be forced into the room; it is rebuilt through consistency. Assertive Strategy: Offer one honest sentence of ownership, then give your son room to respond in his own time. Character Call: Lead with Authority that is earned through character, not control. Next step: take the Free Reconnection Assessment below to identify your next action.";
   }
-  return "Father, start here: do not try to fix the whole relationship in one move. Listen first. Own what is yours. Remove pressure from the next message. Presence is not weakness; it is mature fatherhood. Take one small step this week that your adult child can experience as safe and consistent, then choose one action below to continue.";
+  return "Grace Principle: Do not try to fix the whole relationship in one move. Assertive Strategy: Listen first, own what is yours, and remove pressure from the next message. Character Call: Presence is not weakness; it is mature fatherhood. Next step: choose one action below that helps you move forward with patience, accountability, and faith.";
 }
 
 export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps) {
   const [open, setOpen] = useState(autoOpen);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [lead, setLead] = useState({ first_name: "", email: "" });
+  const [lead, setLead] = useState<LeadState>({ first_name: "", email: "", consent: false });
+  const [leadStatus, setLeadStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [selectedAction, setSelectedAction] = useState<ActionLink | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -97,6 +135,14 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
   }, [autoOpen]);
 
   const canSend = useMemo(() => message.trim().length > 1 && !loading, [message, loading]);
+  const canCaptureLead = useMemo(
+    () => Boolean(lead.first_name.trim()) && isValidEmail(lead.email) && lead.consent && leadStatus !== "saving",
+    [lead, leadStatus]
+  );
+
+  function sourcePage() {
+    return typeof window === "undefined" ? "" : window.location.href;
+  }
 
   async function send(text = message) {
     const clean = text.trim();
@@ -112,24 +158,74 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode: "coach",
+          source: "Papa Life Action Coach",
           message: clean,
           history: nextMessages.slice(-8),
-          lead,
+          lead: { first_name: lead.first_name, email: lead.email },
+          source_page: sourcePage(),
         }),
       });
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Coach unavailable");
       setMessages((current) => [...current, { role: "assistant", content: json.reply }]);
     } catch {
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content: localPapaReply(clean),
-        },
-      ]);
+      setMessages((current) => [...current, { role: "assistant", content: localPapaReply(clean) }]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function captureLead() {
+    if (!canCaptureLead) return;
+    setLeadStatus("saving");
+    const interest = selectedAction?.interest || "General Guidance";
+    try {
+      const response = await fetch("/api/ai/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: lead.first_name,
+          email: lead.email,
+          offer: selectedAction?.label || "Papa Life Action Coach — General Guidance",
+          interest,
+          cta_selected: selectedAction?.label || null,
+          source: "Papa Life Action Coach",
+          source_page: sourcePage(),
+          conversation_summary: buildConversationSummary(messages),
+          consent: { marketing: true, captured_at: new Date().toISOString() },
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) throw new Error(json.error || "Unable to save your details");
+      setLeadStatus("saved");
+    } catch {
+      setLeadStatus("error");
+    }
+  }
+
+  function trackCta(action: ActionLink) {
+    setSelectedAction(action);
+    const payload = JSON.stringify({
+      cta: action.label,
+      interest: action.interest,
+      source: "Papa Life Action Coach",
+      source_page: sourcePage(),
+      conversation_summary: buildConversationSummary(messages),
+      lead: lead.consent && isValidEmail(lead.email) ? { first_name: lead.first_name, email: lead.email } : undefined,
+    });
+    try {
+      if (typeof navigator !== "undefined" && "sendBeacon" in navigator) {
+        navigator.sendBeacon("/api/ai/cta", new Blob([payload], { type: "application/json" }));
+      } else {
+        void fetch("/api/ai/cta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        });
+      }
+    } catch {
+      // CTA navigation remains available even if attribution cannot be recorded.
     }
   }
 
@@ -148,9 +244,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                 </div>
                 <div>
                   <h2 className="text-base font-extrabold text-white">Papa Life Action Coach</h2>
-                  <p className="text-xs font-semibold text-white/62">
-                    Get guidance, choose a next step, and take action today.
-                  </p>
+                  <p className="text-xs font-semibold text-white/62">Get guidance, choose a next step, and take action today.</p>
                 </div>
               </div>
               <button
@@ -188,9 +282,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
 
           <div className="border-t border-white/10 p-4">
             <div className="mb-4 rounded-xl border border-brand-yellow/25 bg-brand-yellow/[0.06] p-3">
-              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-brand-yellow">
-                Choose your next step
-              </p>
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-brand-yellow">Choose your next step</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {actionLinks.map((action) => {
                   const Icon = action.icon;
@@ -198,6 +290,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                     <a
                       key={action.href}
                       href={action.href}
+                      onClick={() => trackCta(action)}
                       className={cn(
                         "flex items-start gap-2 rounded-lg border px-3 py-2.5 transition",
                         action.primary
@@ -221,23 +314,53 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
             <div className="mb-3 grid gap-2 sm:grid-cols-2">
               <Input
                 value={lead.first_name}
-                onChange={(event) => setLead((current) => ({ ...current, first_name: event.target.value }))}
+                onChange={(event) => {
+                  setLeadStatus("idle");
+                  setLead((current) => ({ ...current, first_name: event.target.value }));
+                }}
                 placeholder="First name"
                 aria-label="First name"
                 className="h-10 border-white/15 bg-white/[0.04]"
               />
               <Input
                 value={lead.email}
-                onChange={(event) => setLead((current) => ({ ...current, email: event.target.value }))}
+                onChange={(event) => {
+                  setLeadStatus("idle");
+                  setLead((current) => ({ ...current, email: event.target.value }));
+                }}
                 placeholder="Email for follow-up"
                 type="email"
                 aria-label="Email for Papa Life follow-up"
                 className="h-10 border-white/15 bg-white/[0.04]"
               />
             </div>
-            <p className="mb-3 text-xs leading-relaxed text-white/45">
-              Share your email when you want Papa Life to follow up with resources and next steps.
-            </p>
+            <label className="mb-2 flex items-start gap-2 text-xs leading-relaxed text-white/58">
+              <input
+                type="checkbox"
+                checked={lead.consent}
+                onChange={(event) => {
+                  setLeadStatus("idle");
+                  setLead((current) => ({ ...current, consent: event.target.checked }));
+                }}
+                className="mt-0.5 h-3.5 w-3.5 accent-brand-yellow"
+              />
+              <span>I agree that Papa Life may use my details to follow up with resources and next steps.</span>
+            </label>
+            <Button
+              type="button"
+              onClick={() => void captureLead()}
+              disabled={!canCaptureLead}
+              variant="outline"
+              className="mb-3 h-9 w-full border-brand-yellow/55 bg-transparent text-xs font-bold text-brand-yellow hover:bg-brand-yellow hover:text-black disabled:opacity-50"
+            >
+              {leadStatus === "saving" ? "Saving your next step..." : leadStatus === "saved" ? "Follow-up details saved" : "Get follow-up resources"}
+            </Button>
+            {leadStatus === "saved" && (
+              <p className="mb-3 text-xs leading-relaxed text-green-300">Thank you, Father. Papa Life has your requested follow-up details and next step.</p>
+            )}
+            {leadStatus === "error" && (
+              <p className="mb-3 text-xs leading-relaxed text-red-300">Your details could not be saved right now. You can still use any next-step option above.</p>
+            )}
 
             <div className="mb-3 flex flex-wrap gap-2">
               {quickPrompts.map((prompt) => (
@@ -245,7 +368,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                   key={prompt}
                   type="button"
                   className="rounded-full border border-white/12 px-3 py-2 text-left text-xs font-semibold text-white/70 hover:border-brand-yellow hover:text-brand-yellow"
-                  onClick={() => send(prompt)}
+                  onClick={() => void send(prompt)}
                 >
                   {prompt}
                 </button>
@@ -259,7 +382,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
-                    send();
+                    void send();
                   }
                 }}
                 placeholder="Tell me what is happening..."
@@ -268,7 +391,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
               />
               <Button
                 type="button"
-                onClick={() => send()}
+                onClick={() => void send()}
                 disabled={!canSend}
                 className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white"
                 aria-label="Send message"
@@ -277,10 +400,7 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
               </Button>
             </div>
 
-            <a
-              href="/ai-coach"
-              className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-brand-yellow hover:text-white"
-            >
+            <a href="/ai-coach" className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-brand-yellow hover:text-white">
               Open the full AI Coach experience
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>

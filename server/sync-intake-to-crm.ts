@@ -33,6 +33,8 @@ export type IntakeCrmSyncInput = {
   source: "mcp" | "web";
   /** When set, overrides default strategist_intake label on the lead row */
   invited_by?: string;
+  /** Explicit marketing/follow-up consent from the originating form. */
+  consent_marketing?: boolean;
 };
 
 /** CRM reads leads table; strategist intake rows live in intake_submissions. Keep them in sync. */
@@ -51,7 +53,11 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
 
   const invitedBy = input.invited_by ?? "strategist_intake";
   const sourceLabel =
-    invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : `strategist intake (${input.source})`;
+    invitedBy === "papa_funnel_intake"
+      ? "Papa Life homepage funnel"
+      : invitedBy === "papa_life_action_coach"
+        ? "Papa Life Action Coach"
+        : `strategist intake (${input.source})`;
 
   const noteBody = [
     `Source: ${sourceLabel}`,
@@ -93,7 +99,7 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
     country: null,
     postal_code: null,
     consent_transactional: 0,
-    consent_marketing: 0,
+    consent_marketing: input.consent_marketing ? 1 : 0,
     checkout_status: "intake",
   });
 

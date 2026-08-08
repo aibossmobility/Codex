@@ -4956,6 +4956,8 @@ async function startServer() {
       const message = cleanPublicText(req.body?.message, 4000);
       const history = Array.isArray(req.body?.history) ? req.body.history.slice(-10) : [];
       const lead = normalizePapaAiLead(req.body?.lead);
+      const source = cleanPublicText(req.body?.source, 120);
+      const interactionMode = source === "Papa Life Action Coach" ? "action_coach_chat" : mode;
       const sourcePage = cleanPublicText(req.body?.source_page || req.body?.sourcePage || req.get("referer"), 500);
 
       if (!message) {
@@ -4965,7 +4967,7 @@ async function startServer() {
       const result = await buildPapaAiReply({ message, mode: mode as any, history });
       savePapaAiInteraction({
         session_id: req.sessionID || "public",
-        mode,
+        mode: interactionMode,
         first_name: lead.first_name,
         email: lead.email,
         phone: lead.phone,
@@ -5134,6 +5136,32 @@ async function startServer() {
     }
   });
 
+  app.post(["/api/papa-ai/cta", "/api/ai/cta"], (req, res) => {
+    try {
+      const cta = cleanPublicText(req.body?.cta, 160);
+      const interest = cleanPublicText(req.body?.interest, 120) || "General Guidance";
+      const sourcePage = cleanPublicText(req.body?.source_page || req.body?.sourcePage || req.get("referer"), 500);
+      const conversationSummary = cleanPublicText(req.body?.conversation_summary || req.body?.conversationSummary, 1000);
+      const lead = normalizePapaAiLead(req.body?.lead);
+      if (!cta) return res.status(400).json({ ok: false, error: "CTA is required" });
+      savePapaAiInteraction({
+        session_id: req.sessionID || "public",
+        mode: "action_coach_cta",
+        first_name: lead.first_name,
+        email: lead.email,
+        phone: lead.phone,
+        source_page: sourcePage,
+        user_message: `CTA selected: ${cta}`,
+        conversation_summary: `Interest: ${interest}${conversationSummary ? ` | ${conversationSummary}` : ""}`,
+        provider: "local",
+      });
+      res.json({ ok: true });
+    } catch (err) {
+      console.error("[papa-ai] CTA tracking failed:", err);
+      res.status(500).json({ ok: false, error: "Failed to record CTA" });
+    }
+  });
+
   app.post(["/api/papa-ai/lead", "/api/ai/leads"], async (req, res) => {
     try {
       const lead = normalizePapaAiLead(req.body);
@@ -5141,11 +5169,33 @@ async function startServer() {
       const sourcePage = cleanPublicText(req.body?.source_page || req.body?.sourcePage || req.get("referer"), 500);
       const conversationSummary = cleanPublicText(req.body?.conversation_summary || req.body?.conversationSummary, 1000);
       const assessmentResult = req.body?.assessment_result || req.body?.assessmentResult || null;
+      const interest = cleanPublicText(req.body?.interest, 120) || "General Guidance";
+      const ctaSelected = cleanPublicText(req.body?.cta_selected || req.body?.ctaSelected, 160);
+      const source = cleanPublicText(req.body?.source, 120) || "Papa Life AI Coach";
+      const actionCoachLead = source === "Papa Life Action Coach";
+      const followUpStatus = ["Private Conversation", "Membership"].includes(interest)
+        ? "priority_follow_up"
+        : "standard_follow_up";
+      if (actionCoachLead && !Boolean(req.body?.consent?.marketing)) {
+        return res.status(400).json({ ok: false, error: "Follow-up consent is required" });
+      }
       if (!lead.first_name || !lead.email) {
         return res.status(400).json({ ok: false, error: "First name and email are required" });
       }
       if (!isValidEmail(lead.email)) {
         return res.status(400).json({ ok: false, error: "A valid email is required" });
+      }
+      if (actionCoachLead) {
+        const duplicate = db
+          .prepare(
+            `SELECT id FROM papa_ai_interactions
+             WHERE mode = 'lead' AND email = ?
+               AND conversation_summary LIKE 'Action Coach |%'
+               AND created_at >= datetime('now', '-24 hours')
+             LIMIT 1`
+          )
+          .get(lead.email) as { id: number } | undefined;
+        if (duplicate) return res.json({ ok: true, id: duplicate.id, duplicate: true });
       }
       const result = db
         .prepare(
@@ -5157,14 +5207,20 @@ async function startServer() {
           lead.email,
           lead.phone || null,
           `Lead requested: ${offer}`,
-          "AI Coach",
+          actionCoachLead ? "Action Coach" : "AI Coach",
           null,
-          "Free assessment, Tuesday Live, newsletter, membership, or free chapter",
+          `${interest} follow-up requested (${followUpStatus})`,
           JSON.stringify({
-            source: "papa_ai_lead",
+            source: actionCoachLead ? "papa_life_action_coach" : "papa_ai_lead",
+            source_label: source,
             source_page: sourcePage,
             offer,
+            interest,
+            cta_selected: ctaSelected || null,
             conversation_summary: conversationSummary,
+            follow_up_status: followUpStatus,
+            consent_marketing: Boolean(req.body?.consent?.marketing),
+            consent_captured_at: cleanPublicText(req.body?.consent?.captured_at, 80) || null,
             assessment_result: assessmentResult,
             submitted_at: new Date().toISOString(),
           })
@@ -5179,6 +5235,35 @@ async function startServer() {
            updated_at = datetime('now')`
       ).run(lead.email, lead.first_name);
 
+      const intakeId = Number(result.lastInsertRowid);
+      try {
+        const crmLead = syncIntakeSubmissionToCrmLead(db, {
+          intakeId,
+          first_name: lead.first_name,
+          email: lead.email,
+          phone: lead.phone || null,
+          situation: `Lead requested: ${offer}`,
+          routed_pillar: actionCoachLead ? "Action Coach" : "AI Coach",
+          disconnected_pillar: null,
+          vision: `${interest} follow-up requested (${followUpStatus})`,
+          source: "web",
+          invited_by: actionCoachLead ? "papa_life_action_coach" : "papa_ai_lead",
+          consent_marketing: actionCoachLead && Boolean(req.body?.consent?.marketing),
+        });
+        if (actionCoachLead) {
+          const tags = [
+            "papa_life_action_coach_lead",
+            `action_coach_interest_${ghlTagSlug(interest)}`,
+            `action_coach_${followUpStatus}`,
+          ];
+          for (const tag of tags) {
+            db.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(crmLead.lead_id, tag);
+          }
+        }
+      } catch (crmErr) {
+        console.error("[crm] Papa AI lead sync failed:", crmErr);
+      }
+
       savePapaAiInteraction({
         session_id: req.sessionID || "public",
         mode: "lead",
@@ -5187,7 +5272,9 @@ async function startServer() {
         phone: lead.phone,
         source_page: sourcePage,
         user_message: `Lead requested: ${offer}`,
-        conversation_summary: conversationSummary,
+        conversation_summary: actionCoachLead
+          ? `Action Coach | Interest: ${interest} | Follow-up: ${followUpStatus}${conversationSummary ? ` | ${conversationSummary}` : ""}`
+          : conversationSummary,
         provider: "local",
         assessment_result: assessmentResult,
       });
@@ -5196,24 +5283,30 @@ async function startServer() {
         first_name: lead.first_name,
         email: lead.email,
         phone: lead.phone || null,
-        source: "bossmobilelifecoach.com Papa Life AI lead",
-        tags: [
-          "papa_ai_lead",
-          "papa_life_ai",
-          offer ? `offer_${offer}` : "",
-        ],
+        source: actionCoachLead ? "bossmobilelifecoach.com Papa Life Action Coach" : "bossmobilelifecoach.com Papa Life AI lead",
+        tags: actionCoachLead
+          ? [
+              "Papa Life Action Coach Lead",
+              `Action Coach Interest ${interest}`,
+              `Action Coach ${followUpStatus}`,
+              ctaSelected ? `Action Coach CTA ${ctaSelected}` : "",
+            ]
+          : ["papa_ai_lead", "papa_life_ai", offer ? `offer_${offer}` : ""],
       });
 
       await sendAdminNotification({
-        event_type: "papa_ai_lead",
-        subject: `Papa Life AI lead: ${lead.first_name}`,
+        event_type: actionCoachLead ? "papa_life_action_coach_lead" : "papa_ai_lead",
+        subject: `${actionCoachLead ? "Papa Life Action Coach" : "Papa Life AI"} lead: ${lead.first_name}`,
         summary: [
-          "A visitor requested a Papa Life AI follow-up.",
+          `A visitor requested a ${actionCoachLead ? "Papa Life Action Coach" : "Papa Life AI"} follow-up.`,
           "",
           `Name: ${lead.first_name}`,
           `Email: ${lead.email}`,
           lead.phone ? `Phone: ${lead.phone}` : null,
           `Offer: ${offer}`,
+          `Interest: ${interest}`,
+          ctaSelected ? `CTA selected: ${ctaSelected}` : null,
+          `Follow-up status: ${followUpStatus}`,
           sourcePage ? `Source page: ${sourcePage}` : null,
           conversationSummary ? `Conversation: ${conversationSummary}` : null,
         ]
@@ -5222,17 +5315,82 @@ async function startServer() {
         payload: {
           lead,
           offer,
+          interest,
+          cta_selected: ctaSelected || null,
+          source: actionCoachLead ? "Papa Life Action Coach" : "Papa Life AI Coach",
+          follow_up_status: followUpStatus,
           source_page: sourcePage,
           conversation_summary: conversationSummary,
-          intake_id: Number(result.lastInsertRowid),
+          intake_id: intakeId,
         },
       });
 
-      res.json({ ok: true, id: result.lastInsertRowid });
+      res.json({ ok: true, id: intakeId, follow_up_status: followUpStatus });
     } catch (err) {
       console.error("[papa-ai] lead failed:", err);
       res.status(500).json({ ok: false, error: "Failed to save lead" });
     }
+  });
+
+  app.get("/api/admin/papa-ai/action-coach-summary", requireAuth, (req, res) => {
+    const requestedDate = typeof req.query.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
+      ? req.query.date
+      : null;
+    const rows = db
+      .prepare(
+        `SELECT session_id, mode, first_name, email, user_message, conversation_summary, created_at
+         FROM papa_ai_interactions
+         WHERE mode IN ('action_coach_chat', 'action_coach_cta', 'lead')
+           AND created_at >= COALESCE(?, date('now'))
+         ORDER BY created_at DESC`
+      )
+      .all(requestedDate) as Array<{
+        session_id: string;
+        mode: string;
+        first_name: string | null;
+        email: string | null;
+        user_message: string | null;
+        conversation_summary: string | null;
+        created_at: string;
+      }>;
+    const actionCoachLead = (row: (typeof rows)[number]) =>
+      row.mode === "lead" && (row.conversation_summary || "").includes("Action Coach");
+    const ctaRows = rows.filter((row) => row.mode === "action_coach_cta");
+    const ctaLabel = (row: (typeof rows)[number]) => (row.user_message || "").replace(/^CTA selected:\s*/, "");
+    const ctaCount = (label: string) => ctaRows.filter((row) => ctaLabel(row) === label).length;
+    const leadRows = rows.filter(actionCoachLead);
+    const conversationRows = rows.filter((row) => row.mode === "action_coach_chat");
+    const priorityLeads = leadRows.filter((row) => (row.conversation_summary || "").includes("priority_follow_up"));
+    const importantQuestions = conversationRows
+      .map((row) => row.user_message?.trim())
+      .filter((value): value is string => Boolean(value))
+      .slice(0, 5);
+    res.json({
+      ok: true,
+      report_date: requestedDate || new Date().toISOString().slice(0, 10),
+      summary: {
+        conversations: new Set(conversationRows.map((row) => row.session_id)).size,
+        captured_leads: leadRows.length,
+        cta_clicks: {
+          reconnection_assessment: ctaCount("Take the Free Reconnection Assessment"),
+          private_conversation: ctaCount("Book a Private Conversation"),
+          tuesday_live: ctaCount("Join Tuesday Live"),
+          membership: ctaCount("Explore Papa Life Membership"),
+        },
+        assessments_started: ctaCount("Take the Free Reconnection Assessment"),
+        booking_interest: ctaCount("Book a Private Conversation"),
+        tuesday_live_interest: ctaCount("Join Tuesday Live"),
+        membership_interest: ctaCount("Explore Papa Life Membership"),
+        important_questions: importantQuestions,
+        leads_requiring_personal_follow_up: priorityLeads.map((row) => ({
+          first_name: row.first_name,
+          email: row.email,
+          created_at: row.created_at,
+        })),
+        recommended_conversion_improvement:
+          leadRows.length === 0 ? "Review whether the consent-based follow-up invitation is clear and visible after the first response." : "Review the most selected CTA and strengthen its destination page's first visible next step.",
+      },
+    });
   });
 
   app.get("/api/admin/papa-ai/interactions", requireAuth, (_req, res) => {

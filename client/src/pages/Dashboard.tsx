@@ -214,6 +214,28 @@ interface PapaAiInteraction {
   created_at: string;
 }
 
+interface ActionCoachDailySummary {
+  conversations: number;
+  captured_leads: number;
+  cta_clicks: {
+    reconnection_assessment: number;
+    private_conversation: number;
+    tuesday_live: number;
+    membership: number;
+  };
+  assessments_started: number;
+  booking_interest: number;
+  tuesday_live_interest: number;
+  membership_interest: number;
+  important_questions: string[];
+  leads_requiring_personal_follow_up: Array<{
+    first_name: string | null;
+    email: string | null;
+    created_at: string;
+  }>;
+  recommended_conversion_improvement: string;
+}
+
 interface NotificationEvent {
   id: number;
   event_type: string;
@@ -2584,6 +2606,7 @@ function AdminAlerts() {
 
 function PapaAiAdmin() {
   const [interactions, setInteractions] = useState<PapaAiInteraction[]>([]);
+  const [actionCoachSummary, setActionCoachSummary] = useState<ActionCoachDailySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -2591,10 +2614,14 @@ function PapaAiAdmin() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/papa-ai/interactions", { credentials: "include" });
-      const data = await res.json();
+      const [res, summaryRes] = await Promise.all([
+        fetch("/api/admin/papa-ai/interactions", { credentials: "include" }),
+        fetch("/api/admin/papa-ai/action-coach-summary", { credentials: "include" }),
+      ]);
+      const [data, summaryData] = await Promise.all([res.json(), summaryRes.json()]);
       if (!res.ok || !data.ok) throw new Error(data.error || "Unable to load Papa AI interactions");
       setInteractions(Array.isArray(data.interactions) ? data.interactions : []);
+      setActionCoachSummary(summaryRes.ok && summaryData.ok ? summaryData.summary : null);
     } catch (err: any) {
       setError(err.message || "Unable to load Papa AI interactions");
     } finally {
@@ -2627,6 +2654,57 @@ function PapaAiAdmin() {
         </Button>
       </div>
 
+      {actionCoachSummary && (
+        <Card className="border-brand-yellow/25 bg-[#111]">
+          <CardHeader className="border-b border-white/10 pb-4">
+            <CardTitle className="text-lg text-white">Papa Life Action Coach — Today</CardTitle>
+            <p className="text-sm text-gray-500">A concise conversion and follow-up brief from the public Action Coach.</p>
+          </CardHeader>
+          <CardContent className="space-y-5 pt-5">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["Conversations", actionCoachSummary.conversations],
+                ["Leads captured", actionCoachSummary.captured_leads],
+                ["Assessment interest", actionCoachSummary.assessments_started],
+                ["Personal follow-up", actionCoachSummary.leads_requiring_personal_follow_up.length],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="rounded-lg bg-black/30 p-4">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+                  <p className="mt-1 text-2xl font-black text-brand-yellow">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">CTA clicks</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-300">
+                  Assessment: {actionCoachSummary.cta_clicks.reconnection_assessment} · Private conversation: {actionCoachSummary.cta_clicks.private_conversation} · Tuesday Live: {actionCoachSummary.cta_clicks.tuesday_live} · Membership: {actionCoachSummary.cta_clicks.membership}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Recommended conversion improvement</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-300">{actionCoachSummary.recommended_conversion_improvement}</p>
+              </div>
+            </div>
+            {actionCoachSummary.leads_requiring_personal_follow_up.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Needs Brian’s attention</p>
+                <p className="mt-2 text-sm text-gray-300">
+                  {actionCoachSummary.leads_requiring_personal_follow_up
+                    .map((lead) => [lead.first_name, lead.email].filter(Boolean).join(" · ") || "Unidentified lead")
+                    .join("; ")}
+                </p>
+              </div>
+            )}
+            {actionCoachSummary.important_questions.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Important visitor questions</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-300">{actionCoachSummary.important_questions.join(" · ")}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-white/10 bg-[#111]">
           <CardContent className="p-5">

@@ -40,7 +40,7 @@ const pages = [
   },
   {
     path: "/relationship-assessment",
-    title: "Free Father-Adult Child Relationship Assessment | Boss Mobile Life Coach",
+    title: "Free Father-Adult Child Relationship Assessment | Papa Life",
     description:
       "Take the free relationship assessment and see where things stand with your adult son or daughter.",
     eyebrow: "Relationship Assessment",
@@ -94,7 +94,7 @@ const pages = [
   },
   {
     path: "/adult-son-relationship",
-    title: "Adult Son Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Son Relationship Help for Fathers | Papa Life",
     description:
       "Guidance for fathers rebuilding connection with an adult son without control, lectures, or walking on eggshells.",
     eyebrow: "Adult Son Relationship",
@@ -107,7 +107,7 @@ const pages = [
   },
   {
     path: "/adult-daughter-relationship",
-    title: "Adult Daughter Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Daughter Relationship Help for Fathers | Papa Life",
     description:
       "Support for fathers who want a deeper, safer connection with an adult daughter after years of tension, silence, or misunderstanding.",
     eyebrow: "Adult Daughter Relationship",
@@ -120,7 +120,7 @@ const pages = [
   },
   {
     path: "/why-adult-children-pull-away",
-    title: "Why Adult Children Pull Away From Their Fathers | Boss Mobile Life Coach",
+    title: "Why Adult Children Pull Away From Their Fathers | Papa Life",
     description:
       "Understand why grown sons and daughters create distance and what fathers can do that actually helps.",
     eyebrow: "Adult Child Distance",
@@ -133,7 +133,7 @@ const pages = [
   },
   {
     path: "/father-child-estrangement",
-    title: "Father-Child Estrangement Help | Boss Mobile Life Coach",
+    title: "Father-Child Estrangement Help | Papa Life",
     description:
       "Hope and practical steps for fathers in estrangement with an adult son or daughter from a coach who lived it.",
     eyebrow: "Estrangement Help",
@@ -160,13 +160,13 @@ const pages = [
       ["What he brings", "Scripture-centered coaching, clear language, responsible technology, and the PAPA Framework turn good intentions into daily practice without promising or forcing reconciliation."],
     ],
     jsonLd: [
-      { "@context": "https://schema.org", "@type": "Person", name: "Brian Keith Hill", jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach", url: "https://bossmobilelifecoach.com/about-brian-keith-hill", image: "https://bossmobilelifecoach.com/images/brian-keith-hill.png", worksFor: { "@type": "Organization", name: "Boss Mobility", alternateName: "Boss Mobile Life Coach" }, sameAs: ["https://www.linkedin.com/in/brian-hill-bossmobility", "https://briankeithhill.com"] },
-      { "@context": "https://schema.org", "@type": "Organization", name: "Boss Mobile Life Coach", alternateName: ["Boss Mobility", "Boss Mobile Life Coach", "Papa Life"], url: "https://bossmobilelifecoach.com", founder: { "@type": "Person", name: "Brian Keith Hill", url: "https://bossmobilelifecoach.com/about-brian-keith-hill" } },
+      { "@context": "https://schema.org", "@type": "Person", name: "Brian Keith Hill", jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach", url: "https://papalifecoach.com/about-brian-keith-hill", image: "https://papalifecoach.com/images/brian-keith-hill.png", worksFor: { "@type": "Organization", name: "Boss Mobility", alternateName: "Boss Mobile Life Coach" }, sameAs: ["https://www.linkedin.com/in/brian-hill-bossmobility", "https://briankeithhill.com"] },
+      { "@context": "https://schema.org", "@type": "Organization", name: "Papa Life", alternateName: ["PapaLifeCoach.com", "Boss Mobility", "Boss Mobile Life Coach"], url: "https://papalifecoach.com", founder: { "@type": "Person", name: "Brian Keith Hill", url: "https://papalifecoach.com/about-brian-keith-hill" } },
     ],
   },
   {
     path: "/courses",
-    title: "Papa Life Courses | Boss Mobile Life Coach",
+    title: "Papa Life Courses | Papa Life",
     description:
       "Programs built for fathers navigating relationships with adult children. Preview Papa Life courses and sign in to watch lessons.",
     eyebrow: "Courses",
@@ -179,7 +179,7 @@ const pages = [
   },
   {
     path: "/resources",
-    title: "Papa Life Resources | Boss Mobile Life Coach",
+    title: "Papa Life Resources | Papa Life",
     description: "Free and member resources for fathers rebuilding connection with adult children through Papa Life.",
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
@@ -192,7 +192,7 @@ const pages = [
   },
   {
     path: "/membership",
-    title: "Papa Life Membership | Boss Mobile Life Coach",
+    title: "Papa Life Membership | Papa Life",
     description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
     eyebrow: "Membership",
     headline: "Build consistency instead of relying on one emotional moment.",
@@ -204,7 +204,7 @@ const pages = [
   },
   {
     path: "/books",
-    title: "Papa Life Books | Boss Mobile Life Coach",
+    title: "Papa Life Books | Papa Life",
     description: "Books and written resources from Brian Keith Hill for fathers navigating distance with adult children.",
     eyebrow: "Books",
     headline: "Written guidance for the fatherhood season no one prepared you for.",
@@ -216,7 +216,7 @@ const pages = [
   },
   {
     path: "/podcast",
-    title: "Papa Life Podcast | Boss Mobile Life Coach",
+    title: "Papa Life Podcast | Papa Life",
     description: "Podcast resources for fathers learning to reconnect with adult children through humility, presence, and practical action.",
     eyebrow: "Podcast",
     headline: "Listen for language, perspective, and next steps.",
@@ -228,11 +228,11 @@ const pages = [
   },
   {
     path: "/contact",
-    title: "Contact Boss Mobile Life Coach",
-    description: "Contact Brian Keith Hill and Boss Mobile Life Coach about Papa Life, fatherhood coaching, and support.",
+    title: "Contact Papa Life",
+    description: "Contact Brian Keith Hill and Papa Life about Papa Life, fatherhood coaching, and support.",
     eyebrow: "Contact",
     headline: "Reach out when you are ready for support.",
-    intro: "Boss Mobile Life Coach supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
+    intro: "Papa Life supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
     sections: [
       ["Start here", "If you are a father trying to reconnect with an adult child, the free assessment is the best first step."],
       ["For broader support", "Use the AI Coach or membership path to get oriented around resources and next actions."],
@@ -253,7 +253,7 @@ const pages = [
   },
   {
     path: "/papa-journey",
-    title: "Papa Journey | Boss Mobile Life Coach",
+    title: "Papa Journey | Papa Life",
     description: "A guided Papa Life journey for fathers rebuilding connection with adult children.",
     eyebrow: "Papa Journey",
     headline: "Move from awareness into a guided fatherhood path.",
@@ -277,10 +277,10 @@ const pages = [
   },
   {
     path: "/booking",
-    title: "Booking | Boss Mobile Life Coach",
-    description: "Booking page for Boss Mobile Life Coach.",
+    title: "Booking | Papa Life",
+    description: "Booking page for Papa Life.",
     eyebrow: "Booking",
-    headline: "Book time with Boss Mobile Life Coach.",
+    headline: "Book time with Papa Life.",
     intro: "Use this page to move from interest into a scheduled conversation or next step.",
     sections: [
       ["Next step", "Choose an available path for booking or follow-up."],
@@ -289,12 +289,12 @@ const pages = [
   },
   {
     path: "/privacy",
-    title: "Privacy Policy | Boss Mobile Life Coach",
-    description: "How Papa Life collects, uses, and protects information submitted through bossmobilelifecoach.com.",
+    title: "Privacy Policy | Papa Life",
+    description: "How Papa Life collects, uses, and protects information submitted through PapaLifeCoach.com.",
     eyebrow: "Privacy Policy",
     headline: "Privacy Policy",
     intro:
-      "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on bossmobilelifecoach.com, how it is used, and how visitors can control it.",
+      "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on PapaLifeCoach.com, how it is used, and how visitors can control it.",
     sections: [
       ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process membership payments, improve services, and follow the law."],
       ["SMS consent", "Phone numbers and SMS consent are never sold or shared with third parties for their own marketing."],
@@ -302,12 +302,12 @@ const pages = [
   },
   {
     path: "/privacy-policy",
-    title: "Privacy Policy | Boss Mobile Life Coach",
-    description: "How Papa Life collects, uses, and protects information submitted through bossmobilelifecoach.com.",
+    title: "Privacy Policy | Papa Life",
+    description: "How Papa Life collects, uses, and protects information submitted through PapaLifeCoach.com.",
     eyebrow: "Privacy Policy",
     headline: "Privacy Policy",
     intro:
-      "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on bossmobilelifecoach.com, how it is used, and how visitors can control it.",
+      "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on PapaLifeCoach.com, how it is used, and how visitors can control it.",
     sections: [
       ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process membership payments, improve services, and follow the law."],
       ["SMS consent", "Phone numbers and SMS consent are never sold or shared with third parties for their own marketing."],
@@ -315,12 +315,12 @@ const pages = [
   },
   {
     path: "/terms",
-    title: "Terms of Service | Boss Mobile Life Coach",
-    description: "Terms for using Papa Life, bossmobilelifecoach.com, ORACLE, courses, and membership.",
+    title: "Terms of Service | Papa Life",
+    description: "Terms for using Papa Life, PapaLifeCoach.com, ORACLE, courses, and membership.",
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using bossmobilelifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using PapaLifeCoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
       ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
@@ -328,12 +328,12 @@ const pages = [
   },
   {
     path: "/terms-of-service",
-    title: "Terms of Service | Boss Mobile Life Coach",
-    description: "Terms for using Papa Life, bossmobilelifecoach.com, ORACLE, courses, and membership.",
+    title: "Terms of Service | Papa Life",
+    description: "Terms for using Papa Life, PapaLifeCoach.com, ORACLE, courses, and membership.",
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using bossmobilelifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using PapaLifeCoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
       ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
@@ -376,8 +376,9 @@ function render(page) {
     )
     .replace('<div id="root"></div>', `<div id="root">${bodyHtml(page)}</div>`);
 
-  const canonical = `<link rel="canonical" href="https://bossmobilelifecoach.com${page.path === "/" ? "" : page.path}" />`;
-  html = html.replace("</head>", `    ${canonical}\n  </head>`);
+  const canonical = `<link rel="canonical" href="https://papalifecoach.com${page.path === "/" ? "" : page.path}" />`;
+  const socialUrl = `<meta property="og:url" content="https://papalifecoach.com${page.path === "/" ? "" : page.path}" />`;
+  html = html.replace("</head>", `    ${canonical}\n    ${socialUrl}\n  </head>`);
   if (page.keywords) html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);
   if (page.jsonLd) {
     const scripts = page.jsonLd.map((schema) => `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`).join("\n    ");

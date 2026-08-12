@@ -1,10 +1,10 @@
-const SITE = "https://bossmobilelifecoach.com";
+const SITE = "https://papalifecoach.com";
 
 export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Boss Mobile Life Coach",
-  alternateName: ["Boss Mobility", "Boss Mobile Life Coach", "Papa Life"],
+  name: "Papa Life",
+  alternateName: ["PapaLifeCoach.com", "Boss Mobility", "Boss Mobile Life Coach"],
   url: SITE,
   logo: `${SITE}/images/papa-life-logo.png`,
   description:
@@ -54,10 +54,10 @@ export const HOMEPAGE_FAQ_SCHEMA = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "What is Boss Mobile Life Coach?",
+      name: "What is Papa Life?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Boss Mobile Life Coach (PAPA Life) provides coaching and resources for fathers navigating relationships with adult children — with clarity, presence, and care for mental health.",
+        text: "Papa Life provides coaching and resources for fathers navigating relationships with adult children—with clarity, presence, and care for mental health.",
       },
     },
     {
@@ -103,7 +103,7 @@ export function webApplicationSchema(path: string, name: string, description: st
     },
     provider: {
       "@type": "Organization",
-      name: "Boss Mobile Life Coach",
+      name: "Papa Life",
     },
   };
 }
@@ -121,7 +121,7 @@ export function articleSchema(slug: string, headline: string, description: strin
     },
     publisher: {
       "@type": "Organization",
-      name: "Boss Mobile Life Coach",
+      name: "Papa Life",
       logo: {
         "@type": "ImageObject",
         url: `${SITE}/images/papa-life-logo.png`,
@@ -145,6 +145,6 @@ export const HOMEPAGE_WEB_APP_SCHEMA = webApplicationSchema(
 
 export const HOMEPAGE_ARTICLE_SCHEMA = articleSchema(
   "/",
-  "Boss Mobile Life Coach — Fatherhood & Life Coaching",
+  "Papa Life — Fatherhood & Life Coaching",
   "Supportive coaching for fathers ready for a clearer mental-health journey with adult children."
 );

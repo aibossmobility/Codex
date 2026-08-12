@@ -30,13 +30,13 @@ const selfIdentificationStatements = [
   "I know something needs to change, and I am willing to begin with myself.",
 ];
 
-const costOfWaiting = [
-  "More missed birthdays and holidays.",
-  "Greater emotional distance.",
-  "Lost time with grandchildren.",
-  "Misunderstandings becoming fixed family stories.",
-  "Additional years of regret.",
-  "Opportunities for conversation passing without preparation.",
+const intentionalPreparation = [
+  "Approach important conversations with greater calm.",
+  "Understand what is yours to repair and what is not yours to control.",
+  "Prepare words that invite connection instead of defensiveness.",
+  "Build steady habits that support trust over time.",
+  "Make room for prayer, reflection, and wise counsel.",
+  "Be ready when an opportunity for conversation opens.",
 ];
 
 const fathersServed = [
@@ -52,11 +52,11 @@ const fathersServed = [
 ];
 
 const readinessBoundaries = [
-  "You only want help proving your adult child is wrong.",
-  "You want a technique for forcing someone to respond.",
-  "You believe the other person must change first.",
-  "You are unwilling to examine your own actions.",
-  "You expect an instant reconciliation guarantee.",
+  "You are still focused on proving who was right or wrong.",
+  "You are hoping for a way to force a response.",
+  "You are waiting for the other person to change first.",
+  "You are not yet ready to examine your own actions.",
+  "You need an instant reconciliation guarantee before beginning.",
 ];
 
 const transformations = [
@@ -149,7 +149,7 @@ export default function Home() {
               href={joinHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
             >
-              Enroll Now — Immediate Access
+              Explore Papa Life Membership
             </a>
           </div>
           <button
@@ -180,7 +180,7 @@ export default function Home() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-md bg-[#b33a32] px-4 py-3 font-extrabold text-white"
               >
-                Enroll Now — Immediate Access
+                Explore Papa Life Membership
               </a>
             </div>
           </div>
@@ -208,17 +208,20 @@ export default function Home() {
               Papa Life is a Scripture-centered community created specifically for fathers of adult children who want to rebuild trust, restore communication, and begin the journey from distance to reconnection.
             </p>
             <p className="mt-5 text-lg font-bold text-[#f2c230] md:text-xl">
-              As long as you’re both alive, it’s never too late.
+              Protect Your Peace. Invest in What Matters.
+            </p>
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
+              You do not have to act from panic or pressure. You can prepare with faith, clarity, and intention for the next right step.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              <ActionLink href={joinHref} light>
-                Enroll Now — Immediate Access
+              <ActionLink href="/assessment" light>
+                Take the Free Assessment
               </ActionLink>
               <a
-                href="/assessment"
+                href={joinHref}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
               >
-                Take the Free Assessment
+                Explore Papa Life Membership
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
@@ -308,15 +311,15 @@ export default function Home() {
         <section aria-labelledby="cost-of-waiting-heading" className="bg-[#b33a32] py-16 text-white md:py-20">
           <div className="container grid items-start gap-10 lg:grid-cols-[1.1fr_.9fr]">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6cf55]">Why begin now</p>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6cf55]">Prepare with peace and purpose</p>
               <h2 id="cost-of-waiting-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
-                Silence Rarely Heals Itself.
+                The Next Right Step Can Begin With You.
               </h2>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/85">
-                Continued waiting can leave a father carrying more distance, more regret, and less preparation for the conversations that may still be possible.
+                Preparation is not pressure. It is the peaceful, intentional work of becoming ready for the conversations and opportunities that may still be possible.
               </p>
               <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                {costOfWaiting.map((item) => (
+                {intentionalPreparation.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#f2c230]" aria-hidden="true" />
                     <span>{item}</span>
@@ -325,7 +328,7 @@ export default function Home() {
               </ul>
             </div>
             <blockquote className="rounded-xl bg-[#17231c] p-8 text-2xl font-extrabold leading-relaxed text-[#f2c230] shadow-xl">
-              “The greatest risk is not hearing ‘no.’ The greatest risk is allowing another year to pass without becoming ready.”
+              “You cannot control when the door opens. You can choose to be prepared—with peace, humility, and love—when it does.”
             </blockquote>
           </div>
         </section>
@@ -350,10 +353,13 @@ export default function Home() {
         <section aria-labelledby="readiness-heading" className="bg-[#17231c] py-16 text-white md:py-20">
           <div className="container grid gap-10 lg:grid-cols-[1fr_.9fr]">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">A compassionate boundary</p>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">An encouraging place to begin</p>
               <h2 id="readiness-heading" className="mt-3 max-w-3xl text-4xl font-extrabold md:text-5xl">
-                Papa Life May Not Be the Right Next Step Yet If…
+                Readiness Begins With One Honest Choice.
               </h2>
+              <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/85">
+                You do not have to have everything figured out. You only need a willingness to begin with the part you can change. The free assessment can help you see your next step clearly if any of these still feel familiar:
+              </p>
               <ul className="mt-8 space-y-4">
                 {readinessBoundaries.map((item) => (
                   <li key={item} className="flex gap-3 text-lg leading-relaxed text-white/85">
@@ -365,7 +371,7 @@ export default function Home() {
             </div>
             <div className="self-center rounded-xl border border-[#f2c230]/30 bg-white/5 p-8">
               <p className="text-2xl font-extrabold leading-relaxed text-[#f2c230]">
-                The door remains open. Papa Life begins when a father is willing to work on the part of the relationship he can control—himself.
+                The door remains open. Growth begins with honesty, and even a small willingness to reflect can become a meaningful first step.
               </p>
             </div>
           </div>
@@ -447,12 +453,12 @@ export default function Home() {
               You may not be able to rewrite yesterday, but you can decide what kind of father you will be from this day forward.
             </p>
             <div className="mt-8">
-              <ActionLink href={joinHref} light>
-                Enroll Now — Immediate Access
+              <ActionLink href="/assessment" light>
+                Take the Free Assessment
               </ActionLink>
             </div>
             <p className="mt-5 text-white/75">
-              Begin the work of becoming the father healthy reconnection may become possible with.
+              Start with clarity. There is no pressure to enroll, and your next step remains yours to choose.
             </p>
             <p className="mt-6 text-lg font-extrabold text-[#f2c230]">Papa Life Membership — $4.99 per month</p>
             <p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p>

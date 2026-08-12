@@ -1387,7 +1387,7 @@ function Footer() {
           <a href="/" className="hover:text-gray-400 transition-colors">Home</a>
           <a href="/member-login" className="hover:text-gray-400 transition-colors">Member Login</a>
         </div>
-        <p className="text-gray-700 text-xs">© {new Date().getFullYear()} Boss Mobile Life Coach. All rights reserved.</p>
+        <p className="text-gray-700 text-xs">© {new Date().getFullYear()} Papa Life. All rights reserved.</p>
       </div>
     </footer>
   );

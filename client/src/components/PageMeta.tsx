@@ -2,6 +2,8 @@ import { useEffect } from "react";
 
 type JsonLd = Record<string, unknown> | Record<string, unknown>[];
 
+const CANONICAL_ORIGIN = "https://papalifecoach.com";
+
 type PageMetaProps = {
   title: string;
   description: string;
@@ -28,17 +30,16 @@ export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }
     upsertMeta("og:title", title, "property");
     upsertMeta("og:description", description, "property");
     upsertMeta("og:type", "website", "property");
-    upsertMeta("og:url", window.location.href, "property");
+    const canonicalUrl = new URL(canonicalPath || window.location.pathname, CANONICAL_ORIGIN).toString();
+    upsertMeta("og:url", canonicalUrl, "property");
 
-    if (canonicalPath) {
-      let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-      if (!canonical) {
-        canonical = document.createElement("link");
-        canonical.rel = "canonical";
-        document.head.appendChild(canonical);
-      }
-      canonical.href = new URL(canonicalPath, window.location.origin).toString();
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
     }
+    canonical.href = canonicalUrl;
 
     const existing = document.querySelectorAll('script[data-page-jsonld="true"]');
     existing.forEach((node) => node.remove());

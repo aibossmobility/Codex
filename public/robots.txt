@@ -14,5 +14,4 @@ Disallow: /private/
 Disallow: /account/
 Disallow: /checkout/
 
-Sitemap: https://bossmobilelifecoach.com/sitemap.xml
 Sitemap: https://papalifecoach.com/sitemap.xml

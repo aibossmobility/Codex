@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "wouter";
 
 type Mode = "coach" | "assessment" | "resource" | "tuesday" | "membership" | "prayer" | "bible-study";
 
@@ -231,12 +232,11 @@ const modeCopy: Record<Mode, { title: string; prompt: string; icon: typeof Bot }
   },
 };
 
-function currentModeFromPath(): Mode {
-  const path = window.location.pathname;
-  if (path.includes("resources")) return "resource";
-  if (path.includes("tuesday-live")) return "tuesday";
-  if (path.includes("membership")) return "membership";
-  if (path.includes("contact")) return "coach";
+function currentModeFromPath(location: string): Mode {
+  const path = location.replace(/\/$/, "") || "/";
+  if (path === "/resources" || path === "/books" || path === "/podcast") return "resource";
+  if (path === "/tuesday-live") return "tuesday";
+  if (path === "/membership") return "membership";
   return "coach";
 }
 
@@ -795,8 +795,13 @@ function HeroPromoPanel({ statusLabel }: { statusLabel: string }) {
 }
 
 export default function PapaAiExperience() {
-  const [activeMode, setActiveMode] = useState<Mode>(currentModeFromPath());
+  const [location] = useLocation();
+  const [activeMode, setActiveMode] = useState<Mode>(() => currentModeFromPath(location));
   const [status, setStatus] = useState<{ live_ai_enabled?: boolean; provider?: string; inactive_message?: string }>({});
+
+  useEffect(() => {
+    setActiveMode(currentModeFromPath(location));
+  }, [location]);
   const [lead, setLead] = useState<LeadContact>({ first_name: "", email: "", phone: "", sms_consent: false });
 
   const statusLabel = useMemo(() => {

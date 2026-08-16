@@ -1236,7 +1236,7 @@ function ProfileView({ user }: { user: MemberUser | null }) {
         </Button>
       </div>
       <div className="bg-[#111] border border-white/10 rounded-xl p-5">
-        <p className="text-gray-500 text-xs">To reset your password or get billing support, contact your PAPA Life coach or email admin@bossmobilelifecoach.com</p>
+        <p className="text-gray-500 text-xs">To reset your password or get billing support, contact your PAPA Life coach or email Brian@bossmobility.net</p>
       </div>
     </div>
   );

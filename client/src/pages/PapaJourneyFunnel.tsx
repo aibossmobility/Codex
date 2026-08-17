@@ -1381,7 +1381,6 @@ function Footer() {
         </div>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-gray-500 text-xs">
           <a href="/tuesday" className="font-bold text-yellow-400 hover:text-yellow-300 transition-colors">Tuesday Live</a>
-          <a href="/walkthrough" className="font-bold text-yellow-400 hover:text-yellow-300 transition-colors">P2P Walkthrough</a>
           <a href="/privacy-policy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
           <a href="/terms-of-service" className="hover:text-gray-400 transition-colors">Terms of Service</a>
           <a href="/" className="hover:text-gray-400 transition-colors">Home</a>

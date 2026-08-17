@@ -172,7 +172,6 @@ const db = new Database(dbPath);
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
 const PAPA_LIFE_MEMBERSHIP_COURSE_ID = Number(process.env.PAPA_LIFE_MEMBERSHIP_COURSE_ID || "11");
 const MEMBER_ACCOUNT_ACTIVATION_HOURS = 72;
-const ISHAREPROPOSALS_STEP_3_VIDEO_URL = "/walkthrough/videos/P2P_Dojo_04_AI_Tools.mp4";
 const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID || "agent_7601kt209ptbe0qrd9b3e4gezyv6";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
 const ELEVENLABS_EXPECTED_AGENT_NAME = process.env.ELEVENLABS_AGENT_NAME || "Brian Keith Hill";
@@ -861,23 +860,6 @@ try {
   ensureGhlIntegrationTable(db);
 } catch (e) {
   console.error("[ghl-integration] table init failed:", e);
-}
-
-try {
-  const result = db
-    .prepare(
-      `UPDATE lessons
-       SET content_url = ?, content_type = 'video'
-       WHERE id = 55
-         AND course_id = 7
-         AND (content_url IS NULL OR trim(content_url) = '')`
-    )
-    .run(ISHAREPROPOSALS_STEP_3_VIDEO_URL);
-  if (result.changes > 0) {
-    console.log("[courses] Added missing video URL for course 7 lesson 55");
-  }
-} catch (e) {
-  console.error("[courses] lesson 55 video backfill failed:", e);
 }
 
 // ─── Session store ────────────────────────────────────────────────────────────

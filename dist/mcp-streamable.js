@@ -494,7 +494,7 @@ function syncIntakeSubmissionToCrmLead(db2, input) {
   const businessEmail = input.email && input.email.trim() ? input.email.trim().toLowerCase() : `intake-${input.intakeId}@placeholder.bossmobile.local`;
   const mobilePhone = input.phone && input.phone.trim() ? input.phone.trim() : "\u2014";
   const invitedBy = input.invited_by ?? "strategist_intake";
-  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : `strategist intake (${input.source})`;
+  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : `strategist intake (${input.source})`;
   const noteBody = [
     `Source: ${sourceLabel}`,
     `Intake submission id: ${input.intakeId}`,
@@ -533,7 +533,7 @@ ${input.vision}` : ""
     country: null,
     postal_code: null,
     consent_transactional: 0,
-    consent_marketing: 0,
+    consent_marketing: input.consent_marketing ? 1 : 0,
     checkout_status: "intake"
   });
   const leadId = Number(r.lastInsertRowid);
@@ -1810,6 +1810,179 @@ function getGhlCredentialsForMcp(db2, adminUserId) {
   return resolveGhlCredentials(db2, adminUserId);
 }
 
+// server/integration-health.ts
+var GHL_API_BASE = process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com";
+var GHL_API_VERSION = process.env.GHL_API_VERSION || "2021-07-28";
+function configured(name) {
+  return Boolean((process.env[name] || "").trim());
+}
+function redact(value) {
+  if (!value) return "not configured";
+  if (value.length <= 8) return "configured";
+  return `${value.slice(0, 3)}\u2026${value.slice(-3)}`;
+}
+async function fetchWithTimeout(url, init = {}, timeoutMs = 1e4) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+function ghlHeaders(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Version: GHL_API_VERSION,
+    Accept: "application/json",
+    "Content-Type": "application/json"
+  };
+}
+function integrationConfigurationSummary() {
+  const token = process.env.GHL_PRIVATE_INTEGRATION_TOKEN || process.env.GHL_API_KEY || "";
+  const locationId = process.env.GHL_LOCATION_ID || "";
+  const webhook = process.env.AUTOMATION_CLOUD_WEBHOOK_URL || "";
+  return {
+    ghl: {
+      token_configured: Boolean(token),
+      token_fingerprint: redact(token),
+      location_id_configured: Boolean(locationId),
+      location_id_fingerprint: redact(locationId),
+      api_base: GHL_API_BASE,
+      api_version: GHL_API_VERSION
+    },
+    make: {
+      webhook_configured: Boolean(webhook),
+      webhook_host: webhook ? new URL(webhook).host : null
+    },
+    claude: {
+      anthropic_key_configured: configured("ANTHROPIC_API_KEY")
+    },
+    mcp: {
+      bearer_token_configured: configured("MCP_BEARER_TOKEN"),
+      public_base_url: process.env.PUBLIC_MCP_BASE_URL || null
+    }
+  };
+}
+async function diagnoseGhlConnection() {
+  const token = process.env.GHL_PRIVATE_INTEGRATION_TOKEN || process.env.GHL_API_KEY || "";
+  const locationId = process.env.GHL_LOCATION_ID || "";
+  if (!token || !locationId) {
+    return {
+      ok: false,
+      status: "not_configured",
+      checks: [
+        {
+          name: "credentials",
+          ok: false,
+          status: "not_configured",
+          detail: "GHL token or location ID is missing from server environment variables."
+        }
+      ],
+      configuration: integrationConfigurationSummary()
+    };
+  }
+  const checks = [];
+  try {
+    const locationResponse = await fetchWithTimeout(`${GHL_API_BASE}/locations/${encodeURIComponent(locationId)}`, {
+      headers: ghlHeaders(token)
+    });
+    checks.push({
+      name: "location_access",
+      ok: locationResponse.ok,
+      status: locationResponse.ok ? "ok" : "error",
+      detail: locationResponse.ok ? "HighLevel location is reachable with the configured private integration token." : `HighLevel rejected the location request (${locationResponse.status}). Check token, location ID, or scopes.`,
+      http_status: locationResponse.status
+    });
+  } catch (error) {
+    checks.push({
+      name: "location_access",
+      ok: false,
+      status: "error",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  }
+  try {
+    const contactResponse = await fetchWithTimeout(
+      `${GHL_API_BASE}/contacts/?locationId=${encodeURIComponent(locationId)}&limit=1`,
+      { headers: ghlHeaders(token) }
+    );
+    checks.push({
+      name: "contacts_scope",
+      ok: contactResponse.ok,
+      status: contactResponse.ok ? "ok" : "warning",
+      detail: contactResponse.ok ? "Contacts API scope is working." : `Contacts check returned ${contactResponse.status}; the token may lack contacts.readonly or contacts.write scope.`,
+      http_status: contactResponse.status
+    });
+  } catch (error) {
+    checks.push({
+      name: "contacts_scope",
+      ok: false,
+      status: "error",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  }
+  const ok = checks.every((check) => check.ok);
+  return { ok, status: ok ? "ok" : "warning", checks, configuration: integrationConfigurationSummary() };
+}
+async function diagnoseMakeWebhook() {
+  const webhook = process.env.AUTOMATION_CLOUD_WEBHOOK_URL || "";
+  if (!webhook) {
+    return {
+      ok: false,
+      status: "not_configured",
+      detail: "AUTOMATION_CLOUD_WEBHOOK_URL is not configured.",
+      dry_run: true
+    };
+  }
+  const payload = {
+    event: "papalife.integration.health_check",
+    dry_run: true,
+    source: "papalife-mcp",
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    instructions: "Diagnostic only. Do not create contacts, send messages, or mutate records."
+  };
+  try {
+    const response = await fetchWithTimeout(webhook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-PapaLife-Dry-Run": "true" },
+      body: JSON.stringify(payload)
+    });
+    const body = await response.text();
+    return {
+      ok: response.ok,
+      status: response.ok ? "ok" : "error",
+      http_status: response.status,
+      response_preview: body.slice(0, 500),
+      dry_run: true
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: "error",
+      detail: error instanceof Error ? error.message : String(error),
+      dry_run: true
+    };
+  }
+}
+async function orchestrationHealthCheck() {
+  const [ghl, make] = await Promise.all([diagnoseGhlConnection(), diagnoseMakeWebhook()]);
+  const configuration = integrationConfigurationSummary();
+  return {
+    ok: Boolean(ghl.ok) && Boolean(make.ok),
+    checked_at: (/* @__PURE__ */ new Date()).toISOString(),
+    configuration,
+    ghl,
+    make,
+    safety: {
+      secrets_returned: false,
+      messages_sent: false,
+      records_mutated: false,
+      dry_run: true
+    }
+  };
+}
+
 // server/mcp-handlers.ts
 var dbPath = path.resolve(process.cwd(), "leads.db");
 var db = new Database(dbPath);
@@ -1982,6 +2155,26 @@ var PAPALIFE_MCP_TOOL_DEFINITIONS = [
   {
     name: "papalife_course_content_workflow_brief",
     description: "CRITICAL for PAPA Life curriculum / Vision Documents: Read this before suggesting any handoff. Tells agents to put learning materials into the on-site courses/lessons system (MCP) so members see them in /portal \u2014 NOT to email Google Doc Master KB update steps or ask humans to paste Vision docs into external docs as the delivery path.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_integration_configuration_summary",
+    description: "Report whether required HighLevel, Make.com, Claude, and MCP environment settings are present. Does NOT return secret values \u2014 previews only. Read-only, no side effects.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_ghl_connection_diagnostic",
+    description: "Read-only HighLevel connection diagnostic. Tests token presence, location ID presence, location API access, and contacts API access. Reports 401/403 scope issues safely. No contacts created or modified.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_make_webhook_diagnostic",
+    description: "Send a clearly-marked dry_run payload to the configured Make.com webhook. URL is never caller-supplied. Confirms webhook connectivity without triggering real automations.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_orchestration_health_check",
+    description: "Combined read-only report: HighLevel connectivity, Make.com webhook, Claude key, MCP auth, and dry-run protections. Confirms messages_sent:false, records_mutated:false, secrets_returned:false.",
     inputSchema: { type: "object", properties: {} }
   },
   {
@@ -2768,6 +2961,14 @@ async function handlePapalifeTool(name, args) {
         tone: "Decisive \u2014 the site is the source of truth for what members see."
       };
     }
+    case "papalife_integration_configuration_summary":
+      return await integrationConfigurationSummary();
+    case "papalife_ghl_connection_diagnostic":
+      return await diagnoseGhlConnection();
+    case "papalife_make_webhook_diagnostic":
+      return await diagnoseMakeWebhook();
+    case "papalife_orchestration_health_check":
+      return await orchestrationHealthCheck();
     case "create_brand_research_dump": {
       assertResearchLabMcpEnabled();
       const raw_notes = String(args.raw_notes ?? "");

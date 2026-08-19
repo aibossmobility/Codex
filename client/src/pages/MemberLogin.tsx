@@ -98,6 +98,15 @@ export default function MemberLogin() {
                 "Sign In"
               )}
             </Button>
+
+            <p className="text-center text-xs mt-3">
+              <a
+                href="mailto:Brian@bossmobility.net?subject=Papa%20Life%20Password%20Reset%20Request"
+                className="text-gray-500 hover:text-gray-400 transition-colors"
+              >
+                Forgot password?
+              </a>
+            </p>
           </form>
         </div>
 

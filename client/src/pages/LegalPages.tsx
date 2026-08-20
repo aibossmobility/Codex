@@ -18,7 +18,7 @@ function LegalShell({
 }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PageMeta title={`${title} | Boss Mobile Life Coach`} description={description} />
+      <PageMeta title={`${title} | Papa Life`} description={description} />
       <header className="border-b border-white/10 bg-black/90">
         <div className="container flex min-h-20 items-center justify-between gap-4 py-3">
           <a href="/" aria-label="Papa Life home">
@@ -37,7 +37,7 @@ function LegalShell({
       </main>
       <footer className="border-t border-white/10 bg-black/90 py-8">
         <div className="container flex flex-col gap-4 text-sm text-white/58 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} Boss Mobile Life Coach. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Papa Life. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {legalLinks.map((link) => (
               <a key={link.href} href={link.href} className="hover:text-brand-yellow">
@@ -58,17 +58,17 @@ export function PrivacyPage() {
   return (
     <LegalShell
       title="Privacy Policy"
-      description="How Papa Life collects, uses, and protects information submitted through bossmobilelifecoach.com."
+      description="How Papa Life collects, uses, and protects information submitted through PapaLifeCoach.com."
     >
       <p>
-        <strong>Effective Date:</strong> July 3, 2026
+        <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> July 3, 2026
+        <strong>Last Updated:</strong> August 20, 2026
       </p>
       <p>
         Papa Life (&quot;we,&quot; &quot;us,&quot; &quot;our&quot;) is a fatherhood coaching service owned and operated by{" "}
         <strong>Brian Keith Hill</strong>, based in San Leandro, California. This page explains what
-        information we collect on bossmobilelifecoach.com, how we use it, and how you can control it.
+        information we collect on PapaLifeCoach.com, how we use it, and how you can control it.
       </p>
       <p>
         If you have questions about this policy, contact us at <strong>Brian@bossmobility.net</strong> or{" "}
@@ -83,14 +83,23 @@ export function PrivacyPage() {
         <li>Book a coaching call through Calendly</li>
         <li>Register for Tuesday Live sessions</li>
         <li>Join Papa Life membership ($4.99/month) through our checkout</li>
-        <li>Send a message through our contact page or AI chat assistant</li>
-        <li>Take the Father-Adult Child Relationship Assessment or Father&apos;s Day Reflection tool</li>
+        <li>Send a message through our contact page or Papa Life AI Coach, including the content you choose to enter</li>
+        <li>Take an assessment or reflection tool, including the answers and scores you choose to submit</li>
+        <li>Create or use a member account, including account and access information</li>
       </ul>
       <p>
-        We also collect some information automatically, like your browser type, device, and how you use
-        the site, through standard web analytics.
+        We also collect limited technical information automatically, such as browser and device type,
+        IP address, pages visited, approximate location derived from IP address, security events, and
+        cookie or similar identifiers used to operate, secure, and understand the site.
       </p>
-      <h2>2. How We Use Your Information</h2>
+      <h2>2. Sensitive Information and AI Conversations</h2>
+      <p>
+        Please do not enter medical records, protected health information, payment-card numbers, Social
+        Security numbers, passwords, or other highly sensitive information into forms, assessments, or the
+        Papa Life AI Coach. AI responses are generated automatically and may be incomplete or inaccurate.
+        The AI Coach is not a confidential therapist, doctor, lawyer, crisis service, or emergency service.
+      </p>
+      <h2>3. How We Use Your Information</h2>
       <p>We use your information to:</p>
       <ul>
         <li>Respond to your questions and requests</li>
@@ -100,7 +109,7 @@ export function PrivacyPage() {
         <li>Improve our website, courses, and coaching programs</li>
         <li>Follow the law and protect our business</li>
       </ul>
-      <h2>3. Text Messages (SMS)</h2>
+      <h2>4. Text Messages (SMS)</h2>
       <p>
         If you give us your phone number and check the SMS consent box on a form, you agree to receive
         text messages from Papa Life about coaching appointments, educational resources, reminders, and
@@ -108,15 +117,33 @@ export function PrivacyPage() {
         <strong>STOP</strong> to unsubscribe at any time, or <strong>HELP</strong> for assistance. Your
         phone number and SMS consent are never sold or shared with third parties for their own marketing.
       </p>
-      <h2>4. How We Share Information</h2>
+      <h2>5. How We Share Information</h2>
       <p>We do not sell your personal information. We only share it with:</p>
       <ul>
-        <li>Service providers who help us run the business, like our CRM (GoHighLevel), payment processor (Stripe), video and voice tools (HeyGen, ElevenLabs), and email/SMS delivery systems</li>
+        <li>Service providers who help us operate Papa Life, including our CRM (GoHighLevel), scheduling provider (Calendly), payment processor (Stripe), hosting and security providers, AI, video and voice providers, and email/SMS delivery systems</li>
         <li>Law enforcement or courts, if we are required to by law</li>
         <li>A buyer, if Papa Life is ever sold or merged with another company</li>
       </ul>
-      <p>Each of these providers is only given the information they need to do their job.</p>
-      <h2>5. Your Choices</h2>
+      <p>
+        These providers process information under their own terms and privacy practices. Payment-card
+        details are entered with and processed by Stripe or another checkout provider; Papa Life does not
+        store full payment-card numbers on its own servers.
+      </p>
+      <h2>6. Cookies and Similar Technologies</h2>
+      <p>
+        We may use cookies or similar technologies that are necessary for sign-in, security, preferences,
+        and site operation. We may also use analytics to understand site use. Where applicable law requires
+        consent for non-essential cookies, we will request that consent before using them. You can also use
+        your browser controls to limit cookies, although some account features may not work correctly.
+      </p>
+      <h2>7. Data Retention</h2>
+      <p>
+        We keep personal information only as long as reasonably necessary for the purposes described in
+        this policy, including providing services, maintaining accounts and transaction records, resolving
+        disputes, meeting legal obligations, and protecting the site. Retention periods vary by record
+        type. We delete or de-identify information when it is no longer reasonably needed.
+      </p>
+      <h2>8. Your Choices and Privacy Rights</h2>
       <p>You can:</p>
       <ul>
         <li>Ask us to see, correct, or delete your personal information</li>
@@ -125,29 +152,39 @@ export function PrivacyPage() {
         <li>Cancel your Papa Life membership at any time in two clicks</li>
       </ul>
       <p>To make any of these requests, email us at Brian@bossmobility.net.</p>
-      <h2>6. Children&apos;s Privacy</h2>
+      <h2>9. Children&apos;s Privacy</h2>
       <p>
         Papa Life is built for adult fathers. Our services are not directed at children, and we do not
         knowingly collect information from anyone under 18.
       </p>
-      <h2>7. Data Security</h2>
+      <h2>10. Data Security</h2>
       <p>
         We use reasonable safeguards to protect your information, including secure hosting and encrypted
         payment processing. No system is 100% secure, so we cannot guarantee absolute protection, but we
         take your privacy seriously.
       </p>
-      <h2>8. California Privacy Rights</h2>
+      <h2>11. California and Other Privacy Rights</h2>
       <p>
-        If you live in California, you have rights under the California Consumer Privacy Act (CCPA),
-        including the right to know what personal information we collect, the right to ask us to delete it,
-        and the right to opt out of the sale of personal information. We do not sell personal information.
+        Depending on where you live and whether a particular law applies to Papa Life, you may have rights
+        to request access, correction, deletion, restriction, objection, or a copy of personal information,
+        and to withdraw consent. California residents may also have rights concerning the sale or sharing of
+        personal information. Papa Life does not sell personal information or share it for cross-context
+        behavioral advertising. We may need to verify your identity before completing a request. You may
+        contact Brian@bossmobility.net to submit a request, and you will not be discriminated against for
+        exercising an applicable privacy right.
       </p>
-      <h2>9. Changes to This Policy</h2>
+      <h2>12. International Processing and External Links</h2>
+      <p>
+        Our providers may process information in the United States or other countries. Privacy protections
+        may differ by location. PapaLifeCoach.com may also link to third-party websites; their privacy
+        practices are governed by their own notices, not this policy.
+      </p>
+      <h2>13. Changes to This Policy</h2>
       <p>
         We may update this policy from time to time. We will change the &quot;Last Updated&quot; date at the
-        top when we do. Continuing to use the site after a change means you accept the update.
+        top when we do. We will provide additional notice when required by applicable law.
       </p>
-      <h2>10. Contact Us</h2>
+      <h2>14. Contact Us</h2>
       <p>
         <strong>Business Name:</strong> Brian Keith Hill
         <br />
@@ -165,17 +202,17 @@ export function TermsPage() {
   return (
     <LegalShell
       title="Terms of Service"
-      description="Terms for using Papa Life, bossmobilelifecoach.com, ORACLE, courses, and membership."
+      description="Terms for using Papa Life, PapaLifeCoach.com, Papa Life AI Coach, courses, and membership."
     >
       <p>
-        <strong>Effective Date:</strong> July 3, 2026
+        <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> July 3, 2026
+        <strong>Last Updated:</strong> August 20, 2026
       </p>
       <p>
         Welcome to Papa Life, a fatherhood coaching service owned and operated by{" "}
         <strong>Brian Keith Hill</strong> (&quot;Papa Life,&quot; &quot;we,&quot; &quot;us&quot;). By using
-        bossmobilelifecoach.com, our AI coach (ORACLE), our courses, or joining our $4.99/month membership,
+        PapaLifeCoach.com, our AI coach (Papa Life AI Coach), our courses, or joining our $4.99/month membership,
         you agree to these terms.
       </p>
       <h2>1. Who We Are</h2>
@@ -210,11 +247,13 @@ required. We do not offer refunds for partial months already paid, unless requir
         Brian Keith Hill. You may use them for your own personal growth. You may not copy, resell, or
         redistribute them without our written permission.
       </p>
-      <h2>6. The AI Coach (ORACLE)</h2>
+      <h2>6. The AI Coach (Papa Life AI Coach)</h2>
       <p>
-        Our AI coach gives general encouragement and coaching-style responses based on the PAPA Framework. It
-        is not a therapist and does not give medical, legal, or psychiatric advice. If you are in crisis or
-        need emergency help, contact a licensed professional or call 911.
+        Our AI coach gives automated, general encouragement and coaching-style responses based on the PAPA
+        Framework. Responses may be incomplete or inaccurate. The AI Coach is not a therapist and does not
+        provide medical, legal, psychiatric, or emergency advice. Do not enter protected health information,
+        payment-card data, passwords, or other highly sensitive information. If you are in immediate danger,
+        call 911. In the United States, call or text 988 for suicide or crisis support.
       </p>
       <h2>7. No Guarantee of Results</h2>
       <p>

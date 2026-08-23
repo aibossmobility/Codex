@@ -50,7 +50,7 @@ const quickPrompts = [
 const actionLinks: ActionLink[] = [
   {
     href: "/assessment",
-    label: "Take the Free Reconnection Assessment",
+    label: "Take the 2-Minute Fatherhood Check-In",
     detail: "Find your next best step",
     interest: "Reconnection Assessment",
     icon: ClipboardCheck,
@@ -104,13 +104,13 @@ function localPapaReply(text: string) {
     return "Father, your immediate safety and the safety of everyone involved come first. If someone may be in immediate danger, call 911 or your local emergency number now. In the U.S. or Canada, call or text 988 for immediate crisis support. Do not try to carry this moment alone. Papa Life can support a wise next step, but it is not an emergency or clinical service.";
   }
   if (lower.includes("pray") || lower.includes("prayer")) {
-    return "Grace Principle: Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Assertive Strategy: Before you reach out, write one sentence that owns your part without asking for a response. Character Call: Let your adult child experience a father who is safe enough to listen. Next step: take the Free Reconnection Assessment below when you are ready.";
+    return "Grace Principle: Father God, give me humility before I speak, patience before I act, and love that does not try to control the outcome. Assertive Strategy: Before you reach out, write one sentence that owns your part without asking for a response. Character Call: Let your adult child experience a father who is safe enough to listen. Next step: take the 2-Minute Fatherhood Check-In below when you are ready.";
   }
   if (lower.includes("daughter")) {
-    return "Grace Principle: Your daughter does not need a perfect speech; she needs evidence that you are becoming safer to talk to. Assertive Strategy: Try, \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\" Character Call: Choose Presence over pressure. Next step: take the Free Reconnection Assessment below to identify one consistent action.";
+    return "Grace Principle: Your daughter does not need a perfect speech; she needs evidence that you are becoming safer to talk to. Assertive Strategy: Try, \"I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I love you, and I am working on my part.\" Character Call: Choose Presence over pressure. Next step: take the 2-Minute Fatherhood Check-In below to identify one consistent action.";
   }
   if (lower.includes("son")) {
-    return "Grace Principle: Respect cannot be forced into the room; it is rebuilt through consistency. Assertive Strategy: Offer one honest sentence of ownership, then give your son room to respond in his own time. Character Call: Lead with Authority that is earned through character, not control. Next step: take the Free Reconnection Assessment below to identify your next action.";
+    return "Grace Principle: Respect cannot be forced into the room; it is rebuilt through consistency. Assertive Strategy: Offer one honest sentence of ownership, then give your son room to respond in his own time. Character Call: Lead with Authority that is earned through character, not control. Next step: take the 2-Minute Fatherhood Check-In below to identify your next action.";
   }
   return "Grace Principle: Do not try to fix the whole relationship in one move. Assertive Strategy: Listen first, own what is yours, and remove pressure from the next message. Character Call: Presence is not weakness; it is mature fatherhood. Next step: choose one action below that helps you move forward with patience, accountability, and faith.";
 }

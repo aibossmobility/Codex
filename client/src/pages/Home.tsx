@@ -14,7 +14,7 @@ const navigation = [
   { label: "Start Here", href: "#is-this-you" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Media Library", href: "/media-library" },
-  { label: "Assessment", href: "/assessment" },
+  { label: "Fatherhood Check-In", href: "/assessment" },
   { label: "Member Login", href: "/member-login" },
 ];
 
@@ -218,7 +218,7 @@ export default function Home() {
                 href="/assessment"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
               >
-                Take the Free Assessment
+                Take the 2-Minute Check-In
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>

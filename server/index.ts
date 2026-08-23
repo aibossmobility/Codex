@@ -2000,7 +2000,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       {
         heading: "Start with clarity",
         body:
-          "Take the free relationship assessment to name where things stand and identify the first honest step toward closing the gap.",
+          "Take the 2-minute fatherhood check-in to name where things stand and identify the first honest step toward closing the gap.",
       },
       {
         heading: "Learn the new role",
@@ -2013,7 +2013,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships.",
       },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
@@ -2092,7 +2092,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "Start here", body: "If you are a father trying to reconnect with an adult child, the free assessment is the best first step." },
       { heading: "For broader support", body: "Use the AI Coach or membership path to get oriented around resources and next actions." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/papa-first-lesson": {
     title: "Free Papa Life Workshop | First Lesson",
@@ -2108,21 +2108,21 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Watch the Free Lesson", href: "/papa-first-lesson" },
   },
   "/assessment": {
-    title: "Free PAPA Fatherhood Assessment | Papa Life",
+    title: "2-Minute Fatherhood Check-In | Papa Life",
     description:
-      "Score yourself across Purpose, Authority, Presence, and Alignment. A free five-minute assessment for fathers of adult children.",
+      "A short fatherhood check-in to help you see where things stand with your adult child and choose a practical next step.",
     keywords: "father adult child relationship assessment, PAPA framework, fatherhood coaching",
-    eyebrow: "Free Assessment",
+    eyebrow: "Fatherhood Check-In",
     headline: "Your grown child stopped talking to you. It does not have to stay that way.",
     intro:
-      "Take the free assessment to see where things stand with your adult son or daughter and identify a first step toward closing the gap.",
+      "Take the 2-minute check-in to see where things stand with your adult son or daughter and identify a first step toward closing the gap.",
     sections: [
       { heading: "Purpose", body: "Know who you are now that fatherhood is no longer centered on daily provision and control." },
       { heading: "Authority", body: "Lead through character, humility, and consistency instead of pressure or position." },
       { heading: "Presence", body: "Listen before fixing and become safe enough for honest conversation." },
       { heading: "Alignment", body: "Close the gap between your values, words, and daily actions." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/relationship-assessment": {
     title: "Free Father-Adult Child Relationship Assessment | Boss Mobile Life Coach",
@@ -2165,7 +2165,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "What fathers get wrong", body: "Fixing instead of listening, lecturing when he needed space, and treating conversations like performance reviews." },
       { heading: "A better path forward", body: "The PAPA Framework gives language and steps when emotions run high and words fail." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/adult-daughter-relationship": {
     title: "Adult Daughter Relationship Help for Fathers | Boss Mobile Life Coach",
@@ -2180,7 +2180,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "Why daughters pull away", body: "Old hurts, unspoken expectations, and a lack of emotional safety can create distance." },
       { heading: "What changes", body: "Presence over performance, curiosity over control, and small steady contact over dramatic speeches." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/why-adult-children-pull-away": {
     title: "Why Adult Children Pull Away From Their Fathers | Boss Mobile Life Coach",
@@ -2210,7 +2210,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "What estrangement asks", body: "Not a performance of change, but real change. Not one letter that fixes years, but a new way of showing up." },
       { heading: "Start where you are", body: "Name the truth without drowning in blame and get support so you are not navigating this alone." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/welcome-to-papa-life": {
     title: "Papa Life | Help for Fathers of Adult Children",
@@ -2242,7 +2242,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "Presence", body: "Show up without fixing everything and let your child feel seen, not managed." },
       { heading: "Alignment", body: "Close the gap between who you say you are and how you live." },
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/about-brian-keith-hill": {
     title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",

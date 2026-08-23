@@ -67,9 +67,9 @@ export default function RelationshipAssessment() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
-        title="Free PAPA Fatherhood Assessment | Papa Life"
-        description="Score yourself across Purpose, Authority, Presence, and Alignment. A free five-minute assessment for fathers of adult children."
-        keywords="fatherhood assessment, fathers of adult children, PAPA assessment, Purpose Authority Presence Alignment"
+        title="2-Minute Fatherhood Check-In | Papa Life"
+        description="A short fatherhood check-in to help you see where things stand with your adult child and choose a practical next step."
+        keywords="fatherhood check-in, fathers of adult children, PAPA framework, Purpose Authority Presence Alignment"
       />
 
       <header className="border-b border-white/10 bg-black/90">
@@ -85,17 +85,17 @@ export default function RelationshipAssessment() {
       <main className="container max-w-4xl py-12 md:py-18">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">
-            For Fathers of Adult Children · Free · Interactive · About 5 minutes
+            For Fathers of Adult Children · Free · Interactive · About 2 minutes
           </p>
-          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl">PAPA Self-Assessment</h1>
+          <h1 className="mt-4 text-4xl font-extrabold md:text-6xl">Where Are You With Your Adult Child?</h1>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Score yourself across all four PAPA pillars and discover where to focus first. No signup is
+            Take a brief, honest check-in across the four PAPA pillars and discover where to focus first. No signup is
             required, and your answers stay in your browser.
           </p>
           <div className="mt-6 flex justify-center">
             <Button asChild variant="outline" className="rounded-full border-white/20 text-white hover:border-brand-yellow hover:text-brand-yellow">
               <a href="/ai-coach">
-                Open the saved AI assessment
+                Open the saved AI check-in
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
@@ -231,7 +231,7 @@ export default function RelationshipAssessment() {
                     onClick={reset}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-                    Retake Assessment
+                    Retake Check-In
                   </Button>
                 </div>
               </CardContent>

@@ -6087,6 +6087,8 @@ async function startServer() {
 
   if (process.env.NODE_ENV === "test") {
     console.info("[elevenlabs] external voice verification skipped in isolated test mode");
+  } else if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID || !ELEVENLABS_EXPECTED_VOICE_ID) {
+    console.warn("[elevenlabs] voice coach is not configured; website startup will continue without voice features");
   } else {
     await assertElevenLabsVoiceConfig("startup");
   }

@@ -2,65 +2,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Brain,
-  CheckCircle2,
-  HeartHandshake,
-  LockKeyhole,
-  MessageCircle,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, HeartHandshake, LockKeyhole, MessageCircle, ShieldCheck } from "lucide-react";
 
-const marleeAssessmentLink = "https://getmarlee.com/app/invite/link/683d41b3ac650107f5a49f3de7866dc4";
+const checkInLink = "https://getmarlee.com/app/invite/link/683d41b3ac650107f5a49f3de7866dc4";
 
-const insightPatterns = [
-  "decision-making",
-  "communication style",
-  "responsibility",
-  "leadership motivation",
-  "teamwork",
-  "change",
-  "personal growth",
-];
-
-const supportAreas = [
-  {
-    title: "Coaching Conversations",
-    copy: "Bring clearer language into the work Brian Keith Hill does with fathers, leaders, and participants.",
-    Icon: MessageCircle,
-  },
-  {
-    title: "Relationship Growth",
-    copy: "Notice how motivation, communication, and decision patterns may shape trust and connection.",
-    Icon: HeartHandshake,
-  },
-  {
-    title: "Leadership Development",
-    copy: "Use greater self-awareness to lead with humility, responsibility, and stronger teamwork.",
-    Icon: Users,
-  },
+const reflectionAreas = [
+  "How communication feels right now",
+  "Where trust may need rebuilding",
+  "Patterns that can create distance",
+  "How you respond when conversations get difficult",
+  "Where listening may matter more than explaining",
+  "What you can begin changing first",
 ];
 
 export default function MarleeAssessment() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
-        title="Marlee Motivation Assessment | Papa Life"
-        description="Join Brian Keith Hill's Papa Life Marlee workspace and complete a motivational assessment for self-awareness, communication, leadership, and relationship growth."
-        keywords="Marlee Motivation Assessment, Papa Life, Brian Keith Hill, motivational assessment, leadership, communication, relationships"
+        title="2-Minute Fatherhood Check-In | Papa Life"
+        description="Where are you with your adult child? Take the Papa Life 2-Minute Fatherhood Check-In and identify a practical place to begin rebuilding connection."
+        keywords="fatherhood check-in, fathers of adult children, Papa Life, reconnect with adult child, rebuild trust"
       />
 
       <header className="border-b border-white/10 bg-black/90">
         <div className="container flex min-h-20 items-center justify-between gap-4 py-3">
-          <a href="/" aria-label="Papa Life home">
-            <SiteLogo size="md" />
-          </a>
+          <a href="/" aria-label="Papa Life home"><SiteLogo size="md" /></a>
           <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 hover:text-brand-yellow">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Back to Papa Life
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to Papa Life
           </a>
         </div>
       </header>
@@ -72,32 +40,17 @@ export default function MarleeAssessment() {
           <div className="container relative z-10">
             <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
               <div>
-                <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-yellow">
-                  Papa Life Growth System
-                </p>
-                <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">
-                  Marlee Motivation Assessment
-                </h1>
+                <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-yellow">2-Minute Fatherhood Check-In</p>
+                <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">Where Are You With Your Adult Child?</h1>
                 <p className="mt-6 text-lg leading-relaxed text-white/75 md:text-xl">
-                  Brian Keith Hill and Papa Life are using Marlee as a motivational insight tool to help
-                  people better understand themselves and others.
+                  This is not a test, a score, or a judgment of you as a father. It is a short private check-in to help you notice where things are today and where you may want to begin.
                 </p>
                 <p className="mt-5 text-lg leading-relaxed text-white/70">
-                  When you join through this invitation, you can complete your motivational assessment
-                  and choose to share your results with Brian Keith Hill. This can help support coaching
-                  conversations, leadership development, relationship growth, and father-adult child
-                  understanding.
+                  You do not have to solve the whole relationship today. Start by getting clear about what is happening, what you are carrying, and what is within your control.
                 </p>
                 <div className="mt-8">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="h-auto min-h-14 rounded-full bg-primary px-7 py-4 text-base font-extrabold text-black shadow-[0_0_24px_rgba(34,197,94,0.25)] hover:bg-primary/90"
-                  >
-                    <a href={marleeAssessmentLink}>
-                      Join Brian Keith Hill on Marlee
-                      <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-                    </a>
+                  <Button asChild size="lg" className="h-auto min-h-14 rounded-full bg-primary px-7 py-4 text-base font-extrabold text-black hover:bg-primary/90">
+                    <a href={checkInLink}>Take the 2-Minute Check-In <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" /></a>
                   </Button>
                 </div>
               </div>
@@ -105,20 +58,16 @@ export default function MarleeAssessment() {
               <Card className="overflow-hidden border-brand-yellow/30 bg-black/65 shadow-2xl">
                 <CardContent className="p-7 md:p-9">
                   <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-brand-yellow/30 bg-brand-yellow/10 text-brand-yellow">
-                    <Brain className="h-8 w-8" aria-hidden="true" />
+                    <HeartHandshake className="h-8 w-8" aria-hidden="true" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Understand What Motivates You</h2>
+                  <h2 className="text-2xl font-bold text-white">A Place to Begin, Dad</h2>
                   <p className="mt-4 leading-relaxed text-white/70">
-                    This assessment is not about labeling people. It is about creating greater
-                    self-awareness, stronger communication, and healthier relationships.
+                    Sometimes the first useful question is not “How do I fix this?” but “What is happening between us, and what can I change first?”
                   </p>
                   <div className="mt-7 rounded-xl border border-primary/25 bg-primary/10 p-4">
                     <div className="flex items-start gap-3">
                       <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                      <p className="text-sm leading-relaxed text-white/75">
-                        Papa Life remains the main brand. Marlee is used as a supportive tool inside
-                        the Papa Life Growth System.
-                      </p>
+                      <p className="text-sm leading-relaxed text-white/75">Papa Life is about reconnection, humility, presence, and practical next steps—not labeling fathers or adult children.</p>
                     </div>
                   </div>
                 </CardContent>
@@ -130,17 +79,14 @@ export default function MarleeAssessment() {
         <section className="py-16 md:py-20">
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-primary">
-                Motivational insight
-              </p>
-              <h2 className="text-3xl font-bold md:text-5xl">What Marlee May Help Identify</h2>
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-primary">A few minutes of honest reflection</p>
+              <h2 className="text-3xl font-bold md:text-5xl">What the Check-In Helps You Notice</h2>
             </div>
-
             <div className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {insightPatterns.map((pattern) => (
-                <div key={pattern} className="flex items-center gap-3 rounded-xl border border-white/10 bg-card/75 p-4">
+              {reflectionAreas.map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-xl border border-white/10 bg-card/75 p-4">
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-yellow" aria-hidden="true" />
-                  <span className="font-semibold capitalize text-white/85">{pattern}</span>
+                  <span className="font-semibold text-white/85">{item}</span>
                 </div>
               ))}
             </div>
@@ -148,20 +94,18 @@ export default function MarleeAssessment() {
         </section>
 
         <section className="border-y border-white/10 bg-white/[0.025] py-16 md:py-20">
-          <div className="container">
-            <div className="grid gap-6 lg:grid-cols-3">
-              {supportAreas.map(({ title, copy, Icon }) => (
-                <Card key={title} className="border-white/10 bg-card/80">
-                  <CardContent className="p-7">
-                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/40 text-primary">
-                      <Icon className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-2xl font-bold">{title}</h3>
-                    <p className="mt-4 leading-relaxed text-muted-foreground">{copy}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          <div className="container mx-auto max-w-4xl">
+            <Card className="border-white/10 bg-card/80">
+              <CardContent className="p-7 md:p-9">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/40 text-primary">
+                  <MessageCircle className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h2 className="text-3xl font-bold">What Happens Next?</h2>
+                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                  Use what you notice as a starting point for prayer, reflection, a Papa Life conversation, or one small action that makes you safer to talk to. The goal is not a perfect score. The goal is a more honest next step.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -174,24 +118,13 @@ export default function MarleeAssessment() {
                 </div>
                 <div>
                   <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand-yellow">Privacy note</p>
-                  <p className="mt-3 text-lg leading-relaxed text-white/75">
-                    Participants&apos; coaching conversations, private boards, and Ask Marlee responses
-                    are not visible unless they choose to share them.
-                  </p>
+                  <p className="mt-3 text-lg leading-relaxed text-white/75">Your private responses and conversations remain private unless you choose to share them.</p>
                 </div>
               </div>
             </div>
-
             <div className="mt-12 text-center">
-              <Button
-                asChild
-                size="lg"
-                className="h-auto min-h-14 rounded-full bg-primary px-7 py-4 text-base font-extrabold text-black hover:bg-primary/90"
-              >
-                <a href={marleeAssessmentLink}>
-                  Join Brian Keith Hill on Marlee
-                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-                </a>
+              <Button asChild size="lg" className="h-auto min-h-14 rounded-full bg-primary px-7 py-4 text-base font-extrabold text-black hover:bg-primary/90">
+                <a href={checkInLink}>Take the 2-Minute Check-In <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" /></a>
               </Button>
             </div>
           </div>

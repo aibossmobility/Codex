@@ -2139,18 +2139,18 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Begin Assessment", href: "/relationship-assessment" },
   },
   "/marlee-assessment": {
-    title: "Marlee Motivation Assessment | Papa Life",
+    title: "2-Minute Fatherhood Check-In | Papa Life",
     description:
-      "Join Brian Keith Hill's Papa Life Marlee workspace and complete a motivational assessment for self-awareness, communication, leadership, and relationship growth.",
-    eyebrow: "Marlee Assessment",
-    headline: "Understand what motivates you and how your style affects relationships.",
+      "Where Are You With Your Adult Child? Take the 2-Minute Check-In and identify a practical place to begin rebuilding connection.",
+    eyebrow: "2-Minute Fatherhood Check-In",
+    headline: "Where Are You With Your Adult Child?",
     intro:
-      "The Marlee assessment supports Papa Life fathers with self-awareness around communication, decision-making, and leadership.",
+      "Take the 2-Minute Check-In to notice where things stand today and choose an honest, practical next step.",
     sections: [
-      { heading: "Better self-awareness", body: "Learn how your natural style may show up in family conversations and repair attempts." },
-      { heading: "Use it with PAPA", body: "Pair Marlee insights with Purpose, Authority, Presence, and Alignment." },
+      { heading: "A place to begin", body: "Notice how communication feels, where trust may need rebuilding, and what you can begin changing first." },
+      { heading: "A practical next step", body: "Use what you notice as a starting point for reflection, a Papa Life conversation, or one small action." },
     ],
-    cta: { label: "Open Marlee Assessment", href: "/marlee-assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/marlee-assessment" },
   },
   "/adult-son-relationship": {
     title: "Adult Son Relationship Help for Fathers | Boss Mobile Life Coach",

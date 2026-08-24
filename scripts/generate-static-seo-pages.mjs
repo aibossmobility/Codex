@@ -240,15 +240,15 @@ const pages = [
   },
   {
     path: "/marlee-assessment",
-    title: "Marlee Motivation Assessment | Papa Life",
+    title: "2-Minute Fatherhood Check-In | Papa Life",
     description:
-      "Join Brian Keith Hill's Papa Life Marlee workspace and complete a motivational assessment for self-awareness, communication, leadership, and relationship growth.",
-    eyebrow: "Marlee Assessment",
-    headline: "Understand what motivates you and how your style affects relationships.",
-    intro: "The Marlee assessment supports Papa Life fathers with self-awareness around communication, decision-making, and leadership.",
+      "Where Are You With Your Adult Child? Take the 2-Minute Check-In and identify a practical place to begin rebuilding connection.",
+    eyebrow: "2-Minute Fatherhood Check-In",
+    headline: "Where Are You With Your Adult Child?",
+    intro: "Take the 2-Minute Check-In to notice where things stand today and choose an honest, practical next step.",
     sections: [
-      ["Better self-awareness", "Learn how your natural style may show up in family conversations and repair attempts."],
-      ["Use it with PAPA", "Pair Marlee insights with Purpose, Authority, Presence, and Alignment."],
+      ["A place to begin", "Notice how communication feels, where trust may need rebuilding, and what you can begin changing first."],
+      ["A practical next step", "Use what you notice as a starting point for reflection, a Papa Life conversation, or one small action."],
     ],
   },
   {

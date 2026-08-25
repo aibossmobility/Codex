@@ -131,7 +131,7 @@ function GlobalPapaAiWidget() {
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 
   if (shouldHide) return null;
-  return <PapaAiWidget autoOpen={path === "/"} />;
+  return <PapaAiWidget />;
 }
 
 function App() {

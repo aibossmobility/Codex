@@ -134,6 +134,12 @@ export function PapaAiWidget({ autoOpen = false, className }: PapaAiWidgetProps)
     if (autoOpen) setOpen(true);
   }, [autoOpen]);
 
+  useEffect(() => {
+    const openCoach = () => setOpen(true);
+    window.addEventListener("papa-ai:open", openCoach);
+    return () => window.removeEventListener("papa-ai:open", openCoach);
+  }, []);
+
   const canSend = useMemo(() => message.trim().length > 1 && !loading, [message, loading]);
   const canCaptureLead = useMemo(
     () => Boolean(lead.first_name.trim()) && isValidEmail(lead.email) && lead.consent && leadStatus !== "saving",

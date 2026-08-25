@@ -4,6 +4,7 @@ import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import {
   ArrowRight,
   CheckCircle2,
+  MessageCircle,
   Menu,
   ShieldCheck,
   X,
@@ -122,6 +123,10 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const joinHref = "/go/join?src=homepage";
 
+  function openPapaAiCoach() {
+    window.dispatchEvent(new Event("papa-ai:open"));
+  }
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
       <PageMeta
@@ -145,6 +150,14 @@ export default function Home() {
                 {item.label}
               </a>
             ))}
+            <button
+              type="button"
+              onClick={openPapaAiCoach}
+              className="inline-flex items-center gap-2 rounded-md border border-[#17231c]/35 px-4 py-3 text-sm font-extrabold text-[#17231c] hover:border-[#145b35] hover:bg-[#145b35] hover:text-white"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              1-Minute AI Experience
+            </button>
             <a
               href={joinHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
@@ -175,6 +188,17 @@ export default function Home() {
                   {item.label}
                 </a>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openPapaAiCoach();
+                }}
+                className="flex items-center gap-2 rounded-md px-4 py-3 text-left font-bold hover:bg-[#145b35] hover:text-white"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                1-Minute AI Experience
+              </button>
               <a
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
@@ -187,42 +211,57 @@ export default function Home() {
         )}
       </nav>
 
-      <header className="relative overflow-hidden bg-[#17231c] text-white">
-        <div className="absolute inset-y-0 right-0 hidden w-[43%] bg-[#f8f0db] lg:block">
-          <img
-            src={brianKeithHillHeadshot}
-            alt="Brian Keith Hill"
-            className="h-full w-full object-cover object-top"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#101712] via-[#101712] lg:via-[#101712]/96 lg:to-transparent" />
+      <header className="relative overflow-hidden bg-[#f8f0db] text-[#17231c]">
+        <img
+          src="/images/papa-life-reconnection-path-hero.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(235,218,179,0.94)_0%,rgba(235,218,179,0.82)_40%,rgba(235,218,179,0.28)_58%,rgba(235,218,179,0.04)_72%)]" />
         <div className="container relative z-10 flex min-h-[650px] items-center py-16 md:py-20">
           <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
               Papa Life · For Fathers of Adult Children
             </p>
             <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.04] sm:text-5xl md:text-7xl">
               Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">
-              Papa Life is a Scripture-centered community created specifically for fathers of adult children who want to rebuild trust, restore communication, and begin the journey from distance to reconnection.
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#314239] md:text-xl">
+              If you are ready to be taught, humbled, and led forward, Papa Life will help you take the next faithful step. Some doors between fathers and adult children cannot be forced open. Only God can make a way—and your part is to be ready when He does.
             </p>
-            <p className="mt-5 text-lg font-bold text-[#f2c230] md:text-xl">
+            <p className="mt-5 text-lg font-bold text-[#145b35] md:text-xl">
               As long as you’re both alive, it’s never too late.
             </p>
+            <div className="mt-8 max-w-2xl rounded-xl border border-[#145b35]/30 bg-white/75 p-4 shadow-lg backdrop-blur-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
+              <div>
+                <p className="font-extrabold text-[#17231c]">Experience AI in your fatherhood.</p>
+                <p className="mt-1 text-sm leading-relaxed text-[#314239]">
+                  Take one minute to share what you are facing and experience how AI can help you understand where you are, explore the app, and choose one practical next step.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={openPapaAiCoach}
+                className="mt-4 inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white sm:mt-0"
+              >
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                Try the 1-Minute AI Experience
+              </button>
+            </div>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
               <ActionLink href={joinHref} light>
                 Enroll Now — Immediate Access
               </ActionLink>
               <a
                 href="/assessment"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/55 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
               >
                 Take the 2-Minute Check-In
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
-            <p className="mt-5 text-sm font-semibold text-white/70">
+            <p className="mt-5 text-sm font-semibold text-[#314239]">
               We do not help fathers win arguments. We help fathers rebuild relationships.
             </p>
           </div>
@@ -429,6 +468,9 @@ export default function Home() {
               <h2 id="brian-story-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">I Know What It Is to Carry the Silence.</h2>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">
                 Brian Keith Hill is the founder of Boss Mobility and Papa Life. He helps fathers face the places where pride, pain, misunderstanding, and silence have damaged family relationships—then take the next honest step with faith, humility, and presence.
+              </p>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
+                Fifty years of marriage have also taught Brian that fatherhood was never meant to be carried alone. He is grateful for the faithful love, honest correction, grace, and companionship God has used to shape the father he is still becoming.
               </p>
               <a href="/about-brian-keith-hill" className="mt-6 inline-flex items-center gap-2 font-extrabold text-[#145b35] hover:text-[#b33a32]">
                 About Brian and the work

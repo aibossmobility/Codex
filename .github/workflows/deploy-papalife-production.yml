@@ -1,0 +1,192 @@
+name: Deploy Papa Life Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_ref:
+        description: "Git ref or commit SHA to deploy (must be on origin/main)"
+        required: true
+        default: "main"
+        type: string
+      confirmation:
+        description: "Type DEPLOY to confirm production deployment"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: papalife-production
+  cancel-in-progress: false
+
+jobs:
+  validate-and-build:
+    name: Validate and build approved ref
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      deploy_sha: ${{ steps.resolve.outputs.deploy_sha }}
+
+    steps:
+      - name: Require explicit confirmation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.confirmation }}" != "DEPLOY" ]]; then
+            echo "Production deployment not confirmed. Enter DEPLOY exactly."
+            exit 1
+          fi
+
+      - name: Check out requested ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deploy_ref }}
+          fetch-depth: 0
+
+      - name: Verify requested commit belongs to main
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags
+          DEPLOY_SHA="$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$DEPLOY_SHA" origin/main || {
+            echo "Ref $DEPLOY_SHA is not contained in origin/main. Refusing production deployment."
+            exit 1
+          }
+          echo "deploy_sha=$DEPLOY_SHA" >> "$GITHUB_OUTPUT"
+          echo "Approved deployment SHA: $DEPLOY_SHA"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run TypeScript check
+        run: pnpm check
+
+      - name: Build Papa Life
+        run: pnpm build
+
+  deploy:
+    name: Deploy to Papa Life production
+    needs: validate-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+
+    steps:
+      - name: Validate required SSH configuration
+        env:
+          SSH_HOST: ${{ secrets.PAPALIFE_SSH_HOST }}
+          SSH_USER: ${{ secrets.PAPALIFE_SSH_USER }}
+          SSH_PORT: ${{ secrets.PAPALIFE_SSH_PORT }}
+          SSH_KEY: ${{ secrets.PAPALIFE_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.PAPALIFE_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in SSH_HOST SSH_USER SSH_PORT SSH_KEY SSH_KNOWN_HOSTS; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required production secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.PAPALIFE_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.PAPALIFE_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/papalife_deploy
+          chmod 600 ~/.ssh/papalife_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Preflight, fast-forward, build, restart, and verify
+        env:
+          SSH_HOST: ${{ secrets.PAPALIFE_SSH_HOST }}
+          SSH_USER: ${{ secrets.PAPALIFE_SSH_USER }}
+          SSH_PORT: ${{ secrets.PAPALIFE_SSH_PORT }}
+          DEPLOY_SHA: ${{ needs.validate-and-build.outputs.deploy_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/papalife_deploy \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$SSH_HOST" \
+            bash -s -- "$DEPLOY_SHA" <<'REMOTE'
+          set -euo pipefail
+
+          TARGET_SHA="$1"
+          APP_DIR="/var/www/html/bossmobilelifecoach.com"
+
+          cd "$APP_DIR"
+          test -d .git || { echo "BLOCKED: production directory is not a Git checkout"; exit 1; }
+
+          CURRENT_BRANCH="$(git branch --show-current)"
+          [[ "$CURRENT_BRANCH" == "main" ]] || {
+            echo "BLOCKED: expected main branch, found '$CURRENT_BRANCH'"
+            exit 1
+          }
+
+          if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+            echo "BLOCKED: tracked production files have local modifications"
+            git status --short --untracked-files=no
+            exit 1
+          fi
+
+          PRE_DEPLOY_SHA="$(git rev-parse HEAD)"
+          echo "Pre-deploy SHA: $PRE_DEPLOY_SHA"
+          echo "Target SHA: $TARGET_SHA"
+
+          git fetch origin main --no-tags
+          git cat-file -e "$TARGET_SHA^{commit}" || {
+            echo "BLOCKED: target SHA is unavailable on the production checkout"
+            exit 1
+          }
+          git merge-base --is-ancestor "$TARGET_SHA" origin/main || {
+            echo "BLOCKED: target SHA is not contained in origin/main"
+            exit 1
+          }
+          git merge-base --is-ancestor "$PRE_DEPLOY_SHA" "$TARGET_SHA" || {
+            echo "BLOCKED: deployment is not a fast-forward from production"
+            exit 1
+          }
+
+          git merge --ff-only "$TARGET_SHA"
+
+          corepack enable >/dev/null 2>&1 || true
+          pnpm install --frozen-lockfile
+          pnpm build
+
+          # Keep the two service restarts separate. Brian's sudo allowance
+          # depends on these exact commands and they must never be combined.
+          sudo /usr/local/bin/pm2 restart papalife
+          sudo /usr/local/bin/pm2 restart papalife-mcp-http
+
+          curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ >/dev/null
+          curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ai-coach >/dev/null
+          curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/assessment >/dev/null
+          curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/tuesday-live >/dev/null
+          curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/membership >/dev/null
+
+          echo "DEPLOYMENT_OK sha=$TARGET_SHA"
+          REMOTE

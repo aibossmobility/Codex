@@ -1911,6 +1911,7 @@ const contentSecurityPolicy = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com",
   "media-src 'self' blob: data:",
+  "frame-src 'self' https://meetn.com",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -2028,6 +2029,42 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "Resource guidance", body: "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
+  },
+  "/tuesday": {
+    title: "Papa Life Tuesday Live | August 25, 2026 Replay",
+    description:
+      "Watch the Papa Life Tuesday Live replay for August 25, 2026: Consistency After the Conversation.",
+    keywords: "Papa Life Tuesday Live, fathers of adult children, Consistency After the Conversation, Brian Keith Hill",
+    eyebrow: "Papa Life Tuesday Live Replay",
+    headline: "Consistency After the Conversation",
+    intro:
+      "The conversation is only the beginning. Stay present, keep your word, and rebuild trust through small, consistent deposits over time.",
+    sections: [
+      {
+        heading: "For Fathers of Adult Children",
+        body:
+          "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
+      },
+    ],
+    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" },
+  },
+  "/tuesday-live": {
+    title: "Papa Life Tuesday Live | August 25, 2026 Replay",
+    description:
+      "Watch the Papa Life Tuesday Live replay for August 25, 2026: Consistency After the Conversation.",
+    keywords: "Papa Life Tuesday Live, fathers of adult children, Consistency After the Conversation, Brian Keith Hill",
+    eyebrow: "Papa Life Tuesday Live Replay",
+    headline: "Consistency After the Conversation",
+    intro:
+      "The conversation is only the beginning. Stay present, keep your word, and rebuild trust through small, consistent deposits over time.",
+    sections: [
+      {
+        heading: "For Fathers of Adult Children",
+        body:
+          "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
+      },
+    ],
+    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" },
   },
   "/resources": {
     title: "Papa Life Resources | Boss Mobile Life Coach",

@@ -13,7 +13,7 @@ need() {
   }
 }
 
-for cmd in ssh ssh-keygen gh awk grep sed chmod mkdir mktemp; do
+for cmd in ssh ssh-keygen gh awk grep chmod mkdir mktemp cat; do
   need "$cmd"
 done
 
@@ -77,20 +77,10 @@ PUBKEY="$(cat "${KEY_PATH}.pub")"
 }
 
 # Add only the dedicated public key, idempotently, through the already-trusted
-# connection. This does not broaden sudo or root access.
+# connection. The key is sent only over the authenticated SSH channel.
 echo "Authorizing dedicated deploy public key on Papa Life server..."
-printf '%s\n' "$PUBKEY" | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_ALIAS" 'bash -s' <<'REMOTE'
-set -euo pipefail
-IFS= read -r PUBKEY
-umask 077
-mkdir -p "$HOME/.ssh"
-touch "$HOME/.ssh/authorized_keys"
-chmod 700 "$HOME/.ssh"
-chmod 600 "$HOME/.ssh/authorized_keys"
-if ! grep -qxF "$PUBKEY" "$HOME/.ssh/authorized_keys"; then
-  printf '%s\n' "$PUBKEY" >> "$HOME/.ssh/authorized_keys"
-fi
-REMOTE
+cat "${KEY_PATH}.pub" | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_ALIAS" \
+  'set -euo pipefail; IFS= read -r PUBKEY; umask 077; mkdir -p "$HOME/.ssh"; touch "$HOME/.ssh/authorized_keys"; chmod 700 "$HOME/.ssh"; chmod 600 "$HOME/.ssh/authorized_keys"; grep -qxF "$PUBKEY" "$HOME/.ssh/authorized_keys" || printf "%s\n" "$PUBKEY" >> "$HOME/.ssh/authorized_keys"'
 
 # Verify GitHub CLI authentication before attempting any secret writes.
 gh auth status >/dev/null 2>&1 || {

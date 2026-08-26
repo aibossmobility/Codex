@@ -1,24 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-import { pathToFileURL } from "url";
 import crypto from "crypto";
 import { randomUUID } from "crypto";
 import Database from "better-sqlite3";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { PAPALIFE_MCP_TOOL_DEFINITIONS, handlePapalifeTool } from "./server/mcp-handlers.js";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
-const MCP_PORT = parseInt(process.env.MCP_PORT || "3009", 10);
 const MCP_BEARER_TOKEN = process.env.MCP_BEARER_TOKEN || "";
 const MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://papalifecoach.com";
 
 const OAUTH_CODE_TTL_MS = 5 * 60 * 1000;
 const OAUTH_ACCESS_TTL_SEC = 60 * 60;
 const OAUTH_REFRESH_TTL_SEC = 30 * 24 * 60 * 60;
+
+const loadPapalifeTools = () => import("./server/mcp-handlers.js");
 
 const oauthDb = new Database(path.resolve(process.cwd(), "leads.db"));
 oauthDb.pragma("journal_mode = WAL");
@@ -196,12 +195,14 @@ function createSession() {
     { capabilities: { tools: {} } }
   );
 
-  mcpServer.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: PAPALIFE_MCP_TOOL_DEFINITIONS,
-  }));
+  mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
+    const { PAPALIFE_MCP_TOOL_DEFINITIONS } = await loadPapalifeTools();
+    return { tools: PAPALIFE_MCP_TOOL_DEFINITIONS };
+  });
 
   mcpServer.setRequestHandler(CallToolRequestSchema, async (req) => {
     try {
+      const { handlePapalifeTool } = await loadPapalifeTools();
       const result = await handlePapalifeTool(
         req.params.name,
         (req.params.arguments || {}) as Record<string, unknown>
@@ -418,18 +419,9 @@ app.post("/token", cors, (req, res) => {
   res.status(400).json({ error: "unsupported_grant_type" });
 });
 
-app.get("/health", (_, res) => {
+app.get("/health", async (_, res) => {
+  const { PAPALIFE_MCP_TOOL_DEFINITIONS } = await loadPapalifeTools();
   res.json({ ok: true, server: "papalife-mcp", tools: PAPALIFE_MCP_TOOL_DEFINITIONS.length });
 });
 
-}
-
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  const app = express();
-  app.use(express.json());
-  registerPapalifeMcpRoutes(app);
-  app.listen(MCP_PORT, "0.0.0.0", () => {
-    console.log(`Papalife MCP server running on port ${MCP_PORT}`);
-    console.log(`Endpoint: ${MCP_BASE_URL}/mcp`);
-  });
 }

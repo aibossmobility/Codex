@@ -13,6 +13,7 @@ import multer from "multer";
 import { nanoid } from "nanoid";
 import { createHash } from "crypto";
 import dotenv from "dotenv";
+import { registerPapalifeMcpRoutes } from "../mcp-streamable";
 import {
   ensureResearchTables,
   createResearchDump,
@@ -2732,6 +2733,7 @@ async function startServer() {
 
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
+  registerPapalifeMcpRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);
 

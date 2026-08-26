@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
+import { pathToFileURL } from "url";
 import crypto from "crypto";
 import { randomUUID } from "crypto";
 import Database from "better-sqlite3";
@@ -13,7 +14,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const MCP_PORT = parseInt(process.env.MCP_PORT || "3009", 10);
 const MCP_BEARER_TOKEN = process.env.MCP_BEARER_TOKEN || "";
-const MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://bossmobilelifecoach.com";
+const MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://papalifecoach.com";
 
 const OAUTH_CODE_TTL_MS = 5 * 60 * 1000;
 const OAUTH_ACCESS_TTL_SEC = 60 * 60;
@@ -152,10 +153,6 @@ function verifyPkce(verifier: string, challenge: string, method: string): boolea
   return verifier === challenge;
 }
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 const cors = (_: express.Request, res: express.Response, next: express.NextFunction) => {
   res.set({
     "Access-Control-Allow-Origin": "*",
@@ -227,7 +224,9 @@ function createSession() {
   return { server: mcpServer, transport };
 }
 
-app.options(/.*/, cors, (_, res) => res.sendStatus(204));
+export function registerPapalifeMcpRoutes(app: express.Express) {
+  app.use(express.urlencoded({ extended: true }));
+  app.options(/.*/, cors, (_, res) => res.sendStatus(204));
 
 app.post("/mcp", cors, checkAuth, async (req, res) => {
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
@@ -423,7 +422,14 @@ app.get("/health", (_, res) => {
   res.json({ ok: true, server: "papalife-mcp", tools: PAPALIFE_MCP_TOOL_DEFINITIONS.length });
 });
 
-app.listen(MCP_PORT, "0.0.0.0", () => {
-  console.log(`Papalife MCP server running on port ${MCP_PORT}`);
-  console.log(`Endpoint: ${MCP_BASE_URL}/mcp`);
-});
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  const app = express();
+  app.use(express.json());
+  registerPapalifeMcpRoutes(app);
+  app.listen(MCP_PORT, "0.0.0.0", () => {
+    console.log(`Papalife MCP server running on port ${MCP_PORT}`);
+    console.log(`Endpoint: ${MCP_BASE_URL}/mcp`);
+  });
+}

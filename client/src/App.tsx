@@ -36,6 +36,7 @@ import TuesdayLive from "./pages/TuesdayLive";
 import MarleeAssessment from "./pages/MarleeAssessment";
 import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
+import TakeTheWheel from "./pages/TakeTheWheel";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import {
   AboutBrianKeithHillPage,
@@ -87,6 +88,7 @@ function Router() {
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/assessment" component={RelationshipAssessment} />
       <Route path="/relationship-assessment" component={RelationshipAssessment} />
+      <Route path="/take-the-wheel" component={TakeTheWheel} />
       <Route path="/marlee-assessment" component={MarleeAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />
       <Route path="/adult-daughter-relationship" component={AdultDaughterRelationshipPage} />

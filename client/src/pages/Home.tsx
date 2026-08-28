@@ -1,5 +1,6 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
+import { TakeTheWheelTeaser } from "@/components/TakeTheWheelTeaser";
 import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import {
   ArrowRight,
@@ -275,6 +276,8 @@ export default function Home() {
       </div>
 
       <main>
+        <TakeTheWheelTeaser />
+
         <section aria-labelledby="why-papa-life-heading" className="bg-white py-14 md:py-18">
           <div className="container">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">

@@ -139,5 +139,20 @@ export async function syncPapaFatherEngagementToGhl(
     creds
   );
 
-  console.info(`[ghl] father engagement synced contact ${contactId} to Brian Review Needed`);
+  // HighLevel Contacts API: POST /contacts/:contactId/tasks.
+  // This creates Brian's review reminder only; it does not send a message to the father.
+  const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  await requestJson(
+    `/contacts/${encodeURIComponent(contactId)}/tasks`,
+    "POST",
+    {
+      title: "Brian Review Needed",
+      body: "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
+      dueDate,
+      completed: false,
+    },
+    creds
+  );
+
+  console.info(`[ghl] father engagement synced contact ${contactId} to Brian Review Needed with review task`);
 }

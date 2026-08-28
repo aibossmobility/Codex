@@ -77,8 +77,11 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
     return raw == null ? "" : String(raw).trim();
   };
 
+  const isFatherEngagement =
+    invitedBy === "papa_lead_assessment" || answerText("father_engagement_opt_in").toLowerCase() === "true";
+
   const fatherEngagementDetails =
-    invitedBy === "papa_lead_assessment"
+    isFatherEngagement
       ? [
           answerText("relationship_status") ? `Relationship Status: ${answerText("relationship_status")}` : null,
           answerText("fathers_stated_hope") ? `Father's Stated Hope: ${answerText("fathers_stated_hope")}` : null,
@@ -140,7 +143,7 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
     db.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(leadId, input.routed_pillar);
   }
 
-  if (invitedBy === "papa_lead_assessment") {
+  if (isFatherEngagement) {
     void syncPapaFatherEngagementToGhl(db, {
       first_name: input.first_name,
       email: input.email,

@@ -1,4 +1,5 @@
 import type { Database as BetterSqliteDatabase } from "better-sqlite3";
+import { syncPapaFatherEngagementToGhl } from "./papa-father-engagement-ghl";
 
 /** Papa Life homepage funnel intake options → CRM tag slugs */
 export const PAPA_FUNNEL_ISSUE_TAGS = [
@@ -57,13 +58,42 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
       ? "Papa Life homepage funnel"
       : invitedBy === "papa_life_action_coach"
         ? "Papa Life Action Coach"
-        : `strategist intake (${input.source})`;
+        : invitedBy === "papa_lead_assessment"
+          ? "Papa Life 2-Minute Fatherhood Check-In"
+          : `strategist intake (${input.source})`;
+
+  let submittedAnswers: Record<string, unknown> = {};
+  try {
+    const intake = db
+      .prepare("SELECT answers_json FROM intake_submissions WHERE id = ?")
+      .get(input.intakeId) as { answers_json?: string | null } | undefined;
+    if (intake?.answers_json) submittedAnswers = JSON.parse(intake.answers_json) as Record<string, unknown>;
+  } catch (e) {
+    console.warn("[crm] could not parse intake answers_json:", e);
+  }
+
+  const answerText = (key: string): string => {
+    const raw = submittedAnswers[key];
+    return raw == null ? "" : String(raw).trim();
+  };
+
+  const fatherEngagementDetails =
+    invitedBy === "papa_lead_assessment"
+      ? [
+          answerText("relationship_status") ? `Relationship Status: ${answerText("relationship_status")}` : null,
+          answerText("fathers_stated_hope") ? `Father's Stated Hope: ${answerText("fathers_stated_hope")}` : null,
+          answerText("primary_concern") ? `Primary Concern: ${answerText("primary_concern")}` : null,
+          answerText("preferred_next_step") ? `Preferred Next Step: ${answerText("preferred_next_step")}` : null,
+          "Brian Review Status: Review Needed",
+        ].filter(Boolean)
+      : [];
 
   const noteBody = [
     `Source: ${sourceLabel}`,
     `Intake submission id: ${input.intakeId}`,
     isPapaFunnelIssueTag(input.routed_pillar) ? `CRM tag: ${input.routed_pillar}` : `Primary pillar: ${input.routed_pillar}`,
     input.disconnected_pillar ? `Disconnected pillar: ${input.disconnected_pillar}` : null,
+    ...fatherEngagementDetails,
     "",
     "Situation:",
     input.situation,
@@ -108,6 +138,15 @@ export function syncIntakeSubmissionToCrmLead(db: BetterSqliteDatabase, input: I
 
   if (isPapaFunnelIssueTag(input.routed_pillar)) {
     db.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(leadId, input.routed_pillar);
+  }
+
+  if (invitedBy === "papa_lead_assessment") {
+    void syncPapaFatherEngagementToGhl(db, {
+      first_name: input.first_name,
+      email: input.email,
+      phone: input.phone,
+      answers: submittedAnswers,
+    }).catch((err) => console.error("[ghl] father engagement bridge failed:", err));
   }
 
   return { lead_id: leadId };

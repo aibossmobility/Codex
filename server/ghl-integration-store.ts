@@ -63,6 +63,112 @@ function envCredentials(): GhlCredentials | null {
   return { token, locationId, source: "env" };
 }
 
+function seedPapaLeadCheckIn(db: BetterSqliteDatabase): void {
+  const rows = [
+    {
+      key: "first_name",
+      label: "Name",
+      type: "text",
+      required: 1,
+      order: 1,
+      placeholder: "Your name",
+      options: [] as string[],
+    },
+    {
+      key: "email",
+      label: "Email",
+      type: "email",
+      required: 1,
+      order: 2,
+      placeholder: "you@example.com",
+      options: [] as string[],
+    },
+    {
+      key: "phone",
+      label: "Mobile",
+      type: "tel",
+      required: 0,
+      order: 3,
+      placeholder: "Your best mobile number",
+      options: [] as string[],
+    },
+    {
+      key: "relationship_status",
+      label: "How would you describe your relationship with your adult child right now?",
+      type: "select",
+      required: 1,
+      order: 4,
+      placeholder: null,
+      options: ["Close—strengthen", "Communication difficult", "Limited contact", "Disconnected", "Unsure"],
+    },
+    {
+      key: "fathers_stated_hope",
+      label: "What do you hope will be different?",
+      type: "text",
+      required: 1,
+      order: 5,
+      placeholder: "In a few words, what are you hoping for?",
+      options: [] as string[],
+    },
+    {
+      key: "primary_concern",
+      label: "What is your biggest concern right now?",
+      type: "select",
+      required: 1,
+      order: 6,
+      placeholder: null,
+      options: ["I feel judged", "I feel shut out", "I don’t know what to say", "I’m afraid of making it worse", "I’m not sure"],
+    },
+    {
+      key: "preferred_next_step",
+      label: "What would be most helpful as a next step?",
+      type: "select",
+      required: 1,
+      order: 7,
+      placeholder: null,
+      options: ["Watch Tuesday Live", "Get weekly email", "Personal conversation", "I’ll think about it"],
+    },
+    {
+      key: "father_of_adult_child",
+      label: "I am the father of an adult child.",
+      type: "select",
+      required: 1,
+      order: 8,
+      placeholder: null,
+      options: ["Yes"],
+    },
+  ];
+
+  const upsert = db.prepare(`
+    INSERT INTO form_questions
+      (form_key, question_key, label, input_type, required, sort_order, placeholder, options_json, active, updated_at)
+    VALUES
+      ('papa_lead', @key, @label, @type, @required, @order, @placeholder, @options_json, 1, datetime('now'))
+    ON CONFLICT(form_key, question_key) DO UPDATE SET
+      label = excluded.label,
+      input_type = excluded.input_type,
+      required = excluded.required,
+      sort_order = excluded.sort_order,
+      placeholder = excluded.placeholder,
+      options_json = excluded.options_json,
+      active = 1,
+      updated_at = datetime('now')
+  `);
+
+  const keep = rows.map((row) => row.key);
+  const tx = db.transaction(() => {
+    for (const row of rows) {
+      upsert.run({ ...row, options_json: JSON.stringify(row.options) });
+    }
+    const placeholders = keep.map(() => "?").join(",");
+    db.prepare(
+      `UPDATE form_questions SET active = 0, updated_at = datetime('now')
+       WHERE form_key = 'papa_lead' AND question_key NOT IN (${placeholders})`
+    ).run(...keep);
+  });
+  tx();
+}
+
 export function ensureGhlIntegrationTable(db: BetterSqliteDatabase): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS admin_ghl_integrations (
@@ -72,6 +178,14 @@ export function ensureGhlIntegrationTable(db: BetterSqliteDatabase): void {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
+
+  // This ensure function runs during app startup after form_questions exists.
+  // Keep the public Papa Life check-in available even on a fresh production database.
+  try {
+    seedPapaLeadCheckIn(db);
+  } catch (e) {
+    console.error("[forms] could not seed papa_lead check-in:", e);
+  }
 }
 
 export function getGhlIntegrationPublic(db: BetterSqliteDatabase, adminUserId: number): GhlIntegrationPublic {

@@ -52,6 +52,53 @@ assert.equal(summary.paired_participant_count, 1);
 assert.deepEqual(summary.dimensions.reflection, { average_delta: 2, improved: 1 });
 assert.deepEqual(summary.dimensions.relationship, { average_delta: 1, improved: 1 });
 
+// A second cycle may be imported out of order. Its follow-up must pair with
+// the baseline carrying the same interaction_ref, never with another cycle.
+createHumanImpactObservation(db, {
+  ...common,
+  interaction_ref: "conversation-002",
+  phase: "follow_up",
+  reflection_score: 5,
+  decision_score: 4,
+  communication_score: 4,
+  action_score: 4,
+  relationship_score: 4,
+  outcome: "relationship_improved",
+  observed_at: "2026-08-20T12:00:00.000Z",
+});
+
+createHumanImpactObservation(db, {
+  ...common,
+  interaction_ref: "conversation-002",
+  phase: "baseline",
+  reflection_score: 1,
+  decision_score: 2,
+  communication_score: 2,
+  action_score: 2,
+  relationship_score: 2,
+  outcome: "not_yet_observed",
+  observed_at: "2026-08-15T12:00:00.000Z",
+});
+
+createHumanImpactObservation(db, {
+  ...common,
+  interaction_ref: "conversation-003",
+  phase: "baseline",
+  reflection_score: 5,
+  decision_score: 5,
+  communication_score: 5,
+  action_score: 5,
+  relationship_score: 5,
+  outcome: "not_yet_observed",
+  observed_at: "2026-08-25T12:00:00.000Z",
+});
+
+const repeatedCycleSummary = summarizeHumanImpact(db);
+assert.equal(repeatedCycleSummary.observation_count, 5);
+assert.equal(repeatedCycleSummary.paired_participant_count, 1);
+assert.deepEqual(repeatedCycleSummary.dimensions.reflection, { average_delta: 4, improved: 1 });
+assert.deepEqual(repeatedCycleSummary.dimensions.relationship, { average_delta: 2, improved: 1 });
+
 assert.throws(
   () =>
     createHumanImpactObservation(db, {

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "node scripts/generate-master-knowledge-page.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "prestart": "node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",

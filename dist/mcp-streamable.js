@@ -1,12 +1,18 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
+// mcp-streamable.ts
+import express from "express";
+import dotenv from "dotenv";
+import path2 from "path";
+import crypto2 from "crypto";
+import { randomUUID } from "crypto";
+import Database2 from "better-sqlite3";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+
+// server/mcp-handlers.ts
+import Database from "better-sqlite3";
+import fs from "fs";
+import path from "path";
 
 // server/research-store.ts
 function ensureResearchTables(db2) {
@@ -114,13 +120,10 @@ function listSocialSuggestions(db2, dumpId) {
 function updateSuggestionStatus(db2, suggestionId, status) {
   db2.prepare("UPDATE brand_social_suggestions SET status = ? WHERE id = ?").run(status, suggestionId);
 }
-var init_research_store = __esm({
-  "server/research-store.ts"() {
-    "use strict";
-  }
-});
 
 // server/research-ai.ts
+var PAPA_SNIPPET = "PAPA Life / Boss Mobile Life Coach: fathers of adult children, faith-informed, PAPA framework. 9th grade reading level.";
+var MAX_INPUT_CHARS = 12e4;
 function truncateForModel(text) {
   if (text.length <= MAX_INPUT_CHARS) return { text, truncated: false };
   return { text: text.slice(0, MAX_INPUT_CHARS) + "\n[truncated]", truncated: true };
@@ -199,6 +202,7 @@ async function analyzeResearchNotes(rawNotes) {
     truncated
   };
 }
+var PLATFORMS = ["instagram", "linkedin", "facebook", "x", "youtube_shorts"];
 async function generateSocialPack(rawNotes, executiveSummary, themes, platforms) {
   const want = (platforms?.length ? platforms : [...PLATFORMS]).map((p) => p.toLowerCase());
   const { text } = truncateForModel(rawNotes);
@@ -239,15 +243,6 @@ async function generateSocialPack(rawNotes, executiveSummary, themes, platforms)
   }
   return out;
 }
-var PAPA_SNIPPET, MAX_INPUT_CHARS, PLATFORMS;
-var init_research_ai = __esm({
-  "server/research-ai.ts"() {
-    "use strict";
-    PAPA_SNIPPET = "PAPA Life / Boss Mobile Life Coach: fathers of adult children, faith-informed, PAPA framework. 9th grade reading level.";
-    MAX_INPUT_CHARS = 12e4;
-    PLATFORMS = ["instagram", "linkedin", "facebook", "x", "youtube_shorts"];
-  }
-});
 
 // server/research-access.ts
 function assertResearchLabMcpEnabled() {
@@ -257,11 +252,6 @@ function assertResearchLabMcpEnabled() {
     );
   }
 }
-var init_research_access = __esm({
-  "server/research-access.ts"() {
-    "use strict";
-  }
-});
 
 // server/site-ctas-store.ts
 function ensureSiteCtasTable(db2) {
@@ -338,11 +328,6 @@ function upsertSiteCta(db2, row) {
 function deleteSiteCta(db2, id) {
   db2.prepare("DELETE FROM site_ctas WHERE id = ?").run(id);
 }
-var init_site_ctas_store = __esm({
-  "server/site-ctas-store.ts"() {
-    "use strict";
-  }
-});
 
 // server/site-media-store.ts
 function ensureSiteMediaTable(db2) {
@@ -402,13 +387,9 @@ function upsertSiteMedia(db2, row) {
 function deleteSiteMedia(db2, placement) {
   db2.prepare("DELETE FROM site_media WHERE placement = ?").run(placement);
 }
-var init_site_media_store = __esm({
-  "server/site-media-store.ts"() {
-    "use strict";
-  }
-});
 
 // server/pricing-store.ts
+var DEFAULT_CHECKOUT_PAYMENT_LINK = "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
 function defaults() {
   return {
     member_trial_hours: Number(process.env.MEMBER_TRIAL_HOURS ?? 0),
@@ -493,198 +474,15 @@ function updatePricingSettings(db2, patch) {
   upsert.run("checkout_payment_link", merged.checkout_payment_link);
   return merged;
 }
-var DEFAULT_CHECKOUT_PAYMENT_LINK;
-var init_pricing_store = __esm({
-  "server/pricing-store.ts"() {
-    "use strict";
-    DEFAULT_CHECKOUT_PAYMENT_LINK = "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
-  }
-});
-
-// server/ghl-integration-store.ts
-import crypto from "crypto";
-function encryptionKey() {
-  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
-  return crypto.createHash("sha256").update(raw).digest();
-}
-function decrypt(blob) {
-  const buf = Buffer.from(blob, "base64");
-  const iv = buf.subarray(0, 12);
-  const tag = buf.subarray(12, 28);
-  const data = buf.subarray(28);
-  const key = encryptionKey();
-  const decipher = crypto.createDecipheriv(ALGO, key, iv);
-  decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
-}
-function envCredentials() {
-  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
-  if (!token) return null;
-  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
-  return { token, locationId, source: "env" };
-}
-function resolveGhlCredentials(db2, adminUserId) {
-  const env = envCredentials();
-  if (env) return env;
-  let uid = adminUserId;
-  if (uid == null) {
-    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
-    uid = row?.id;
-  }
-  if (uid == null) return null;
-  const stored = db2.prepare(
-    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
-  ).get(uid);
-  if (!stored?.api_token_enc) return null;
-  try {
-    const token = decrypt(stored.api_token_enc);
-    return {
-      token,
-      locationId: stored.location_id?.trim() || void 0,
-      source: "dashboard"
-    };
-  } catch {
-    return null;
-  }
-}
-var ALGO;
-var init_ghl_integration_store = __esm({
-  "server/ghl-integration-store.ts"() {
-    "use strict";
-    ALGO = "aes-256-gcm";
-  }
-});
-
-// server/papa-father-engagement-ghl.ts
-function headers(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Version: GHL_VERSION
-  };
-}
-function value(answers, key) {
-  const raw = answers[key];
-  return raw == null ? "" : String(raw).trim();
-}
-function contactIdFromPayload(data) {
-  const direct = data.id || data.contactId;
-  if (direct) return String(direct);
-  const contact = data.contact;
-  if (contact && typeof contact === "object") {
-    const id = contact.id || contact.contactId;
-    if (id) return String(id);
-  }
-  return null;
-}
-async function requestJson(path3, method, body, creds) {
-  const response = await fetch(`${GHL_BASE}${path3}`, {
-    method,
-    headers: headers(creds.token),
-    body: JSON.stringify(body)
-  });
-  const text = await response.text();
-  let data = {};
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    data = { raw: text.slice(0, 500) };
-  }
-  if (!response.ok) {
-    const message = String(data.message || text || response.statusText);
-    throw new Error(`GHL ${method} ${path3} failed (${response.status}): ${message}`);
-  }
-  return data;
-}
-async function syncPapaFatherEngagementToGhl(db2, input) {
-  const email = input.email?.trim().toLowerCase() || "";
-  if (!email) return;
-  const creds = resolveGhlCredentials(db2);
-  if (!creds?.token || !creds.locationId) {
-    console.warn("[ghl] father engagement sync skipped: credentials/location not configured");
-    return;
-  }
-  const [firstName, ...lastNameParts] = input.first_name.trim().split(/\s+/).filter(Boolean);
-  const customFields = [
-    { id: FIELD_IDS.relationship_status, fieldValue: value(input.answers, "relationship_status") },
-    { id: FIELD_IDS.fathers_stated_hope, fieldValue: value(input.answers, "fathers_stated_hope") },
-    { id: FIELD_IDS.primary_concern, fieldValue: value(input.answers, "primary_concern") },
-    { id: FIELD_IDS.preferred_next_step, fieldValue: value(input.answers, "preferred_next_step") },
-    { id: FIELD_IDS.brian_review_status, fieldValue: "Review Needed" },
-    { id: FIELD_IDS.sensitive_or_personal_response, fieldValue: value(input.answers, "sensitive_or_personal_response") }
-  ].filter((field) => Boolean(String(field.fieldValue || "").trim()));
-  const upsert = await requestJson(
-    "/contacts/upsert",
-    "POST",
-    {
-      locationId: creds.locationId,
-      firstName: firstName || input.first_name.trim(),
-      ...lastNameParts.length ? { lastName: lastNameParts.join(" ") } : {},
-      email,
-      ...input.phone?.trim() ? { phone: input.phone.trim() } : {},
-      source: "PapaLifeCoach.com 2-Minute Fatherhood Check-In",
-      customFields
-    },
-    creds
-  );
-  const contactId = contactIdFromPayload(upsert);
-  if (!contactId) throw new Error("GHL contact upsert returned no contact id");
-  await requestJson(
-    `/contacts/${encodeURIComponent(contactId)}/tags`,
-    "POST",
-    { tags: ["Papa Life\u2014Fatherhood Check-In"] },
-    creds
-  );
-  await requestJson(
-    "/opportunities/",
-    "POST",
-    {
-      pipelineId: PAPA_FATHER_ENGAGEMENT_PIPELINE_ID,
-      locationId: creds.locationId,
-      name: `${input.first_name.trim()} \u2014 Fatherhood Check-In`,
-      pipelineStageId: PAPA_BRIAN_REVIEW_STAGE_ID,
-      status: "open",
-      contactId
-    },
-    creds
-  );
-  const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1e3).toISOString();
-  await requestJson(
-    `/contacts/${encodeURIComponent(contactId)}/tasks`,
-    "POST",
-    {
-      title: "Brian Review Needed",
-      body: "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
-      dueDate,
-      completed: false
-    },
-    creds
-  );
-  console.info(`[ghl] father engagement synced contact ${contactId} to Brian Review Needed with review task`);
-}
-var GHL_BASE, GHL_VERSION, PAPA_FATHER_ENGAGEMENT_PIPELINE_ID, PAPA_BRIAN_REVIEW_STAGE_ID, FIELD_IDS;
-var init_papa_father_engagement_ghl = __esm({
-  "server/papa-father-engagement-ghl.ts"() {
-    "use strict";
-    init_ghl_integration_store();
-    GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
-    GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
-    PAPA_FATHER_ENGAGEMENT_PIPELINE_ID = process.env.GHL_PAPA_FATHER_ENGAGEMENT_PIPELINE_ID?.trim() || "vPAlmSzBI5ufgmMgniOB";
-    PAPA_BRIAN_REVIEW_STAGE_ID = process.env.GHL_PAPA_BRIAN_REVIEW_STAGE_ID?.trim() || "93609656-433c-4489-a4fd-f6ee6845f4b7";
-    FIELD_IDS = {
-      relationship_status: "JBXjAvQx9txLaI6ZwJQc",
-      fathers_stated_hope: "K4aO0yWrSokcj1qStgQX",
-      primary_concern: "glcIkE9CFPA7JKfWPB5D",
-      preferred_next_step: "TI9r47A2Iwfl6Vyovqnh",
-      brian_review_status: "VjXCs7vl9HhSDWKvEEZu",
-      sensitive_or_personal_response: "57X1xM3MZGmwTGeGMM3s",
-      brian_review_decision: "nfIWfbI29k3PTyUXfOPj"
-    };
-  }
-});
 
 // server/sync-intake-to-crm.ts
+var PAPA_FUNNEL_ISSUE_TAGS = [
+  "communication",
+  "dismissed",
+  "disconnected",
+  "dont_know",
+  "ready_to_change"
+];
 function isPapaFunnelIssueTag(s) {
   return PAPA_FUNNEL_ISSUE_TAGS.includes(s);
 }
@@ -696,32 +494,12 @@ function syncIntakeSubmissionToCrmLead(db2, input) {
   const businessEmail = input.email && input.email.trim() ? input.email.trim().toLowerCase() : `intake-${input.intakeId}@placeholder.bossmobile.local`;
   const mobilePhone = input.phone && input.phone.trim() ? input.phone.trim() : "\u2014";
   const invitedBy = input.invited_by ?? "strategist_intake";
-  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : invitedBy === "papa_lead_assessment" ? "Papa Life 2-Minute Fatherhood Check-In" : `strategist intake (${input.source})`;
-  let submittedAnswers = {};
-  try {
-    const intake = db2.prepare("SELECT answers_json FROM intake_submissions WHERE id = ?").get(input.intakeId);
-    if (intake?.answers_json) submittedAnswers = JSON.parse(intake.answers_json);
-  } catch (e) {
-    console.warn("[crm] could not parse intake answers_json:", e);
-  }
-  const answerText = (key) => {
-    const raw = submittedAnswers[key];
-    return raw == null ? "" : String(raw).trim();
-  };
-  const isFatherEngagement = invitedBy === "papa_lead_assessment" || answerText("father_engagement_opt_in").toLowerCase() === "true";
-  const fatherEngagementDetails = isFatherEngagement ? [
-    answerText("relationship_status") ? `Relationship Status: ${answerText("relationship_status")}` : null,
-    answerText("fathers_stated_hope") ? `Father's Stated Hope: ${answerText("fathers_stated_hope")}` : null,
-    answerText("primary_concern") ? `Primary Concern: ${answerText("primary_concern")}` : null,
-    answerText("preferred_next_step") ? `Preferred Next Step: ${answerText("preferred_next_step")}` : null,
-    "Brian Review Status: Review Needed"
-  ].filter(Boolean) : [];
+  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : `strategist intake (${input.source})`;
   const noteBody = [
     `Source: ${sourceLabel}`,
     `Intake submission id: ${input.intakeId}`,
     isPapaFunnelIssueTag(input.routed_pillar) ? `CRM tag: ${input.routed_pillar}` : `Primary pillar: ${input.routed_pillar}`,
     input.disconnected_pillar ? `Disconnected pillar: ${input.disconnected_pillar}` : null,
-    ...fatherEngagementDetails,
     "",
     "Situation:",
     input.situation,
@@ -763,32 +541,78 @@ ${input.vision}` : ""
   if (isPapaFunnelIssueTag(input.routed_pillar)) {
     db2.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(leadId, input.routed_pillar);
   }
-  if (isFatherEngagement) {
-    void syncPapaFatherEngagementToGhl(db2, {
-      first_name: input.first_name,
-      email: input.email,
-      phone: input.phone,
-      answers: submittedAnswers
-    }).catch((err) => console.error("[ghl] father engagement bridge failed:", err));
-  }
   return { lead_id: leadId };
 }
-var PAPA_FUNNEL_ISSUE_TAGS;
-var init_sync_intake_to_crm = __esm({
-  "server/sync-intake-to-crm.ts"() {
-    "use strict";
-    init_papa_father_engagement_ghl();
-    PAPA_FUNNEL_ISSUE_TAGS = [
-      "communication",
-      "dismissed",
-      "disconnected",
-      "dont_know",
-      "ready_to_change"
-    ];
-  }
-});
 
 // server/heygen-mcp.ts
+var HEYGEN_API = "https://api.heygen.com";
+var BRIAN_HEYGEN_VOICE_ID = process.env.BRIAN_HEYGEN_VOICE_ID?.trim() || "1d5b92d8097541f881d1be4a061b6559";
+var BOSSMOBILE_VOICE = "Boss Mobile Life Coach / PAPA Life creates teaching content for men navigating fatherhood, purpose, and personal growth. Be warm, authoritative, and conversational \u2014 like a mentor coaching a friend. Speak from real-life experience.";
+var BOSSMOBILE_HEYGEN_GUIDE_MARKDOWN = `## Boss Mobile x HeyGen \u2014 Teaching Content Video Pipeline (MCP tools)
+
+Use these tools to turn your **lesson outlines, research dumps, course scripts, Google Drive docs, and agent session notes** into polished avatar videos for the PAPA Life curriculum.
+
+### Content sources for video scripts
+
+1. **Site pages** \u2014 fetch any page from bossmobilelifecoach.com with \`bossmobile_heygen_fetch_page\`.
+2. **Course / lesson content** \u2014 call \`get_content_tree\` to see your curriculum, then reference lesson descriptions in your script prompt.
+3. **Research dumps** \u2014 call \`get_brand_research_dump\` (with \`include_raw: true\`) to pull raw notes and executive summaries from the Research Lab.
+4. **Google Drive docs** \u2014 paste the shareable link or exported text into \`bossmobile_heygen_script_from_text\` so the AI can turn it into spoken narration.
+5. **Agent session notes** \u2014 copy conversation highlights or action items from agent chat sessions into \`bossmobile_heygen_script_from_text\` for video scripting.
+
+### Your face (studio avatar, talking photo, or digital twin)
+
+1. Train or upload in the HeyGen app (Instant Avatar, Photo Avatar, Digital Twin, etc.).
+2. **bossmobile_heygen_list_avatars** \u2014 lists **avatars** (studio looks) and **talking_photos** (photo avatars). Use the IDs you need.
+3. **bossmobile_heygen_video_agent** accepts \`avatar_id\` (studio look) or \`talking_photo_id\` (photo avatar).
+4. Optional env defaults: **\`HEYGEN_DEFAULT_AVATAR_ID\`**, **\`HEYGEN_DEFAULT_TALKING_PHOTO_ID\`** so you can omit IDs on every call.
+
+### Your voice (including voice clones)
+
+1. **bossmobile_heygen_list_voices** \u2014 confirms available voices.
+2. **bossmobile_heygen_video_agent** always sends the Brian Keith Hill voice ID. If another \`voice_id\` is passed, the request fails.
+
+### Typical flow
+
+#### Flow A: Site page \u2192 script \u2192 video
+1. \`bossmobile_heygen_fetch_page\` \u2014 fetch page text (e.g. \`/\`, \`/courses\`).
+2. \`bossmobile_heygen_script_from_pages\` \u2014 Claude writes narration from page copy.
+3. \`bossmobile_heygen_video_agent\` \u2014 create the video.
+4. \`bossmobile_heygen_video_status\` \u2014 poll until done.
+
+#### Flow B: Paste text (Google Drive, session notes, outline) \u2192 script \u2192 video
+1. \`bossmobile_heygen_script_from_text\` \u2014 paste any raw text (a Google Doc export, agent session notes, a lesson outline). Claude converts it to spoken narration.
+2. \`bossmobile_heygen_video_agent\` \u2014 create the video.
+3. \`bossmobile_heygen_video_status\` \u2014 poll until done.
+
+#### Flow C: Research dump \u2192 script \u2192 video
+1. \`get_brand_research_dump\` (include_raw: true) \u2014 pull existing research.
+2. \`bossmobile_heygen_script_from_text\` \u2014 feed the raw_notes or executive_summary.
+3. \`bossmobile_heygen_video_agent\` + \`bossmobile_heygen_video_status\`.
+
+### Linking videos to courses
+
+After a video is completed:
+1. Download the \`video_url\` from \`bossmobile_heygen_video_status\`.
+2. Use \`update_lesson\` with \`content_url\` set to the video URL and \`content_type: "video"\` so members see it in /portal.
+
+### Environment
+
+| Variable | Purpose |
+|----------|---------|
+| \`HEYGEN_API_KEY\` | Required for HeyGen calls |
+| \`ANTHROPIC_API_KEY\` | Required for script generation (Claude) |
+| \`PUBLIC_MCP_BASE_URL\` | Site origin for page fetch (default \`https://bossmobilelifecoach.com\`) |
+| \`HEYGEN_CALLBACK_URL\` | Optional default webhook for Video Agent completions |
+| \`HEYGEN_DEFAULT_AVATAR_ID\` | Optional default studio avatar_id |
+| \`HEYGEN_DEFAULT_TALKING_PHOTO_ID\` | Optional default talking_photo_id |
+| \`HEYGEN_DEFAULT_VOICE_ID\` | Brian Keith Hill voice_id |
+| \`BRIAN_HEYGEN_VOICE_ID\` | Required Brian Keith Hill voice guard |
+
+### Security
+
+Never paste API keys into chat or commit them. Use server env only.
+`;
 function requireHeygenKey() {
   const key = process.env.HEYGEN_API_KEY?.trim();
   if (!key) throw new Error("HEYGEN_API_KEY is not configured");
@@ -1093,80 +917,6 @@ async function bossmobileHeygenVideoStatus(video_id) {
     next_step: d.status === "completed" && d.video_url ? "Video ready! Preferred path: call bossmobile_publish_video_playbook(heygen_video_id, lesson_id) \u2014 it returns the step-by-step playbook for uploading to YouTube via your own Composio connection and embedding into the lesson. Or skip to update_lesson directly if you already have a hosted video URL." : void 0
   };
 }
-var HEYGEN_API, BRIAN_HEYGEN_VOICE_ID, BOSSMOBILE_VOICE, BOSSMOBILE_HEYGEN_GUIDE_MARKDOWN;
-var init_heygen_mcp = __esm({
-  "server/heygen-mcp.ts"() {
-    "use strict";
-    HEYGEN_API = "https://api.heygen.com";
-    BRIAN_HEYGEN_VOICE_ID = process.env.BRIAN_HEYGEN_VOICE_ID?.trim() || "1d5b92d8097541f881d1be4a061b6559";
-    BOSSMOBILE_VOICE = "Boss Mobile Life Coach / PAPA Life creates teaching content for men navigating fatherhood, purpose, and personal growth. Be warm, authoritative, and conversational \u2014 like a mentor coaching a friend. Speak from real-life experience.";
-    BOSSMOBILE_HEYGEN_GUIDE_MARKDOWN = `## Boss Mobile x HeyGen \u2014 Teaching Content Video Pipeline (MCP tools)
-
-Use these tools to turn your **lesson outlines, research dumps, course scripts, Google Drive docs, and agent session notes** into polished avatar videos for the PAPA Life curriculum.
-
-### Content sources for video scripts
-
-1. **Site pages** \u2014 fetch any page from bossmobilelifecoach.com with \`bossmobile_heygen_fetch_page\`.
-2. **Course / lesson content** \u2014 call \`get_content_tree\` to see your curriculum, then reference lesson descriptions in your script prompt.
-3. **Research dumps** \u2014 call \`get_brand_research_dump\` (with \`include_raw: true\`) to pull raw notes and executive summaries from the Research Lab.
-4. **Google Drive docs** \u2014 paste the shareable link or exported text into \`bossmobile_heygen_script_from_text\` so the AI can turn it into spoken narration.
-5. **Agent session notes** \u2014 copy conversation highlights or action items from agent chat sessions into \`bossmobile_heygen_script_from_text\` for video scripting.
-
-### Your face (studio avatar, talking photo, or digital twin)
-
-1. Train or upload in the HeyGen app (Instant Avatar, Photo Avatar, Digital Twin, etc.).
-2. **bossmobile_heygen_list_avatars** \u2014 lists **avatars** (studio looks) and **talking_photos** (photo avatars). Use the IDs you need.
-3. **bossmobile_heygen_video_agent** accepts \`avatar_id\` (studio look) or \`talking_photo_id\` (photo avatar).
-4. Optional env defaults: **\`HEYGEN_DEFAULT_AVATAR_ID\`**, **\`HEYGEN_DEFAULT_TALKING_PHOTO_ID\`** so you can omit IDs on every call.
-
-### Your voice (including voice clones)
-
-1. **bossmobile_heygen_list_voices** \u2014 confirms available voices.
-2. **bossmobile_heygen_video_agent** always sends the Brian Keith Hill voice ID. If another \`voice_id\` is passed, the request fails.
-
-### Typical flow
-
-#### Flow A: Site page \u2192 script \u2192 video
-1. \`bossmobile_heygen_fetch_page\` \u2014 fetch page text (e.g. \`/\`, \`/courses\`).
-2. \`bossmobile_heygen_script_from_pages\` \u2014 Claude writes narration from page copy.
-3. \`bossmobile_heygen_video_agent\` \u2014 create the video.
-4. \`bossmobile_heygen_video_status\` \u2014 poll until done.
-
-#### Flow B: Paste text (Google Drive, session notes, outline) \u2192 script \u2192 video
-1. \`bossmobile_heygen_script_from_text\` \u2014 paste any raw text (a Google Doc export, agent session notes, a lesson outline). Claude converts it to spoken narration.
-2. \`bossmobile_heygen_video_agent\` \u2014 create the video.
-3. \`bossmobile_heygen_video_status\` \u2014 poll until done.
-
-#### Flow C: Research dump \u2192 script \u2192 video
-1. \`get_brand_research_dump\` (include_raw: true) \u2014 pull existing research.
-2. \`bossmobile_heygen_script_from_text\` \u2014 feed the raw_notes or executive_summary.
-3. \`bossmobile_heygen_video_agent\` + \`bossmobile_heygen_video_status\`.
-
-### Linking videos to courses
-
-After a video is completed:
-1. Download the \`video_url\` from \`bossmobile_heygen_video_status\`.
-2. Use \`update_lesson\` with \`content_url\` set to the video URL and \`content_type: "video"\` so members see it in /portal.
-
-### Environment
-
-| Variable | Purpose |
-|----------|---------|
-| \`HEYGEN_API_KEY\` | Required for HeyGen calls |
-| \`ANTHROPIC_API_KEY\` | Required for script generation (Claude) |
-| \`PUBLIC_MCP_BASE_URL\` | Site origin for page fetch (default \`https://bossmobilelifecoach.com\`) |
-| \`HEYGEN_CALLBACK_URL\` | Optional default webhook for Video Agent completions |
-| \`HEYGEN_DEFAULT_AVATAR_ID\` | Optional default studio avatar_id |
-| \`HEYGEN_DEFAULT_TALKING_PHOTO_ID\` | Optional default talking_photo_id |
-| \`HEYGEN_DEFAULT_VOICE_ID\` | Brian Keith Hill voice_id |
-| \`BRIAN_HEYGEN_VOICE_ID\` | Required Brian Keith Hill voice guard |
-
-### Security
-
-Never paste API keys into chat or commit them. Use server env only.
-`;
-  }
-});
 
 // server/heygen-publish.ts
 function safeSlug(s) {
@@ -1361,12 +1111,6 @@ Re-run this tool in ~30s.`
     markdown
   };
 }
-var init_heygen_publish = __esm({
-  "server/heygen-publish.ts"() {
-    "use strict";
-    init_heygen_mcp();
-  }
-});
 
 // server/lesson-content-normalize.ts
 function extractYoutubeId(url) {
@@ -1480,14 +1224,68 @@ function normalizeLessonContent(rawUrl, previousContentUrl, contentTypeHint) {
     changed: url !== previousContentUrl
   };
 }
-var init_lesson_content_normalize = __esm({
-  "server/lesson-content-normalize.ts"() {
-    "use strict";
-  }
-});
 
 // server/ghl-automation.ts
 import { randomBytes } from "crypto";
+
+// server/ghl-integration-store.ts
+import crypto from "crypto";
+var ALGO = "aes-256-gcm";
+function encryptionKey() {
+  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
+  return crypto.createHash("sha256").update(raw).digest();
+}
+function decrypt(blob) {
+  const buf = Buffer.from(blob, "base64");
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const data = buf.subarray(28);
+  const key = encryptionKey();
+  const decipher = crypto.createDecipheriv(ALGO, key, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
+}
+function envCredentials() {
+  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
+  if (!token) return null;
+  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
+  return { token, locationId, source: "env" };
+}
+function resolveGhlCredentials(db2, adminUserId) {
+  const env = envCredentials();
+  if (env) return env;
+  let uid = adminUserId;
+  if (uid == null) {
+    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
+    uid = row?.id;
+  }
+  if (uid == null) return null;
+  const stored = db2.prepare(
+    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
+  ).get(uid);
+  if (!stored?.api_token_enc) return null;
+  try {
+    const token = decrypt(stored.api_token_enc);
+    return {
+      token,
+      locationId: stored.location_id?.trim() || void 0,
+      source: "dashboard"
+    };
+  } catch {
+    return null;
+  }
+}
+
+// server/ghl-automation.ts
+var PAPA_VOICE_SYSTEM = `You are Brian Keith Hill's Papa Life AI strategist \u2014 warm, direct, faith-informed, 9th-grade reading level.
+Brand: Boss Mobile Life Coach / PAPA Life \u2014 fathers of adult children rebuilding connection.
+Never sound corporate. Sound like Brian talking to one dad at a time.`;
+var OUTREACH_NOTE_SYSTEM = `${PAPA_VOICE_SYSTEM}
+Write exactly 3 sentences for a GoHighLevel contact note \u2014 a warm Papa Life outreach opener in Brian's voice.
+No bullet points. No subject line. No sign-off block.`;
+var VOICE_BRIEF_SYSTEM = `${PAPA_VOICE_SYSTEM}
+The user (Brian) will HEAR this aloud in Claude voice mode. Write 2\u20134 short spoken sentences:
+who just came in, why they matter, and one suggested next move. Conversational, present tense.`;
 function anthropicKey2() {
   return process.env.ANTHROPIC_API_KEY?.trim() || process.env.CLAUDE_API_KEY?.trim() || null;
 }
@@ -1617,11 +1415,11 @@ function buildOutboundCloudPayload(input, result) {
 }
 async function postJsonToCloudWebhook(db2, url, payload, alertId) {
   const secret = webhookSecret();
-  const headers3 = { "Content-Type": "application/json" };
-  if (secret) headers3.Authorization = `Bearer ${secret}`;
+  const headers2 = { "Content-Type": "application/json" };
+  if (secret) headers2.Authorization = `Bearer ${secret}`;
   const r = await fetch(url, {
     method: "POST",
-    headers: headers3,
+    headers: headers2,
     body: JSON.stringify(payload)
   });
   const body = await r.text();
@@ -1870,30 +1668,16 @@ function automationStatusPayload(db2) {
     ghl_settings_path: `${base}/crm-console (sidebar \u2192 Settings)`
   };
 }
-var PAPA_VOICE_SYSTEM, OUTREACH_NOTE_SYSTEM, VOICE_BRIEF_SYSTEM;
-var init_ghl_automation = __esm({
-  "server/ghl-automation.ts"() {
-    "use strict";
-    init_ghl_integration_store();
-    PAPA_VOICE_SYSTEM = `You are Brian Keith Hill's Papa Life AI strategist \u2014 warm, direct, faith-informed, 9th-grade reading level.
-Brand: Boss Mobile Life Coach / PAPA Life \u2014 fathers of adult children rebuilding connection.
-Never sound corporate. Sound like Brian talking to one dad at a time.`;
-    OUTREACH_NOTE_SYSTEM = `${PAPA_VOICE_SYSTEM}
-Write exactly 3 sentences for a GoHighLevel contact note \u2014 a warm Papa Life outreach opener in Brian's voice.
-No bullet points. No subject line. No sign-off block.`;
-    VOICE_BRIEF_SYSTEM = `${PAPA_VOICE_SYSTEM}
-The user (Brian) will HEAR this aloud in Claude voice mode. Write 2\u20134 short spoken sentences:
-who just came in, why they matter, and one suggested next move. Conversational, present tense.`;
-  }
-});
 
 // server/ghl-api.ts
-function headers2(token) {
+var GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+var GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
+function headers(token) {
   return {
     Authorization: `Bearer ${token}`,
     Accept: "application/json",
     "Content-Type": "application/json",
-    Version: GHL_VERSION2
+    Version: GHL_VERSION
   };
 }
 function smsScopeHint(message) {
@@ -1937,9 +1721,9 @@ async function ghlMoveOpportunityStage(args, creds) {
     ...args.pipeline_id || args.pipelineId ? { pipelineId: String(args.pipeline_id || args.pipelineId).trim() } : {},
     ...args.status ? { status: String(args.status).trim() } : {}
   });
-  const r = await fetch(`${GHL_BASE2}/opportunities/${encodeURIComponent(oppId)}`, {
+  const r = await fetch(`${GHL_BASE}/opportunities/${encodeURIComponent(oppId)}`, {
     method: "PUT",
-    headers: headers2(creds.token),
+    headers: headers(creds.token),
     body: JSON.stringify(body)
   });
   const text = await r.text();
@@ -1989,9 +1773,9 @@ async function ghlNurtureSmsSend(args, creds) {
     };
   }
   const payload = { type: "SMS", contactId, message };
-  const r = await fetch(`${GHL_BASE2}/conversations/messages`, {
+  const r = await fetch(`${GHL_BASE}/conversations/messages`, {
     method: "POST",
-    headers: headers2(creds.token),
+    headers: headers(creds.token),
     body: JSON.stringify(payload)
   });
   const text = await r.text();
@@ -2025,24 +1809,17 @@ async function ghlNurtureSmsSend(args, creds) {
 function getGhlCredentialsForMcp(db2, adminUserId) {
   return resolveGhlCredentials(db2, adminUserId);
 }
-var GHL_BASE2, GHL_VERSION2;
-var init_ghl_api = __esm({
-  "server/ghl-api.ts"() {
-    "use strict";
-    init_ghl_integration_store();
-    GHL_BASE2 = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
-    GHL_VERSION2 = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
-  }
-});
 
 // server/integration-health.ts
+var GHL_API_BASE = process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com";
+var GHL_API_VERSION = process.env.GHL_API_VERSION || "2021-07-28";
 function configured(name) {
   return Boolean((process.env[name] || "").trim());
 }
-function redact(value2) {
-  if (!value2) return "not configured";
-  if (value2.length <= 8) return "configured";
-  return `${value2.slice(0, 3)}\u2026${value2.slice(-3)}`;
+function redact(value) {
+  if (!value) return "not configured";
+  if (value.length <= 8) return "configured";
+  return `${value.slice(0, 3)}\u2026${value.slice(-3)}`;
 }
 async function fetchWithTimeout(url, init = {}, timeoutMs = 1e4) {
   const controller = new AbortController();
@@ -2205,24 +1982,14 @@ async function orchestrationHealthCheck() {
     }
   };
 }
-var GHL_API_BASE, GHL_API_VERSION;
-var init_integration_health = __esm({
-  "server/integration-health.ts"() {
-    "use strict";
-    GHL_API_BASE = process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com";
-    GHL_API_VERSION = process.env.GHL_API_VERSION || "2021-07-28";
-  }
-});
 
 // server/mcp-handlers.ts
-var mcp_handlers_exports = {};
-__export(mcp_handlers_exports, {
-  PAPALIFE_MCP_TOOL_DEFINITIONS: () => PAPALIFE_MCP_TOOL_DEFINITIONS,
-  handlePapalifeTool: () => handlePapalifeTool
-});
-import Database from "better-sqlite3";
-import fs from "fs";
-import path from "path";
+var dbPath = path.resolve(process.cwd(), "leads.db");
+var db = new Database(dbPath);
+ensureResearchTables(db);
+ensureSiteCtasTable(db);
+ensureSiteMediaTable(db);
+ensurePricingSettingsTable(db);
 function ensureIntakeSubmissionContactSchema() {
   const cols = db.prepare("PRAGMA table_info(intake_submissions)").all();
   if (!cols.length) return;
@@ -2277,6 +2044,772 @@ function ensureIntakeSubmissionContactSchema() {
     throw err;
   }
 }
+ensureIntakeSubmissionContactSchema();
+ensureGhlAutomationTables(db);
+var PAPALIFE_MCP_TOOL_DEFINITIONS = [
+  {
+    name: "get_site_endpoints",
+    description: "Return public URLs for Papalife site and MCP endpoint.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_automation_status",
+    description: "GHL + Make.com automation map for Brian: Scenario 5259259 (new contact \u2192 note), Scenario 5259335 (MCP \u2192 Claude), webhook URLs, and voice-mode instructions for Claude Desktop.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_claude_complete",
+    description: 'Cloud round-trip inbound: same as POST /api/automation/claude-prompt with body {"prompt":"..."}. Returns { ok, prompt, response, model, voice: papa_life }.',
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Required \u2014 what Claude should process" },
+        context: { type: "string", description: "Optional CRM/GHL context prepended" }
+      },
+      required: ["prompt"]
+    }
+  },
+  {
+    name: "papalife_forward_alert_to_cloud",
+    description: "POST outbound JSON webhook to AUTOMATION_CLOUD_WEBHOOK_URL (Make Scenario 5259335). Includes prompt + contact + inbound.claude_prompt_url for back-and-forth.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        alert_id: { type: "number", description: "ghl_contact_alerts.id from papalife_process_ghl_new_contact" }
+      },
+      required: ["alert_id"]
+    }
+  },
+  {
+    name: "papalife_get_webhook_contract",
+    description: `Return the JSON webhook contract (outbound + inbound {"prompt"} format) for Brian's cloud / Make setup.`,
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_process_ghl_new_contact",
+    description: "Process a new GoHighLevel contact: sync to site CRM leads, generate outreach note + voice_prompt for Brian's Claude voice chat. Use when GHL fires or Make forwards contact JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ghl_contact_id: { type: "string" },
+        first_name: { type: "string" },
+        last_name: { type: "string" },
+        email: { type: "string" },
+        phone: { type: "string" },
+        source: { type: "string" },
+        tags: { type: "array", items: { type: "string" } },
+        outreach_note: { type: "string", description: "Skip regeneration if Make Scenario 1 already wrote the note" }
+      }
+    }
+  },
+  {
+    name: "papalife_list_ghl_contact_alerts",
+    description: "List unread GHL new-contact alerts with voice_prompt \u2014 Brian's Claude reads these in voice mode when a new lead lands.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        unread_only: { type: "boolean", description: "Default true" },
+        limit: { type: "number" },
+        mark_read_ids: {
+          type: "array",
+          items: { type: "number" },
+          description: "Optional alert ids to mark read after Brian reviews"
+        }
+      }
+    }
+  },
+  {
+    name: "papalife_ghl_move_opportunity_stage",
+    description: "Move a GHL opportunity to a new pipeline stage (Brian's GHL token on this server). Pass id/opportunity_id + pipelineStageId/pipeline_stage_id.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        opportunity_id: { type: "string" },
+        id: { type: "string", description: "Alias for opportunity_id" },
+        pipeline_stage_id: { type: "string" },
+        pipelineStageId: { type: "string" },
+        pipeline_id: { type: "string" },
+        status: { type: "string", description: "open, won, lost, abandoned" }
+      }
+    }
+  },
+  {
+    name: "papalife_nurture_sms_send",
+    description: "Send nurture SMS via GHL conversations API (not Twilio). Uses the token Brian saves in CRM \u2192 Settings (SMS scope required on the PIT).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ghl_contact_id: { type: "string" },
+        contact_id: { type: "string" },
+        body: { type: "string" },
+        dry_run: { type: "boolean" }
+      },
+      required: ["body"]
+    }
+  },
+  {
+    name: "bossmobile_research_workflow_brief",
+    description: "IMPORTANT for Boss Mobile / PAPA Life: Read this first when the user pastes huge research notes. Explains the Research Lab workflow \u2014 do NOT ask the team to read raw note dumps; guide them to capture notes in the app, analyze, then generate social content.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_course_content_workflow_brief",
+    description: "CRITICAL for PAPA Life curriculum / Vision Documents: Read this before suggesting any handoff. Tells agents to put learning materials into the on-site courses/lessons system (MCP) so members see them in /portal \u2014 NOT to email Google Doc Master KB update steps or ask humans to paste Vision docs into external docs as the delivery path.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_integration_configuration_summary",
+    description: "Report whether required HighLevel, Make.com, Claude, and MCP environment settings are present. Does NOT return secret values \u2014 previews only. Read-only, no side effects.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_ghl_connection_diagnostic",
+    description: "Read-only HighLevel connection diagnostic. Tests token presence, location ID presence, location API access, and contacts API access. Reports 401/403 scope issues safely. No contacts created or modified.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_make_webhook_diagnostic",
+    description: "Send a clearly-marked dry_run payload to the configured Make.com webhook. URL is never caller-supplied. Confirms webhook connectivity without triggering real automations.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "papalife_orchestration_health_check",
+    description: "Combined read-only report: HighLevel connectivity, Make.com webhook, Claude key, MCP auth, and dry-run protections. Confirms messages_sent:false, records_mutated:false, secrets_returned:false.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "create_brand_research_dump",
+    description: "Save a large research / planning note dump (Boss Mobile / PAPA Life). Replaces emailing walls of text. Then call analyze_brand_research_dump.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Short label for this capture" },
+        raw_notes: { type: "string", description: "Full pasted notes (can be very long)" }
+      },
+      required: ["raw_notes"]
+    }
+  },
+  {
+    name: "list_brand_research_dumps",
+    description: "List recent research captures (title, size, analysis status).",
+    inputSchema: {
+      type: "object",
+      properties: { limit: { type: "number" } }
+    }
+  },
+  {
+    name: "get_brand_research_dump",
+    description: "Get one dump by id. Set include_raw true only when necessary (large payload).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "number" },
+        include_raw: { type: "boolean" }
+      },
+      required: ["id"]
+    }
+  },
+  {
+    name: "analyze_brand_research_dump",
+    description: "Run AI summary + theme extraction on a dump (server uses ANTHROPIC_API_KEY / Claude). Produces executive summary for social generation.",
+    inputSchema: {
+      type: "object",
+      properties: { id: { type: "number" } },
+      required: ["id"]
+    }
+  },
+  {
+    name: "generate_social_from_research_dump",
+    description: "After analysis: generate draft social posts (Instagram, LinkedIn, Facebook, X, YouTube Shorts ideas). Optional replace=true clears prior drafts for that dump.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "number" },
+        platforms: {
+          type: "array",
+          items: { type: "string" },
+          description: "e.g. instagram, linkedin, facebook, x, youtube_shorts"
+        },
+        replace: { type: "boolean" }
+      },
+      required: ["id"]
+    }
+  },
+  {
+    name: "list_social_suggestions_for_dump",
+    description: "List generated social post drafts linked to a research dump.",
+    inputSchema: {
+      type: "object",
+      properties: { dump_id: { type: "number" } },
+      required: ["dump_id"]
+    }
+  },
+  {
+    name: "approve_social_suggestion",
+    description: "Mark a draft as approved, rejected, or posted after human review.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        suggestion_id: { type: "number" },
+        status: { type: "string", description: "draft | approved | rejected | posted" }
+      },
+      required: ["suggestion_id", "status"]
+    }
+  },
+  {
+    name: "site_cta_placement_guide",
+    description: "Lists placement keys for site_ctas \u2014 use with upsert_site_cta so CTAs appear on the public site and member learning areas.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "list_site_ctas",
+    description: "List marketing CTAs (optional filter by placement).",
+    inputSchema: {
+      type: "object",
+      properties: { placement: { type: "string", description: "Filter by single placement key" } }
+    }
+  },
+  {
+    name: "get_pricing_structure",
+    description: "Get current pricing config used by public checkout and member trial/billing flows.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "update_pricing_structure",
+    description: "Update pricing config so Boss can change it via MCP agents without dev changes.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        member_trial_hours: { type: "number", description: "Trial duration in hours (e.g. 24)" },
+        member_price_usd_cents: { type: "number", description: "Price in cents (e.g. 499 for $4.99)" },
+        member_currency: { type: "string", description: "ISO currency code (e.g. usd)" },
+        member_product_name: { type: "string", description: "Checkout product label" },
+        member_stripe_price_id: {
+          type: "string",
+          description: "Stripe price id for Checkout (optional; leave blank to use inline amount)"
+        },
+        checkout_payment_link: {
+          type: "string",
+          description: "Public strategist checkout link shown in forms"
+        }
+      }
+    }
+  },
+  {
+    name: "upsert_site_cta",
+    description: "Create or update a CTA block. Omit id to create. variant: amber | outline | minimal. active defaults true.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "number", description: "Set to update existing row" },
+        placement: { type: "string" },
+        headline: { type: "string" },
+        body: { type: "string" },
+        button_label: { type: "string" },
+        button_url: { type: "string" },
+        variant: { type: "string" },
+        active: { type: "boolean" },
+        sort_order: { type: "number" }
+      },
+      required: ["placement"]
+    }
+  },
+  {
+    name: "delete_site_cta",
+    description: "Delete a site CTA by id.",
+    inputSchema: {
+      type: "object",
+      properties: { id: { type: "number" } },
+      required: ["id"]
+    }
+  },
+  {
+    name: "site_media_placement_guide",
+    description: "Lists MCP-managed site media slots. Use upsert_site_media to swap campaign video/image assets without code changes.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "list_site_media",
+    description: "List MCP-managed site media slots (optional filter by placement).",
+    inputSchema: {
+      type: "object",
+      properties: { placement: { type: "string", description: "Filter by single placement key" } }
+    }
+  },
+  {
+    name: "upsert_site_media",
+    description: "Create or update a site media slot. Placements: home_plan_video, home_framework_image (image), papa_journey_video_top (funnel hero, before copy), papa_journey_video_assessment (above self-assessment CTA), papa_journey_video_membership (above $4.99 join CTA). Use direct video URL (/media/file.mp4, CDN mp4, HeyGen mp4) or embed URL with media_type 'embed'.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        placement: { type: "string" },
+        media_url: { type: "string", description: "Direct media URL. Use /media/... after admin upload for hosted files." },
+        media_type: { type: "string", description: "video | image. Defaults to video." },
+        poster_url: { type: "string", description: "Optional poster image shown before play." },
+        alt_text: { type: "string", description: "Accessible label for the media." },
+        title: { type: "string", description: "Internal campaign/media title." },
+        active: { type: "boolean" }
+      },
+      required: ["placement", "media_url"]
+    }
+  },
+  {
+    name: "delete_site_media",
+    description: "Delete a site media slot by placement.",
+    inputSchema: {
+      type: "object",
+      properties: { placement: { type: "string" } },
+      required: ["placement"]
+    }
+  },
+  {
+    name: "get_intake_submissions",
+    description: "List recent strategist intake submissions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: { type: "number" }
+      }
+    }
+  },
+  {
+    name: "create_intake_submission",
+    description: "Create a new intake submission from AI chat/call capture. Require at least one contact method: email or phone.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        first_name: { type: "string" },
+        email: { type: "string" },
+        phone: { type: "string" },
+        situation: { type: "string" },
+        routed_pillar: { type: "string" },
+        disconnected_pillar: { type: "string" },
+        vision: { type: "string" }
+      },
+      required: ["first_name", "situation", "routed_pillar"]
+    }
+  },
+  {
+    name: "log_engagement_event",
+    description: "Log an engagement event and keep conversion pipeline synced.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        email: { type: "string" },
+        event_type: { type: "string" },
+        event_detail: { type: "string" }
+      },
+      required: ["email", "event_type"]
+    }
+  },
+  {
+    name: "get_content_tree",
+    description: "Return courses with nested lessons and drip metadata. Call first when aligning Vision Documents or curriculum to existing site content.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "create_course",
+    description: "Create a new learning course. Primary delivery path for program material (e.g. Papa Life Relationship Reset, Vision 1\u201316 series): members see it in /portal; public marketing list at /courses when show_in_catalog is true.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        pillar: { type: "string" },
+        sort_order: { type: "number" },
+        show_in_catalog: { type: "boolean", description: "If true (default), course appears on public /courses marketing catalog." }
+      },
+      required: ["title"]
+    }
+  },
+  {
+    name: "update_course",
+    description: "Update an existing learning course.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        course_id: { type: "number" },
+        title: { type: "string" },
+        description: { type: "string" },
+        pillar: { type: "string" },
+        sort_order: { type: "number" },
+        show_in_catalog: { type: "boolean" }
+      },
+      required: ["course_id"]
+    }
+  },
+  {
+    name: "create_lesson",
+    description: "Create a lesson under a course. Map each Vision Document or module to a lesson; use description for text outline. Set content_url after uploading media via admin POST /api/admin/upload (see get_site_endpoints).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        course_id: { type: "number" },
+        title: { type: "string" },
+        description: { type: "string" },
+        content_url: { type: "string" },
+        content_type: { type: "string" },
+        duration_minutes: { type: "number" },
+        sort_order: { type: "number" }
+      },
+      required: ["course_id", "title"]
+    }
+  },
+  {
+    name: "update_lesson",
+    description: "Update a lesson record (set content_url after uploading via POST /api/admin/upload).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        lesson_id: { type: "number" },
+        title: { type: "string" },
+        description: { type: "string" },
+        content_url: { type: "string" },
+        content_type: { type: "string" },
+        duration_minutes: { type: "number" },
+        sort_order: { type: "number" }
+      },
+      required: ["lesson_id"]
+    }
+  },
+  {
+    name: "delete_lesson",
+    description: "Delete a lesson by id.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        lesson_id: { type: "number" }
+      },
+      required: ["lesson_id"]
+    }
+  },
+  {
+    name: "set_drip_rule",
+    description: "Set or update drip-release rule for lesson.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        lesson_id: { type: "number" },
+        release_days_after_enroll: { type: "number" }
+      },
+      required: ["lesson_id", "release_days_after_enroll"]
+    }
+  },
+  {
+    name: "publish_content",
+    description: "Snapshot current course/lesson structure as a published version.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        course_id: { type: "number" },
+        summary: { type: "string" }
+      },
+      required: ["course_id"]
+    }
+  },
+  {
+    name: "get_member_progress",
+    description: "Return member lesson completion and percent for each course.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        member_id: { type: "number" }
+      },
+      required: ["member_id"]
+    }
+  },
+  {
+    name: "get_journal_prompts",
+    description: "List journal prompts editable by admins.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "create_journal_prompt",
+    description: "Create a new journal prompt.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        pillar: { type: "string" },
+        prompt_text: { type: "string" },
+        sort_order: { type: "number" }
+      },
+      required: ["pillar", "prompt_text"]
+    }
+  },
+  {
+    name: "update_journal_prompt",
+    description: "Update text/order for a journal prompt.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "number" },
+        pillar: { type: "string" },
+        prompt_text: { type: "string" },
+        sort_order: { type: "number" }
+      },
+      required: ["id"]
+    }
+  },
+  {
+    name: "delete_journal_prompt",
+    description: "Delete a journal prompt.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "number" }
+      },
+      required: ["id"]
+    }
+  },
+  {
+    name: "get_form_schema",
+    description: "Return editable form question schema for a form key.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        form_key: { type: "string" }
+      },
+      required: ["form_key"]
+    }
+  },
+  {
+    name: "upsert_form_question",
+    description: "Create or update a form question row.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        form_key: { type: "string" },
+        question_key: { type: "string" },
+        label: { type: "string" },
+        help_text: { type: "string" },
+        input_type: { type: "string" },
+        required: { type: "boolean" },
+        sort_order: { type: "number" },
+        placeholder: { type: "string" },
+        options: { type: "array", items: { type: "string" } },
+        active: { type: "boolean" }
+      },
+      required: ["form_key", "question_key", "label"]
+    }
+  },
+  {
+    name: "delete_form_question",
+    description: "Delete a form question from a form schema.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        form_key: { type: "string" },
+        question_key: { type: "string" }
+      },
+      required: ["form_key", "question_key"]
+    }
+  },
+  {
+    name: "get_members",
+    description: "List member accounts and portal status.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: { type: "number" }
+      }
+    }
+  },
+  {
+    name: "set_member_portal_access",
+    description: "Enable/disable member portal login access.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        member_id: { type: "number" },
+        active: { type: "boolean" }
+      },
+      required: ["member_id", "active"]
+    }
+  },
+  {
+    name: "get_member_course_access",
+    description: "Get all courses and whether the member can access each one.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        member_id: { type: "number" }
+      },
+      required: ["member_id"]
+    }
+  },
+  {
+    name: "set_member_course_access",
+    description: "Grant or revoke member access to a specific course.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        member_id: { type: "number" },
+        course_id: { type: "number" },
+        granted: { type: "boolean" }
+      },
+      required: ["member_id", "course_id", "granted"]
+    }
+  },
+  // ── HeyGen Video Tools ──────────────────────────────────────────────────────
+  {
+    name: "bossmobile_heygen_guide",
+    description: "IMPORTANT: Read this first before using HeyGen tools. Returns the full video pipeline guide \u2014 covers site pages, Google Drive docs, agent session notes, Research Lab dumps as script sources, plus avatar/voice setup.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "bossmobile_heygen_list_avatars",
+    description: "List HeyGen studio avatars and talking photos (your trained faces). GET /v2/avatars.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "bossmobile_heygen_list_voices",
+    description: "List HeyGen AI voices including clones. GET /v2/voices.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name_contains: { type: "string", description: "Filter voices by name (case-insensitive)" },
+        limit: { type: "number", description: "Max results (1-500, default 400)" }
+      }
+    }
+  },
+  {
+    name: "bossmobile_heygen_fetch_page",
+    description: "Fetch a page from bossmobilelifecoach.com and strip HTML to plain text for script grounding.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: "Page path, e.g. / or /courses" }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "bossmobile_heygen_script_from_pages",
+    description: "Generate spoken narration script from one or more site pages. Claude writes a HeyGen-ready script grounded in the page content. Requires ANTHROPIC_API_KEY.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        paths: { type: "array", items: { type: "string" }, description: 'Array of site paths like ["/", "/courses"]' },
+        goal: { type: "string", description: "What the video should achieve" },
+        duration_seconds_hint: { type: "number", description: "Target duration in seconds (default 45)" },
+        tone: { type: "string", description: "Tone guidance (default: warm, mentor-like, conversational)" },
+        max_chars: { type: "number", description: "Max chars per page excerpt (default 4500)" }
+      },
+      required: ["paths"]
+    }
+  },
+  {
+    name: "bossmobile_heygen_script_from_text",
+    description: "Generate spoken narration script from raw text \u2014 paste Google Drive doc content, agent session notes, lesson outlines, or any text. Claude converts it to a HeyGen-ready spoken script. Requires ANTHROPIC_API_KEY.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        text: { type: "string", description: "Raw text to convert \u2014 Google Drive doc export, agent session notes, lesson outline, etc." },
+        goal: { type: "string", description: "What the video should achieve" },
+        duration_seconds_hint: { type: "number", description: "Target duration in seconds (default 60)" },
+        tone: { type: "string", description: "Tone guidance (default: warm, mentor-like, conversational)" },
+        source_label: { type: "string", description: "Label for the source (e.g. 'Vision Doc 3', 'Google Drive export', 'agent session')" }
+      },
+      required: ["text"]
+    }
+  },
+  {
+    name: "bossmobile_heygen_video_agent",
+    description: "Create a video via HeyGen Video Agent v3. Pass the script as prompt. Uses the Brian Keith Hill voice guard; any non-Brian voice_id fails. Requires HEYGEN_API_KEY.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Script / prompt for the video (1-10000 chars)" },
+        mode: { type: "string", description: "generate (default) or chat" },
+        avatar_id: { type: "string", description: "Studio avatar ID (mutually exclusive with talking_photo_id)" },
+        talking_photo_id: { type: "string", description: "Photo avatar ID (mutually exclusive with avatar_id)" },
+        voice_id: { type: "string", description: "Must match the Brian Keith Hill voice ID if provided" },
+        orientation: { type: "string", description: "landscape or portrait" },
+        callback_url: { type: "string", description: "Webhook for completion" },
+        callback_id: { type: "string", description: "Custom callback ID" },
+        auto_proceed: { type: "boolean", description: "Auto-proceed without manual review" },
+        style_id: { type: "string", description: "HeyGen style ID" }
+      },
+      required: ["prompt"]
+    }
+  },
+  {
+    name: "bossmobile_heygen_video_status",
+    description: "Poll HeyGen video generation status. GET /v3/videos/{video_id}. Returns video_url when completed.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        video_id: { type: "string", description: "Video ID from bossmobile_heygen_video_agent" }
+      },
+      required: ["video_id"]
+    }
+  },
+  {
+    name: "bossmobile_lesson_set_content_url",
+    description: "Smart setter \u2014 give it any lesson URL (YouTube watch/short/embed, HeyGen embed, Google Drive share/view, direct .mp4/.mp3/.pdf, or /media/ upload) and it normalizes to the canonical form the site's LessonMediaPlayer expects (YouTube \u2192 /embed/{id}, Drive \u2192 /file/d/{id}/preview, HeyGen embed \u2192 pass-through) and writes content_url + content_type onto the lesson. Prefer this over update_lesson when attaching new media \u2014 it guarantees the right format so the player renders correctly.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        lesson_id: { type: "number", description: "Lesson id" },
+        url: { type: "string", description: "Any lesson URL (YouTube, HeyGen, Drive, direct file, /media/ upload)" },
+        content_type_hint: {
+          type: "string",
+          description: "Optional override: 'video', 'audio', 'pdf', or 'document'. Only used when the URL itself is ambiguous (e.g. Drive or /media/)."
+        }
+      },
+      required: ["lesson_id", "url"]
+    }
+  },
+  {
+    name: "bossmobile_lessons_normalize_all",
+    description: "Scan every lesson with a non-empty content_url and show what would change if normalized to the player's expected format. Dry-run by default (dry_run=true). Set dry_run=false to actually apply the updates. Use this to fix legacy YouTube watch URLs, Google Drive share URLs, etc., in one pass.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        dry_run: { type: "boolean", description: "Default true \u2014 preview changes without writing" }
+      }
+    }
+  },
+  {
+    name: "bossmobile_publish_video_playbook",
+    description: "End-to-end publishing playbook: HeyGen \u2192 YouTube (via the caller's own Composio YouTube connection) \u2192 embed into a course lesson. Inspects HeyGen status + lesson row and returns the exact next-step playbook with all YouTube upload arguments pre-filled (title/description/tags/category/privacy). Re-call repeatedly while HeyGen renders \u2014 response state flips from 'rendering' to 'ready_to_upload' when the MP4 is ready. Brian's agent executes the upload with HIS OWN Composio YouTube connection (YOUTUBE_MULTIPART_UPLOAD_VIDEO). The papalife MCP never touches Composio credentials.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        heygen_video_id: {
+          type: "string",
+          description: "HeyGen video id returned by bossmobile_heygen_video_agent"
+        },
+        lesson_id: {
+          type: "number",
+          description: "Destination lesson id \u2014 the YouTube embed URL will be written here via update_lesson in step 3"
+        },
+        title: {
+          type: "string",
+          description: "Override YouTube title (defaults to the lesson title, max 100 chars)"
+        },
+        description: {
+          type: "string",
+          description: "Override YouTube description (defaults to the lesson description)"
+        },
+        privacy_status: {
+          type: "string",
+          description: "'public', 'unlisted' (default), or 'private'"
+        },
+        category_id: {
+          type: "string",
+          description: "YouTube category id (default '27' Education)"
+        },
+        tags: {
+          type: "array",
+          items: { type: "string" },
+          description: "YouTube tags (defaults to Papa Life / fatherhood coaching)"
+        }
+      },
+      required: ["heygen_video_id", "lesson_id"]
+    }
+  }
+];
 function normEmail(v) {
   return String(v ?? "").trim().toLowerCase();
 }
@@ -3141,815 +3674,15 @@ async function handlePapalifeTool(name, args) {
       throw new Error(`Unknown tool: ${name}`);
   }
 }
-var dbPath, db, PAPALIFE_MCP_TOOL_DEFINITIONS;
-var init_mcp_handlers = __esm({
-  "server/mcp-handlers.ts"() {
-    "use strict";
-    init_research_store();
-    init_research_ai();
-    init_research_access();
-    init_site_ctas_store();
-    init_site_media_store();
-    init_pricing_store();
-    init_sync_intake_to_crm();
-    init_heygen_mcp();
-    init_heygen_publish();
-    init_lesson_content_normalize();
-    init_ghl_automation();
-    init_ghl_api();
-    init_integration_health();
-    dbPath = path.resolve(process.cwd(), "leads.db");
-    db = new Database(dbPath);
-    ensureResearchTables(db);
-    ensureSiteCtasTable(db);
-    ensureSiteMediaTable(db);
-    ensurePricingSettingsTable(db);
-    ensureIntakeSubmissionContactSchema();
-    ensureGhlAutomationTables(db);
-    PAPALIFE_MCP_TOOL_DEFINITIONS = [
-      {
-        name: "get_site_endpoints",
-        description: "Return public URLs for Papalife site and MCP endpoint.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_automation_status",
-        description: "GHL + Make.com automation map for Brian: Scenario 5259259 (new contact \u2192 note), Scenario 5259335 (MCP \u2192 Claude), webhook URLs, and voice-mode instructions for Claude Desktop.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_claude_complete",
-        description: 'Cloud round-trip inbound: same as POST /api/automation/claude-prompt with body {"prompt":"..."}. Returns { ok, prompt, response, model, voice: papa_life }.',
-        inputSchema: {
-          type: "object",
-          properties: {
-            prompt: { type: "string", description: "Required \u2014 what Claude should process" },
-            context: { type: "string", description: "Optional CRM/GHL context prepended" }
-          },
-          required: ["prompt"]
-        }
-      },
-      {
-        name: "papalife_forward_alert_to_cloud",
-        description: "POST outbound JSON webhook to AUTOMATION_CLOUD_WEBHOOK_URL (Make Scenario 5259335). Includes prompt + contact + inbound.claude_prompt_url for back-and-forth.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            alert_id: { type: "number", description: "ghl_contact_alerts.id from papalife_process_ghl_new_contact" }
-          },
-          required: ["alert_id"]
-        }
-      },
-      {
-        name: "papalife_get_webhook_contract",
-        description: `Return the JSON webhook contract (outbound + inbound {"prompt"} format) for Brian's cloud / Make setup.`,
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_process_ghl_new_contact",
-        description: "Process a new GoHighLevel contact: sync to site CRM leads, generate outreach note + voice_prompt for Brian's Claude voice chat. Use when GHL fires or Make forwards contact JSON.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            ghl_contact_id: { type: "string" },
-            first_name: { type: "string" },
-            last_name: { type: "string" },
-            email: { type: "string" },
-            phone: { type: "string" },
-            source: { type: "string" },
-            tags: { type: "array", items: { type: "string" } },
-            outreach_note: { type: "string", description: "Skip regeneration if Make Scenario 1 already wrote the note" }
-          }
-        }
-      },
-      {
-        name: "papalife_list_ghl_contact_alerts",
-        description: "List unread GHL new-contact alerts with voice_prompt \u2014 Brian's Claude reads these in voice mode when a new lead lands.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            unread_only: { type: "boolean", description: "Default true" },
-            limit: { type: "number" },
-            mark_read_ids: {
-              type: "array",
-              items: { type: "number" },
-              description: "Optional alert ids to mark read after Brian reviews"
-            }
-          }
-        }
-      },
-      {
-        name: "papalife_ghl_move_opportunity_stage",
-        description: "Move a GHL opportunity to a new pipeline stage (Brian's GHL token on this server). Pass id/opportunity_id + pipelineStageId/pipeline_stage_id.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            opportunity_id: { type: "string" },
-            id: { type: "string", description: "Alias for opportunity_id" },
-            pipeline_stage_id: { type: "string" },
-            pipelineStageId: { type: "string" },
-            pipeline_id: { type: "string" },
-            status: { type: "string", description: "open, won, lost, abandoned" }
-          }
-        }
-      },
-      {
-        name: "papalife_nurture_sms_send",
-        description: "Send nurture SMS via GHL conversations API (not Twilio). Uses the token Brian saves in CRM \u2192 Settings (SMS scope required on the PIT).",
-        inputSchema: {
-          type: "object",
-          properties: {
-            ghl_contact_id: { type: "string" },
-            contact_id: { type: "string" },
-            body: { type: "string" },
-            dry_run: { type: "boolean" }
-          },
-          required: ["body"]
-        }
-      },
-      {
-        name: "bossmobile_research_workflow_brief",
-        description: "IMPORTANT for Boss Mobile / PAPA Life: Read this first when the user pastes huge research notes. Explains the Research Lab workflow \u2014 do NOT ask the team to read raw note dumps; guide them to capture notes in the app, analyze, then generate social content.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_course_content_workflow_brief",
-        description: "CRITICAL for PAPA Life curriculum / Vision Documents: Read this before suggesting any handoff. Tells agents to put learning materials into the on-site courses/lessons system (MCP) so members see them in /portal \u2014 NOT to email Google Doc Master KB update steps or ask humans to paste Vision docs into external docs as the delivery path.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_integration_configuration_summary",
-        description: "Report whether required HighLevel, Make.com, Claude, and MCP environment settings are present. Does NOT return secret values \u2014 previews only. Read-only, no side effects.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_ghl_connection_diagnostic",
-        description: "Read-only HighLevel connection diagnostic. Tests token presence, location ID presence, location API access, and contacts API access. Reports 401/403 scope issues safely. No contacts created or modified.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_make_webhook_diagnostic",
-        description: "Send a clearly-marked dry_run payload to the configured Make.com webhook. URL is never caller-supplied. Confirms webhook connectivity without triggering real automations.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "papalife_orchestration_health_check",
-        description: "Combined read-only report: HighLevel connectivity, Make.com webhook, Claude key, MCP auth, and dry-run protections. Confirms messages_sent:false, records_mutated:false, secrets_returned:false.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "create_brand_research_dump",
-        description: "Save a large research / planning note dump (Boss Mobile / PAPA Life). Replaces emailing walls of text. Then call analyze_brand_research_dump.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            title: { type: "string", description: "Short label for this capture" },
-            raw_notes: { type: "string", description: "Full pasted notes (can be very long)" }
-          },
-          required: ["raw_notes"]
-        }
-      },
-      {
-        name: "list_brand_research_dumps",
-        description: "List recent research captures (title, size, analysis status).",
-        inputSchema: {
-          type: "object",
-          properties: { limit: { type: "number" } }
-        }
-      },
-      {
-        name: "get_brand_research_dump",
-        description: "Get one dump by id. Set include_raw true only when necessary (large payload).",
-        inputSchema: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            include_raw: { type: "boolean" }
-          },
-          required: ["id"]
-        }
-      },
-      {
-        name: "analyze_brand_research_dump",
-        description: "Run AI summary + theme extraction on a dump (server uses ANTHROPIC_API_KEY / Claude). Produces executive summary for social generation.",
-        inputSchema: {
-          type: "object",
-          properties: { id: { type: "number" } },
-          required: ["id"]
-        }
-      },
-      {
-        name: "generate_social_from_research_dump",
-        description: "After analysis: generate draft social posts (Instagram, LinkedIn, Facebook, X, YouTube Shorts ideas). Optional replace=true clears prior drafts for that dump.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            platforms: {
-              type: "array",
-              items: { type: "string" },
-              description: "e.g. instagram, linkedin, facebook, x, youtube_shorts"
-            },
-            replace: { type: "boolean" }
-          },
-          required: ["id"]
-        }
-      },
-      {
-        name: "list_social_suggestions_for_dump",
-        description: "List generated social post drafts linked to a research dump.",
-        inputSchema: {
-          type: "object",
-          properties: { dump_id: { type: "number" } },
-          required: ["dump_id"]
-        }
-      },
-      {
-        name: "approve_social_suggestion",
-        description: "Mark a draft as approved, rejected, or posted after human review.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            suggestion_id: { type: "number" },
-            status: { type: "string", description: "draft | approved | rejected | posted" }
-          },
-          required: ["suggestion_id", "status"]
-        }
-      },
-      {
-        name: "site_cta_placement_guide",
-        description: "Lists placement keys for site_ctas \u2014 use with upsert_site_cta so CTAs appear on the public site and member learning areas.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "list_site_ctas",
-        description: "List marketing CTAs (optional filter by placement).",
-        inputSchema: {
-          type: "object",
-          properties: { placement: { type: "string", description: "Filter by single placement key" } }
-        }
-      },
-      {
-        name: "get_pricing_structure",
-        description: "Get current pricing config used by public checkout and member trial/billing flows.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "update_pricing_structure",
-        description: "Update pricing config so Boss can change it via MCP agents without dev changes.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            member_trial_hours: { type: "number", description: "Trial duration in hours (e.g. 24)" },
-            member_price_usd_cents: { type: "number", description: "Price in cents (e.g. 499 for $4.99)" },
-            member_currency: { type: "string", description: "ISO currency code (e.g. usd)" },
-            member_product_name: { type: "string", description: "Checkout product label" },
-            member_stripe_price_id: {
-              type: "string",
-              description: "Stripe price id for Checkout (optional; leave blank to use inline amount)"
-            },
-            checkout_payment_link: {
-              type: "string",
-              description: "Public strategist checkout link shown in forms"
-            }
-          }
-        }
-      },
-      {
-        name: "upsert_site_cta",
-        description: "Create or update a CTA block. Omit id to create. variant: amber | outline | minimal. active defaults true.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            id: { type: "number", description: "Set to update existing row" },
-            placement: { type: "string" },
-            headline: { type: "string" },
-            body: { type: "string" },
-            button_label: { type: "string" },
-            button_url: { type: "string" },
-            variant: { type: "string" },
-            active: { type: "boolean" },
-            sort_order: { type: "number" }
-          },
-          required: ["placement"]
-        }
-      },
-      {
-        name: "delete_site_cta",
-        description: "Delete a site CTA by id.",
-        inputSchema: {
-          type: "object",
-          properties: { id: { type: "number" } },
-          required: ["id"]
-        }
-      },
-      {
-        name: "site_media_placement_guide",
-        description: "Lists MCP-managed site media slots. Use upsert_site_media to swap campaign video/image assets without code changes.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "list_site_media",
-        description: "List MCP-managed site media slots (optional filter by placement).",
-        inputSchema: {
-          type: "object",
-          properties: { placement: { type: "string", description: "Filter by single placement key" } }
-        }
-      },
-      {
-        name: "upsert_site_media",
-        description: "Create or update a site media slot. Placements: home_plan_video, home_framework_image (image), papa_journey_video_top (funnel hero, before copy), papa_journey_video_assessment (above self-assessment CTA), papa_journey_video_membership (above $4.99 join CTA). Use direct video URL (/media/file.mp4, CDN mp4, HeyGen mp4) or embed URL with media_type 'embed'.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            placement: { type: "string" },
-            media_url: { type: "string", description: "Direct media URL. Use /media/... after admin upload for hosted files." },
-            media_type: { type: "string", description: "video | image. Defaults to video." },
-            poster_url: { type: "string", description: "Optional poster image shown before play." },
-            alt_text: { type: "string", description: "Accessible label for the media." },
-            title: { type: "string", description: "Internal campaign/media title." },
-            active: { type: "boolean" }
-          },
-          required: ["placement", "media_url"]
-        }
-      },
-      {
-        name: "delete_site_media",
-        description: "Delete a site media slot by placement.",
-        inputSchema: {
-          type: "object",
-          properties: { placement: { type: "string" } },
-          required: ["placement"]
-        }
-      },
-      {
-        name: "get_intake_submissions",
-        description: "List recent strategist intake submissions.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            limit: { type: "number" }
-          }
-        }
-      },
-      {
-        name: "create_intake_submission",
-        description: "Create a new intake submission from AI chat/call capture. Require at least one contact method: email or phone.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            first_name: { type: "string" },
-            email: { type: "string" },
-            phone: { type: "string" },
-            situation: { type: "string" },
-            routed_pillar: { type: "string" },
-            disconnected_pillar: { type: "string" },
-            vision: { type: "string" }
-          },
-          required: ["first_name", "situation", "routed_pillar"]
-        }
-      },
-      {
-        name: "log_engagement_event",
-        description: "Log an engagement event and keep conversion pipeline synced.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            email: { type: "string" },
-            event_type: { type: "string" },
-            event_detail: { type: "string" }
-          },
-          required: ["email", "event_type"]
-        }
-      },
-      {
-        name: "get_content_tree",
-        description: "Return courses with nested lessons and drip metadata. Call first when aligning Vision Documents or curriculum to existing site content.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "create_course",
-        description: "Create a new learning course. Primary delivery path for program material (e.g. Papa Life Relationship Reset, Vision 1\u201316 series): members see it in /portal; public marketing list at /courses when show_in_catalog is true.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            description: { type: "string" },
-            pillar: { type: "string" },
-            sort_order: { type: "number" },
-            show_in_catalog: { type: "boolean", description: "If true (default), course appears on public /courses marketing catalog." }
-          },
-          required: ["title"]
-        }
-      },
-      {
-        name: "update_course",
-        description: "Update an existing learning course.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            course_id: { type: "number" },
-            title: { type: "string" },
-            description: { type: "string" },
-            pillar: { type: "string" },
-            sort_order: { type: "number" },
-            show_in_catalog: { type: "boolean" }
-          },
-          required: ["course_id"]
-        }
-      },
-      {
-        name: "create_lesson",
-        description: "Create a lesson under a course. Map each Vision Document or module to a lesson; use description for text outline. Set content_url after uploading media via admin POST /api/admin/upload (see get_site_endpoints).",
-        inputSchema: {
-          type: "object",
-          properties: {
-            course_id: { type: "number" },
-            title: { type: "string" },
-            description: { type: "string" },
-            content_url: { type: "string" },
-            content_type: { type: "string" },
-            duration_minutes: { type: "number" },
-            sort_order: { type: "number" }
-          },
-          required: ["course_id", "title"]
-        }
-      },
-      {
-        name: "update_lesson",
-        description: "Update a lesson record (set content_url after uploading via POST /api/admin/upload).",
-        inputSchema: {
-          type: "object",
-          properties: {
-            lesson_id: { type: "number" },
-            title: { type: "string" },
-            description: { type: "string" },
-            content_url: { type: "string" },
-            content_type: { type: "string" },
-            duration_minutes: { type: "number" },
-            sort_order: { type: "number" }
-          },
-          required: ["lesson_id"]
-        }
-      },
-      {
-        name: "delete_lesson",
-        description: "Delete a lesson by id.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            lesson_id: { type: "number" }
-          },
-          required: ["lesson_id"]
-        }
-      },
-      {
-        name: "set_drip_rule",
-        description: "Set or update drip-release rule for lesson.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            lesson_id: { type: "number" },
-            release_days_after_enroll: { type: "number" }
-          },
-          required: ["lesson_id", "release_days_after_enroll"]
-        }
-      },
-      {
-        name: "publish_content",
-        description: "Snapshot current course/lesson structure as a published version.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            course_id: { type: "number" },
-            summary: { type: "string" }
-          },
-          required: ["course_id"]
-        }
-      },
-      {
-        name: "get_member_progress",
-        description: "Return member lesson completion and percent for each course.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            member_id: { type: "number" }
-          },
-          required: ["member_id"]
-        }
-      },
-      {
-        name: "get_journal_prompts",
-        description: "List journal prompts editable by admins.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "create_journal_prompt",
-        description: "Create a new journal prompt.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            pillar: { type: "string" },
-            prompt_text: { type: "string" },
-            sort_order: { type: "number" }
-          },
-          required: ["pillar", "prompt_text"]
-        }
-      },
-      {
-        name: "update_journal_prompt",
-        description: "Update text/order for a journal prompt.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            pillar: { type: "string" },
-            prompt_text: { type: "string" },
-            sort_order: { type: "number" }
-          },
-          required: ["id"]
-        }
-      },
-      {
-        name: "delete_journal_prompt",
-        description: "Delete a journal prompt.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            id: { type: "number" }
-          },
-          required: ["id"]
-        }
-      },
-      {
-        name: "get_form_schema",
-        description: "Return editable form question schema for a form key.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            form_key: { type: "string" }
-          },
-          required: ["form_key"]
-        }
-      },
-      {
-        name: "upsert_form_question",
-        description: "Create or update a form question row.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            form_key: { type: "string" },
-            question_key: { type: "string" },
-            label: { type: "string" },
-            help_text: { type: "string" },
-            input_type: { type: "string" },
-            required: { type: "boolean" },
-            sort_order: { type: "number" },
-            placeholder: { type: "string" },
-            options: { type: "array", items: { type: "string" } },
-            active: { type: "boolean" }
-          },
-          required: ["form_key", "question_key", "label"]
-        }
-      },
-      {
-        name: "delete_form_question",
-        description: "Delete a form question from a form schema.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            form_key: { type: "string" },
-            question_key: { type: "string" }
-          },
-          required: ["form_key", "question_key"]
-        }
-      },
-      {
-        name: "get_members",
-        description: "List member accounts and portal status.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            limit: { type: "number" }
-          }
-        }
-      },
-      {
-        name: "set_member_portal_access",
-        description: "Enable/disable member portal login access.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            member_id: { type: "number" },
-            active: { type: "boolean" }
-          },
-          required: ["member_id", "active"]
-        }
-      },
-      {
-        name: "get_member_course_access",
-        description: "Get all courses and whether the member can access each one.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            member_id: { type: "number" }
-          },
-          required: ["member_id"]
-        }
-      },
-      {
-        name: "set_member_course_access",
-        description: "Grant or revoke member access to a specific course.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            member_id: { type: "number" },
-            course_id: { type: "number" },
-            granted: { type: "boolean" }
-          },
-          required: ["member_id", "course_id", "granted"]
-        }
-      },
-      // ── HeyGen Video Tools ──────────────────────────────────────────────────────
-      {
-        name: "bossmobile_heygen_guide",
-        description: "IMPORTANT: Read this first before using HeyGen tools. Returns the full video pipeline guide \u2014 covers site pages, Google Drive docs, agent session notes, Research Lab dumps as script sources, plus avatar/voice setup.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "bossmobile_heygen_list_avatars",
-        description: "List HeyGen studio avatars and talking photos (your trained faces). GET /v2/avatars.",
-        inputSchema: { type: "object", properties: {} }
-      },
-      {
-        name: "bossmobile_heygen_list_voices",
-        description: "List HeyGen AI voices including clones. GET /v2/voices.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            name_contains: { type: "string", description: "Filter voices by name (case-insensitive)" },
-            limit: { type: "number", description: "Max results (1-500, default 400)" }
-          }
-        }
-      },
-      {
-        name: "bossmobile_heygen_fetch_page",
-        description: "Fetch a page from bossmobilelifecoach.com and strip HTML to plain text for script grounding.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            path: { type: "string", description: "Page path, e.g. / or /courses" }
-          },
-          required: ["path"]
-        }
-      },
-      {
-        name: "bossmobile_heygen_script_from_pages",
-        description: "Generate spoken narration script from one or more site pages. Claude writes a HeyGen-ready script grounded in the page content. Requires ANTHROPIC_API_KEY.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            paths: { type: "array", items: { type: "string" }, description: 'Array of site paths like ["/", "/courses"]' },
-            goal: { type: "string", description: "What the video should achieve" },
-            duration_seconds_hint: { type: "number", description: "Target duration in seconds (default 45)" },
-            tone: { type: "string", description: "Tone guidance (default: warm, mentor-like, conversational)" },
-            max_chars: { type: "number", description: "Max chars per page excerpt (default 4500)" }
-          },
-          required: ["paths"]
-        }
-      },
-      {
-        name: "bossmobile_heygen_script_from_text",
-        description: "Generate spoken narration script from raw text \u2014 paste Google Drive doc content, agent session notes, lesson outlines, or any text. Claude converts it to a HeyGen-ready spoken script. Requires ANTHROPIC_API_KEY.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            text: { type: "string", description: "Raw text to convert \u2014 Google Drive doc export, agent session notes, lesson outline, etc." },
-            goal: { type: "string", description: "What the video should achieve" },
-            duration_seconds_hint: { type: "number", description: "Target duration in seconds (default 60)" },
-            tone: { type: "string", description: "Tone guidance (default: warm, mentor-like, conversational)" },
-            source_label: { type: "string", description: "Label for the source (e.g. 'Vision Doc 3', 'Google Drive export', 'agent session')" }
-          },
-          required: ["text"]
-        }
-      },
-      {
-        name: "bossmobile_heygen_video_agent",
-        description: "Create a video via HeyGen Video Agent v3. Pass the script as prompt. Uses the Brian Keith Hill voice guard; any non-Brian voice_id fails. Requires HEYGEN_API_KEY.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            prompt: { type: "string", description: "Script / prompt for the video (1-10000 chars)" },
-            mode: { type: "string", description: "generate (default) or chat" },
-            avatar_id: { type: "string", description: "Studio avatar ID (mutually exclusive with talking_photo_id)" },
-            talking_photo_id: { type: "string", description: "Photo avatar ID (mutually exclusive with avatar_id)" },
-            voice_id: { type: "string", description: "Must match the Brian Keith Hill voice ID if provided" },
-            orientation: { type: "string", description: "landscape or portrait" },
-            callback_url: { type: "string", description: "Webhook for completion" },
-            callback_id: { type: "string", description: "Custom callback ID" },
-            auto_proceed: { type: "boolean", description: "Auto-proceed without manual review" },
-            style_id: { type: "string", description: "HeyGen style ID" }
-          },
-          required: ["prompt"]
-        }
-      },
-      {
-        name: "bossmobile_heygen_video_status",
-        description: "Poll HeyGen video generation status. GET /v3/videos/{video_id}. Returns video_url when completed.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            video_id: { type: "string", description: "Video ID from bossmobile_heygen_video_agent" }
-          },
-          required: ["video_id"]
-        }
-      },
-      {
-        name: "bossmobile_lesson_set_content_url",
-        description: "Smart setter \u2014 give it any lesson URL (YouTube watch/short/embed, HeyGen embed, Google Drive share/view, direct .mp4/.mp3/.pdf, or /media/ upload) and it normalizes to the canonical form the site's LessonMediaPlayer expects (YouTube \u2192 /embed/{id}, Drive \u2192 /file/d/{id}/preview, HeyGen embed \u2192 pass-through) and writes content_url + content_type onto the lesson. Prefer this over update_lesson when attaching new media \u2014 it guarantees the right format so the player renders correctly.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            lesson_id: { type: "number", description: "Lesson id" },
-            url: { type: "string", description: "Any lesson URL (YouTube, HeyGen, Drive, direct file, /media/ upload)" },
-            content_type_hint: {
-              type: "string",
-              description: "Optional override: 'video', 'audio', 'pdf', or 'document'. Only used when the URL itself is ambiguous (e.g. Drive or /media/)."
-            }
-          },
-          required: ["lesson_id", "url"]
-        }
-      },
-      {
-        name: "bossmobile_lessons_normalize_all",
-        description: "Scan every lesson with a non-empty content_url and show what would change if normalized to the player's expected format. Dry-run by default (dry_run=true). Set dry_run=false to actually apply the updates. Use this to fix legacy YouTube watch URLs, Google Drive share URLs, etc., in one pass.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            dry_run: { type: "boolean", description: "Default true \u2014 preview changes without writing" }
-          }
-        }
-      },
-      {
-        name: "bossmobile_publish_video_playbook",
-        description: "End-to-end publishing playbook: HeyGen \u2192 YouTube (via the caller's own Composio YouTube connection) \u2192 embed into a course lesson. Inspects HeyGen status + lesson row and returns the exact next-step playbook with all YouTube upload arguments pre-filled (title/description/tags/category/privacy). Re-call repeatedly while HeyGen renders \u2014 response state flips from 'rendering' to 'ready_to_upload' when the MP4 is ready. Brian's agent executes the upload with HIS OWN Composio YouTube connection (YOUTUBE_MULTIPART_UPLOAD_VIDEO). The papalife MCP never touches Composio credentials.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            heygen_video_id: {
-              type: "string",
-              description: "HeyGen video id returned by bossmobile_heygen_video_agent"
-            },
-            lesson_id: {
-              type: "number",
-              description: "Destination lesson id \u2014 the YouTube embed URL will be written here via update_lesson in step 3"
-            },
-            title: {
-              type: "string",
-              description: "Override YouTube title (defaults to the lesson title, max 100 chars)"
-            },
-            description: {
-              type: "string",
-              description: "Override YouTube description (defaults to the lesson description)"
-            },
-            privacy_status: {
-              type: "string",
-              description: "'public', 'unlisted' (default), or 'private'"
-            },
-            category_id: {
-              type: "string",
-              description: "YouTube category id (default '27' Education)"
-            },
-            tags: {
-              type: "array",
-              items: { type: "string" },
-              description: "YouTube tags (defaults to Papa Life / fatherhood coaching)"
-            }
-          },
-          required: ["heygen_video_id", "lesson_id"]
-        }
-      }
-    ];
-  }
-});
 
 // mcp-streamable.ts
-import express from "express";
-import dotenv from "dotenv";
-import path2 from "path";
-import crypto2 from "crypto";
-import { randomUUID } from "crypto";
-import Database2 from "better-sqlite3";
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 dotenv.config({ path: path2.resolve(process.cwd(), ".env") });
+var MCP_PORT = parseInt(process.env.MCP_PORT || "3009", 10);
 var MCP_BEARER_TOKEN = process.env.MCP_BEARER_TOKEN || "";
-var MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://papalifecoach.com";
+var MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://bossmobilelifecoach.com";
 var OAUTH_CODE_TTL_MS = 5 * 60 * 1e3;
 var OAUTH_ACCESS_TTL_SEC = 60 * 60;
 var OAUTH_REFRESH_TTL_SEC = 30 * 24 * 60 * 60;
-var loadPapalifeTools = () => Promise.resolve().then(() => (init_mcp_handlers(), mcp_handlers_exports));
 var oauthDb = new Database2(path2.resolve(process.cwd(), "leads.db"));
 oauthDb.pragma("journal_mode = WAL");
 oauthDb.exec(`
@@ -4043,6 +3776,9 @@ function verifyPkce(verifier, challenge, method) {
   }
   return verifier === challenge;
 }
+var app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 var cors = (_, res, next) => {
   res.set({
     "Access-Control-Allow-Origin": "*",
@@ -4081,14 +3817,12 @@ function createSession() {
     { name: "papalife-mcp", version: "1.0.0" },
     { capabilities: { tools: {} } }
   );
-  mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
-    const { PAPALIFE_MCP_TOOL_DEFINITIONS: PAPALIFE_MCP_TOOL_DEFINITIONS2 } = await loadPapalifeTools();
-    return { tools: PAPALIFE_MCP_TOOL_DEFINITIONS2 };
-  });
+  mcpServer.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: PAPALIFE_MCP_TOOL_DEFINITIONS
+  }));
   mcpServer.setRequestHandler(CallToolRequestSchema, async (req) => {
     try {
-      const { handlePapalifeTool: handlePapalifeTool2 } = await loadPapalifeTools();
-      const result = await handlePapalifeTool2(
+      const result = await handlePapalifeTool(
         req.params.name,
         req.params.arguments || {}
       );
@@ -4108,97 +3842,95 @@ function createSession() {
   });
   return { server: mcpServer, transport };
 }
-function registerPapalifeMcpRoutes(app) {
-  app.use(express.urlencoded({ extended: true }));
-  app.options(/.*/, cors, (_, res) => res.sendStatus(204));
-  app.post("/mcp", cors, checkAuth, async (req, res) => {
-    const sessionId = req.headers["mcp-session-id"];
-    if (sessionId && sessions.has(sessionId)) {
-      await sessions.get(sessionId).transport.handleRequest(req, res, req.body);
-      return;
-    }
-    const { server: mcpServer, transport } = createSession();
-    await mcpServer.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-    const newId = transport.sessionId;
-    if (newId) sessions.set(newId, { server: mcpServer, transport });
+app.options(/.*/, cors, (_, res) => res.sendStatus(204));
+app.post("/mcp", cors, checkAuth, async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"];
+  if (sessionId && sessions.has(sessionId)) {
+    await sessions.get(sessionId).transport.handleRequest(req, res, req.body);
+    return;
+  }
+  const { server: mcpServer, transport } = createSession();
+  await mcpServer.connect(transport);
+  await transport.handleRequest(req, res, req.body);
+  const newId = transport.sessionId;
+  if (newId) sessions.set(newId, { server: mcpServer, transport });
+});
+app.get("/mcp", cors, checkAuth, async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"];
+  if (sessionId && sessions.has(sessionId)) {
+    await sessions.get(sessionId).transport.handleRequest(req, res);
+    return;
+  }
+  res.status(400).json({
+    jsonrpc: "2.0",
+    error: { code: -32e3, message: "Bad Request: Mcp-Session-Id header is required" },
+    id: null
   });
-  app.get("/mcp", cors, checkAuth, async (req, res) => {
-    const sessionId = req.headers["mcp-session-id"];
-    if (sessionId && sessions.has(sessionId)) {
-      await sessions.get(sessionId).transport.handleRequest(req, res);
-      return;
-    }
-    res.status(400).json({
-      jsonrpc: "2.0",
-      error: { code: -32e3, message: "Bad Request: Mcp-Session-Id header is required" },
-      id: null
-    });
+});
+app.delete("/mcp", cors, checkAuth, async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"];
+  if (sessionId && sessions.has(sessionId)) {
+    const s = sessions.get(sessionId);
+    await s.transport.close();
+    await s.server.close();
+    sessions.delete(sessionId);
+  }
+  res.status(200).json({ ok: true });
+});
+app.get("/.well-known/oauth-authorization-server", cors, (_, res) => {
+  res.json({
+    issuer: MCP_BASE_URL,
+    authorization_endpoint: `${MCP_BASE_URL}/authorize`,
+    token_endpoint: `${MCP_BASE_URL}/token`,
+    registration_endpoint: `${MCP_BASE_URL}/register`,
+    response_types_supported: ["code"],
+    grant_types_supported: ["authorization_code", "refresh_token"],
+    code_challenge_methods_supported: ["S256", "plain"],
+    token_endpoint_auth_methods_supported: ["none"],
+    scopes_supported: ["mcp"]
   });
-  app.delete("/mcp", cors, checkAuth, async (req, res) => {
-    const sessionId = req.headers["mcp-session-id"];
-    if (sessionId && sessions.has(sessionId)) {
-      const s = sessions.get(sessionId);
-      await s.transport.close();
-      await s.server.close();
-      sessions.delete(sessionId);
-    }
-    res.status(200).json({ ok: true });
+});
+app.get("/.well-known/oauth-protected-resource", cors, (_, res) => {
+  res.json({
+    resource: `${MCP_BASE_URL}/mcp`,
+    authorization_servers: [MCP_BASE_URL],
+    bearer_methods_supported: ["header"],
+    scopes_supported: ["mcp"],
+    resource_documentation: `${MCP_BASE_URL}/mcp`
   });
-  app.get("/.well-known/oauth-authorization-server", cors, (_, res) => {
-    res.json({
-      issuer: MCP_BASE_URL,
-      authorization_endpoint: `${MCP_BASE_URL}/authorize`,
-      token_endpoint: `${MCP_BASE_URL}/token`,
-      registration_endpoint: `${MCP_BASE_URL}/register`,
-      response_types_supported: ["code"],
-      grant_types_supported: ["authorization_code", "refresh_token"],
-      code_challenge_methods_supported: ["S256", "plain"],
-      token_endpoint_auth_methods_supported: ["none"],
-      scopes_supported: ["mcp"]
-    });
+});
+app.get("/.well-known/oauth-protected-resource/mcp", cors, (_, res) => {
+  res.json({
+    resource: `${MCP_BASE_URL}/mcp`,
+    authorization_servers: [MCP_BASE_URL],
+    bearer_methods_supported: ["header"],
+    scopes_supported: ["mcp"],
+    resource_documentation: `${MCP_BASE_URL}/mcp`
   });
-  app.get("/.well-known/oauth-protected-resource", cors, (_, res) => {
-    res.json({
-      resource: `${MCP_BASE_URL}/mcp`,
-      authorization_servers: [MCP_BASE_URL],
-      bearer_methods_supported: ["header"],
-      scopes_supported: ["mcp"],
-      resource_documentation: `${MCP_BASE_URL}/mcp`
-    });
+});
+app.post("/register", cors, (req, res) => {
+  const clientName = req.body?.client_name || "mcp-client";
+  const redirectUris = Array.isArray(req.body?.redirect_uris) ? req.body.redirect_uris : [];
+  const clientId = `${clientName.replace(/[^a-zA-Z0-9_-]/g, "")}_${crypto2.randomBytes(8).toString("hex")}`;
+  saveClient(clientId, clientName, redirectUris);
+  res.json({
+    client_id: clientId,
+    client_id_issued_at: Math.floor(Date.now() / 1e3),
+    client_name: clientName,
+    redirect_uris: redirectUris,
+    grant_types: ["authorization_code", "refresh_token"],
+    response_types: ["code"],
+    token_endpoint_auth_method: "none"
   });
-  app.get("/.well-known/oauth-protected-resource/mcp", cors, (_, res) => {
-    res.json({
-      resource: `${MCP_BASE_URL}/mcp`,
-      authorization_servers: [MCP_BASE_URL],
-      bearer_methods_supported: ["header"],
-      scopes_supported: ["mcp"],
-      resource_documentation: `${MCP_BASE_URL}/mcp`
-    });
-  });
-  app.post("/register", cors, (req, res) => {
-    const clientName = req.body?.client_name || "mcp-client";
-    const redirectUris = Array.isArray(req.body?.redirect_uris) ? req.body.redirect_uris : [];
-    const clientId = `${clientName.replace(/[^a-zA-Z0-9_-]/g, "")}_${crypto2.randomBytes(8).toString("hex")}`;
-    saveClient(clientId, clientName, redirectUris);
-    res.json({
-      client_id: clientId,
-      client_id_issued_at: Math.floor(Date.now() / 1e3),
-      client_name: clientName,
-      redirect_uris: redirectUris,
-      grant_types: ["authorization_code", "refresh_token"],
-      response_types: ["code"],
-      token_endpoint_auth_method: "none"
-    });
-  });
-  app.get("/authorize", (req, res) => {
-    const { response_type, client_id, redirect_uri, code_challenge, code_challenge_method, state } = req.query;
-    if (response_type !== "code" || !redirect_uri) {
-      res.status(400).json({ error: "invalid_request" });
-      return;
-    }
-    res.setHeader("Content-Type", "text/html");
-    res.send(`<!DOCTYPE html><html><head><title>Authorize \u2014 Papa Life MCP</title>
+});
+app.get("/authorize", (req, res) => {
+  const { response_type, client_id, redirect_uri, code_challenge, code_challenge_method, state } = req.query;
+  if (response_type !== "code" || !redirect_uri) {
+    res.status(400).json({ error: "invalid_request" });
+    return;
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.send(`<!DOCTYPE html><html><head><title>Authorize \u2014 Papa Life MCP</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>body{font-family:system-ui,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0f172a;color:#e2e8f0}.card{background:#1e293b;border-radius:16px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4);text-align:center}h2{color:#93c5fd;margin-top:0}.app{color:#a5b4fc;font-weight:600}button{padding:12px 32px;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin:.5rem;font-weight:600}.approve{background:#2563eb;color:#fff}.deny{background:#334155;color:#94a3b8}</style>
 </head><body><div class="card">
@@ -4214,81 +3946,80 @@ function registerPapalifeMcpRoutes(app) {
 <button type="submit" name="action" value="approve" class="approve">Approve</button>
 <button type="submit" name="action" value="deny" class="deny">Deny</button>
 </form></div></body></html>`);
-  });
-  app.post("/authorize", (req, res) => {
-    const { action, client_id, redirect_uri, code_challenge, code_challenge_method, state } = req.body;
-    if (action === "deny" || !redirect_uri) {
-      const sep2 = redirect_uri?.includes("?") ? "&" : "?";
-      res.redirect(
-        `${redirect_uri}${sep2}error=access_denied${state ? `&state=${encodeURIComponent(state)}` : ""}`
-      );
-      return;
-    }
-    const code = crypto2.randomBytes(32).toString("base64url");
-    saveCode(code, client_id || "", redirect_uri, code_challenge || "", code_challenge_method || "S256");
-    const sep = redirect_uri.includes("?") ? "&" : "?";
+});
+app.post("/authorize", (req, res) => {
+  const { action, client_id, redirect_uri, code_challenge, code_challenge_method, state } = req.body;
+  if (action === "deny" || !redirect_uri) {
+    const sep2 = redirect_uri?.includes("?") ? "&" : "?";
     res.redirect(
-      `${redirect_uri}${sep}code=${encodeURIComponent(code)}${state ? `&state=${encodeURIComponent(state)}` : ""}`
+      `${redirect_uri}${sep2}error=access_denied${state ? `&state=${encodeURIComponent(state)}` : ""}`
     );
-  });
-  app.post("/token", cors, (req, res) => {
-    const grantType = req.body?.grant_type;
-    if (grantType === "authorization_code") {
-      if (!req.body?.code) {
-        res.status(400).json({ error: "invalid_request" });
-        return;
-      }
-      const stored = takeCode(req.body.code);
-      if (!stored) {
-        res.status(400).json({ error: "invalid_grant" });
-        return;
-      }
-      if (stored.code_challenge) {
-        if (!req.body.code_verifier || !verifyPkce(req.body.code_verifier, stored.code_challenge, stored.code_challenge_method)) {
-          res.status(400).json({ error: "invalid_grant", error_description: "PKCE failed" });
-          return;
-        }
-      }
-      const scope = "mcp";
-      const accessToken = issueAccessToken(stored.client_id, scope);
-      const refreshToken = issueRefreshToken(stored.client_id, scope);
-      res.json({
-        access_token: accessToken,
-        token_type: "Bearer",
-        expires_in: OAUTH_ACCESS_TTL_SEC,
-        refresh_token: refreshToken,
-        scope
-      });
+    return;
+  }
+  const code = crypto2.randomBytes(32).toString("base64url");
+  saveCode(code, client_id || "", redirect_uri, code_challenge || "", code_challenge_method || "S256");
+  const sep = redirect_uri.includes("?") ? "&" : "?";
+  res.redirect(
+    `${redirect_uri}${sep}code=${encodeURIComponent(code)}${state ? `&state=${encodeURIComponent(state)}` : ""}`
+  );
+});
+app.post("/token", cors, (req, res) => {
+  const grantType = req.body?.grant_type;
+  if (grantType === "authorization_code") {
+    if (!req.body?.code) {
+      res.status(400).json({ error: "invalid_request" });
       return;
     }
-    if (grantType === "refresh_token") {
-      if (!req.body?.refresh_token) {
-        res.status(400).json({ error: "invalid_request" });
-        return;
-      }
-      const consumed = consumeRefreshToken(req.body.refresh_token);
-      if (!consumed) {
-        res.status(400).json({ error: "invalid_grant" });
-        return;
-      }
-      const accessToken = issueAccessToken(consumed.client_id, consumed.scope);
-      const refreshToken = issueRefreshToken(consumed.client_id, consumed.scope);
-      res.json({
-        access_token: accessToken,
-        token_type: "Bearer",
-        expires_in: OAUTH_ACCESS_TTL_SEC,
-        refresh_token: refreshToken,
-        scope: consumed.scope
-      });
+    const stored = takeCode(req.body.code);
+    if (!stored) {
+      res.status(400).json({ error: "invalid_grant" });
       return;
     }
-    res.status(400).json({ error: "unsupported_grant_type" });
-  });
-  app.get("/health", async (_, res) => {
-    const { PAPALIFE_MCP_TOOL_DEFINITIONS: PAPALIFE_MCP_TOOL_DEFINITIONS2 } = await loadPapalifeTools();
-    res.json({ ok: true, server: "papalife-mcp", tools: PAPALIFE_MCP_TOOL_DEFINITIONS2.length });
-  });
-}
-export {
-  registerPapalifeMcpRoutes
-};
+    if (stored.code_challenge) {
+      if (!req.body.code_verifier || !verifyPkce(req.body.code_verifier, stored.code_challenge, stored.code_challenge_method)) {
+        res.status(400).json({ error: "invalid_grant", error_description: "PKCE failed" });
+        return;
+      }
+    }
+    const scope = "mcp";
+    const accessToken = issueAccessToken(stored.client_id, scope);
+    const refreshToken = issueRefreshToken(stored.client_id, scope);
+    res.json({
+      access_token: accessToken,
+      token_type: "Bearer",
+      expires_in: OAUTH_ACCESS_TTL_SEC,
+      refresh_token: refreshToken,
+      scope
+    });
+    return;
+  }
+  if (grantType === "refresh_token") {
+    if (!req.body?.refresh_token) {
+      res.status(400).json({ error: "invalid_request" });
+      return;
+    }
+    const consumed = consumeRefreshToken(req.body.refresh_token);
+    if (!consumed) {
+      res.status(400).json({ error: "invalid_grant" });
+      return;
+    }
+    const accessToken = issueAccessToken(consumed.client_id, consumed.scope);
+    const refreshToken = issueRefreshToken(consumed.client_id, consumed.scope);
+    res.json({
+      access_token: accessToken,
+      token_type: "Bearer",
+      expires_in: OAUTH_ACCESS_TTL_SEC,
+      refresh_token: refreshToken,
+      scope: consumed.scope
+    });
+    return;
+  }
+  res.status(400).json({ error: "unsupported_grant_type" });
+});
+app.get("/health", (_, res) => {
+  res.json({ ok: true, server: "papalife-mcp", tools: PAPALIFE_MCP_TOOL_DEFINITIONS.length });
+});
+app.listen(MCP_PORT, "0.0.0.0", () => {
+  console.log(`Papalife MCP server running on port ${MCP_PORT}`);
+  console.log(`Endpoint: ${MCP_BASE_URL}/mcp`);
+});

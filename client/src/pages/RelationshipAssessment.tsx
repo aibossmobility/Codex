@@ -2,10 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
+import { FatherEngagementFollowUpForm } from "@/components/FatherEngagementFollowUpForm";
 import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type Pillar = "Purpose" | "Authority" | "Presence" | "Alignment";
+type Pillar = "Presence" | "Purpose" | "Authority" | "Alignment";
 
 type Question = {
   id: string;
@@ -14,15 +15,15 @@ type Question = {
 };
 
 const questions: Question[] = [
+  { id: "pr1", pillar: "Presence", text: "When my adult child shares something difficult, I listen first rather than advising or fixing." },
+  { id: "pr2", pillar: "Presence", text: "I am comfortable having conversations that do not have a clear agenda or resolution." },
+  { id: "pr3", pillar: "Presence", text: "I initiate connection without needing something from my adult child in return." },
   { id: "p1", pillar: "Purpose", text: "I have a clear sense of who I am beyond my role as a provider or family authority." },
   { id: "p2", pillar: "Purpose", text: "I know what I want from my relationship with my adult child beyond logistics and provision." },
   { id: "p3", pillar: "Purpose", text: "I feel a strong sense of purpose in this season of fatherhood—not loss or irrelevance." },
   { id: "a1", pillar: "Authority", text: "I lead my adult children through my character and integrity, not through position or pressure." },
   { id: "a2", pillar: "Authority", text: "I take accountability for my part in any distance or conflict with my adult child." },
   { id: "a3", pillar: "Authority", text: "My adult child would say my leadership is trustworthy and consistent, not controlling." },
-  { id: "pr1", pillar: "Presence", text: "When my adult child shares something difficult, I listen first rather than advising or fixing." },
-  { id: "pr2", pillar: "Presence", text: "I am comfortable having conversations that do not have a clear agenda or resolution." },
-  { id: "pr3", pillar: "Presence", text: "I initiate connection without needing something from my adult child in return." },
   { id: "al1", pillar: "Alignment", text: "The way I actually live is consistent with the values I say I hold." },
   { id: "al2", pillar: "Alignment", text: "I have said the things I need to say—apologies, acknowledgments, and love." },
   { id: "al3", pillar: "Alignment", text: "I actively work to close the gap between who I want to be and who I am currently being." },
@@ -41,7 +42,7 @@ export default function RelationshipAssessment() {
   const answeredCount = Object.keys(answers).length;
 
   const scores = useMemo(() => {
-    const totals: Record<Pillar, number> = { Purpose: 0, Authority: 0, Presence: 0, Alignment: 0 };
+    const totals: Record<Pillar, number> = { Presence: 0, Purpose: 0, Authority: 0, Alignment: 0 };
     questions.forEach((question) => {
       totals[question.pillar] += answers[question.id] || 0;
     });
@@ -69,7 +70,7 @@ export default function RelationshipAssessment() {
       <PageMeta
         title="2-Minute Fatherhood Check-In | Papa Life"
         description="A short fatherhood check-in to help you see where things stand with your adult child and choose a practical next step."
-        keywords="fatherhood check-in, fathers of adult children, PAPA framework, Purpose Authority Presence Alignment"
+        keywords="fatherhood check-in, fathers of adult children, PAPA framework, Presence Purpose Authority Alignment"
       />
 
       <header className="border-b border-white/10 bg-black/90">
@@ -111,7 +112,7 @@ export default function RelationshipAssessment() {
               <p className="mt-2 text-sm text-white/60">Be honest. This is for clarity, not judgment.</p>
             </div>
 
-            {(["Purpose", "Authority", "Presence", "Alignment"] as Pillar[]).map((pillar) => (
+            {(["Presence", "Purpose", "Authority", "Alignment"] as Pillar[]).map((pillar) => (
               <section key={pillar} aria-labelledby={`${pillar.toLowerCase()}-heading`}>
                 <div className="mb-4 flex items-baseline gap-3">
                   <span className="text-3xl font-black text-brand-yellow">{pillar[0]}</span>
@@ -233,6 +234,19 @@ export default function RelationshipAssessment() {
                     <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
                     Retake Check-In
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-8 border-brand-yellow/30 bg-brand-yellow/5">
+              <CardContent className="p-7 md:p-9">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">Optional next step</p>
+                <h2 className="mt-3 text-2xl font-extrabold md:text-3xl">Would you like Brian to help you choose your next step?</h2>
+                <p className="mt-3 leading-relaxed text-white/70">
+                  Your 12 reflection answers and scores stay in this browser. Only the contact and follow-up information you voluntarily enter below is shared with Papa Life for Brian's review. Nothing is sent to your adult child.
+                </p>
+                <div className="mt-7">
+                  <FatherEngagementFollowUpForm />
                 </div>
               </CardContent>
             </Card>

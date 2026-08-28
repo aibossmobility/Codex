@@ -133,14 +133,10 @@ export function listHumanImpactObservations(
 export function summarizeHumanImpact(db: BetterSqliteDatabase, program = "papa_life") {
   const rows = db
     .prepare(
-      `WITH ranked AS (
-        SELECT *,
-          ROW_NUMBER() OVER (PARTITION BY participant_ref, phase ORDER BY observed_at DESC, id DESC) AS phase_rank
-        FROM human_impact_observations
-        WHERE program = ?
-      ), paired AS (
+      `WITH valid_pairs AS (
         SELECT
-          b.participant_ref,
+          f.id AS follow_up_id,
+          f.participant_ref,
           b.reflection_score AS baseline_reflection,
           f.reflection_score AS follow_up_reflection,
           b.decision_score AS baseline_decision,
@@ -150,13 +146,32 @@ export function summarizeHumanImpact(db: BetterSqliteDatabase, program = "papa_l
           b.action_score AS baseline_action,
           f.action_score AS follow_up_action,
           b.relationship_score AS baseline_relationship,
-          f.relationship_score AS follow_up_relationship
-        FROM ranked b
-        JOIN ranked f ON f.participant_ref = b.participant_ref
-        WHERE b.phase = 'baseline' AND b.phase_rank = 1
-          AND f.phase = 'follow_up' AND f.phase_rank = 1
+          f.relationship_score AS follow_up_relationship,
+          ROW_NUMBER() OVER (
+            PARTITION BY f.participant_ref
+            ORDER BY f.observed_at DESC, f.id DESC
+          ) AS participant_rank
+        FROM human_impact_observations f
+        JOIN human_impact_observations b ON b.id = (
+          SELECT candidate.id
+          FROM human_impact_observations candidate
+          WHERE candidate.program = f.program
+            AND candidate.participant_ref = f.participant_ref
+            AND candidate.phase = 'baseline'
+            AND (
+              candidate.observed_at < f.observed_at
+              OR (candidate.observed_at = f.observed_at AND candidate.id < f.id)
+            )
+            AND (
+              f.interaction_ref IS NULL
+              OR candidate.interaction_ref = f.interaction_ref
+            )
+          ORDER BY candidate.observed_at DESC, candidate.id DESC
+          LIMIT 1
+        )
+        WHERE f.program = ? AND f.phase = 'follow_up'
       )
-      SELECT * FROM paired`
+      SELECT * FROM valid_pairs WHERE participant_rank = 1`
     )
     .all(program) as Array<Record<string, number | string>>;
 

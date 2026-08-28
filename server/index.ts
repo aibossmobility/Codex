@@ -27,6 +27,12 @@ import {
 import { analyzeResearchNotes, generateSocialPack } from "./research-ai";
 import { isResearchLabWebUser } from "./research-access";
 import {
+  createHumanImpactObservation,
+  ensureHumanImpactTables,
+  listHumanImpactObservations,
+  summarizeHumanImpact,
+} from "./human-impact-store";
+import {
   ensureSiteCtasTable,
   listSiteCtasPublic,
   listSiteCtasAdmin,
@@ -679,6 +685,7 @@ try {
 } catch {}
 
 ensureResearchTables(db);
+ensureHumanImpactTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
@@ -5868,6 +5875,41 @@ async function startServer() {
       res.json({ ok: true });
     } catch (e) {
       res.status(500).json({ ok: false, error: String(e) });
+    }
+  });
+
+  // Private, consent-scoped Papa Life human-impact observations. Participant
+  // references are pseudonymous; direct names, email addresses, and transcripts
+  // are deliberately outside this contract.
+  app.post("/api/admin/human-impact/observations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = createHumanImpactObservation(db, req.body);
+      res.status(201).json({ ok: true, id });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/human-impact/observations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const participantRef = String(req.query.participant_ref || "").trim() || undefined;
+      const requestedLimit = Number(req.query.limit || 100);
+      const observations = listHumanImpactObservations(db, {
+        participantRef,
+        limit: Number.isFinite(requestedLimit) ? requestedLimit : 100,
+      });
+      res.json({ ok: true, observations });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/human-impact/summary", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const program = String(req.query.program || "papa_life").trim() || "papa_life";
+      res.json({ ok: true, summary: summarizeHumanImpact(db, program) });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
 

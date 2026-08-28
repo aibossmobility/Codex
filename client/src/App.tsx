@@ -32,6 +32,7 @@ import PapaFirstLesson from "./pages/PapaFirstLesson";
 import PapaDailyWorkReport from "./pages/PapaDailyWorkReport";
 import RelationshipAssessment from "./pages/RelationshipAssessment";
 import PapaAiExperience from "./pages/PapaAiExperience";
+import TuesdayLive from "./pages/TuesdayLive";
 import MarleeAssessment from "./pages/MarleeAssessment";
 import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
@@ -68,7 +69,8 @@ function Router() {
       <Route path="/resources" component={PapaAiExperience} />
       <Route path="/books" component={PapaAiExperience} />
       <Route path="/podcast" component={PapaAiExperience} />
-      <Route path="/tuesday-live" component={PapaAiExperience} />
+      <Route path="/tuesday" component={TuesdayLive} />
+      <Route path="/tuesday-live" component={TuesdayLive} />
       <Route path="/membership" component={PapaAiExperience} />
       <Route path="/contact" component={PapaAiExperience} />
       <Route path="/privacy-policy" component={PrivacyPage} />

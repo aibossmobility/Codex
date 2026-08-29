@@ -27,6 +27,15 @@ import {
 import { analyzeResearchNotes, generateSocialPack } from "./research-ai";
 import { isResearchLabWebUser } from "./research-access";
 import {
+  archiveExecutiveMemory,
+  ensureExecutiveMemoryTables,
+  getExecutiveMemoryHistory,
+  listExecutiveConversationBriefs,
+  listExecutiveMemories,
+  rememberExecutiveMemory,
+  saveExecutiveConversationBrief,
+} from "./executive-memory-store";
+import {
   createHumanImpactObservation,
   ensureHumanImpactTables,
   listHumanImpactObservations,
@@ -697,6 +706,7 @@ try {
 } catch {}
 
 ensureResearchTables(db);
+ensureExecutiveMemoryTables(db);
 ensureHumanImpactTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
@@ -6102,6 +6112,70 @@ async function startServer() {
       res.json({ ok: true, summary: summarizeHumanImpact(db, program) });
     } catch (e) {
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  // AI Boss OS executive continuity. These routes are private and use the
+  // existing Brian-only Research Lab authorization boundary.
+  app.get("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const memories = listExecutiveMemories(db, {
+        query: String(req.query.query || "").trim() || undefined,
+        category: String(req.query.category || "").trim() || undefined,
+        includeArchived: req.query.include_archived === "true" || req.query.include_archived === "1",
+        limit: Number(req.query.limit || 100),
+      });
+      res.json({ ok: true, memories });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, ...rememberExecutiveMemory(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/executive-memory/:key/history", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.json({ ok: true, history: getExecutiveMemoryHistory(db, String(req.params.key || "")) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/executive-memory/:id/archive", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      const archived = archiveExecutiveMemory(db, id);
+      if (!archived) return res.status(404).json({ ok: false, error: "Active memory not found" });
+      res.json({ ok: true, id });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const conversations = listExecutiveConversationBriefs(db, {
+        status: String(req.query.status || "").trim() || undefined,
+        limit: Number(req.query.limit || 50),
+      });
+      res.json({ ok: true, conversations });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
 

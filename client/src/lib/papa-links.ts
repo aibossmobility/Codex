@@ -1,4 +1,4 @@
-export const PAPA_FATHERHOOD_STAGES_LINK = "/go/stage";
+export const PAPA_FATHERHOOD_STAGES_LINK = "/my-journey?from=fatherhood-stage";
 
 export const PAPA_EMAIL_SERIES_LINK = "/go/email-series";
 

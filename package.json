@@ -11,6 +11,7 @@
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
+    "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
     "check:voice": "node scripts/validate-elevenlabs-voice.mjs",
     "format": "prettier --write .",
     "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs"

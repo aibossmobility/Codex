@@ -63,7 +63,7 @@ export function PrivacyPage() {
       <p>
         <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> August 20, 2026
+        <strong>Last Updated:</strong> August 29, 2026
       </p>
       <p>
         Papa Life (&quot;we,&quot; &quot;us,&quot; &quot;our&quot;) is a fatherhood coaching service owned and operated by{" "}
@@ -90,7 +90,10 @@ export function PrivacyPage() {
       <p>
         We also collect limited technical information automatically, such as browser and device type,
         IP address, pages visited, approximate location derived from IP address, security events, and
-        cookie or similar identifiers used to operate, secure, and understand the site.
+        cookie or similar identifiers used to operate, secure, and understand the site. Through HeyCatch
+        analytics, we may also process session activity, page views, clicks or taps, route changes, and the
+        occurrence of form submissions. HeyCatch is configured for behavioral analytics and does not need
+        the contents typed into form fields for this purpose.
       </p>
       <h2>2. Sensitive Information and AI Conversations</h2>
       <p>
@@ -120,7 +123,7 @@ export function PrivacyPage() {
       <h2>5. How We Share Information</h2>
       <p>We do not sell your personal information. We only share it with:</p>
       <ul>
-        <li>Service providers who help us operate Papa Life, including our CRM (GoHighLevel), scheduling provider (Calendly), payment processor (Stripe), hosting and security providers, AI, video and voice providers, and email/SMS delivery systems</li>
+        <li>Service providers who help us operate Papa Life, including our CRM (GoHighLevel), scheduling provider (Calendly), payment processor (Stripe), website analytics provider (HeyCatch), hosting and security providers, AI, video and voice providers, and email/SMS delivery systems</li>
         <li>Law enforcement or courts, if we are required to by law</li>
         <li>A buyer, if Papa Life is ever sold or merged with another company</li>
       </ul>

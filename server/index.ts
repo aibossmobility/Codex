@@ -2236,6 +2236,22 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
+  "/my-journey": {
+    title: "My Fatherhood Journey | Papa Life",
+    description:
+      "A private, interactive Papa Life journey that helps fathers reflect, practice healthier relationship patterns, and track meaningful growth.",
+    eyebrow: "Your Private Journey",
+    headline: "Turn the wheel and take the next honest step.",
+    intro:
+      "Move through awareness, engagement, understanding, action, and reconnection with guided reflection focused on your relationship with your child.",
+    sections: [
+      { heading: "See where you are", body: "Choose your season of fatherhood and your child's life stage so the journey meets you where the relationship is today." },
+      { heading: "Do the work", body: "Use PIES and FOES reflection, relationship practices, and private prompts to turn insight into one practical action." },
+      { heading: "Return and continue", body: "Save your progress privately, revisit completed steps, and keep building presence, safety, and trust over time." },
+    ],
+    cta: { label: "Start My Fatherhood Journey", href: "/my-journey" },
+    noindex: true,
+  },
   "/relationship-assessment": {
     title: "Free Father-Adult Child Relationship Assessment | Boss Mobile Life Coach",
     description:
@@ -2406,6 +2422,24 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "Members can access course lessons, progress tracking, journal prompts, and the Papa Life resource library.",
     sections: [{ heading: "Member portal", body: "Use your Papa Life account to continue lessons and track your progress." }],
     cta: { label: "Sign In", href: "/member-login" },
+    noindex: true,
+  },
+  "/member-forgot-password": {
+    title: "Reset Papa Life Password",
+    description: "Request a secure password-reset link for your Papa Life member account.",
+    eyebrow: "Member Access",
+    headline: "Get back into your Papa Life account.",
+    intro: "Enter your member email address to request a secure, time-limited password-reset link.",
+    sections: [{ heading: "Secure recovery", body: "For privacy, the response does not reveal whether an email address is registered." }],
+    noindex: true,
+  },
+  "/member-reset-password": {
+    title: "Choose a New Papa Life Password",
+    description: "Use a secure reset link to choose a new Papa Life member password.",
+    eyebrow: "Member Access",
+    headline: "Choose a new password.",
+    intro: "Valid reset links are time-limited and can be used only once.",
+    sections: [{ heading: "Secure reset", body: "If your link has expired or was already used, request a new one from the forgot-password page." }],
     noindex: true,
   },
   "/member-register": {

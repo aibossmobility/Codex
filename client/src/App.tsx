@@ -12,11 +12,14 @@ import Login from "./pages/Login";
 import MemberLogin from "./pages/MemberLogin";
 import MemberRegister from "./pages/MemberRegister";
 import MemberActivate from "./pages/MemberActivate";
+import MemberForgotPassword from "./pages/MemberForgotPassword";
+import MemberResetPassword from "./pages/MemberResetPassword";
 import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
 import Shop from "./pages/Shop";
 import Join from "./pages/Join";
 import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
+import FatherJourney from "./pages/FatherJourney";
 import Strategist from "./pages/Strategist";
 import ThemeMatrix from "./pages/ThemeMatrix";
 import Operators from "./pages/Operators";
@@ -80,11 +83,14 @@ function Router() {
       <Route path={"/member-login"} component={MemberLogin} />
       <Route path={"/member-register"} component={MemberRegister} />
       <Route path={"/member-activate"} component={MemberActivate} />
+      <Route path="/member-forgot-password" component={MemberForgotPassword} />
+      <Route path="/member-reset-password" component={MemberResetPassword} />
       <Route path={"/member-billing"} component={MemberBilling} />
       <Route path={"/portal"} component={MemberPortal} />
       <Route path={"/shop"} component={Shop} />
       <Route path={"/join"} component={Join} />
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
+      <Route path="/my-journey" component={FatherJourney} />
       <Route path="/assessment" component={RelationshipAssessment} />
       <Route path="/relationship-assessment" component={RelationshipAssessment} />
       <Route path="/marlee-assessment" component={MarleeAssessment} />
@@ -122,6 +128,7 @@ function GlobalPapaAiWidget() {
     "/member-activate",
     "/member-billing",
     "/portal",
+    "/my-journey",
     "/join",
     "/research-lab",
     "/admin",

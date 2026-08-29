@@ -287,6 +287,18 @@ db.exec(`
     UNIQUE(member_id, lesson_id)
   );
 
+  CREATE TABLE IF NOT EXISTS member_journey_steps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    step_key TEXT NOT NULL,
+    response TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'in_progress',
+    started_at TEXT NOT NULL DEFAULT (datetime('now')),
+    completed_at TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(member_id, step_key)
+  );
+
   CREATE TABLE IF NOT EXISTS journal_prompts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pillar TEXT NOT NULL,
@@ -1814,6 +1826,62 @@ function memberActivationByToken(rawToken: string) {
   ).get(tokenHash) as any;
 }
 
+function issueMemberPasswordReset(memberId: number) {
+  const rawToken = nanoid(48);
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+  db.prepare(
+    "UPDATE member_account_activations SET used_at = COALESCE(used_at, datetime('now')) WHERE member_id = ? AND purpose = 'reset_password' AND used_at IS NULL"
+  ).run(memberId);
+  db.prepare(
+    "INSERT INTO member_account_activations (member_id, token_hash, purpose, expires_at) VALUES (?, ?, 'reset_password', ?)"
+  ).run(memberId, tokenHash, expiresAt);
+  return { rawToken, expiresAt };
+}
+
+function memberPasswordResetByToken(rawToken: string) {
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  return db.prepare(
+    `SELECT a.id, a.member_id, a.expires_at, a.used_at, m.email, m.first_name, m.last_name, m.status
+     FROM member_account_activations a
+     JOIN members m ON m.id = a.member_id
+     WHERE a.token_hash = ? AND a.purpose = 'reset_password'
+     LIMIT 1`
+  ).get(tokenHash) as any;
+}
+
+async function sendMemberPasswordResetEmail(input: {
+  recipient: string;
+  firstName: string;
+  resetUrl: string;
+  expiresAt: string;
+  memberId: number;
+}) {
+  const provider = adminNotificationProvider();
+  const subject = "Reset your Papa Life password";
+  const text = `Hello ${input.firstName || "Papa Life member"},\n\nWe received a request to reset your Papa Life password. Use this secure link within two hours:\n${input.resetUrl}\n\nIf you did not request this, you can ignore this message. Your current password will remain unchanged.\n\nPapa Life`;
+  if (!provider || !isValidEmail(input.recipient)) {
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: isValidEmail(input.recipient) ? input.recipient : null, subject, status: "skipped", error: "No supported transactional email sender is configured", payload: { member_id: input.memberId } });
+    return { ok: false, skipped: true };
+  }
+  const from = process.env.MEMBER_NOTIFICATION_FROM?.trim() || adminNotificationFrom();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = provider === "resend"
+      ? await fetch("https://api.resend.com/emails", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [input.recipient], subject, text }) })
+      : await fetch("https://api.sendgrid.com/v3/mail/send", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ personalizations: [{ to: [{ email: input.recipient }] }], from: { email: extractEmailAddress(from) }, subject, content: [{ type: "text/plain", value: text }] }) });
+    const responseText = await response.text().catch(() => "");
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: input.recipient, subject, status: response.ok ? "sent" : "error", response_status: response.status, error: response.ok ? null : responseText.slice(0, 1000), payload: { member_id: input.memberId } });
+    return { ok: response.ok };
+  } catch (error: any) {
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: input.recipient, subject, status: "error", error: error?.message || "Password reset email failed", payload: { member_id: input.memberId } });
+    return { ok: false };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function recentMemberPaymentEvents(limit = 25) {
   return db
     .prepare(
@@ -3322,6 +3390,48 @@ async function startServer() {
     });
   });
 
+  app.post("/api/member/auth/forgot-password", async (req, res) => {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const generic = { ok: true, message: "If that email belongs to an active Papa Life account, a secure reset link has been sent." };
+    if (!isValidEmail(email)) return res.json(generic);
+    const member = loadMemberByEmail(email);
+    if (!member || member.status !== "active") return res.json(generic);
+    const reset = issueMemberPasswordReset(member.id);
+    const resetUrl = `${appBaseUrl(req)}/member-reset-password?token=${encodeURIComponent(reset.rawToken)}`;
+    await sendMemberPasswordResetEmail({ recipient: member.email, firstName: member.first_name, resetUrl, expiresAt: reset.expiresAt, memberId: member.id });
+    return res.json(generic);
+  });
+
+  app.get("/api/member/auth/reset-password", (req, res) => {
+    const token = cleanPublicText(req.query?.token, 200);
+    const reset = token ? memberPasswordResetByToken(token) : null;
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    return res.json({ ok: true, first_name: reset.first_name, email: reset.email });
+  });
+
+  app.post("/api/member/auth/reset-password", async (req, res) => {
+    const token = cleanPublicText(req.body?.token, 200);
+    const password = String(req.body?.password || "");
+    const confirmPassword = String(req.body?.confirm_password || "");
+    if (!token || password.length < 8) return res.status(400).json({ ok: false, error: "A valid link and password of at least 8 characters are required" });
+    if (password !== confirmPassword) return res.status(400).json({ ok: false, error: "Passwords do not match" });
+    const reset = memberPasswordResetByToken(token);
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    const consumed = db.prepare("UPDATE member_account_activations SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL").run(reset.id);
+    if (!consumed.changes) return res.status(400).json({ ok: false, error: "This password-reset link has already been used" });
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(await bcrypt.hash(password, 12), reset.member_id);
+    const member = loadMemberById(Number(reset.member_id));
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+    return res.json({ ok: true, redirect: "/portal" });
+  });
+
   app.get("/api/member/auth/activate", (req, res) => {
     const token = cleanPublicText(req.query?.token, 200);
     if (!token) return res.status(400).json({ ok: false, error: "Activation token is required" });
@@ -4240,6 +4350,54 @@ async function startServer() {
     const memberId = (req.session as any).memberId;
     db.prepare("DELETE FROM member_progress WHERE member_id = ? AND lesson_id = ?").run(memberId, req.params.lesson_id);
     res.json({ ok: true });
+  });
+
+  app.get("/api/member/journey", requireMemberAuth, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const steps = db.prepare(
+      `SELECT step_key, response, status, started_at, completed_at, updated_at
+       FROM member_journey_steps WHERE member_id = ? ORDER BY id`
+    ).all(memberId);
+    res.json({ ok: true, steps });
+  });
+
+  app.put("/api/member/journey/:stepKey", requireMemberAuth, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const stepKey = String(req.params.stepKey || "").trim();
+    const allowedSteps = ["awareness", "engage", "understand", "take_action", "reconnection"];
+    if (!allowedSteps.includes(stepKey)) {
+      return res.status(400).json({ ok: false, error: "Unknown journey destination" });
+    }
+    const response = cleanPublicText(String(req.body?.response || ""), 4000);
+    const status = req.body?.status === "completed" ? "completed" : "in_progress";
+    db.prepare(
+      `INSERT INTO member_journey_steps (member_id, step_key, response, status, completed_at, updated_at)
+       VALUES (?, ?, ?, ?, CASE WHEN ? = 'completed' THEN datetime('now') ELSE NULL END, datetime('now'))
+       ON CONFLICT(member_id, step_key) DO UPDATE SET
+         response = excluded.response,
+         status = excluded.status,
+         completed_at = CASE
+           WHEN excluded.status = 'completed' THEN COALESCE(member_journey_steps.completed_at, datetime('now'))
+           ELSE member_journey_steps.completed_at
+         END,
+         updated_at = datetime('now')`
+    ).run(memberId, stepKey, response, status, status);
+    res.json({ ok: true, step_key: stepKey, status });
+  });
+
+  app.get("/api/admin/father-journeys", requireAuth, requireResearchLabAccess, (_req, res) => {
+    const journeys = db.prepare(
+      `SELECT m.id AS member_id, m.first_name, m.last_name, m.email,
+              COUNT(js.id) AS started_steps,
+              SUM(CASE WHEN js.status = 'completed' THEN 1 ELSE 0 END) AS completed_steps,
+              MAX(js.updated_at) AS last_activity
+       FROM members m
+       LEFT JOIN member_journey_steps js ON js.member_id = m.id
+       WHERE js.id IS NOT NULL
+       GROUP BY m.id
+       ORDER BY last_activity DESC`
+    ).all();
+    res.json({ ok: true, journeys });
   });
 
   // ── Journal prompts (public read) ─────────────────────────────────────────

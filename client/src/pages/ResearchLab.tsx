@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Sparkles, FileStack, Loader2, CheckCircle2 } from "lucide-react";
+import { HumanImpactDashboard } from "@/components/HumanImpactDashboard";
 
 type DumpList = {
   id: number;
@@ -174,6 +175,8 @@ export default function ResearchLab() {
           Private marketing notes — Brian only. Claude summarizes; then draft social posts.
         </p>
       </header>
+
+      <HumanImpactDashboard />
 
       <div className="p-6 grid lg:grid-cols-2 gap-6 max-w-[1600px] mx-auto">
         <Card className="bg-[#111] border-white/10">

@@ -111,7 +111,7 @@ assert.throws(
       relationship_score: 3,
       outcome: "human_contact_made",
     }),
-  /less than or equal to 5/
+  /(less than or equal to 5|<=5)/
 );
 
 assert.throws(

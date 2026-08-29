@@ -158,6 +158,19 @@ export function HumanImpactDashboard() {
     }
   };
 
+  const startJourneyObservation = (journey: FatherJourney) => {
+    const completed = Number(journey.completed_steps || 0);
+    setForm((current) => ({
+      ...current,
+      participant_ref: `journey-${journey.member_id}`,
+      interaction_ref: `journey-${journey.member_id}-step-${Math.max(completed, 1)}`,
+      guidance_channel: "fatherhood_journey",
+      evidence_note: `Journey progress: ${completed}/5 steps completed.`,
+    }));
+    window.setTimeout(() => document.getElementById("human-impact-observation-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    toast.success("Journey touchpoint loaded into the observation form. Review scores and consent before saving.");
+  };
+
   const averageMovement = useMemo(() => {
     if (!summary) return null;
     const values = dimensions
@@ -209,7 +222,7 @@ export function HumanImpactDashboard() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left text-sm">
-                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-gray-500"><tr><th className="pb-3">Father</th><th className="pb-3">Progress</th><th className="pb-3">Current destination</th><th className="pb-3">Last activity</th></tr></thead>
+                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-gray-500"><tr><th className="pb-3">Father</th><th className="pb-3">Progress</th><th className="pb-3">Current destination</th><th className="pb-3">Last activity</th><th className="pb-3 text-right">Human impact</th></tr></thead>
                   <tbody className="divide-y divide-white/10">
                     {fatherJourneys.map((journey) => {
                       const completed = Number(journey.completed_steps || 0);
@@ -219,6 +232,7 @@ export function HumanImpactDashboard() {
                         <td className="py-4"><span className="font-bold text-primary">{completed}/5</span><div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-primary" style={{ width: `${completed * 20}%` }} /></div></td>
                         <td className="py-4 text-gray-300">{completed === 5 ? "Journey completed" : journeyLabel}</td>
                         <td className="py-4 text-gray-500">{journey.last_activity ? new Date(journey.last_activity).toLocaleString() : "—"}</td>
+                        <td className="py-4 text-right"><Button size="sm" variant="outline" onClick={() => startJourneyObservation(journey)}>Record impact</Button></td>
                       </tr>;
                     })}
                   </tbody>
@@ -229,7 +243,7 @@ export function HumanImpactDashboard() {
         </Card>
 
         <div className="grid xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 items-start">
-          <Card className="bg-[#111] border-white/10">
+          <Card id="human-impact-observation-form" className="bg-[#111] border-white/10 scroll-mt-6">
             <CardHeader>
               <CardTitle className="text-white">Record an observation</CardTitle>
               <p className="text-sm text-gray-500">Use the same participant and interaction references for a matched baseline and follow-up.</p>
@@ -240,7 +254,7 @@ export function HumanImpactDashboard() {
                   <Field label="Participant reference" required><Input value={form.participant_ref} onChange={(e) => setForm({ ...form, participant_ref: e.target.value })} placeholder="e.g. pilot-014" className="bg-black/40 border-white/10" /></Field>
                   <Field label="Interaction reference"><Input value={form.interaction_ref} onChange={(e) => setForm({ ...form, interaction_ref: e.target.value })} placeholder="e.g. call-2026-08-29" className="bg-black/40 border-white/10" /></Field>
                   <SelectField label="Phase" value={form.phase} onChange={(value) => setForm({ ...form, phase: value as FormState["phase"] })} options={["baseline", "follow_up"]} />
-                  <SelectField label="Guidance channel" value={form.guidance_channel} onChange={(value) => setForm({ ...form, guidance_channel: value })} options={["ai_coach", "human_coaching", "tuesday_live", "fatherhood_check_in", "email", "other"]} />
+                  <SelectField label="Guidance channel" value={form.guidance_channel} onChange={(value) => setForm({ ...form, guidance_channel: value })} options={["ai_coach", "human_coaching", "tuesday_live", "fatherhood_check_in", "fatherhood_journey", "email", "other"]} />
                   <SelectField label="Outcome" value={form.outcome} onChange={(value) => setForm({ ...form, outcome: value })} options={["not_yet_observed", "reflection_only", "decision_made", "communication_attempted", "human_contact_made", "relationship_improved", "relationship_unchanged", "relationship_worsened"]} />
                   <SelectField label="Consent scope" value={form.consent_scope} onChange={(value) => setForm({ ...form, consent_scope: value })} options={["program_improvement", "research_opt_in"]} />
                 </div>

@@ -21,6 +21,7 @@ export const humanImpactObservationSchema = z
       "human_coaching",
       "tuesday_live",
       "fatherhood_check_in",
+      "fatherhood_journey",
       "email",
       "other",
     ]),

@@ -12,6 +12,8 @@ export default function MemberLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const returnPath = new URLSearchParams(window.location.search).get("return");
+  const safeReturnPath = returnPath?.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/portal";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +30,7 @@ export default function MemberLogin() {
         setError(data.error || "Login failed");
       } else {
         if (data.billing_required) navigate("/member-billing");
-        else navigate("/portal");
+        else navigate(safeReturnPath);
       }
     } catch {
       setError("Server error. Please try again.");
@@ -101,7 +103,7 @@ export default function MemberLogin() {
 
             <p className="text-center text-xs mt-3">
               <a
-                href="mailto:Brian@bossmobility.net?subject=Papa%20Life%20Password%20Reset%20Request"
+                href="/member-forgot-password"
                 className="text-gray-500 hover:text-gray-400 transition-colors"
               >
                 Forgot password?

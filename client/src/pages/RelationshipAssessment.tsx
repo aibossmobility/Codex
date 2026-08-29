@@ -219,8 +219,8 @@ export default function RelationshipAssessment() {
 
                 <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                   <Button asChild size="lg" className="rounded-full bg-primary font-extrabold text-black hover:bg-primary/90">
-                    <a href="/papa-first-lesson">
-                      Start the Free Workshop
+                    <a href="/my-journey?from=check-in">
+                      Continue to My Journey
                       <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                     </a>
                   </Button>

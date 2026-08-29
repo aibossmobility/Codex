@@ -14,8 +14,7 @@ import { useState } from "react";
 const navigation = [
   { label: "Start Here", href: "#is-this-you" },
   { label: "Brian’s Story", href: "#brian-story" },
-  { label: "Media Library", href: "/media-library" },
-  { label: "Fatherhood Check-In", href: "/assessment" },
+  { label: "Start My Journey", href: "/assessment" },
   { label: "Member Login", href: "/member-login" },
 ];
 
@@ -257,7 +256,7 @@ export default function Home() {
                 href="/assessment"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/55 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
               >
-                Take the 2-Minute Check-In
+                Start My Journey
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>

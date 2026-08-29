@@ -36,6 +36,16 @@ type Observation = {
   observed_at: string;
 };
 
+type FatherJourney = {
+  member_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  started_steps: number;
+  completed_steps: number;
+  last_activity: string;
+};
+
 type FormState = {
   participant_ref: string;
   interaction_ref: string;
@@ -82,6 +92,7 @@ export function HumanImpactDashboard() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [observations, setObservations] = useState<Observation[]>([]);
+  const [fatherJourneys, setFatherJourneys] = useState<FatherJourney[]>([]);
   const [participantFilter, setParticipantFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,12 +103,14 @@ export function HumanImpactDashboard() {
     setError(null);
     try {
       const query = filter.trim() ? `?participant_ref=${encodeURIComponent(filter.trim())}&limit=50` : "?limit=50";
-      const [summaryData, observationData] = await Promise.all([
+      const [summaryData, observationData, journeyData] = await Promise.all([
         apiJson<{ summary: Summary }>(`/api/admin/human-impact/summary?program=${encodeURIComponent(form.program)}`),
         apiJson<{ observations: Observation[] }>(`/api/admin/human-impact/observations${query}`),
+        apiJson<{ journeys: FatherJourney[] }>("/api/admin/father-journeys"),
       ]);
       setSummary(summaryData.summary);
       setObservations(observationData.observations || []);
+      setFatherJourneys(journeyData.journeys || []);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The dashboard could not be loaded.");
     } finally {
@@ -182,6 +195,38 @@ export function HumanImpactDashboard() {
           <Metric label="Paired participants" value={loading ? "—" : String(summary?.paired_participant_count ?? 0)} icon={<Users className="w-5 h-5" />} />
           <Metric label="Average movement" value={loading ? "—" : averageMovement === null ? "Not paired" : `${averageMovement > 0 ? "+" : ""}${averageMovement}`} icon={<ArrowRight className="w-5 h-5" />} />
         </div>
+
+        <Card className="bg-[#111] border-white/10">
+          <CardHeader>
+            <CardTitle className="text-white">Father journey progress</CardTitle>
+            <p className="text-sm text-gray-500">See who started, where progress stopped, and when personal support may be needed.</p>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="py-8 flex items-center justify-center text-gray-500"><Loader2 className="w-5 h-5 mr-2 animate-spin" />Loading journeys</div>
+            ) : fatherJourneys.length === 0 ? (
+              <div className="py-8 text-center text-sm text-gray-500">No father has started the interactive journey yet.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[680px] text-left text-sm">
+                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-gray-500"><tr><th className="pb-3">Father</th><th className="pb-3">Progress</th><th className="pb-3">Current destination</th><th className="pb-3">Last activity</th></tr></thead>
+                  <tbody className="divide-y divide-white/10">
+                    {fatherJourneys.map((journey) => {
+                      const completed = Number(journey.completed_steps || 0);
+                      const journeyLabel = ["Awareness", "Engage", "Understand", "Take Action", "Reconnection"][Math.min(completed, 4)];
+                      return <tr key={journey.member_id}>
+                        <td className="py-4"><p className="font-semibold text-white">{journey.first_name} {journey.last_name}</p><p className="text-xs text-gray-500">{journey.email}</p></td>
+                        <td className="py-4"><span className="font-bold text-primary">{completed}/5</span><div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-primary" style={{ width: `${completed * 20}%` }} /></div></td>
+                        <td className="py-4 text-gray-300">{completed === 5 ? "Journey completed" : journeyLabel}</td>
+                        <td className="py-4 text-gray-500">{journey.last_activity ? new Date(journey.last_activity).toLocaleString() : "—"}</td>
+                      </tr>;
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="grid xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 items-start">
           <Card className="bg-[#111] border-white/10">

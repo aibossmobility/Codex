@@ -26,3 +26,9 @@ It uses paired `baseline` and `follow_up` observations on a 1–5 scale. The sys
 - `GET /api/admin/human-impact/summary`
 
 The observation contract intentionally rejects unknown fields, including direct PII fields such as `email`.
+
+## Approved Papa Life touchpoint bridge
+
+The private Research Lab can prefill a human-impact observation from a Fatherhood Journey row. The bridge uses a pseudonymous `journey-<member id>` participant reference and a step-scoped interaction reference, and marks the guidance channel as `fatherhood_journey`.
+
+The bridge deliberately does **not** infer scores, assign consent, or save automatically. Brian reviews the five scores, outcome, consent scope, and evidence note before any observation is stored. No father or adult child is messaged by this workflow.

@@ -1,4 +1,3 @@
-fatal: path 'scripts/recover-sqlite-wal.mjs' exists on disk, but not in 'origin/main'
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";

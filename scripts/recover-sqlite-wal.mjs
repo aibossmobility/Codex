@@ -112,7 +112,14 @@ try {
     console.warn(`[sqlite-recovery] native recovery succeeded and replacement validated: ${JSON.stringify(finalCounts)}`);
   } catch (recoveryError) {
     console.error(`[sqlite-recovery] native recovery did not complete safely: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`);
-    console.error(`[sqlite-recovery] original database remains in place; backups are preserved with stamp ${stamp}`);
-    throw error;
+    const quarantinedDb = `${dbPath}.quarantined-${stamp}`;
+    const quarantinedWal = `${walPath}.quarantined-${stamp}`;
+    const quarantinedShm = `${shmPath}.quarantined-${stamp}`;
+    moveIfPresent(dbPath, quarantinedDb);
+    moveIfPresent(walPath, quarantinedWal);
+    moveIfPresent(shmPath, quarantinedShm);
+    console.warn(
+      `[sqlite-recovery] corrupt database quarantined after exact backups were preserved; startup will create a clean database (stamp ${stamp})`
+    );
   }
 }

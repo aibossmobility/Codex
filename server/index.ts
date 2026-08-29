@@ -1980,11 +1980,11 @@ const allowedAiOrigins = new Set([
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com",
+  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com https://in.heycatch.ai",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai",
   "media-src 'self' blob: data:",
   "frame-src 'self' https://meetn.com",
   "object-src 'none'",
@@ -6312,6 +6312,11 @@ async function startServer() {
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));
     res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);
+  });
+
+  app.get(/^\/([a-z0-9])$/, (req, res) => {
+    const campaign = encodeURIComponent(String(req.params[0] || ""));
+    res.redirect(302, `/?utm_source=heycatch&utm_campaign=${campaign}`);
   });
 
   app.use("/api", (_req, res) => {

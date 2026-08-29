@@ -16,6 +16,7 @@
     "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs"
   },
   "dependencies": {
+    "@heycatch/sdk": "^0.7.0",
     "@hookform/resolvers": "^5.2.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@radix-ui/react-accordion": "^1.2.12",

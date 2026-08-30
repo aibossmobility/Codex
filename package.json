@@ -12,6 +12,7 @@
     "check": "tsc --noEmit",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
     "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
+    "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
     "check:voice": "node scripts/validate-elevenlabs-voice.mjs",
     "format": "prettier --write .",
     "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs"

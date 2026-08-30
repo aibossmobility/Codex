@@ -77,7 +77,7 @@ export function actionRequiresApproval(input: {
   const mandatory =
     input.authority_level === "act_external" ||
     input.authority_level === "sensitive" ||
-    ["send", "publish", "delete", "execute"].includes(input.action_type) ||
+    ["create", "update", "send", "publish", "delete", "execute"].includes(input.action_type) ||
     input.execution_route === "cloud_model";
   return mandatory || input.approval_required === true;
 }

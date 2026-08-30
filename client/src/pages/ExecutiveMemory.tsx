@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ExecutiveActionQueue } from "@/components/ExecutiveActionQueue";
 
 type MemoryItem = {
   id: number;
@@ -177,6 +178,10 @@ export default function ExecutiveMemory() {
               <CardContent>{loading ? <Loading label="Loading conversations" /> : briefs.length === 0 ? <Empty text="No conversation briefs have been stored yet." /> : <div className="divide-y divide-white/10">{briefs.slice(0, 10).map((brief) => <div key={brief.id} className="py-3 first:pt-0"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium">{brief.session_ref}</p><span className="text-xs text-primary">{titleCase(brief.channel)} · {titleCase(brief.status)}</span></div><p className="mt-2 text-sm text-gray-300">{brief.summary}</p>{brief.next_action && <p className="mt-2 text-xs text-brand-yellow">Next: {brief.next_action}</p>}</div>)}</div>}</CardContent>
             </Card>
           </div>
+        </div>
+
+        <div className="border-t border-white/10 pt-8">
+          <ExecutiveActionQueue />
         </div>
       </main>
     </div>

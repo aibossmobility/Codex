@@ -13,7 +13,7 @@ File operations, memory retrieval, Gmail/Calendar lookups, GitHub status reads, 
 
 ## Approval policy
 
-Sending, publishing, deleting, executing, external-consequential work, sensitive work, and cloud-model use always require approval. Read-only deterministic actions can be policy-approved. Approval makes an action eligible; it does not execute it in this slice.
+Creating, updating, sending, publishing, deleting, executing, external-consequential work, sensitive work, and cloud-model use always require approval. Read-only deterministic actions can be policy-approved. Approval makes an action eligible; it does not execute it in this slice.
 
 Every action records its route, provider when relevant, estimated external AI cost, status, source conversation, optional human-impact linkage, and an append-only audit trail.
 

@@ -70,8 +70,58 @@ export function createDesktopCommanderExecutor(fetchImpl: typeof fetch = fetch):
   };
 }
 
+
+function resolveGmailConnectorEndpoint() {
+  return String(process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT || "").trim();
+}
+
+function resolveGmailConnectorToken() {
+  return String(process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN || "").trim();
+}
+
+export function createGmailReadExecutor(fetchImpl: typeof fetch = fetch): ExecutiveActionExecutor {
+  return async (action) => {
+    if (!["read", "search"].includes(action.action_type)) {
+      throw new Error(`Gmail executor only permits read/search actions; received ${action.action_type}.`);
+    }
+    const endpoint = resolveGmailConnectorEndpoint();
+    if (!endpoint) {
+      throw new Error("Gmail connector executor is not configured on this runtime.");
+    }
+    const token = resolveGmailConnectorToken();
+    if (!token) {
+      throw new Error("Gmail connector token is not configured on this runtime.");
+    }
+    const response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        action_id: action.id,
+        operation: action.action_type,
+        target_ref: action.target_ref,
+        requested_outcome: action.requested_outcome,
+      }),
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`Gmail connector returned ${response.status}: ${text.slice(0, 500)}`);
+    }
+    let details: unknown = text;
+    try {
+      details = text ? JSON.parse(text) : null;
+    } catch {
+      // Keep plain-text connector responses as-is.
+    }
+    return { summary: "Gmail read/search action completed through the configured connector.", details };
+  };
+}
+
 export function defaultExecutorRegistry(): ExecutorRegistry {
   return {
+    gmail: createGmailReadExecutor(),
     desktop_commander: createDesktopCommanderExecutor(),
     files: createDesktopCommanderExecutor(),
   };

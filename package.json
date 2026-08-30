@@ -18,7 +18,8 @@
     "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs",
     "test:action-executor": "node --import tsx server/executive-action-executor.test.ts",
     "test:local-bridge": "node --import tsx server/ai-boss-local-bridge.test.ts",
-    "start:ai-boss-bridge": "node dist/ai-boss-local-bridge.js"
+    "start:ai-boss-bridge": "node dist/ai-boss-local-bridge.js",
+    "test:gmail-executor": "node --import tsx server/executive-action-executor.test.ts"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

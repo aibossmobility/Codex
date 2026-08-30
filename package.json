@@ -15,7 +15,8 @@
     "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
     "check:voice": "node scripts/validate-elevenlabs-voice.mjs",
     "format": "prettier --write .",
-    "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs"
+    "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs",
+    "test:action-executor": "node --import tsx server/executive-action-executor.test.ts"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

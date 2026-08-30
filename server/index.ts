@@ -42,6 +42,7 @@ import {
   getExecutiveActionAudit,
   listExecutiveActions,
 } from "./executive-action-queue-store";
+import { executeApprovedExecutiveAction } from "./executive-action-executor";
 import {
   createHumanImpactObservation,
   ensureHumanImpactTables,
@@ -6216,6 +6217,19 @@ async function startServer() {
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       res.status(message === "Action not found" ? 404 : 400).json({ ok: false, error: message });
+    }
+  });
+
+  app.post("/api/admin/action-queue/:id/execute", requireAuth, requireResearchLabAccess, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      const action = await executeApprovedExecutiveAction(db, id);
+      res.json({ ok: true, action });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      const status = message === "Action not found" ? 404 : message.includes("not configured") ? 503 : 400;
+      res.status(status).json({ ok: false, error: message });
     }
   });
 

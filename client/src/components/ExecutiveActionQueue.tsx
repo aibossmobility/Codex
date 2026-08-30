@@ -109,7 +109,7 @@ export function ExecutiveActionQueue() {
   return (
     <section className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div><h2 className="text-2xl font-bold">Authority-controlled action queue</h2><p className="mt-2 text-sm text-gray-400 max-w-3xl">Direct connector and local Mac routes are preferred. External, sensitive, destructive, sending, publishing, and cloud-model actions wait for your approval.</p></div>
+        <div><h2 className="text-2xl font-bold">Authority-controlled action queue</h2><p className="mt-2 text-sm text-gray-400 max-w-3xl">Direct connector and local Mac routes are preferred. Every modifying, external, sensitive, destructive, publishing, and cloud-model action waits for your approval.</p></div>
         <div className="flex items-center gap-2 text-xs text-gray-400 border border-white/10 rounded-lg px-3 py-2 bg-black/30"><Gauge className="w-4 h-4 text-primary" />No executor is enabled in this slice</div>
       </div>
 

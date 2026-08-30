@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --host",
-    "build": "node scripts/generate-master-knowledge-page.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "node scripts/generate-master-knowledge-page.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-local-bridge.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "prestart": "node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
@@ -16,7 +16,9 @@
     "check:voice": "node scripts/validate-elevenlabs-voice.mjs",
     "format": "prettier --write .",
     "sync:papa-ai-promos": "node scripts/sync-papa-ai-promos.mjs",
-    "test:action-executor": "node --import tsx server/executive-action-executor.test.ts"
+    "test:action-executor": "node --import tsx server/executive-action-executor.test.ts",
+    "test:local-bridge": "node --import tsx server/ai-boss-local-bridge.test.ts",
+    "start:ai-boss-bridge": "node dist/ai-boss-local-bridge.js"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

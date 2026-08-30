@@ -31,6 +31,10 @@ function resolveDesktopCommanderEndpoint() {
   return String(process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT || "").trim();
 }
 
+function resolveDesktopCommanderToken() {
+  return String(process.env.AI_BOSS_LOCAL_BRIDGE_TOKEN || "").trim();
+}
+
 export function createDesktopCommanderExecutor(fetchImpl: typeof fetch = fetch): ExecutiveActionExecutor {
   return async (action) => {
     const endpoint = resolveDesktopCommanderEndpoint();
@@ -39,10 +43,14 @@ export function createDesktopCommanderExecutor(fetchImpl: typeof fetch = fetch):
     }
     const response = await fetchImpl(endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        ...(resolveDesktopCommanderToken() ? { authorization: `Bearer ${resolveDesktopCommanderToken()}` } : {}),
+      },
       body: JSON.stringify({
         action_id: action.id,
         action_type: action.action_type,
+        target_system: action.target_system,
         target_ref: action.target_ref,
         requested_outcome: action.requested_outcome,
         authority_level: action.authority_level,

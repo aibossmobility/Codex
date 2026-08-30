@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Sparkles, FileStack, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Sparkles, FileStack, Loader2, CheckCircle2, Brain } from "lucide-react";
 import { HumanImpactDashboard } from "@/components/HumanImpactDashboard";
 
 type DumpList = {
@@ -174,6 +174,9 @@ export default function ResearchLab() {
         <p className="text-gray-500 text-sm ml-auto max-w-xl text-right hidden md:block">
           Private marketing notes — Brian only. Claude summarizes; then draft social posts.
         </p>
+        <Button variant="outline" size="sm" className="border-white/15" onClick={() => navigate("/executive-memory")}>
+          <Brain className="w-4 h-4 mr-2" /> Executive memory
+        </Button>
       </header>
 
       <HumanImpactDashboard />

@@ -26,6 +26,7 @@ import Operators from "./pages/Operators";
 import Governance from "./pages/Governance";
 import Booking from "./pages/Booking";
 import ResearchLab from "./pages/ResearchLab";
+import ExecutiveMemory from "./pages/ExecutiveMemory";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
@@ -108,6 +109,7 @@ function Router() {
       <Route path={"/governance"} component={Governance} />
       <Route path={"/booking"} component={Booking} />
       <Route path={"/research-lab"} component={ResearchLab} />
+      <Route path={"/executive-memory"} component={ExecutiveMemory} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -131,6 +133,7 @@ function GlobalPapaAiWidget() {
     "/my-journey",
     "/join",
     "/research-lab",
+    "/executive-memory",
     "/admin",
     "/strategist",
     "/theme-matrix",

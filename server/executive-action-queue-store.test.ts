@@ -21,6 +21,10 @@ assert.equal(
   actionRequiresApproval({ action_type: "send", authority_level: "act_external", execution_route: "direct" }),
   true
 );
+assert.equal(
+  actionRequiresApproval({ action_type: "update", authority_level: "observe", execution_route: "direct" }),
+  true
+);
 
 const safe = createExecutiveAction(db, {
   action_type: "read",

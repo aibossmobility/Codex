@@ -102,6 +102,7 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
         'completed', 'failed', 'declined'
       )),
       result_summary TEXT,
+      result_json TEXT,
       error_summary TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -128,6 +129,10 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
     CREATE INDEX IF NOT EXISTS idx_executive_action_audit_action
       ON executive_action_audit(action_id, id ASC);
   `);
+  const actionColumns = db.prepare("PRAGMA table_info(executive_actions)").all() as Array<{ name: string }>;
+  if (!actionColumns.some((column) => column.name === "result_json")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN result_json TEXT");
+  }
 }
 
 export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: ExecutiveActionInput) {
@@ -147,6 +152,12 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
 
   const status = approvalRequired ? "awaiting_approval" : "approved";
   const transaction = db.transaction(() => {
+    if (parsed.human_impact_observation_id) {
+      const observation = db
+        .prepare("SELECT id FROM human_impact_observations WHERE id = ?")
+        .get(parsed.human_impact_observation_id);
+      if (!observation) throw new Error("Human-impact observation not found.");
+    }
     const result = db
       .prepare(
         `INSERT INTO executive_actions (
@@ -269,8 +280,16 @@ export function completeExecutiveActionExecution(
   db: BetterSqliteDatabase,
   id: number,
   summary: string,
-  actor = "executor"
+  actor = "executor",
+  details?: unknown
 ) {
+  let resultJson: string | null = null;
+  if (details !== undefined) {
+    resultJson = JSON.stringify(details) ?? JSON.stringify(String(details));
+    if (Buffer.byteLength(resultJson, "utf8") > 1_000_000) {
+      throw new Error("Executor result exceeds the 1 MB storage limit.");
+    }
+  }
   const transaction = db.transaction(() => {
     const current = getExecutiveActionById(db, id) as { status?: string } | undefined;
     if (!current) throw new Error("Action not found");
@@ -278,9 +297,9 @@ export function completeExecutiveActionExecution(
       throw new Error(`Only executing actions can complete; current status is ${current.status}`);
     }
     db.prepare(
-      `UPDATE executive_actions SET status = 'completed', result_summary = ?, error_summary = NULL,
+      `UPDATE executive_actions SET status = 'completed', result_summary = ?, result_json = ?, error_summary = NULL,
        updated_at = datetime('now'), completed_at = datetime('now') WHERE id = ?`
-    ).run(summary.slice(0, 4000), id);
+    ).run(summary.slice(0, 4000), resultJson, id);
     db.prepare(
       `INSERT INTO executive_action_audit
        (action_id, event_type, from_status, to_status, note, actor)

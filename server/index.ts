@@ -36,6 +36,13 @@ import {
   saveExecutiveConversationBrief,
 } from "./executive-memory-store";
 import {
+  createExecutiveAction,
+  decideExecutiveAction,
+  ensureExecutiveActionQueueTables,
+  getExecutiveActionAudit,
+  listExecutiveActions,
+} from "./executive-action-queue-store";
+import {
   createHumanImpactObservation,
   ensureHumanImpactTables,
   listHumanImpactObservations,
@@ -708,6 +715,7 @@ try {
 ensureResearchTables(db);
 ensureExecutiveMemoryTables(db);
 ensureHumanImpactTables(db);
+ensureExecutiveActionQueueTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
@@ -6174,6 +6182,48 @@ async function startServer() {
   app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
     try {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const actions = listExecutiveActions(db, {
+        status: String(req.query.status || "").trim() || undefined,
+        targetSystem: String(req.query.target_system || "").trim() || undefined,
+        limit: Number(req.query.limit || 100),
+      });
+      res.json({ ok: true, actions });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, action: createExecutiveAction(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/action-queue/:id/decision", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      res.json({ ok: true, action: decideExecutiveAction(db, id, req.body) });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      res.status(message === "Action not found" ? 404 : 400).json({ ok: false, error: message });
+    }
+  });
+
+  app.get("/api/admin/action-queue/:id/audit", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      res.json({ ok: true, audit: getExecutiveActionAudit(db, id) });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }

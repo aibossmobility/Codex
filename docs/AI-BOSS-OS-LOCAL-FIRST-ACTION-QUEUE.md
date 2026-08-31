@@ -13,7 +13,7 @@ File operations, memory retrieval, Gmail/Calendar lookups, GitHub status reads, 
 
 ## Approval policy
 
-Creating, updating, sending, publishing, deleting, executing, external-consequential work, sensitive work, and cloud-model use always require approval. Read-only deterministic actions can be policy-approved. Approval makes an action eligible; it does not execute it in this slice.
+Creating, updating, sending, publishing, deleting, executing, external-consequential work, sensitive work, and cloud-model use always require approval. Read-only deterministic actions can be policy-approved, but still run only when Brian presses **Run read-only**.
 
 Every action records its route, provider when relevant, estimated external AI cost, status, source conversation, optional human-impact linkage, and an append-only audit trail.
 
@@ -23,4 +23,4 @@ Every action records its route, provider when relevant, estimated external AI co
 
 ## Safety boundary
 
-This pull request deliberately includes no connector or Desktop Commander executor. The queue can prepare and authorize actions without producing external side effects while the authority policy is reviewed.
+The executor foundation is limited to Gmail read/search through an explicitly configured private connector and local Mac/file read/search through a token-protected loopback bridge. Modifying actions have no registered executor. Local paths are canonicalized before approved-root checks, connector calls have timeouts and bounded responses, and complete structured results are stored separately from their short summaries.

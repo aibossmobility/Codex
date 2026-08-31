@@ -147,6 +147,12 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
 
   const status = approvalRequired ? "awaiting_approval" : "approved";
   const transaction = db.transaction(() => {
+    if (parsed.human_impact_observation_id) {
+      const observation = db
+        .prepare("SELECT id FROM human_impact_observations WHERE id = ?")
+        .get(parsed.human_impact_observation_id);
+      if (!observation) throw new Error("Human-impact observation not found.");
+    }
     const result = db
       .prepare(
         `INSERT INTO executive_actions (

@@ -37,15 +37,31 @@ function resolveExecutorTimeoutMs() {
   return Math.min(Math.max(Math.round(configured), 1_000), 120_000);
 }
 
-function formatCompletedSummary(result: ExecutorResult) {
-  if (result.details === undefined) return result.summary;
-  let serialized: string;
-  try {
-    serialized = typeof result.details === "string" ? result.details : JSON.stringify(result.details);
-  } catch {
-    serialized = String(result.details);
+function resolveExecutorResultMaxBytes() {
+  const configured = Number(process.env.AI_BOSS_EXECUTOR_RESULT_MAX_BYTES || 1_000_000);
+  if (!Number.isFinite(configured)) return 1_000_000;
+  return Math.min(Math.max(Math.round(configured), 1_000), 2_000_000);
+}
+
+async function readBoundedResponseText(response: Response) {
+  const maxBytes = resolveExecutorResultMaxBytes();
+  const declaredLength = Number(response.headers.get("content-length") || 0);
+  if (declaredLength > maxBytes) throw new Error(`Connector response exceeds the ${maxBytes}-byte limit.`);
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+    if (totalBytes > maxBytes) {
+      await reader.cancel();
+      throw new Error(`Connector response exceeds the ${maxBytes}-byte limit.`);
+    }
+    chunks.push(value);
   }
-  return `${result.summary}\nResult: ${serialized}`.slice(0, 4000);
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString("utf8");
 }
 
 function resolveDesktopCommanderEndpoint() {
@@ -81,7 +97,7 @@ export function createDesktopCommanderExecutor(fetchImpl: typeof fetch = fetch):
       }),
       signal: AbortSignal.timeout(resolveExecutorTimeoutMs()),
     });
-    const text = await response.text();
+    const text = await readBoundedResponseText(response);
     if (!response.ok) {
       throw new Error(`Desktop Commander bridge returned ${response.status}: ${text.slice(0, 500)}`);
     }
@@ -133,7 +149,7 @@ export function createGmailReadExecutor(fetchImpl: typeof fetch = fetch): Execut
       }),
       signal: AbortSignal.timeout(resolveExecutorTimeoutMs()),
     });
-    const text = await response.text();
+    const text = await readBoundedResponseText(response);
     if (!response.ok) {
       throw new Error(`Gmail connector returned ${response.status}: ${text.slice(0, 500)}`);
     }
@@ -174,7 +190,7 @@ export async function executeApprovedExecutiveAction(
   beginExecutiveActionExecution(db, id, "executor");
   try {
     const result = await executor({ ...row, status: "executing" });
-    return completeExecutiveActionExecution(db, id, formatCompletedSummary(result), "executor");
+    return completeExecutiveActionExecution(db, id, result.summary, "executor", result.details);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     failExecutiveActionExecution(db, id, message, "executor");

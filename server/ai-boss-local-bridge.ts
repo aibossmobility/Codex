@@ -15,17 +15,30 @@ const bridgeRequestSchema = z.object({
 
 export type LocalBridgeRequest = z.infer<typeof bridgeRequestSchema>;
 
-function allowedRoots() {
+async function allowedRoots() {
   const configured = String(process.env.AI_BOSS_LOCAL_ALLOWED_ROOTS || "").trim();
   const roots = configured ? configured.split(path.delimiter) : [os.homedir()];
-  return roots.map((root) => path.resolve(root.trim())).filter(Boolean);
+  return Promise.all(roots.map((root) => root.trim()).filter(Boolean).map((root) => fs.realpath(path.resolve(root))));
 }
 
-function resolveAllowedPath(rawPath: string) {
-  const candidate = path.resolve(rawPath.replace(/^file:/, ""));
-  const allowed = allowedRoots().some((root) => candidate === root || candidate.startsWith(`${root}${path.sep}`));
+async function resolveAllowedPath(rawPath: string) {
+  const candidate = await fs.realpath(path.resolve(rawPath.replace(/^(file|dir):/, "")));
+  const roots = await allowedRoots();
+  const allowed = roots.some((root) => candidate === root || candidate.startsWith(`${root}${path.sep}`));
   if (!allowed) throw new Error("Requested path is outside AI Boss OS approved local roots.");
   return candidate;
+}
+
+function parseSearchTarget(targetRef: string) {
+  const marker = "::query=";
+  const markerIndex = targetRef.lastIndexOf(marker);
+  if (markerIndex < 0) {
+    throw new Error(`Search targets must include ${marker}<text>.`);
+  }
+  const target = targetRef.slice(0, markerIndex);
+  const query = targetRef.slice(markerIndex + marker.length).trim();
+  if (!target || !query) throw new Error("Search target and query are required.");
+  return { target, query };
 }
 
 async function desktopRead(targetRef: string) {
@@ -50,9 +63,20 @@ async function desktopRead(targetRef: string) {
   throw new Error(`Unsupported Desktop Commander read target: ${targetRef}`);
 }
 
+async function desktopSearch(targetRef: string) {
+  const { target, query } = parseSearchTarget(targetRef);
+  if (target !== "mac:processes") {
+    throw new Error(`Unsupported Desktop Commander search target: ${target}`);
+  }
+  const processes = await desktopRead(target);
+  const normalizedQuery = query.toLocaleLowerCase();
+  const matches = (processes as string[]).filter((process) => process.toLocaleLowerCase().includes(normalizedQuery));
+  return { query, match_count: matches.length, matches };
+}
+
 async function filesRead(targetRef: string) {
   if (targetRef.startsWith("file:")) {
-    const filePath = resolveAllowedPath(targetRef);
+    const filePath = await resolveAllowedPath(targetRef);
     const stat = await fs.stat(filePath);
     if (!stat.isFile()) throw new Error("Requested file target is not a regular file.");
     if (stat.size > 1_000_000) throw new Error("Local bridge file reads are limited to 1 MB.");
@@ -60,11 +84,37 @@ async function filesRead(targetRef: string) {
     return { path: filePath, size_bytes: stat.size, content };
   }
   if (targetRef.startsWith("dir:")) {
-    const directoryPath = resolveAllowedPath(targetRef.replace(/^dir:/, ""));
+    const directoryPath = await resolveAllowedPath(targetRef);
     const entries = await fs.readdir(directoryPath, { withFileTypes: true });
     return entries.slice(0, 500).map((entry) => ({ name: entry.name, type: entry.isDirectory() ? "directory" : entry.isFile() ? "file" : "other" }));
   }
   throw new Error(`Unsupported files read target: ${targetRef}`);
+}
+
+async function filesSearch(targetRef: string) {
+  const { target, query } = parseSearchTarget(targetRef);
+  const normalizedQuery = query.toLocaleLowerCase();
+  if (target.startsWith("file:")) {
+    const filePath = await resolveAllowedPath(target);
+    const stat = await fs.stat(filePath);
+    if (!stat.isFile()) throw new Error("Requested file target is not a regular file.");
+    if (stat.size > 1_000_000) throw new Error("Local bridge file searches are limited to 1 MB.");
+    const content = await fs.readFile(filePath, "utf8");
+    const matches = content.split(/\r?\n/).flatMap((line, index) =>
+      line.toLocaleLowerCase().includes(normalizedQuery) ? [{ line_number: index + 1, text: line }] : []
+    ).slice(0, 200);
+    return { path: filePath, query, match_count: matches.length, matches };
+  }
+  if (target.startsWith("dir:")) {
+    const directoryPath = await resolveAllowedPath(target);
+    const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+    const matches = entries
+      .filter((entry) => entry.name.toLocaleLowerCase().includes(normalizedQuery))
+      .slice(0, 500)
+      .map((entry) => ({ name: entry.name, type: entry.isDirectory() ? "directory" : entry.isFile() ? "file" : "other" }));
+    return { path: directoryPath, query, match_count: matches.length, matches };
+  }
+  throw new Error(`Unsupported files search target: ${target}`);
 }
 
 export async function executeLocalBridgeRequest(raw: unknown) {
@@ -73,8 +123,8 @@ export async function executeLocalBridgeRequest(raw: unknown) {
     throw new Error("Local bridge currently supports read/search actions only.");
   }
   const details = request.target_system === "desktop_commander"
-    ? await desktopRead(request.target_ref)
-    : await filesRead(request.target_ref);
+    ? request.action_type === "search" ? await desktopSearch(request.target_ref) : await desktopRead(request.target_ref)
+    : request.action_type === "search" ? await filesSearch(request.target_ref) : await filesRead(request.target_ref);
   return {
     ok: true,
     bridge_version: "1",

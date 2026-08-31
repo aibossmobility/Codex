@@ -25,8 +25,22 @@ const completed = await executeApprovedExecutiveAction(db, Number(action?.id), {
 });
 assert.equal(completed?.status, "completed");
 assert.match(String(completed?.result_summary), /successfully/i);
-assert.match(String(completed?.result_summary), /boss-mac/i);
+assert.match(String(completed?.result_json), /boss-mac/i);
 assert.equal(getExecutiveActionAudit(db, Number(action?.id)).length, 3);
+
+const largeAction = createExecutiveAction(db, {
+  action_type: "read",
+  target_system: "desktop_commander",
+  target_ref: "mac:status",
+  requested_outcome: "Preserve a complete bounded result.",
+  authority_level: "observe",
+  estimated_external_ai_cost_micros: 0,
+});
+const largeValue = "x".repeat(12_000);
+const largeCompleted = await executeApprovedExecutiveAction(db, Number(largeAction?.id), {
+  "desktop_commander:local": async () => ({ summary: "Large result preserved.", details: { largeValue } }),
+});
+assert.equal(JSON.parse(String(largeCompleted?.result_json)).largeValue.length, 12_000);
 
 const unsupported = createExecutiveAction(db, {
   action_type: "read",
@@ -90,7 +104,7 @@ const gmailRead = createExecutiveAction(db, {
 const gmailDone = await executeApprovedExecutiveAction(db, Number(gmailRead?.id), { "gmail:direct": gmailExecutor });
 assert.equal(gmailDone?.status, "completed");
 assert.equal(capturedAuth, "Bearer test-only-token");
-assert.match(String(gmailDone?.result_summary), /messages/i);
+assert.match(String(gmailDone?.result_json), /messages/i);
 await assert.rejects(
   () => createGmailReadExecutor(async () => new Response("ok"))({
     id: 999, action_type: "send", target_system: "gmail", target_ref: null,

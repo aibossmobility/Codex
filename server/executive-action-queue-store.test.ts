@@ -63,5 +63,17 @@ assert.throws(
   /must name/i
 );
 
+assert.throws(
+  () => createExecutiveAction(db, {
+    action_type: "read",
+    target_system: "human_impact",
+    requested_outcome: "Read a missing human-impact observation.",
+    authority_level: "observe",
+    human_impact_observation_id: 999,
+    estimated_external_ai_cost_micros: 0,
+  }),
+  /observation not found/i
+);
+
 assert.equal(listExecutiveActions(db).length, 2);
 console.log("✓ Action queue defaults local/direct, gates consequential work, and audits decisions");

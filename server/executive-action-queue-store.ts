@@ -102,6 +102,7 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
         'completed', 'failed', 'declined'
       )),
       result_summary TEXT,
+      result_json TEXT,
       error_summary TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -128,6 +129,10 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
     CREATE INDEX IF NOT EXISTS idx_executive_action_audit_action
       ON executive_action_audit(action_id, id ASC);
   `);
+  const actionColumns = db.prepare("PRAGMA table_info(executive_actions)").all() as Array<{ name: string }>;
+  if (!actionColumns.some((column) => column.name === "result_json")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN result_json TEXT");
+  }
 }
 
 export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: ExecutiveActionInput) {
@@ -241,6 +246,91 @@ export function decideExecutiveAction(
        (action_id, event_type, from_status, to_status, note, actor)
        VALUES (?, ?, 'awaiting_approval', ?, ?, 'brian')`
     ).run(id, input.decision, toStatus, input.note || null);
+    return getExecutiveActionById(db, id);
+  });
+  return transaction();
+}
+
+export function beginExecutiveActionExecution(
+  db: BetterSqliteDatabase,
+  id: number,
+  actor = "executor"
+) {
+  const transaction = db.transaction(() => {
+    const current = getExecutiveActionById(db, id) as { status?: string } | undefined;
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "approved") {
+      throw new Error(`Only approved actions can execute; current status is ${current.status}`);
+    }
+    db.prepare(
+      `UPDATE executive_actions SET status = 'executing', updated_at = datetime('now'),
+       error_summary = NULL WHERE id = ?`
+    ).run(id);
+    db.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_started', 'approved', 'executing', NULL, ?)`
+    ).run(id, actor);
+    return getExecutiveActionById(db, id);
+  });
+  return transaction();
+}
+
+export function completeExecutiveActionExecution(
+  db: BetterSqliteDatabase,
+  id: number,
+  summary: string,
+  actor = "executor",
+  details?: unknown
+) {
+  let resultJson: string | null = null;
+  if (details !== undefined) {
+    resultJson = JSON.stringify(details) ?? JSON.stringify(String(details));
+    if (Buffer.byteLength(resultJson, "utf8") > 1_000_000) {
+      throw new Error("Executor result exceeds the 1 MB storage limit.");
+    }
+  }
+  const transaction = db.transaction(() => {
+    const current = getExecutiveActionById(db, id) as { status?: string } | undefined;
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "executing") {
+      throw new Error(`Only executing actions can complete; current status is ${current.status}`);
+    }
+    db.prepare(
+      `UPDATE executive_actions SET status = 'completed', result_summary = ?, result_json = ?, error_summary = NULL,
+       updated_at = datetime('now'), completed_at = datetime('now') WHERE id = ?`
+    ).run(summary.slice(0, 4000), resultJson, id);
+    db.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_completed', 'executing', 'completed', ?, ?)`
+    ).run(id, summary.slice(0, 2000), actor);
+    return getExecutiveActionById(db, id);
+  });
+  return transaction();
+}
+
+export function failExecutiveActionExecution(
+  db: BetterSqliteDatabase,
+  id: number,
+  errorSummary: string,
+  actor = "executor"
+) {
+  const transaction = db.transaction(() => {
+    const current = getExecutiveActionById(db, id) as { status?: string } | undefined;
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "executing") {
+      throw new Error(`Only executing actions can fail; current status is ${current.status}`);
+    }
+    db.prepare(
+      `UPDATE executive_actions SET status = 'failed', error_summary = ?,
+       updated_at = datetime('now'), completed_at = datetime('now') WHERE id = ?`
+    ).run(errorSummary.slice(0, 4000), id);
+    db.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_failed', 'executing', 'failed', ?, ?)`
+    ).run(id, errorSummary.slice(0, 2000), actor);
     return getExecutiveActionById(db, id);
   });
   return transaction();

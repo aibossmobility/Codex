@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Check, Cloud, Cpu, Gauge, Loader2, ShieldAlert, X } from "lucide-react";
+import { Check, Cloud, Cpu, Gauge, Loader2, Play, ShieldAlert, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,8 @@ type ActionItem = {
   provider_id: string | null;
   estimated_external_ai_cost_micros: number;
   status: string;
+  result_summary: string | null;
+  result_json: string | null;
   created_at: string;
 };
 
@@ -36,6 +38,7 @@ export function ExecutiveActionQueue() {
   const [actions, setActions] = useState<ActionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [executingId, setExecutingId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [form, setForm] = useState({
     action_type: "read",
@@ -99,10 +102,24 @@ export function ExecutiveActionQueue() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ decision }),
       });
-      toast.success(decision === "approve" ? "Action approved. It is ready for a future executor." : "Action declined.");
+      toast.success(decision === "approve" ? "Action approved and ready for manual execution." : "Action declined.");
       await load();
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "Decision could not be recorded.");
+    }
+  };
+
+  const executeAction = async (id: number) => {
+    setExecutingId(id);
+    try {
+      await apiJson(`/api/admin/action-queue/${id}/execute`, { method: "POST" });
+      toast.success("Read-only action completed.");
+      await load();
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "Action could not be executed.");
+      await load();
+    } finally {
+      setExecutingId(null);
     }
   };
 
@@ -110,7 +127,7 @@ export function ExecutiveActionQueue() {
     <section className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div><h2 className="text-2xl font-bold">Authority-controlled action queue</h2><p className="mt-2 text-sm text-gray-400 max-w-3xl">Direct connector and local Mac routes are preferred. Every modifying, external, sensitive, destructive, publishing, and cloud-model action waits for your approval.</p></div>
-        <div className="flex items-center gap-2 text-xs text-gray-400 border border-white/10 rounded-lg px-3 py-2 bg-black/30"><Gauge className="w-4 h-4 text-primary" />No executor is enabled in this slice</div>
+        <div className="flex items-center gap-2 text-xs text-gray-400 border border-white/10 rounded-lg px-3 py-2 bg-black/30"><Gauge className="w-4 h-4 text-primary" />Read-only executors available when configured</div>
       </div>
 
       <div className="grid xl:grid-cols-[0.85fr_1.15fr] gap-6 items-start">
@@ -132,13 +149,14 @@ export function ExecutiveActionQueue() {
 
         <Card className="bg-[#111] border-white/10">
           <CardHeader className="gap-3"><div className="flex flex-wrap items-center justify-between gap-3"><CardTitle className="text-white">Queued actions</CardTitle><Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="w-48 bg-black/40 border-white/10"><SelectValue /></SelectTrigger><SelectContent>{["all", "awaiting_approval", "approved", "executing", "completed", "failed", "declined"].map((status) => <SelectItem key={status} value={status}>{titleCase(status)}</SelectItem>)}</SelectContent></Select></div></CardHeader>
-          <CardContent>{loading ? <div className="py-12 flex items-center justify-center text-gray-500"><Loader2 className="w-4 h-4 mr-2 animate-spin" />Loading queue</div> : actions.length === 0 ? <div className="py-12 text-center text-sm text-gray-500">No actions match this view.</div> : <div className="divide-y divide-white/10">{actions.map((action) => <div key={action.id} className="py-4 first:pt-0 last:pb-0"><div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2 text-xs"><span className={action.status === "awaiting_approval" ? "text-brand-yellow" : action.status === "declined" || action.status === "failed" ? "text-brand-red" : "text-primary"}>{titleCase(action.status)}</span><span className="text-gray-600">{titleCase(action.target_system)} · {titleCase(action.action_type)}</span></div><p className="mt-2 text-sm text-white">{action.requested_outcome}</p>{action.target_ref && <p className="mt-1 text-xs text-gray-500 break-all">{action.target_ref}</p>}<div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500"><span className="flex items-center gap-1">{action.execution_route === "cloud_model" ? <Cloud className="w-3 h-3" /> : <Cpu className="w-3 h-3" />}{titleCase(action.execution_route)}</span><span>{action.approval_required ? "Approval required" : "Policy-approved"}</span>{action.provider_id && <span>Provider: {action.provider_id}</span>}{action.estimated_external_ai_cost_micros > 0 && <span>Estimated cloud AI: ${(action.estimated_external_ai_cost_micros / 1_000_000).toFixed(4)}</span>}</div></div>{action.status === "awaiting_approval" && <div className="flex gap-2 shrink-0"><Button size="sm" onClick={() => decide(action.id, "approve")}><Check className="w-4 h-4 mr-1" />Approve</Button><Button size="sm" variant="outline" onClick={() => decide(action.id, "decline")}><X className="w-4 h-4 mr-1" />Decline</Button></div>}</div></div>)}</div>}</CardContent>
+          <CardContent>{loading ? <div className="py-12 flex items-center justify-center text-gray-500"><Loader2 className="w-4 h-4 mr-2 animate-spin" />Loading queue</div> : actions.length === 0 ? <div className="py-12 text-center text-sm text-gray-500">No actions match this view.</div> : <div className="divide-y divide-white/10">{actions.map((action) => <div key={action.id} className="py-4 first:pt-0 last:pb-0"><div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2 text-xs"><span className={action.status === "awaiting_approval" ? "text-brand-yellow" : action.status === "declined" || action.status === "failed" ? "text-brand-red" : "text-primary"}>{titleCase(action.status)}</span><span className="text-gray-600">{titleCase(action.target_system)} · {titleCase(action.action_type)}</span></div><p className="mt-2 text-sm text-white">{action.requested_outcome}</p>{action.target_ref && <p className="mt-1 text-xs text-gray-500 break-all">{action.target_ref}</p>}{action.result_summary && <p className="mt-2 text-xs text-primary">{action.result_summary}</p>}<div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500"><span className="flex items-center gap-1">{action.execution_route === "cloud_model" ? <Cloud className="w-3 h-3" /> : <Cpu className="w-3 h-3" />}{titleCase(action.execution_route)}</span><span>{action.approval_required ? "Approval required" : "Policy-approved"}</span>{action.provider_id && <span>Provider: {action.provider_id}</span>}{action.estimated_external_ai_cost_micros > 0 && <span>Estimated cloud AI: ${(action.estimated_external_ai_cost_micros / 1_000_000).toFixed(4)}</span>}</div></div><div className="flex gap-2 shrink-0">{action.status === "awaiting_approval" && <><Button size="sm" onClick={() => decide(action.id, "approve")}><Check className="w-4 h-4 mr-1" />Approve</Button><Button size="sm" variant="outline" onClick={() => decide(action.id, "decline")}><X className="w-4 h-4 mr-1" />Decline</Button></>}{action.status === "approved" && isReadOnlyExecutable(action) && <Button size="sm" onClick={() => executeAction(action.id)} disabled={executingId === action.id}>{executingId === action.id ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Play className="w-4 h-4 mr-1" />}Run read-only</Button>}</div></div></div>)}</div>}</CardContent>
         </Card>
       </div>
-      <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 p-4 text-sm text-gray-400"><ShieldAlert className="w-5 h-5 text-primary shrink-0" /><p>Approval only makes an action eligible for execution. This pull request intentionally contains no connector or desktop executor, preventing accidental external changes while the authority model is reviewed.</p></div>
+      <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 p-4 text-sm text-gray-400"><ShieldAlert className="w-5 h-5 text-primary shrink-0" /><p>Only read/search actions have executors, and they run only when you press Run read-only. Gmail requires its private connector; Mac/files require the loopback local bridge. Modifying actions have no executor.</p></div>
     </section>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div className="space-y-2"><Label className="text-gray-300">{label}</Label>{children}</div>; }
+function isReadOnlyExecutable(action: ActionItem) { return ["read", "search"].includes(action.action_type) && ((action.target_system === "gmail" && action.execution_route === "direct") || (["files", "desktop_commander"].includes(action.target_system) && action.execution_route === "local")); }
 function SelectField({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) { return <Field label={label}><Select value={value} onValueChange={onChange}><SelectTrigger className="bg-black/40 border-white/10"><SelectValue /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{titleCase(option)}</SelectItem>)}</SelectContent></Select></Field>; }

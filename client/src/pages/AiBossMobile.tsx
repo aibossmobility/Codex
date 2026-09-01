@@ -14,6 +14,7 @@ type Mission = {
 };
 
 const liveUrl = "https://meetn.com/briankeithhill";
+const youtubeStudioUrl = "https://studio.youtube.com/";
 const todayTopic = "Rebuilding Trust in Small Deposits";
 
 async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -106,8 +107,8 @@ export default function AiBossMobile() {
         <Card className="bg-[#111] border-brand-yellow/30">
           <CardHeader><div className="flex items-center justify-between gap-3"><div><p className="text-xs uppercase tracking-widest text-brand-yellow">Tuesday Live</p><CardTitle className="mt-1 text-white">{todayTopic}</CardTitle></div><Mic2 className="w-8 h-8 text-brand-yellow" /></div></CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-3 text-sm"><Checklist items={["Open Meetn and confirm camera/microphone", "Keep Scripture and the main question visible", "Start recording before the teaching", "End with one practical trust-building action"]} /><div className="rounded-lg bg-black/40 p-4"><p className="font-semibold">45-minute cue</p><ol className="mt-2 space-y-1 text-gray-400"><li>0–5: Welcome and prayer</li><li>5–15: Why small deposits rebuild trust</li><li>15–30: Coaching and reflection</li><li>30–40: Questions and practical action</li><li>40–45: Commitment and closing prayer</li></ol></div></div>
-            <a href={liveUrl} target="_blank" rel="noopener noreferrer"><Button className="w-full bg-brand-red hover:bg-brand-red/90 text-white"><Play className="w-4 h-4 mr-2" />Open Tuesday Live start link</Button></a>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm"><Checklist items={["Open Meetn and confirm camera/microphone", "Confirm YouTube is connected in Meetn Stream Manager", "Start the Meetn multistream so YouTube goes live with the session", "Keep Scripture and the main question visible", "Start recording before the teaching", "End with one practical trust-building action"]} /><div className="rounded-lg bg-black/40 p-4"><p className="font-semibold">45-minute cue</p><ol className="mt-2 space-y-1 text-gray-400"><li>0–5: Welcome and prayer</li><li>5–15: Why small deposits rebuild trust</li><li>15–30: Coaching and reflection</li><li>30–40: Questions and practical action</li><li>40–45: Commitment and closing prayer</li></ol></div></div>
+            <div className="grid sm:grid-cols-2 gap-3"><a href={liveUrl} target="_blank" rel="noopener noreferrer"><Button className="w-full bg-brand-red hover:bg-brand-red/90 text-white"><Play className="w-4 h-4 mr-2" />Open Tuesday Live</Button></a><a href={youtubeStudioUrl} target="_blank" rel="noopener noreferrer"><Button variant="outline" className="w-full border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10"><Play className="w-4 h-4 mr-2" />Open YouTube Studio</Button></a></div>
           </CardContent>
         </Card>
 

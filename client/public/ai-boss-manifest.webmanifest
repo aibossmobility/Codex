@@ -1,0 +1,10 @@
+{
+  "name": "AI Boss OS",
+  "short_name": "AI Boss",
+  "start_url": "/ai-boss",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f5c518",
+  "description": "Brian Keith Hill's private Papa Life executive command center",
+  "icons": [{ "src": "/images/papa-life-logo.png", "sizes": "512x512", "type": "image/png" }]
+}

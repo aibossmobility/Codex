@@ -11,7 +11,7 @@ import bcrypt from "bcryptjs";
 import connectSqlite3 from "connect-sqlite3";
 import multer from "multer";
 import { nanoid } from "nanoid";
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import dotenv from "dotenv";
 import {
   ensureResearchTables,
@@ -43,6 +43,11 @@ import {
   listExecutiveActions,
 } from "./executive-action-queue-store";
 import { executeApprovedExecutiveAction } from "./executive-action-executor";
+import {
+  ensureAiBossMobileTables,
+  getAiBossMissionControl,
+  recordAiBossNodeHeartbeat,
+} from "./ai-boss-mobile-store";
 import {
   createHumanImpactObservation,
   ensureHumanImpactTables,
@@ -717,6 +722,7 @@ ensureResearchTables(db);
 ensureExecutiveMemoryTables(db);
 ensureHumanImpactTables(db);
 ensureExecutiveActionQueueTables(db);
+ensureAiBossMobileTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
@@ -6185,6 +6191,30 @@ async function startServer() {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/ai-boss/nodes/heartbeat", (req, res) => {
+    try {
+      const expected = String(process.env.AI_BOSS_NODE_HEARTBEAT_TOKEN || "").trim();
+      if (!expected) return res.status(503).json({ ok: false, error: "Node heartbeat is not configured" });
+      const provided = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const expectedBuffer = Buffer.from(expected);
+      const providedBuffer = Buffer.from(provided);
+      if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+        return res.status(401).json({ ok: false, error: "Unauthorized" });
+      }
+      res.json({ ok: true, node: recordAiBossNodeHeartbeat(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/ai-boss/mission-control", requireAuth, requireResearchLabAccess, (_req, res) => {
+    try {
+      res.json({ ok: true, mission: getAiBossMissionControl(db) });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
 

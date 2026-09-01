@@ -71,7 +71,9 @@ console.log("✓ Approved actions use route-specific adapters and preserve retur
 const originalDesktopEndpoint = process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT;
 process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT = "http://127.0.0.1:9999/execute";
 let desktopSignal: AbortSignal | null = null;
+let desktopFetchCalls = 0;
 const desktopExecutor = createDesktopCommanderExecutor(async (_url, init) => {
+  desktopFetchCalls += 1;
   desktopSignal = init?.signal as AbortSignal;
   return new Response(JSON.stringify({ ok: true, hostname: "boss-mac" }), { status: 200 });
 });
@@ -81,8 +83,17 @@ await desktopExecutor({
   execution_route: "local", approval_required: 0, status: "executing",
 });
 assert.ok(desktopSignal, "Desktop Commander requests must carry an abort signal");
+await assert.rejects(
+  () => desktopExecutor({
+    id: 997, action_type: "update", target_system: "desktop_commander", target_ref: "file:/tmp/example.txt",
+    requested_outcome: "Modify a local file", authority_level: "act_reversible",
+    execution_route: "local", approval_required: 1, status: "approved",
+  }),
+  /only permits read\/search/i
+);
+assert.equal(desktopFetchCalls, 1, "Modifying local actions must be rejected before contacting the bridge");
 if (originalDesktopEndpoint === undefined) delete process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT; else process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT = originalDesktopEndpoint;
-console.log("✓ Local bridge requests are bounded by an application timeout");
+console.log("✓ Local bridge requests are timeout-bounded and read/search-only before dispatch");
 
 const originalEndpoint = process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT;
 const originalToken = process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN;

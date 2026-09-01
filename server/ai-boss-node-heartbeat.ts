@@ -21,7 +21,7 @@ async function heartbeat() {
 }
 
 async function main() {
-  await heartbeat();
+  await heartbeat().catch((error) => console.error(error instanceof Error ? error.message : error));
   setInterval(() => heartbeat().catch((error) => console.error(error instanceof Error ? error.message : error)), 30_000);
 }
 

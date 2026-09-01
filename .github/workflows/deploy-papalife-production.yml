@@ -124,21 +124,57 @@ jobs:
           SSH_USER: ${{ secrets.PAPALIFE_SSH_USER }}
           SSH_PORT: ${{ secrets.PAPALIFE_SSH_PORT }}
           DEPLOY_SHA: ${{ needs.validate-and-build.outputs.deploy_sha }}
+          AI_BOSS_NODE_HEARTBEAT_TOKEN: ${{ secrets.AI_BOSS_NODE_HEARTBEAT_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
+          if [[ -z "${AI_BOSS_NODE_HEARTBEAT_TOKEN:-}" ]]; then
+            echo "Missing required production secret: AI_BOSS_NODE_HEARTBEAT_TOKEN"
+            exit 1
+          fi
+          TOKEN_FILE="$RUNNER_TEMP/ai-boss-heartbeat-token"
+          printf '%s' "$AI_BOSS_NODE_HEARTBEAT_TOKEN" > "$TOKEN_FILE"
+          chmod 600 "$TOKEN_FILE"
+          REMOTE_TOKEN_FILE="/tmp/ai-boss-heartbeat-token-${GITHUB_RUN_ID}"
+          scp -i ~/.ssh/papalife_deploy -P "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$TOKEN_FILE" "$SSH_USER@$SSH_HOST:$REMOTE_TOKEN_FILE"
           ssh -i ~/.ssh/papalife_deploy \
             -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$SSH_USER@$SSH_HOST" \
-            bash -s -- "$DEPLOY_SHA" <<'REMOTE'
+            bash -s -- "$DEPLOY_SHA" "$REMOTE_TOKEN_FILE" <<'REMOTE'
           set -euo pipefail
 
           TARGET_SHA="$1"
+          REMOTE_TOKEN_FILE="$2"
           APP_DIR="/var/www/html/bossmobilelifecoach.com"
 
+          HEARTBEAT_TOKEN="$(cat "$REMOTE_TOKEN_FILE")"
+          rm -f "$REMOTE_TOKEN_FILE"
+          [[ -n "$HEARTBEAT_TOKEN" ]] || { echo "BLOCKED: heartbeat token file was empty"; exit 1; }
+
           cd "$APP_DIR"
+          python3 - "$HEARTBEAT_TOKEN" <<'PYENV'
+          from pathlib import Path
+          import sys
+          env_path = Path('.env')
+          token = sys.argv[1]
+          lines = env_path.read_text().splitlines() if env_path.exists() else []
+          key = 'AI_BOSS_NODE_HEARTBEAT_TOKEN='
+          out = []
+          replaced = False
+          for line in lines:
+            if line.startswith(key):
+              out.append(key + token)
+              replaced = True
+            else:
+              out.append(line)
+          if not replaced:
+            out.append(key + token)
+          env_path.write_text('\n'.join(out) + '\n')
+          PYENV
+          chmod 600 .env
           test -d .git || { echo "BLOCKED: production directory is not a Git checkout"; exit 1; }
 
           CURRENT_BRANCH="$(git branch --show-current)"

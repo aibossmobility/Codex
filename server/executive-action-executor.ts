@@ -16,6 +16,7 @@ type ExecutiveActionRow = {
   authority_level: string;
   execution_route: string;
   approval_required: number;
+  action_payload_json?: string | null;
   status: string;
 };
 
@@ -117,13 +118,38 @@ function resolveGmailConnectorToken() {
   return String(process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN || "").trim();
 }
 
-export function createGmailReadExecutor(fetchImpl: typeof fetch = fetch): ExecutiveActionExecutor {
+function parseGmailSendPayload(action: ExecutiveActionRow) {
+  if (action.approval_required !== 1 || !["act_external", "sensitive"].includes(action.authority_level)) {
+    throw new Error("Gmail send actions require explicit external-action approval.");
+  }
+  let payload: any = null;
+  try { payload = action.action_payload_json ? JSON.parse(action.action_payload_json) : null; } catch {
+    throw new Error("Gmail send action payload is not valid JSON.");
+  }
+  if (!payload || !["send", "reply"].includes(payload.mode) || typeof payload.body !== "string" || !payload.body.trim()) {
+    throw new Error("Gmail send actions require a structured send/reply payload with a non-empty body.");
+  }
+  if (payload.mode === "send") {
+    if (typeof payload.to !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.to)) {
+      throw new Error("Gmail send payload requires a valid recipient email address.");
+    }
+    if (typeof payload.subject !== "string" || !payload.subject.trim()) {
+      throw new Error("Gmail send payload requires a subject.");
+    }
+  }
+  if (payload.mode === "reply" && (typeof payload.message_id !== "string" || !payload.message_id.trim())) {
+    throw new Error("Gmail reply payload requires the original message ID.");
+  }
+  return payload;
+}
+
+export function createGmailExecutor(fetchImpl: typeof fetch = fetch): ExecutiveActionExecutor {
   return async (action) => {
     if (action.execution_route !== "direct") {
       throw new Error(`Gmail connector executor only supports the direct route; received ${action.execution_route}.`);
     }
-    if (!["read", "search"].includes(action.action_type)) {
-      throw new Error(`Gmail executor only permits read/search actions; received ${action.action_type}.`);
+    if (!["read", "search", "send"].includes(action.action_type)) {
+      throw new Error(`Gmail executor only permits read/search/send actions; received ${action.action_type}.`);
     }
     const endpoint = resolveGmailConnectorEndpoint();
     if (!endpoint) {
@@ -139,7 +165,11 @@ export function createGmailReadExecutor(fetchImpl: typeof fetch = fetch): Execut
         "content-type": "application/json",
         authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
+      body: JSON.stringify(action.action_type === "send" ? {
+        action_id: action.id,
+        operation: "send",
+        payload: parseGmailSendPayload(action),
+      } : {
         action_id: action.id,
         operation: action.action_type,
         target_ref: action.target_ref,
@@ -157,13 +187,13 @@ export function createGmailReadExecutor(fetchImpl: typeof fetch = fetch): Execut
     } catch {
       // Keep plain-text connector responses as-is.
     }
-    return { summary: "Gmail read/search action completed through the configured connector.", details };
+    return { summary: action.action_type === "send" ? "Approved Gmail send/reply completed through the configured connector." : "Gmail read/search action completed through the configured connector.", details };
   };
 }
 
 export function defaultExecutorRegistry(): ExecutorRegistry {
   return {
-    [executorRegistryKey("gmail", "direct")]: createGmailReadExecutor(),
+    [executorRegistryKey("gmail", "direct")]: createGmailExecutor(),
     [executorRegistryKey("desktop_commander", "local")]: createDesktopCommanderExecutor(),
     [executorRegistryKey("files", "local")]: createDesktopCommanderExecutor(),
   };

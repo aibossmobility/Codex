@@ -41,6 +41,7 @@ export const executiveActionInputSchema = z
     provider_id: z.string().trim().max(100).nullable().optional(),
     estimated_external_ai_cost_micros: z.number().int().min(0).max(100_000_000).default(0),
     source_conversation_ref: z.string().trim().max(160).nullable().optional(),
+    action_payload: z.record(z.string(), z.unknown()).nullable().optional(),
     human_impact_observation_id: z.number().int().positive().nullable().optional(),
   })
   .strict();
@@ -96,6 +97,7 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
       provider_id TEXT,
       estimated_external_ai_cost_micros INTEGER NOT NULL DEFAULT 0,
       source_conversation_ref TEXT,
+      action_payload_json TEXT,
       human_impact_observation_id INTEGER REFERENCES human_impact_observations(id) ON DELETE SET NULL,
       status TEXT NOT NULL CHECK (status IN (
         'proposed', 'awaiting_approval', 'approved', 'executing',
@@ -133,6 +135,9 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
   if (!actionColumns.some((column) => column.name === "result_json")) {
     db.exec("ALTER TABLE executive_actions ADD COLUMN result_json TEXT");
   }
+  if (!actionColumns.some((column) => column.name === "action_payload_json")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN action_payload_json TEXT");
+  }
 }
 
 export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: ExecutiveActionInput) {
@@ -163,9 +168,9 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
         `INSERT INTO executive_actions (
           action_type, target_system, target_ref, requested_outcome, authority_level,
           execution_route, approval_required, provider_id,
-          estimated_external_ai_cost_micros, source_conversation_ref,
+          estimated_external_ai_cost_micros, source_conversation_ref, action_payload_json,
           human_impact_observation_id, status, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
       )
       .run(
         parsed.action_type,
@@ -178,6 +183,7 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
         parsed.provider_id || (executionRoute === "local_model" ? "local_default" : null),
         parsed.estimated_external_ai_cost_micros,
         parsed.source_conversation_ref || null,
+        parsed.action_payload ? JSON.stringify(parsed.action_payload) : null,
         parsed.human_impact_observation_id || null,
         status
       );

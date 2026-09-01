@@ -5,6 +5,7 @@ import {
   failExecutiveActionExecution,
   getExecutiveActionById,
 } from "./executive-action-queue-store";
+import { resolveExecutorResultMaxBytes } from "./executive-action-limits";
 
 type ExecutiveActionRow = {
   id: number;
@@ -37,16 +38,10 @@ function resolveExecutorTimeoutMs() {
   return Math.min(Math.max(Math.round(configured), 1_000), 120_000);
 }
 
-function resolveExecutorResultMaxBytes() {
-  const configured = Number(process.env.AI_BOSS_EXECUTOR_RESULT_MAX_BYTES || 1_000_000);
-  if (!Number.isFinite(configured)) return 1_000_000;
-  return Math.min(Math.max(Math.round(configured), 1_000), 2_000_000);
-}
-
 async function readBoundedResponseText(response: Response) {
   const maxBytes = resolveExecutorResultMaxBytes();
   const declaredLength = Number(response.headers.get("content-length") || 0);
-  if (declaredLength > maxBytes) throw new Error(`Connector response exceeds the ${maxBytes}-byte limit.`);
+  if (declaredLength > maxBytes) throw new Error(`Connector response exceeds the ${maxBytes}-byte result limit.`);
   if (!response.body) return "";
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -57,7 +52,7 @@ async function readBoundedResponseText(response: Response) {
     totalBytes += value.byteLength;
     if (totalBytes > maxBytes) {
       await reader.cancel();
-      throw new Error(`Connector response exceeds the ${maxBytes}-byte limit.`);
+      throw new Error(`Connector response exceeds the ${maxBytes}-byte result limit.`);
     }
     chunks.push(value);
   }
@@ -76,6 +71,9 @@ export function createDesktopCommanderExecutor(fetchImpl: typeof fetch = fetch):
   return async (action) => {
     if (action.execution_route !== "local") {
       throw new Error(`Desktop Commander executor only supports the local route; received ${action.execution_route}.`);
+    }
+    if (!["read", "search"].includes(action.action_type)) {
+      throw new Error(`Desktop Commander executor only permits read/search actions; received ${action.action_type}.`);
     }
     const endpoint = resolveDesktopCommanderEndpoint();
     if (!endpoint) {

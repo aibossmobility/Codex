@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import Database from "better-sqlite3";
 import { createExecutiveAction, ensureExecutiveActionQueueTables, getExecutiveActionAudit } from "./executive-action-queue-store";
-import { createDesktopCommanderExecutor, createGmailReadExecutor, executeApprovedExecutiveAction } from "./executive-action-executor";
+import { createDesktopCommanderExecutor, createGmailExecutor, executeApprovedExecutiveAction } from "./executive-action-executor";
 
 const db = new Database(":memory:");
 db.exec("CREATE TABLE human_impact_observations (id INTEGER PRIMARY KEY)");
@@ -89,7 +89,7 @@ const originalToken = process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN;
 process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT = "http://127.0.0.1:9999/gmail";
 process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN = "test-only-token";
 let capturedAuth = "";
-const gmailExecutor = createGmailReadExecutor(async (_url, init) => {
+const gmailExecutor = createGmailExecutor(async (_url, init) => {
   capturedAuth = String((init?.headers as Record<string, string>)?.authorization || "");
   return new Response(JSON.stringify({ messages: [{ id: "m1", subject: "Test" }] }), { status: 200 });
 });
@@ -105,14 +105,35 @@ const gmailDone = await executeApprovedExecutiveAction(db, Number(gmailRead?.id)
 assert.equal(gmailDone?.status, "completed");
 assert.equal(capturedAuth, "Bearer test-only-token");
 assert.match(String(gmailDone?.result_json), /messages/i);
+let capturedSendBody = "";
+const gmailSendExecutor = createGmailExecutor(async (_url, init) => {
+  capturedSendBody = String(init?.body || "");
+  return new Response(JSON.stringify({ message_id: "sent-1" }), { status: 200 });
+});
 await assert.rejects(
-  () => createGmailReadExecutor(async () => new Response("ok"))({
+  () => gmailSendExecutor({
     id: 999, action_type: "send", target_system: "gmail", target_ref: null,
     requested_outcome: "Send a message", authority_level: "act_external",
-    execution_route: "direct", approval_required: 1, status: "approved",
+    execution_route: "direct", approval_required: 0,
+    action_payload_json: JSON.stringify({ mode: "send", to: "test@example.com", subject: "Test", body: "Hello" }),
+    status: "approved",
   }),
-  /only permits read\/search/i
+  /explicit external-action approval/i
 );
+const gmailSend = createExecutiveAction(db, {
+  action_type: "send",
+  target_system: "gmail",
+  requested_outcome: "Send the approved email.",
+  authority_level: "act_external",
+  estimated_external_ai_cost_micros: 0,
+  action_payload: { mode: "send", to: "test@example.com", subject: "Approved Test", body: "Hello from AI Boss OS" },
+});
+assert.equal(gmailSend?.status, "awaiting_approval");
+db.prepare("UPDATE executive_actions SET status = 'approved', approved_at = datetime('now') WHERE id = ?").run(gmailSend?.id);
+const gmailSent = await executeApprovedExecutiveAction(db, Number(gmailSend?.id), { "gmail:direct": gmailSendExecutor });
+assert.equal(gmailSent?.status, "completed");
+assert.match(capturedSendBody, /Approved Test/);
+assert.match(capturedSendBody, /test@example.com/);
 if (originalEndpoint === undefined) delete process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT; else process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT = originalEndpoint;
 if (originalToken === undefined) delete process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN; else process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN = originalToken;
-console.log("✓ Gmail executor is read/search-only and requires connector credentials");
+console.log("✓ Gmail executor keeps read/search direct and requires approval plus structured payloads for send/reply");

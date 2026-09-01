@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { z } from "zod";
+import { assertExecutorResultWithinLimit, resolveExecutorResultMaxBytes } from "./executive-action-limits";
 
 const bridgeRequestSchema = z.object({
   action_id: z.number().int().positive(),
@@ -57,7 +58,7 @@ async function desktopRead(targetRef: string) {
     const { execFile } = await import("node:child_process");
     const { promisify } = await import("node:util");
     const run = promisify(execFile);
-    const { stdout } = await run("/bin/ps", ["-axo", "pid=,comm="], { maxBuffer: 512_000 });
+    const { stdout } = await run("/bin/ps", ["-axo", "pid=,comm="], { maxBuffer: Math.min(512_000, resolveExecutorResultMaxBytes()) });
     return stdout.split("\n").filter(Boolean).slice(0, 500).map((line) => line.trim());
   }
   throw new Error(`Unsupported Desktop Commander read target: ${targetRef}`);
@@ -79,7 +80,8 @@ async function filesRead(targetRef: string) {
     const filePath = await resolveAllowedPath(targetRef);
     const stat = await fs.stat(filePath);
     if (!stat.isFile()) throw new Error("Requested file target is not a regular file.");
-    if (stat.size > 1_000_000) throw new Error("Local bridge file reads are limited to 1 MB.");
+    const maxBytes = resolveExecutorResultMaxBytes();
+    if (stat.size > maxBytes) throw new Error(`Local bridge file reads are limited to ${maxBytes} bytes.`);
     const content = await fs.readFile(filePath, "utf8");
     return { path: filePath, size_bytes: stat.size, content };
   }
@@ -98,7 +100,8 @@ async function filesSearch(targetRef: string) {
     const filePath = await resolveAllowedPath(target);
     const stat = await fs.stat(filePath);
     if (!stat.isFile()) throw new Error("Requested file target is not a regular file.");
-    if (stat.size > 1_000_000) throw new Error("Local bridge file searches are limited to 1 MB.");
+    const maxBytes = resolveExecutorResultMaxBytes();
+    if (stat.size > maxBytes) throw new Error(`Local bridge file searches are limited to ${maxBytes} bytes.`);
     const content = await fs.readFile(filePath, "utf8");
     const matches = content.split(/\r?\n/).flatMap((line, index) =>
       line.toLocaleLowerCase().includes(normalizedQuery) ? [{ line_number: index + 1, text: line }] : []
@@ -164,7 +167,9 @@ export function createLocalBridgeServer() {
     }
     try {
       const result = await executeLocalBridgeRequest(await readJson(req));
-      res.end(JSON.stringify(result));
+      const serialized = JSON.stringify(result);
+      assertExecutorResultWithinLimit(serialized, "Local bridge response");
+      res.end(serialized);
     } catch (error) {
       res.statusCode = 400;
       res.end(JSON.stringify({ ok: false, error: error instanceof Error ? error.message : String(error) }));

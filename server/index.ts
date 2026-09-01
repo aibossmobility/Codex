@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 71535)
-Total output lines: 6548
-
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -2423,7 +2420,1962 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Privacy",
     headline: "Privacy Policy",
     intro:
-      "Boss Mobile Life Coach and Papa Life collect information needed to provide coaching resources, assessments, AI c…21535 tokens truncated…  const memberId = (req.session as any).memberId;
+      "Boss Mobile Life Coach and Papa Life collect information needed to provide coaching resources, assessments, AI coach interactions, membership features, and follow-up support.",
+    sections: [
+      { heading: "Information use", body: "Information may be used to respond to requests, personalize resources, operate the site, and improve services." },
+      { heading: "Your choices", body: "Visitors and members may contact Boss Mobile Life Coach about their information and communication preferences." },
+    ],
+  },
+  "/terms": {
+    title: "Terms of Use | Boss Mobile Life Coach",
+    description: "Terms for using Boss Mobile Life Coach, Papa Life resources, AI coaching, assessments, and member features.",
+    eyebrow: "Terms",
+    headline: "Terms of Use",
+    intro:
+      "By using Boss Mobile Life Coach and Papa Life resources, visitors agree to use the site responsibly and understand that coaching resources do not replace professional medical, mental health, legal, or financial advice.",
+    sections: [
+      { heading: "Site use", body: "Resources, assessments, and AI coaching are provided for education, reflection, and coaching support." },
+      { heading: "Membership", body: "Member features and paid access are governed by the purchase and access terms shown during signup." },
+    ],
+  },
+  "/member-login": {
+    title: "Member Login | Papa Life",
+    description: "Sign in to the Papa Life member portal.",
+    eyebrow: "Members",
+    headline: "Sign in to continue your Papa Life path.",
+    intro:
+      "Members can access course lessons, progress tracking, journal prompts, and the Papa Life resource library.",
+    sections: [{ heading: "Member portal", body: "Use your Papa Life account to continue lessons and track your progress." }],
+    cta: { label: "Sign In", href: "/member-login" },
+    noindex: true,
+  },
+  "/member-forgot-password": {
+    title: "Reset Papa Life Password",
+    description: "Request a secure password-reset link for your Papa Life member account.",
+    eyebrow: "Member Access",
+    headline: "Get back into your Papa Life account.",
+    intro: "Enter your member email address to request a secure, time-limited password-reset link.",
+    sections: [{ heading: "Secure recovery", body: "For privacy, the response does not reveal whether an email address is registered." }],
+    noindex: true,
+  },
+  "/member-reset-password": {
+    title: "Choose a New Papa Life Password",
+    description: "Use a secure reset link to choose a new Papa Life member password.",
+    eyebrow: "Member Access",
+    headline: "Choose a new password.",
+    intro: "Valid reset links are time-limited and can be used only once.",
+    sections: [{ heading: "Secure reset", body: "If your link has expired or was already used, request a new one from the forgot-password page." }],
+    noindex: true,
+  },
+  "/member-register": {
+    title: "Create Member Account | Papa Life",
+    description: "Create a Papa Life member account.",
+    eyebrow: "Members",
+    headline: "Create your Papa Life member account.",
+    intro:
+      "Registration gives members access to the course portal, progress tools, and member resources.",
+    sections: [{ heading: "Continue after signup", body: "After creating an account, members can sign in and continue the Papa Life course path." }],
+    cta: { label: "Create Account", href: "/member-register" },
+    noindex: true,
+  },
+  "/member-billing": {
+    title: "Papa Life Billing",
+    description: "Complete billing for Papa Life membership.",
+    eyebrow: "Billing",
+    headline: "Complete membership access.",
+    intro: "This page supports Papa Life membership billing and access.",
+    sections: [{ heading: "Secure checkout", body: "Follow the on-page steps to complete membership access." }],
+    noindex: true,
+  },
+  "/join": {
+    title: "Join Papa Life | $4.99 Monthly Membership",
+    description: "Start the $4.99 monthly Papa Life Membership enrollment and receive immediate access to Course 11 after payment.",
+    eyebrow: "Papa Life Membership",
+    headline: "Join Papa Life for $4.99 per month.",
+    intro: "Complete the membership intake, continue to secure recurring checkout, and activate your member account to enter Course 11.",
+    sections: [{ heading: "No free trial", body: "Membership bills $4.99 monthly until canceled and includes immediate access to Course 11 after successful payment." }],
+    noindex: true,
+  },
+  "/member-activate": {
+    title: "Activate Papa Life Membership",
+    description: "Set your Papa Life member password and activate access to Course 11.",
+    eyebrow: "Member activation",
+    headline: "Activate your Papa Life membership.",
+    intro: "Use the secure activation link sent after successful payment to set your password and enter Course 11.",
+    sections: [{ heading: "Secure activation", body: "Activation links are tied to the paid member account and expire for security." }],
+    noindex: true,
+  },
+  "/portal": {
+    title: "Papa Life Member Portal",
+    description: "Member portal for Papa Life courses, progress, journal prompts, events, and resources.",
+    eyebrow: "Member Portal",
+    headline: "Continue your Papa Life lessons and reflection work.",
+    intro: "The portal contains member course lessons, progress tracking, daily reflection, events, and resource library access.",
+    sections: [{ heading: "Members only", body: "Sign in to view your lessons and track your progress." }],
+    noindex: true,
+  },
+  "/login": {
+    title: "Admin Login | Boss Mobile Life Coach",
+    description: "Admin login for Boss Mobile Life Coach.",
+    eyebrow: "Admin",
+    headline: "Admin login",
+    intro: "This page is for authorized Boss Mobile Life Coach administrators.",
+    sections: [{ heading: "Restricted access", body: "Sign in with an authorized account to manage site content and operations." }],
+    noindex: true,
+  },
+  "/crm": {
+    title: "CRM Intake | Boss Mobile Life Coach",
+    description: "CRM intake form for Boss Mobile Life Coach.",
+    eyebrow: "CRM",
+    headline: "CRM intake",
+    intro: "This intake page collects lead and relationship context for follow-up.",
+    sections: [{ heading: "Intake", body: "Submit the requested details so the team can route follow-up appropriately." }],
+    noindex: true,
+  },
+  "/crm-console": {
+    title: "CRM Console | Boss Mobile Life Coach",
+    description: "Admin CRM console for Boss Mobile Life Coach.",
+    eyebrow: "Admin",
+    headline: "CRM console",
+    intro: "Authorized administrators can manage leads, courses, media, and site operations.",
+    sections: [{ heading: "Restricted access", body: "Sign in with an authorized account to use the CRM console." }],
+    noindex: true,
+  },
+  "/dashboard": {
+    title: "CRM Console | Boss Mobile Life Coach",
+    description: "Dashboard route for Boss Mobile Life Coach administrators.",
+    eyebrow: "Admin",
+    headline: "Dashboard",
+    intro: "This route redirects administrators to the CRM console in the browser app.",
+    sections: [{ heading: "Restricted access", body: "Authorized users can continue to the CRM console." }],
+    cta: { label: "Open CRM Console", href: "/crm-console" },
+    noindex: true,
+  },
+  "/papa-journey": {
+    title: "Papa Journey | Boss Mobile Life Coach",
+    description: "A guided Papa Life journey for fathers rebuilding connection with adult children.",
+    eyebrow: "Papa Journey",
+    headline: "Move from awareness into a guided fatherhood path.",
+    intro:
+      "The Papa Journey helps fathers work through relationship distance with structure, reflection, coaching, and next steps.",
+    sections: [
+      { heading: "PAPA pillars", body: "Purpose, Authority, Presence, and Alignment organize the path." },
+      { heading: "Continue steadily", body: "Use the journey to build consistency and repair-oriented habits over time." },
+    ],
+    cta: { label: "Join Papa Life", href: "/go/join" },
+  },
+  "/papa-intro": {
+    title: "Papa Life Intro Video",
+    description: "Introductory video for the Papa Life fatherhood path.",
+    eyebrow: "Intro Video",
+    headline: "Start with the heart of Papa Life.",
+    intro: "The intro video explains the Papa Life path for fathers of adult children.",
+    sections: [{ heading: "Watch first", body: "Begin here to understand the mission, message, and next step." }],
+    cta: { label: "Start the Free Workshop", href: "/papa-first-lesson" },
+  },
+  "/papa-journal": {
+    title: "Papa Life Journal",
+    description: "Journal prompts and reflection for fathers practicing the Papa Life path.",
+    eyebrow: "Journal",
+    headline: "Reflect before you react.",
+    intro: "Papa Life journaling helps fathers process emotion, clarify intent, and practice a steadier way of showing up.",
+    sections: [{ heading: "Reflection", body: "Use prompts to connect your values, words, and actions." }],
+    noindex: true,
+  },
+  "/papa-daily-work-report": {
+    title: "Papa Life Daily Work Report",
+    description: "Daily work report for Papa Life operations.",
+    eyebrow: "Daily Report",
+    headline: "Papa Life daily work report",
+    intro: "This page supports internal tracking of outreach, content, scheduling, automation, coaching, and outcomes.",
+    sections: [{ heading: "Internal operations", body: "Authorized users can record and review daily Papa Life work." }],
+    noindex: true,
+  },
+  "/strategist": {
+    title: "Strategist | Boss Mobile Life Coach",
+    description: "Strategic planning tools for Boss Mobile Life Coach.",
+    eyebrow: "Strategist",
+    headline: "Strategy tools for focused action.",
+    intro: "This page supports strategy work and planning for Boss Mobile Life Coach operations.",
+    sections: [{ heading: "Planning", body: "Use the strategist tools to clarify priorities and next moves." }],
+    noindex: true,
+  },
+  "/theme-matrix": {
+    title: "Theme Matrix | Boss Mobile Life Coach",
+    description: "Theme matrix planning page for Boss Mobile Life Coach.",
+    eyebrow: "Theme Matrix",
+    headline: "Organize themes and messages.",
+    intro: "This page supports internal planning and content structure.",
+    sections: [{ heading: "Planning", body: "Use the matrix to organize themes, messages, and content direction." }],
+    noindex: true,
+  },
+  "/operators": {
+    title: "Operators | Boss Mobile Life Coach",
+    description: "Operations page for Boss Mobile Life Coach.",
+    eyebrow: "Operators",
+    headline: "Operations workspace",
+    intro: "This page supports operational planning and workflows.",
+    sections: [{ heading: "Internal tools", body: "Authorized users can use this workspace to coordinate operational work." }],
+    noindex: true,
+  },
+  "/governance": {
+    title: "Governance | Boss Mobile Life Coach",
+    description: "Governance page for Boss Mobile Life Coach.",
+    eyebrow: "Governance",
+    headline: "Governance workspace",
+    intro: "This page supports internal governance and operating principles.",
+    sections: [{ heading: "Internal guidance", body: "Use this page to review structure, accountability, and decision guidance." }],
+    noindex: true,
+  },
+  "/booking": {
+    title: "Booking | Boss Mobile Life Coach",
+    description: "Booking page for Boss Mobile Life Coach.",
+    eyebrow: "Booking",
+    headline: "Book time with Boss Mobile Life Coach.",
+    intro: "Use this page to move from interest into a scheduled conversation or next step.",
+    sections: [{ heading: "Next step", body: "Choose an available path for booking or follow-up." }],
+  },
+  "/research-lab": {
+    title: "Research Lab | Boss Mobile Life Coach",
+    description: "Research lab workspace for Boss Mobile Life Coach.",
+    eyebrow: "Research Lab",
+    headline: "Research workspace",
+    intro: "This page supports research collection, analysis, and content planning.",
+    sections: [{ heading: "Restricted access", body: "Authorized users can use research tools after signing in." }],
+    noindex: true,
+  },
+};
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+    switch (ch) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return ch;
+    }
+  });
+}
+
+function normalizeAppPath(rawUrl: string) {
+  let pathname = "/";
+  try {
+    pathname = new URL(rawUrl, "https://bossmobilelifecoach.com").pathname;
+  } catch {
+    pathname = rawUrl.split("?")[0] || "/";
+  }
+  if (pathname.length > 1) pathname = pathname.replace(/\/+$/, "");
+  return pathname || "/";
+}
+
+function serverPageShell(page: StaticServerPage, extraHtml = "") {
+  const sections = page.sections
+    .map(
+      (section) => `
+        <section>
+          <h2>${escapeHtml(section.heading)}</h2>
+          <p>${escapeHtml(section.body)}</p>
+        </section>`
+    )
+    .join("");
+  const cta = page.cta
+    ? `<p><a href="${escapeHtml(page.cta.href)}">${escapeHtml(page.cta.label)}</a></p>`
+    : "";
+
+  return `
+    <main id="server-prerender" style="font-family: Inter, Arial, sans-serif; background: #050505; color: #f8fafc; min-height: 100vh; padding: 64px 20px;">
+      <article style="max-width: 920px; margin: 0 auto;">
+        <p style="color: #f6c74a; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">${escapeHtml(page.eyebrow)}</p>
+        <h1 style="font-size: clamp(2.25rem, 6vw, 4.75rem); line-height: 1.02; margin: 18px 0;">${escapeHtml(page.headline)}</h1>
+        <p style="font-size: 1.2rem; line-height: 1.7; color: #d4d4d8; max-width: 760px;">${escapeHtml(page.intro)}</p>
+        ${cta}
+        <div style="display: grid; gap: 24px; margin-top: 42px;">
+          ${sections}
+          ${extraHtml}
+        </div>
+      </article>
+    </main>`;
+}
+
+function notFoundServerPage(): ServerRenderedPage {
+  return {
+    status: 404,
+    title: "404 Page Not Found | Boss Mobile Life Coach",
+    description: "The requested Boss Mobile Life Coach page could not be found.",
+    noindex: true,
+    bodyHtml: serverPageShell({
+      title: "404 Page Not Found | Boss Mobile Life Coach",
+      description: "The requested Boss Mobile Life Coach page could not be found.",
+      eyebrow: "404",
+      headline: "Page not found.",
+      intro: "Sorry, the page you are looking for does not exist. It may have been moved or deleted.",
+      sections: [{ heading: "Return home", body: "Use the home page to find Papa Life resources, courses, assessments, and support." }],
+      cta: { label: "Go Home", href: "/" },
+      noindex: true,
+    }),
+  };
+}
+
+function staticServerPage(pathname: string): ServerRenderedPage | null {
+  const page = STATIC_SERVER_PAGES[pathname];
+  if (!page) return null;
+  return {
+    status: 200,
+    title: page.title,
+    description: page.description,
+    keywords: page.keywords,
+    bodyHtml: serverPageShell(page),
+    noindex: page.noindex,
+  };
+}
+
+function coursesServerPage(): ServerRenderedPage {
+  const courses = db
+    .prepare(
+      `SELECT c.id, c.title, c.description, c.pillar, COUNT(l.id) AS lesson_count
+       FROM courses c
+       LEFT JOIN lessons l ON l.course_id = c.id
+       WHERE c.show_in_catalog = 1
+       GROUP BY c.id
+       ORDER BY c.sort_order ASC, c.created_at DESC`
+    )
+    .all() as Array<{ id: number; title: string; description: string | null; pillar: string; lesson_count: number }>;
+
+  const courseHtml =
+    courses.length > 0
+      ? `<section><h2>Course catalog</h2><ul>${courses
+          .map(
+            (course) =>
+              `<li><a href="/courses/${course.id}">${escapeHtml(course.title)}</a> - ${escapeHtml(course.pillar)} - ${Number(course.lesson_count)} lesson${Number(course.lesson_count) === 1 ? "" : "s"}${course.description ? `<br><span>${escapeHtml(course.description)}</span>` : ""}</li>`
+          )
+          .join("")}</ul></section>`
+      : `<section><h2>Course catalog</h2><p>No courses are listed yet. Check back soon, or contact your coach.</p></section>`;
+
+  const page: StaticServerPage = {
+    title: "Papa Life Courses | Boss Mobile Life Coach",
+    description:
+      "Programs built for fathers navigating relationships with adult children. Preview Papa Life courses and sign in to watch lessons.",
+    eyebrow: "Courses",
+    headline: "Papa Life course catalog",
+    intro:
+      "Programs built for fathers navigating relationships with adult children. Members can sign in to watch lessons and track progress.",
+    sections: [],
+    cta: { label: "Member Portal", href: "/member-login" },
+  };
+
+  return {
+    status: 200,
+    title: page.title,
+    description: page.description,
+    bodyHtml: serverPageShell(page, courseHtml),
+  };
+}
+
+function courseDetailServerPage(courseId: number): ServerRenderedPage {
+  const course = db
+    .prepare(
+      `SELECT c.id, c.title, c.description, c.pillar
+       FROM courses c
+       WHERE c.id = ? AND c.show_in_catalog = 1`
+    )
+    .get(courseId) as { id: number; title: string; description: string | null; pillar: string } | undefined;
+  if (!course) return notFoundServerPage();
+
+  const lessons = db
+    .prepare(
+      `SELECT id, title, description, duration_minutes, content_type
+       FROM lessons
+       WHERE course_id = ?
+       ORDER BY sort_order ASC, created_at ASC`
+    )
+    .all(courseId) as Array<{ id: number; title: string; description: string | null; duration_minutes: number | null; content_type: string | null }>;
+
+  const lessonHtml = `<section><h2>Lessons (${lessons.length})</h2>${
+    lessons.length > 0
+      ? `<ol>${lessons
+          .map(
+            (lesson) =>
+              `<li><strong>${escapeHtml(lesson.title)}</strong>${lesson.duration_minutes ? ` (${Number(lesson.duration_minutes)} min)` : ""}${lesson.description ? `<br><span>${escapeHtml(lesson.description)}</span>` : ""}</li>`
+          )
+          .join("")}</ol>`
+      : "<p>No lessons are listed for this course yet.</p>"
+  }</section>`;
+
+  const page: StaticServerPage = {
+    title: `${course.title} | Papa Life Courses`,
+    description:
+      course.description ||
+      `Preview the ${course.title} Papa Life course and its lesson plan for fathers of adult children.`,
+    eyebrow: course.pillar || "Course",
+    headline: course.title,
+    intro:
+      course.description ||
+      "Lesson videos and materials are available after you sign in to the member portal. This page is a preview of the curriculum.",
+    sections: [{ heading: "Member access", body: "Sign in to the member portal to watch lesson videos and track progress." }],
+    cta: { label: "Sign in to watch", href: "/member-login" },
+  };
+
+  return {
+    status: 200,
+    title: page.title,
+    description: page.description,
+    bodyHtml: serverPageShell(page, lessonHtml),
+  };
+}
+
+function renderServerPage(rawUrl: string): ServerRenderedPage {
+  const pathname = normalizeAppPath(rawUrl);
+  if (pathname === "/404") return notFoundServerPage();
+  if (pathname === "/courses") return coursesServerPage();
+
+  const courseMatch = pathname.match(/^\/courses\/(\d+)$/);
+  if (courseMatch) return courseDetailServerPage(Number(courseMatch[1]));
+
+  return staticServerPage(pathname) || notFoundServerPage();
+}
+
+function renderHtmlDocument(template: string, page: ServerRenderedPage) {
+  let html = template
+    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(page.title)}</title>`)
+    .replace(
+      /<meta name="description" content="[^"]*"\s*\/?>/i,
+      `<meta name="description" content="${escapeHtml(page.description)}" />`
+    );
+
+  if (page.keywords) {
+    if (/<meta name="keywords" content="[^"]*"\s*\/?>/i.test(html)) {
+      html = html.replace(
+        /<meta name="keywords" content="[^"]*"\s*\/?>/i,
+        `<meta name="keywords" content="${escapeHtml(page.keywords)}" />`
+      );
+    } else {
+      html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);
+    }
+  }
+
+  if (page.noindex) {
+    const robots = `<meta name="robots" content="noindex, follow" />`;
+    if (/<meta name="robots"/i.test(html)) {
+      html = html.replace(/<meta name="robots" content="[^"]*"\s*\/?>/i, robots);
+    } else {
+      html = html.replace("</head>", `    ${robots}\n  </head>`);
+    }
+  }
+
+  // The SEO generator writes a prerendered homepage into dist/public/index.html.
+  // Replace that complete root payload so every server-rendered route exposes
+  // its own meaningful content before the client application hydrates.
+  return html.replace(
+    /<div id="root">[\s\S]*?<\/body>/i,
+    `<div id="root">${page.bodyHtml}</div>\n  </body>`
+  );
+}
+
+function sendServerRenderedApp(req: Request, res: Response, staticPath: string) {
+  const page = renderServerPage(req.originalUrl || req.url);
+  const templatePath = path.join(staticPath, "index.html");
+  let template = "";
+  try {
+    template = fs.readFileSync(templatePath, "utf8");
+  } catch {
+    res.status(500).type("text/plain").send("Site template missing");
+    return;
+  }
+
+  res.status(page.status).type("html").send(renderHtmlDocument(template, page));
+}
+
+// ─── Server ───────────────────────────────────────────────────────────────────
+
+async function startServer() {
+  const app = express();
+  const server = createServer(app);
+
+  server.on("upgrade", proxyElevenLabsVoiceWebSocket);
+
+  app.use(securityHeaders);
+  app.use(express.json({ limit: "12mb" }));
+  app.use("/api/ai", papaAiCors, papaAiRateLimit());
+  app.use("/api/health", papaAiCors);
+
+  app.use(
+    session({
+      store: new (SQLiteStore as any)({ db: "sessions.db", dir: path.resolve(__dirname, "..") }),
+      secret: "papalife-secret-2026",
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true },
+    })
+  );
+
+  app.get("/api/health", (_req, res) => {
+    const ai = getPapaAiStatus();
+    res.json({
+      ok: true,
+      service: "papa-life-website",
+      timestamp: new Date().toISOString(),
+      ai: {
+        live_ai_enabled: ai.live_ai_enabled,
+        provider: ai.provider,
+        supported_providers: ai.supported_providers,
+      },
+      database: "sqlite",
+    });
+  });
+
+  // ── Auth routes ────────────────────────────────────────────────────────────
+
+  app.post("/api/auth/login", (req, res) => {
+    const { username, password } = req.body;
+    const login = (username || "").trim();
+    const user = login.includes("@")
+      ? db.prepare("SELECT * FROM admin_users WHERE email = ?").get(login) as any
+      : db.prepare("SELECT * FROM admin_users WHERE username = ?").get(login) as any;
+    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+      return res.status(401).json({ ok: false, error: "Invalid credentials" });
+    }
+    (req.session as any).adminId = user.id;
+    (req.session as any).adminUser = {
+      id: user.id,
+      username: user.username,
+      display_name: user.display_name,
+      email: user.email,
+    };
+    res.json({ ok: true, user: { id: user.id, username: user.username, display_name: user.display_name, email: user.email } });
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy(() => res.json({ ok: true }));
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    const user = (req.session as any).adminUser;
+    if (!user) return res.status(401).json({ ok: false });
+    res.json({
+      ok: true,
+      user: {
+        ...user,
+        researchLabAccess: isResearchLabWebUser(user.username),
+      },
+    });
+  });
+
+  // ── Admin: Go High Level integration (PIT in dashboard Settings) ─────────
+
+  app.get("/api/admin/ghl-integration", requireAuth, (req, res) => {
+    const adminId = (req.session as any).adminId as number;
+    if (!adminId) return res.status(401).json({ ok: false, error: "Unauthorized" });
+    try {
+      res.json({ ok: true, integration: getGhlIntegrationPublic(db, adminId) });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e?.message || "Failed to load GHL settings" });
+    }
+  });
+
+  app.put("/api/admin/ghl-integration", requireAuth, (req, res) => {
+    const adminId = (req.session as any).adminId as number;
+    if (!adminId) return res.status(401).json({ ok: false, error: "Unauthorized" });
+    const token = String(req.body?.api_token ?? req.body?.ghl_api_token ?? "").trim();
+    if (!token) {
+      return res.status(400).json({ ok: false, error: "api_token is required" });
+    }
+    try {
+      const integration = saveGhlIntegration(
+        db,
+        adminId,
+        token,
+        req.body?.location_id ?? req.body?.ghl_location_id ?? null
+      );
+      res.json({ ok: true, integration, message: "Go High Level token saved securely." });
+    } catch (e: any) {
+      res.status(400).json({ ok: false, error: e?.message || "Failed to save GHL token" });
+    }
+  });
+
+  app.delete("/api/admin/ghl-integration", requireAuth, (req, res) => {
+    const adminId = (req.session as any).adminId as number;
+    if (!adminId) return res.status(401).json({ ok: false, error: "Unauthorized" });
+    try {
+      const integration = clearGhlIntegration(db, adminId);
+      res.json({ ok: true, integration, message: "Go High Level token removed from dashboard storage." });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e?.message || "Failed to clear GHL token" });
+    }
+  });
+
+  app.get("/api/admin/integrations/status", requireAuth, (_req, res) => {
+    try {
+      res.json({ ok: true, status: adminIntegrationStatusPayload() });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e?.message || "Failed to load integration status" });
+    }
+  });
+
+  app.get("/api/admin/notification-events", requireAuth, (req, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit || 50), 1), 200);
+    try {
+      res.json({ ok: true, events: recentNotificationEvents(limit) });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e?.message || "Failed to load notification events" });
+    }
+  });
+
+  app.post("/api/admin/notifications/test", requireAuth, async (req, res) => {
+    const user = (req.session as any).adminUser;
+    const result = await sendAdminNotification({
+      event_type: "admin_test",
+      subject: "Papa Life notification test",
+      summary: [
+        "This is a test notification from Boss Mobile Life Coach.",
+        "",
+        `Requested by: ${user?.display_name || user?.username || "admin"}`,
+        `Time: ${new Date().toISOString()}`,
+      ].join("\n"),
+      payload: { source: "crm_console_settings" },
+    });
+    res.json({ ok: true, result });
+  });
+
+  app.get("/api/admin/payment-events", requireAuth, (req, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit || 25), 1), 100);
+    try {
+      res.json({ ok: true, events: recentMemberPaymentEvents(limit) });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e?.message || "Failed to load payment events" });
+    }
+  });
+
+  // ── Public: save lead ─────────────────────────────────────────────────────
+
+  app.post("/api/leads", async (req, res) => {
+    try {
+      const body = req.body;
+      const isAiLead =
+        body?.source === "papa_ai" ||
+        body?.source_page ||
+        body?.conversation_summary ||
+        body?.assessment_result ||
+        (body?.first_name && body?.email && !body?.business_email);
+
+      if (isAiLead) {
+        const lead = normalizePapaAiLead(body);
+        const sourcePage = cleanPublicText(body?.source_page || body?.sourcePage || req.get("referer"), 500);
+        const conversationSummary = cleanPublicText(body?.conversation_summary || body?.conversationSummary, 1000);
+        const assessmentResult = body?.assessment_result || body?.assessmentResult || null;
+        const offer = cleanPublicText(body?.offer, 160) || "Papa Life AI Coach";
+
+        if (!lead.first_name || !lead.email || !isValidEmail(lead.email)) {
+          return res.status(400).json({ ok: false, error: "Valid first name and email are required" });
+        }
+
+        const result = db
+          .prepare(
+            `INSERT INTO intake_submissions (first_name, email, phone, situation, routed_pillar, disconnected_pillar, vision, answers_json)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+          )
+          .run(
+            lead.first_name,
+            lead.email,
+            lead.phone || null,
+            `AI lead requested: ${offer}`,
+            "AI Coach",
+            null,
+            conversationSummary || "Visitor requested follow-up from the Papa Life AI experience.",
+            JSON.stringify({
+              source: "papa_ai",
+              source_page: sourcePage,
+              offer,
+              assessment_result: assessmentResult,
+              conversation_summary: conversationSummary,
+              submitted_at: new Date().toISOString(),
+            })
+          );
+
+        db.prepare(
+          `INSERT INTO conversion_pipeline (email, first_name, stage, intake_completed)
+           VALUES (?, ?, 'engagement', 1)
+           ON CONFLICT(email) DO UPDATE SET
+             first_name = COALESCE(excluded.first_name, conversion_pipeline.first_name),
+             intake_completed = 1,
+             updated_at = datetime('now')`
+        ).run(lead.email, lead.first_name);
+
+        savePapaAiInteraction({
+          session_id: req.sessionID || "public",
+          mode: "lead",
+          first_name: lead.first_name,
+          email: lead.email,
+          phone: lead.phone,
+          source_page: sourcePage,
+          user_message: `Lead requested: ${offer}`,
+          conversation_summary: conversationSummary,
+          provider: "local",
+          assessment_result: assessmentResult,
+        });
+
+        await syncPapaAiContactToGhl({
+          first_name: lead.first_name,
+          email: lead.email,
+          phone: lead.phone || null,
+          source: "bossmobilelifecoach.com Papa Life AI lead",
+          tags: [
+            "papa_ai_lead",
+            "papa_life_ai",
+            offer ? `offer_${offer}` : "",
+          ],
+        });
+
+        await sendAdminNotification({
+          event_type: "papa_ai_lead",
+          subject: `Papa Life AI lead: ${lead.first_name}`,
+          summary: [
+            "A visitor requested a Papa Life AI follow-up.",
+            "",
+            `Name: ${lead.first_name}`,
+            `Email: ${lead.email}`,
+            lead.phone ? `Phone: ${lead.phone}` : null,
+            `Offer: ${offer}`,
+            sourcePage ? `Source page: ${sourcePage}` : null,
+            conversationSummary ? `Conversation: ${conversationSummary}` : null,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          payload: {
+            lead,
+            offer,
+            source_page: sourcePage,
+            conversation_summary: conversationSummary,
+            intake_id: Number(result.lastInsertRowid),
+          },
+        });
+
+        return res.json({ ok: true, id: result.lastInsertRowid });
+      }
+
+      const result = insertLead.run({
+        invited_by: body.invited_by || null,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        mobile_phone: body.mobile_phone,
+        business_email: body.business_email,
+        business_name: body.business_name || null,
+        website: body.website || null,
+        street_address: body.street_address || null,
+        address2: body.address2 || null,
+        city: body.city || null,
+        state: body.state || null,
+        country: body.country || null,
+        postal_code: body.postal_code || null,
+        consent_transactional: body.consent_transactional ? 1 : 0,
+        consent_marketing: body.consent_marketing ? 1 : 0,
+        checkout_status: "redirected_to_checkout",
+      });
+      res.json({ ok: true, id: result.lastInsertRowid });
+    } catch (err) {
+      console.error("Lead insert error:", err);
+      res.status(500).json({ ok: false, error: "Failed to save lead" });
+    }
+  });
+
+  // ── Protected: CRM ────────────────────────────────────────────────────────
+
+  app.get("/api/leads", requireAuth, (_req, res) => {
+    const leads = db.prepare("SELECT * FROM leads ORDER BY created_at DESC").all();
+    res.json(leads);
+  });
+
+  app.delete("/api/leads/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM leads WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.get("/api/leads/:id/notes", requireAuth, (req, res) => {
+    const notes = db
+      .prepare("SELECT * FROM lead_notes WHERE lead_id = ? ORDER BY created_at DESC")
+      .all(req.params.id);
+    res.json(notes);
+  });
+
+  app.post("/api/leads/:id/notes", requireAuth, (req, res) => {
+    const { body } = req.body;
+    if (!body?.trim()) return res.status(400).json({ ok: false, error: "Note body required" });
+    const result = db
+      .prepare("INSERT INTO lead_notes (lead_id, body) VALUES (?, ?)")
+      .run(req.params.id, body.trim());
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.delete("/api/notes/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM lead_notes WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  // ── Protected: Stats ──────────────────────────────────────────────────────
+
+  app.get("/api/dashboard/stats", requireAuth, (_req, res) => {
+    const total = (db.prepare("SELECT COUNT(*) as c FROM leads").get() as { c: number }).c;
+    const checkedOut = (db.prepare("SELECT COUNT(*) as c FROM leads WHERE checkout_status = 'redirected_to_checkout'").get() as { c: number }).c;
+    const deliveryRate = total > 0 ? Math.round((checkedOut / total) * 100) : 0;
+    const byDay = db.prepare(`SELECT date(created_at) as day, COUNT(*) as count FROM leads GROUP BY date(created_at) ORDER BY day DESC LIMIT 30`).all();
+    const byConsent = db.prepare(`SELECT SUM(consent_transactional) as transactional, SUM(consent_marketing) as marketing FROM leads`).get() as { transactional: number; marketing: number };
+    const trafficTotal = (db.prepare("SELECT COUNT(*) as c FROM traffic_clicks").get() as { c: number }).c;
+    const trafficByDoorway = db.prepare(
+      `SELECT doorway, COUNT(*) as count
+       FROM traffic_clicks
+       GROUP BY doorway
+       ORDER BY count DESC`
+    ).all();
+    const trafficBySource = db.prepare(
+      `SELECT COALESCE(source, 'unknown') as source, COUNT(*) as count
+       FROM traffic_clicks
+       GROUP BY COALESCE(source, 'unknown')
+       ORDER BY count DESC
+       LIMIT 12`
+    ).all();
+    const recentTraffic = db.prepare(
+      `SELECT doorway, destination, source, campaign, referrer, created_at
+       FROM traffic_clicks
+       ORDER BY created_at DESC
+       LIMIT 25`
+    ).all();
+    res.json({
+      total,
+      checkedOut,
+      deliveryRate,
+      byDay,
+      byConsent,
+      traffic: { total: trafficTotal, byDoorway: trafficByDoorway, bySource: trafficBySource, recent: recentTraffic },
+    });
+  });
+
+  registerSmsCampaignRoutes(app, db, requireAuth);
+
+  // ── Protected: Papa Life daily work reports ───────────────────────────────
+
+  app.get("/api/admin/papa-daily-work-reports", requireAuth, (_req, res) => {
+    const reports = db
+      .prepare(
+        `SELECT id, report_date, title, outcomes, win, ventures_saved, created_at
+         FROM papa_daily_work_reports
+         ORDER BY report_date DESC, created_at DESC
+         LIMIT 30`
+      )
+      .all();
+    res.json({ ok: true, reports });
+  });
+
+  app.post("/api/admin/papa-daily-work-reports", requireAuth, async (req, res) => {
+    try {
+      const date = normalizeReportDate(req.body?.reportDate);
+      const fields = normalizeReportFields(req.body?.fields);
+      const outcomes = normalizeOutcomes(req.body?.outcomes);
+      const markdown = String(req.body?.markdown || "").trim() || buildPapaDailyReportMarkdown(date, fields, outcomes);
+      const title = `Papa Life Daily Work Report - ${date}`;
+      const ventures = await sendPapaDailyReportToVentures(date, markdown);
+      const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
+
+      const result = db
+        .prepare(
+          `INSERT INTO papa_daily_work_reports (
+            report_date, title, outreach, content_creation, scheduling, automation,
+            coaching, pipeline, revenue, research, outcomes, win, markdown,
+            ventures_saved, ventures_error, created_by
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .run(
+          date,
+          title,
+          fields.outreach || null,
+          fields.contentCreation || null,
+          fields.scheduling || null,
+          fields.automation || null,
+          fields.coaching || null,
+          fields.pipeline || null,
+          fields.revenue || null,
+          fields.research || null,
+          JSON.stringify(outcomes),
+          fields.win || null,
+          markdown,
+          ventures.ok ? 1 : 0,
+          ventures.error,
+          user?.email || user?.username || null
+        );
+
+      res.json({
+        ok: true,
+        id: result.lastInsertRowid,
+        venturesSaved: ventures.ok,
+        venturesError: ventures.error,
+      });
+    } catch (e: any) {
+      console.error("[papa-daily-work-report] save failed:", e);
+      res.status(500).json({ ok: false, error: e?.message || "Failed to save report" });
+    }
+  });
+
+  // ── Resources (teaching docs) ─────────────────────────────────────────────
+
+  app.get("/api/resources", requireAuth, (_req, res) => {
+    const resources = db.prepare("SELECT * FROM resources ORDER BY sort_order ASC, created_at DESC").all();
+    res.json(resources);
+  });
+
+  app.post("/api/resources", requireAuth, (req, res) => {
+    const { title, description, url, category } = req.body;
+    if (!title?.trim() || !url?.trim()) return res.status(400).json({ ok: false, error: "Title and URL required" });
+    const result = db.prepare(
+      "INSERT INTO resources (title, description, url, category) VALUES (?, ?, ?, ?)"
+    ).run(title.trim(), description?.trim() || null, url.trim(), category?.trim() || "General");
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.put("/api/resources/:id", requireAuth, (req, res) => {
+    const { title, description, url, category } = req.body;
+    db.prepare("UPDATE resources SET title=?, description=?, url=?, category=? WHERE id=?")
+      .run(title, description || null, url, category || "General", req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/resources/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM resources WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  // ── Lead pipeline status ──────────────────────────────────────────────────
+
+  app.put("/api/leads/:id/status", requireAuth, (req, res) => {
+    const { status } = req.body;
+    const valid = ["New", "Contacted", "Qualified", "Enrolled", "Active", "Alumni"];
+    if (!valid.includes(status)) return res.status(400).json({ ok: false, error: "Invalid status" });
+    db.prepare("UPDATE leads SET status = ? WHERE id = ?").run(status, req.params.id);
+    res.json({ ok: true });
+  });
+
+  // ── Tasks ─────────────────────────────────────────────────────────────────
+
+  app.get("/api/leads/:id/tasks", requireAuth, (req, res) => {
+    const tasks = db.prepare("SELECT * FROM tasks WHERE lead_id = ? ORDER BY created_at ASC").all(req.params.id);
+    res.json(tasks);
+  });
+
+  app.post("/api/leads/:id/tasks", requireAuth, (req, res) => {
+    const { title, due_date } = req.body;
+    if (!title?.trim()) return res.status(400).json({ ok: false, error: "Title required" });
+    const result = db.prepare("INSERT INTO tasks (lead_id, title, due_date) VALUES (?, ?, ?)").run(req.params.id, title.trim(), due_date || null);
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.put("/api/tasks/:id", requireAuth, (req, res) => {
+    const { title, due_date, completed } = req.body;
+    db.prepare("UPDATE tasks SET title = COALESCE(?, title), due_date = COALESCE(?, due_date), completed = COALESCE(?, completed) WHERE id = ?")
+      .run(title ?? null, due_date ?? null, completed !== undefined ? (completed ? 1 : 0) : null, req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/tasks/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM tasks WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  // ── Member auth ───────────────────────────────────────────────────────────
+
+  app.post("/api/member/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+    const member = db.prepare("SELECT * FROM members WHERE email = ? AND status = 'active'").get(email) as any;
+    if (!member) return res.status(401).json({ ok: false, error: "Invalid email or password" });
+    const valid = await bcrypt.compare(password, member.password_hash);
+    if (!valid) return res.status(401).json({ ok: false, error: "Invalid email or password" });
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+    const billing = getMemberAccessState(member);
+    const access = memberAccessScopes(member);
+    res.json({
+      ok: true,
+      user: memberSessionPayload(member),
+      billing,
+      access,
+      billing_required: !access.portal,
+    });
+  });
+
+  app.post("/api/member/auth/register", async (req, res) => {
+    const { first_name, last_name, email, password } = req.body || {};
+    if (!first_name?.trim() || !last_name?.trim() || !email?.trim() || !password?.trim()) {
+      return res.status(400).json({ ok: false, error: "First name, last name, email, and password are required" });
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existing = db.prepare("SELECT id FROM members WHERE email = ?").get(normalizedEmail) as { id?: number } | undefined;
+    if (existing?.id) {
+      return res.status(409).json({ ok: false, error: "An account with this email already exists" });
+    }
+
+    const hash = await bcrypt.hash(String(password), 10);
+    const enrolledAt = new Date().toISOString();
+    const result = db
+      .prepare(
+        "INSERT INTO members (first_name, last_name, email, password_hash, status, payment_status, trial_started_at, trial_expires_at, enrolled_at) VALUES (?, ?, ?, ?, 'active', 'payment_required', NULL, NULL, ?)"
+      )
+      .run(
+        String(first_name).trim(),
+        String(last_name).trim(),
+        normalizedEmail,
+        hash,
+        enrolledAt
+      );
+
+    const memberId = Number(result.lastInsertRowid);
+    const member = loadMemberById(memberId);
+
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+
+    const billing = getMemberAccessState(member);
+    const access = memberAccessScopes(member);
+    res.status(201).json({
+      ok: true,
+      user: memberSessionPayload(member),
+      billing,
+      access,
+      billing_required: !access.portal,
+    });
+  });
+
+  app.post("/api/member/auth/forgot-password", async (req, res) => {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const generic = { ok: true, message: "If that email belongs to an active Papa Life account, a secure reset link has been sent." };
+    if (!isValidEmail(email)) return res.json(generic);
+    const member = loadMemberByEmail(email);
+    if (!member || member.status !== "active") return res.json(generic);
+    const reset = issueMemberPasswordReset(member.id);
+    const resetUrl = `${appBaseUrl(req)}/member-reset-password?token=${encodeURIComponent(reset.rawToken)}`;
+    await sendMemberPasswordResetEmail({ recipient: member.email, firstName: member.first_name, resetUrl, expiresAt: reset.expiresAt, memberId: member.id });
+    return res.json(generic);
+  });
+
+  app.get("/api/member/auth/reset-password", (req, res) => {
+    const token = cleanPublicText(req.query?.token, 200);
+    const reset = token ? memberPasswordResetByToken(token) : null;
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    return res.json({ ok: true, first_name: reset.first_name, email: reset.email });
+  });
+
+  app.post("/api/member/auth/reset-password", async (req, res) => {
+    const token = cleanPublicText(req.body?.token, 200);
+    const password = String(req.body?.password || "");
+    const confirmPassword = String(req.body?.confirm_password || "");
+    if (!token || password.length < 8) return res.status(400).json({ ok: false, error: "A valid link and password of at least 8 characters are required" });
+    if (password !== confirmPassword) return res.status(400).json({ ok: false, error: "Passwords do not match" });
+    const reset = memberPasswordResetByToken(token);
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    const consumed = db.prepare("UPDATE member_account_activations SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL").run(reset.id);
+    if (!consumed.changes) return res.status(400).json({ ok: false, error: "This password-reset link has already been used" });
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(await bcrypt.hash(password, 12), reset.member_id);
+    const member = loadMemberById(Number(reset.member_id));
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+    return res.json({ ok: true, redirect: "/portal" });
+  });
+
+  app.get("/api/member/auth/activate", (req, res) => {
+    const token = cleanPublicText(req.query?.token, 200);
+    if (!token) return res.status(400).json({ ok: false, error: "Activation token is required" });
+    const activation = memberActivationByToken(token);
+    const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+      return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
+    }
+    return res.json({
+      ok: true,
+      first_name: activation.first_name,
+      email: activation.email,
+      expires_at: activation.expires_at,
+    });
+  });
+
+  app.post("/api/member/auth/activate", async (req, res) => {
+    const token = cleanPublicText(req.body?.token, 200);
+    const password = String(req.body?.password || "");
+    const confirmPassword = String(req.body?.confirm_password || "");
+    if (!token || !password) return res.status(400).json({ ok: false, error: "Activation token and password are required" });
+    if (password.length < 8) return res.status(400).json({ ok: false, error: "Password must be at least 8 characters" });
+    if (password !== confirmPassword) return res.status(400).json({ ok: false, error: "Passwords do not match" });
+
+    const activation = memberActivationByToken(token);
+    const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+      return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
+    }
+
+    const hash = await bcrypt.hash(password, 12);
+    const update = db.prepare(
+      "UPDATE member_account_activations SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL"
+    ).run(activation.id);
+    if (!update.changes) return res.status(400).json({ ok: false, error: "This activation link has already been used" });
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(hash, activation.member_id);
+    const member = loadMemberById(Number(activation.member_id));
+    (req.session as any).memberId = member.id;
+    (req.session as any).memberUser = memberSessionPayload(member);
+    return res.json({
+      ok: true,
+      user: memberSessionPayload(member),
+      billing: getMemberAccessState(member),
+      access: memberAccessScopes(member),
+      redirect: "/portal",
+    });
+  });
+
+  app.post("/api/member/auth/logout", (req, res) => {
+    req.session.destroy(() => res.json({ ok: true }));
+  });
+
+  app.get("/api/member/auth/me", (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    if (!memberId) return res.status(401).json({ ok: false });
+    const member = loadMemberById(memberId);
+    if (!member || member.status !== "active") return res.status(401).json({ ok: false });
+
+    const user = memberSessionPayload(member);
+    (req.session as any).memberUser = user;
+    const billing = getMemberAccessState(member);
+    const access = memberAccessScopes(member);
+    if (!access.portal) {
+      return res.status(402).json({ ok: false, user, billing_required: true, billing, access });
+    }
+    res.json({ ok: true, user, billing, access });
+  });
+
+  app.get("/api/member/billing/status", requireMemberSession, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(401).json({ ok: false, error: "Unauthorized" });
+
+    const pricing = getPricingSettings(db);
+    const billing = getMemberAccessState(member, pricing);
+    return res.json({
+      ok: true,
+      user: memberSessionPayload(member),
+      billing,
+      amount_cents: pricing.member_price_usd_cents,
+      amount_display: formatAmountDisplay(pricing.member_price_usd_cents, pricing.member_currency),
+      currency: pricing.member_currency,
+      product_name: pricing.member_product_name,
+      checkout_provider: STRIPE_SECRET_KEY ? "stripe" : "fastpay",
+      checkout_payment_link: appendCheckoutTracking(pricing.checkout_payment_link, member),
+    });
+  });
+
+  app.post("/api/member/billing/create-checkout-session", requireMemberSession, async (req, res) => {
+    try {
+      const memberId = Number((req.session as any).memberId);
+      const member = loadMemberById(memberId);
+      if (!member) return res.status(401).json({ ok: false, error: "Unauthorized" });
+
+      const pricing = getPricingSettings(db);
+      const billing = getMemberAccessState(member, pricing);
+      if (billing.payment_status === "paid") {
+        return res.json({ ok: true, already_paid: true, checkout_url: null });
+      }
+
+      if (!STRIPE_SECRET_KEY) {
+        return res.json({
+          ok: true,
+          provider: "fastpay",
+          checkout_url: appendCheckoutTracking(pricing.checkout_payment_link, member),
+          manual_reconciliation_required: true,
+          message:
+            "Stripe is not configured. Redirecting to the active Boss Mobility payment link.",
+        });
+      }
+
+      const baseUrl = appBaseUrl(req);
+      const successUrl = `${baseUrl}/member-billing?success=1&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${baseUrl}/member-billing?canceled=1`;
+
+      const form = new URLSearchParams();
+      form.set("mode", "payment");
+      form.set("success_url", successUrl);
+      form.set("cancel_url", cancelUrl);
+      form.set("customer_email", member.email);
+      form.set("client_reference_id", String(member.id));
+      form.set("metadata[member_id]", String(member.id));
+
+      if (pricing.member_stripe_price_id) {
+        form.set("line_items[0][price]", pricing.member_stripe_price_id);
+      } else {
+        form.set("line_items[0][price_data][currency]", pricing.member_currency);
+        form.set("line_items[0][price_data][unit_amount]", String(pricing.member_price_usd_cents));
+        form.set("line_items[0][price_data][product_data][name]", pricing.member_product_name);
+      }
+      form.set("line_items[0][quantity]", "1");
+
+      const sessionData = await stripeCreateCheckoutSession(form);
+
+      db.prepare("UPDATE members SET stripe_checkout_session_id = ? WHERE id = ?")
+        .run(sessionData.id || null, member.id);
+
+      return res.json({
+        ok: true,
+        checkout_url: sessionData.url,
+        session_id: sessionData.id,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ ok: false, error: error?.message || "Unable to start checkout" });
+    }
+  });
+
+  app.post("/api/member/billing/confirm", requireMemberSession, async (req, res) => {
+    try {
+      const memberId = Number((req.session as any).memberId);
+      const member = loadMemberById(memberId);
+      if (!member) return res.status(401).json({ ok: false, error: "Unauthorized" });
+
+      const { session_id } = req.body || {};
+      if (!session_id || typeof session_id !== "string") {
+        return res.status(400).json({ ok: false, error: "session_id is required" });
+      }
+
+      const sessionData = await stripeRetrieveCheckoutSession(session_id);
+      const paid = sessionData?.payment_status === "paid";
+      const matchesMember =
+        String(sessionData?.client_reference_id || "") === String(member.id) ||
+        String(sessionData?.metadata?.member_id || "") === String(member.id);
+
+      if (!matchesMember) {
+        return res.status(403).json({ ok: false, error: "Checkout session does not match this account" });
+      }
+
+      if (!paid) {
+        return res.status(400).json({ ok: false, error: "Payment not completed yet" });
+      }
+
+      db.prepare(
+        "UPDATE members SET payment_status = 'paid', paid_at = ?, stripe_checkout_session_id = ?, stripe_customer_id = ?, trial_expires_at = NULL WHERE id = ?"
+      ).run(
+        new Date().toISOString(),
+        sessionData.id || null,
+        typeof sessionData.customer === "string" ? sessionData.customer : null,
+        member.id
+      );
+
+      const updated = loadMemberById(member.id);
+      (req.session as any).memberUser = memberSessionPayload(updated);
+      return res.json({ ok: true, user: memberSessionPayload(updated), billing: getMemberAccessState(updated) });
+    } catch (error: any) {
+      return res.status(500).json({ ok: false, error: error?.message || "Unable to confirm payment" });
+    }
+  });
+
+  app.post("/api/webhooks/member-paid", async (req, res) => {
+    if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
+      return res.status(503).json({
+        ok: false,
+        error: "PAYMENT_WEBHOOK_SECRET is not configured",
+      });
+    }
+    if (!verifyPaymentWebhookAuth(req)) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+
+    try {
+      const body = (req.body || {}) as Record<string, any>;
+      const memberIdRaw =
+        body.member_id ?? body.memberId ?? body.client_reference_id ?? body.metadata?.member_id ??
+        body.data?.object?.client_reference_id ?? body.data?.object?.metadata?.member_id;
+      const email = cleanPublicText(
+        body.email ?? body.customer_email ?? body.customer?.email ??
+        body.data?.object?.customer_email ?? body.data?.object?.customer_details?.email,
+        160
+      ).toLowerCase();
+      if (!isValidEmail(email) && !Number.isFinite(Number(memberIdRaw))) {
+        return res.status(400).json({ ok: false, error: "A valid paid-customer email or member_id is required" });
+      }
+
+      const provider = cleanPublicText(
+        body.provider ?? body.source ?? body.type ?? body.data?.object?.object ?? "external", 80
+      ) || "external";
+      const transactionId = cleanPublicText(
+        body.transaction_id ?? body.transactionId ?? body.payment_id ?? body.paymentId ??
+        body.session_id ?? body.id ?? body.data?.object?.id, 160
+      ) || null;
+      if (transactionId) {
+        const duplicate = db.prepare(
+          "SELECT member_id FROM member_payment_events WHERE provider = ? AND transaction_id = ? LIMIT 1"
+        ).get(provider, transactionId) as { member_id?: number } | undefined;
+        if (duplicate?.member_id) {
+          const existingMember = loadMemberById(Number(duplicate.member_id));
+          return res.json({
+            ok: true,
+            duplicate: true,
+            member_id: existingMember?.id || Number(duplicate.member_id),
+            payment_status: existingMember?.payment_status || "paid",
+          });
+        }
+      }
+
+      const account = findOrCreatePaidMembershipMember({
+        memberId: Number.isFinite(Number(memberIdRaw)) ? Number(memberIdRaw) : null,
+        email,
+        firstName: body.first_name ?? body.firstName ?? body.customer?.name?.split?.(/\s+/)?.[0] ?? body.data?.object?.customer_details?.name?.split?.(/\s+/)?.[0],
+        lastName: body.last_name ?? body.lastName,
+        displayName: body.name ?? body.customer_name ?? body.customer?.name ?? body.data?.object?.customer_details?.name,
+      });
+      const member = account.member;
+      const amountCentsRaw = body.amount_cents ?? body.amountCents ?? body.amount_total ?? body.data?.object?.amount_total ?? null;
+      const amountCents = Number.isFinite(Number(amountCentsRaw)) ? Number(amountCentsRaw) : null;
+      if (amountCents !== null && amountCents < 499) {
+        return res.status(400).json({ ok: false, error: "Membership payment amount is below the approved $4.99 base price" });
+      }
+
+      const paidAt = new Date().toISOString();
+      markMemberPaid(member.id, paidAt);
+      db.prepare(
+        `INSERT INTO member_payment_events
+         (member_id, provider, transaction_id, email, amount_cents, raw_payload_json)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      ).run(member.id, provider, transactionId, isValidEmail(email) ? email : member.email, amountCents, JSON.stringify(body).slice(0, 20000));
+
+      let activationDelivery: { requested: boolean; sent?: boolean; skipped?: boolean } = { requested: false };
+      if (account.created) {
+        const activation = issueMemberAccountActivation(member.id);
+        const activationUrl = `${appBaseUrl(req)}/member-activate?token=${encodeURIComponent(activation.rawToken)}`;
+        const delivery = await sendMemberAccountActivationEmail({
+          recipient: member.email,
+          firstName: member.first_name,
+          activationUrl,
+          expiresAt: activation.expiresAt,
+          memberId: Number(member.id),
+          transactionId,
+        });
+        activationDelivery = { requested: true, sent: Boolean(delivery.ok), skipped: Boolean((delivery as any).skipped) };
+      }
+
+      const updated = loadMemberById(member.id);
+      return res.json({
+        ok: true,
+        member_id: member.id,
+        account_created: account.created,
+        email: updated.email,
+        payment_status: updated.payment_status,
+        paid_at: updated.paid_at,
+        course_access: { course_id: PAPA_LIFE_MEMBERSHIP_COURSE_ID, granted: true },
+        activation_delivery: activationDelivery,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ ok: false, error: error?.message || "Unable to record paid membership" });
+    }
+  });
+
+  app.post("/api/webhooks/commerce-paid", (req, res) => {
+    if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
+      return res.status(503).json({ ok: false, error: "PAYMENT_WEBHOOK_SECRET is not configured" });
+    }
+    if (!verifyPaymentWebhookAuth(req)) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+
+    const body = (req.body || {}) as Record<string, any>;
+    const provider = cleanPublicText(body.provider ?? body.source ?? "external", 80) || "external";
+    const sourceEventId = cleanPublicText(
+      body.event_id ?? body.eventId ?? body.transaction_id ?? body.transactionId ??
+      body.payment_id ?? body.paymentId ?? body.session_id ?? body.id ?? body.data?.object?.id,
+      180
+    );
+    if (!sourceEventId) {
+      return res.status(400).json({ ok: false, error: "A unique payment event or transaction id is required." });
+    }
+
+    const eventKey = `${provider}:${sourceEventId}`;
+    const eventCreated = recordCommerceEvent(db, {
+      eventKey,
+      provider,
+      eventType: cleanPublicText(body.type ?? body.event_type ?? "payment.completed", 100),
+      externalOrderId: sourceEventId,
+      payload: body,
+    });
+    if (!eventCreated) {
+      const existingEvent = db.prepare(
+        "SELECT status FROM commerce_events WHERE event_key = ?"
+      ).get(eventKey) as { status?: string } | undefined;
+      if (existingEvent?.status === "processed") {
+        return res.json({ ok: true, duplicate: true, event_key: eventKey });
+      }
+    }
+
+    try {
+      const productCode = cleanPublicText(
+        body.product_code ?? body.productCode ?? body.metadata?.product_code ??
+        body.data?.object?.metadata?.product_code,
+        120
+      );
+      const product = getCommerceProductByCode(db, productCode);
+      if (!product || !product.active) {
+        throw new Error("A valid active Papa Life product_code is required.");
+      }
+
+      const memberIdRaw = body.member_id ?? body.memberId ?? body.metadata?.member_id ??
+        body.client_reference_id ?? body.data?.object?.metadata?.member_id ??
+        body.data?.object?.client_reference_id;
+      const email = cleanPublicText(
+        body.email ?? body.customer_email ?? body.customer?.email ??
+        body.data?.object?.customer_details?.email ?? body.data?.object?.customer_email,
+        160
+      ).toLowerCase();
+      let member = Number.isFinite(Number(memberIdRaw)) ? loadMemberById(Number(memberIdRaw)) : null;
+      if (!member && isValidEmail(email)) member = loadMemberByEmail(email);
+      if (!member) throw new Error("Member not found. Complete intake and account creation before payment.");
+
+      const paidStatus = String(
+        body.payment_status ?? body.status ?? body.data?.object?.payment_status ?? "paid"
+      ).toLowerCase();
+      if (!["paid", "complete", "completed", "succeeded", "success"].includes(paidStatus)) {
+        throw new Error(`Payment is not complete: ${paidStatus}`);
+      }
+
+      const subtotalRaw = body.amount_subtotal ?? body.subtotal_cents ?? body.subtotal ??
+        body.data?.object?.amount_subtotal ?? null;
+      if (subtotalRaw !== null && Number(subtotalRaw) !== product.price_cents) {
+        throw new Error(`Pre-tax subtotal does not match ${product.canonical_name}.`);
+      }
+
+      grantMemberProductEntitlement(db, {
+        memberId: Number(member.id),
+        productCode: product.code,
+        source: provider,
+        externalOrderId: sourceEventId,
+        metadata: { event_key: eventKey, provisioned_by: "commerce_webhook" },
+      });
+      completeCommerceEvent(db, eventKey, "processed");
+      return res.json({
+        ok: true,
+        event_key: eventKey,
+        member_id: member.id,
+        product_code: product.code,
+        access: memberAccessScopes(loadMemberById(Number(member.id))),
+      });
+    } catch (error: any) {
+      completeCommerceEvent(db, eventKey, "failed", error?.message || "Commerce provisioning failed");
+      return res.status(400).json({ ok: false, event_key: eventKey, error: error?.message || "Commerce provisioning failed" });
+    }
+  });
+
+  // ── Admin: member management ──────────────────────────────────────────────
+
+  app.get("/api/members", requireAuth, (_req, res) => {
+    const members = db.prepare(
+      `SELECT id, lead_id, first_name, last_name, email, status, payment_status,
+              trial_started_at, trial_expires_at, paid_at, enrolled_at, created_at
+       FROM members ORDER BY created_at DESC`
+    ).all();
+    res.json(members);
+  });
+
+  app.post("/api/members", requireAuth, async (req, res) => {
+    const { first_name, last_name, email, password, lead_id, enrolled_at } = req.body;
+    if (!first_name?.trim() || !last_name?.trim() || !email?.trim() || !password?.trim()) {
+      return res.status(400).json({ ok: false, error: "Name, email, and password required" });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    try {
+      const result = db.prepare(
+        "INSERT INTO members (lead_id, first_name, last_name, email, password_hash, payment_status, paid_at, enrolled_at) VALUES (?, ?, ?, ?, ?, 'paid', ?, ?)"
+      ).run(
+        lead_id || null,
+        first_name.trim(),
+        last_name.trim(),
+        email.trim().toLowerCase(),
+        hash,
+        new Date().toISOString(),
+        enrolled_at || null
+      );
+      res.json({ ok: true, id: result.lastInsertRowid });
+    } catch {
+      res.status(409).json({ ok: false, error: "Email already exists" });
+    }
+  });
+
+  app.put("/api/members/:id", requireAuth, (req, res) => {
+    const { first_name, last_name, email, status } = req.body;
+    db.prepare("UPDATE members SET first_name = ?, last_name = ?, email = ?, status = ? WHERE id = ?")
+      .run(first_name, last_name, email, status, req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.put("/api/members/:id/password", requireAuth, async (req, res) => {
+    const { password } = req.body;
+    if (!password?.trim()) return res.status(400).json({ ok: false, error: "Password required" });
+    const hash = await bcrypt.hash(password, 10);
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(hash, req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.put("/api/members/:id/mark-paid", requireAuth, (req, res) => {
+    const now = new Date().toISOString();
+    const updated = markMemberPaid(Number(req.params.id), now);
+    if (!updated) return res.status(404).json({ ok: false, error: "Member not found" });
+    db.prepare(
+      `INSERT INTO member_payment_events
+       (member_id, provider, transaction_id, email, amount_cents, raw_payload_json)
+       VALUES (?, 'admin', NULL, NULL, NULL, ?)`
+    ).run(Number(req.params.id), JSON.stringify({ source: "admin_mark_paid" }));
+    res.json({ ok: true, paid_at: now });
+  });
+
+  app.get("/api/commerce/products", requireAuth, (_req, res) => {
+    res.json({ products: listCommerceProducts(db) });
+  });
+
+  app.get("/api/members/:id/commerce-entitlements", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    res.json({
+      member_id: memberId,
+      access: memberAccessScopes(member),
+      products: getMemberEntitledProducts(db, memberId),
+    });
+  });
+
+  app.post("/api/members/:id/commerce-entitlements", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    const productCode = cleanPublicText(req.body?.product_code, 120);
+    const product = getCommerceProductByCode(db, productCode);
+    if (!product || !product.active) {
+      return res.status(400).json({ ok: false, error: "A valid active product_code is required" });
+    }
+    grantMemberProductEntitlement(db, {
+      memberId,
+      productCode,
+      source: cleanPublicText(req.body?.source ?? "admin", 80) || "admin",
+      externalOrderId: cleanPublicText(req.body?.source_event_id, 180) || undefined,
+      metadata: {
+        granted_by: cleanPublicText((req.session as any)?.user?.email ?? "admin", 160) || "admin",
+      },
+    });
+    res.status(201).json({
+      ok: true,
+      member_id: memberId,
+      product_code: productCode,
+      access: memberAccessScopes(loadMemberById(memberId)),
+      products: getMemberEntitledProducts(db, memberId),
+    });
+  });
+
+  app.delete("/api/members/:id/commerce-entitlements/:productCode", requireAuth, (req, res) => {
+    const memberId = Number(req.params.id);
+    const member = loadMemberById(memberId);
+    if (!member) return res.status(404).json({ ok: false, error: "Member not found" });
+    const productCode = String(req.params.productCode || "");
+    if (!getCommerceProductByCode(db, productCode)) {
+      return res.status(404).json({ ok: false, error: "Product not found" });
+    }
+    revokeMemberProductEntitlement(db, memberId, productCode);
+    res.json({
+      ok: true,
+      member_id: memberId,
+      product_code: productCode,
+      access: memberAccessScopes(loadMemberById(memberId)),
+      products: getMemberEntitledProducts(db, memberId),
+    });
+  });
+
+  app.delete("/api/members/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM members WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  // ── Public marketing: course catalog + form schema (no auth) ──────────────
+
+  app.get("/api/public/courses", (_req, res) => {
+    const courses = db
+      .prepare(
+        `SELECT c.id, c.title, c.description, c.pillar, c.sort_order, COUNT(l.id) AS lesson_count
+         FROM courses c
+         LEFT JOIN lessons l ON l.course_id = c.id
+         WHERE c.show_in_catalog = 1
+         GROUP BY c.id
+         ORDER BY c.sort_order ASC, c.created_at DESC`
+      )
+      .all();
+    res.json(courses);
+  });
+
+  app.get("/api/public/courses/:id", (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ ok: false, error: "Invalid id" });
+    const course = db
+      .prepare(
+        `SELECT c.id, c.title, c.description, c.pillar, c.sort_order
+         FROM courses c
+         WHERE c.id = ? AND c.show_in_catalog = 1`
+      )
+      .get(id) as Record<string, unknown> | undefined;
+    if (!course) return res.status(404).json({ ok: false, error: "Not found" });
+    const lessons = db
+      .prepare(
+        `SELECT id, title, description, duration_minutes, sort_order, content_type
+         FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC`
+      )
+      .all(id);
+    res.json({ ...course, lessons });
+  });
+
+  /** First catalog lesson (by course order, then lesson order) for Papa Life funnel */
+  app.get("/api/public/first-lesson", (_req, res) => {
+    const row = db
+      .prepare(
+        `SELECT
+           c.id AS course_id,
+           c.title AS course_title,
+           c.pillar AS course_pillar,
+           l.id AS lesson_id,
+           l.title AS lesson_title,
+           l.description AS lesson_description,
+           l.content_url AS content_url,
+           l.content_type AS content_type,
+           l.duration_minutes AS duration_minutes,
+           l.sort_order AS lesson_sort_order
+         FROM courses c
+         INNER JOIN lessons l ON l.course_id = c.id
+         WHERE c.show_in_catalog = 1
+         ORDER BY c.sort_order ASC, c.id ASC, l.sort_order ASC, l.id ASC
+         LIMIT 1`
+      )
+      .get() as
+      | {
+          course_id: number;
+          course_title: string;
+          course_pillar: string;
+          lesson_id: number;
+          lesson_title: string;
+          lesson_description: string | null;
+          content_url: string | null;
+          content_type: string;
+          duration_minutes: number | null;
+          lesson_sort_order: number;
+        }
+      | undefined;
+    if (!row) {
+      return res.json({ course: null, lesson: null });
+    }
+    res.json({
+      course: {
+        id: row.course_id,
+        title: row.course_title,
+        pillar: row.course_pillar,
+      },
+      lesson: {
+        id: row.lesson_id,
+        title: row.lesson_title,
+        description: row.lesson_description,
+        content_url: row.content_url,
+        content_type: row.content_type,
+        duration_minutes: row.duration_minutes,
+      },
+    });
+  });
+
+  app.get("/api/public/forms/:formKey", (req, res) => {
+    const raw = String(req.params.formKey ?? "");
+    if (!/^[a-z0-9_]+$/i.test(raw)) {
+      return res.status(400).json({ ok: false, error: "Invalid form key" });
+    }
+    const rows = db
+      .prepare(
+        `SELECT question_key, label, help_text, input_type, required, sort_order, placeholder, options_json
+         FROM form_questions
+         WHERE form_key = ? AND active = 1
+         ORDER BY sort_order ASC, question_key ASC`
+      )
+      .all(raw) as Array<Record<string, unknown>>;
+    const questions = rows.map((row) => ({
+      question_key: row.question_key,
+      label: row.label,
+      help_text: row.help_text,
+      input_type: row.input_type,
+      required: Number(row.required) === 1,
+      sort_order: row.sort_order,
+      placeholder: row.placeholder,
+      options: row.options_json ? (JSON.parse(String(row.options_json)) as string[]) : [],
+    }));
+    res.json({ form_key: raw, questions });
+  });
+
+  // ── Courses (admin) ───────────────────────────────────────────────────────
+
+  app.get("/api/courses", requireAuth, (_req, res) => {
+    const courses = db.prepare("SELECT c.*, COUNT(l.id) as lesson_count FROM courses c LEFT JOIN lessons l ON l.course_id = c.id GROUP BY c.id ORDER BY c.sort_order ASC, c.created_at DESC").all();
+    res.json(courses);
+  });
+
+  app.post("/api/courses", requireAuth, (req, res) => {
+    const { title, description, pillar, show_in_catalog } = req.body;
+    if (!title?.trim()) return res.status(400).json({ ok: false, error: "Title required" });
+    const catalog = show_in_catalog === false || show_in_catalog === 0 ? 0 : 1;
+    const result = db
+      .prepare("INSERT INTO courses (title, description, pillar, show_in_catalog) VALUES (?, ?, ?, ?)")
+      .run(title.trim(), description?.trim() || null, pillar || "General", catalog);
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.put("/api/courses/:id", requireAuth, (req, res) => {
+    const { title, description, pillar, sort_order, show_in_catalog } = req.body;
+    const catalog =
+      show_in_catalog === undefined
+        ? ((db.prepare("SELECT show_in_catalog FROM courses WHERE id = ?").get(req.params.id) as { show_in_catalog?: number })?.show_in_catalog ?? 1)
+        : show_in_catalog === false || show_in_catalog === 0
+          ? 0
+          : 1;
+    db.prepare("UPDATE courses SET title = ?, description = ?, pillar = ?, sort_order = ?, show_in_catalog = ? WHERE id = ?")
+      .run(title, description || null, pillar || "General", sort_order ?? 0, catalog, req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/courses/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM courses WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.get("/api/courses/:id/lessons", requireAuth, (req, res) => {
+    const lessons = db.prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC").all(req.params.id);
+    res.json(lessons);
+  });
+
+  app.post("/api/courses/:id/lessons", requireAuth, (req, res) => {
+    const { title, description, content_url, content_type, duration_minutes } = req.body;
+    if (!title?.trim()) return res.status(400).json({ ok: false, error: "Title required" });
+    const result = db.prepare(
+      "INSERT INTO lessons (course_id, title, description, content_url, content_type, duration_minutes) VALUES (?, ?, ?, ?, ?, ?)"
+    ).run(req.params.id, title.trim(), description?.trim() || null, content_url?.trim() || null, content_type || "video", duration_minutes || null);
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.put("/api/lessons/:id", requireAuth, (req, res) => {
+    const { title, description, content_url, content_type, duration_minutes, sort_order } = req.body;
+    db.prepare("UPDATE lessons SET title = ?, description = ?, content_url = ?, content_type = ?, duration_minutes = ?, sort_order = ? WHERE id = ?")
+      .run(title, description || null, content_url || null, content_type || "video", duration_minutes || null, sort_order ?? 0, req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/lessons/:id", requireAuth, (req, res) => {
+    db.prepare("DELETE FROM lessons WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  });
+
+  app.post(
+    "/api/admin/upload",
+    requireAuth,
+    (req, res, next) => {
+      mediaUpload.single("file")(req, res, (err: unknown) => {
+        if (err) {
+          const msg = err instanceof Error ? err.message : "Upload failed";
+          return res.status(400).json({ ok: false, error: msg });
+        }
+        next();
+      });
+    },
+    (req, res) => {
+      const f = (req as Request & { file?: Express.Multer.File }).file;
+      if (!f) return res.status(400).json({ ok: false, error: "No file" });
+      const url = `/media/${f.filename}`;
+      res.json({
+        ok: true,
+        url,
+        content_type: trainingContentTypeFromMime(f.mimetype),
+        mimetype: f.mimetype,
+        size: f.size,
+      });
+    }
+  );
+
+  app.get("/api/admin/content/versions/:course_id", requireAuth, (req, res) => {
+    const rows = db.prepare(
+      "SELECT id, course_id, summary, published_at, created_at FROM content_versions WHERE course_id = ? ORDER BY id DESC"
+    ).all(req.params.course_id);
+    res.json(rows);
+  });
+
+  app.post("/api/admin/content/publish/:course_id", requireAuth, (req, res) => {
+    const courseId = Number(req.params.course_id);
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(courseId);
+    if (!course) return res.status(404).json({ ok: false, error: "Course not found" });
+    const lessons = db.prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC").all(courseId);
+    const { summary } = req.body || {};
+    const result = db.prepare(
+      "INSERT INTO content_versions (course_id, summary, snapshot_json, published_at) VALUES (?, ?, ?, datetime('now'))"
+    ).run(courseId, summary?.trim() || null, JSON.stringify({ course, lessons }));
+    res.json({ ok: true, id: result.lastInsertRowid });
+  });
+
+  app.put("/api/admin/content/drip-rules/:lesson_id", requireAuth, (req, res) => {
+    const lessonId = Number(req.params.lesson_id);
+    const releaseDays = Number(req.body?.release_days_after_enroll);
+    if (!Number.isInteger(releaseDays) || releaseDays < 0) {
+      return res.status(400).json({ ok: false, error: "release_days_after_enroll must be a non-negative integer" });
+    }
+    db.prepare(
+      `INSERT INTO content_drip_rules (lesson_id, release_days_after_enroll, updated_at)
+       VALUES (?, ?, datetime('now'))
+       ON CONFLICT(lesson_id) DO UPDATE SET
+         release_days_after_enroll = excluded.release_days_after_enroll,
+         updated_at = datetime('now')`
+    ).run(lessonId, releaseDays);
+    res.json({ ok: true });
+  });
+
+  // ── Member portal: courses ────────────────────────────────────────────────
+
+  app.get("/api/member/courses", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const member = loadMemberById(memberId);
+    const communityAccess = memberAccessScopes(member).community;
+    const entitledDigitalLessonIds = new Set(
+      getMemberEntitledProducts(db, memberId)
+        .filter((product) => product.format === "digital" && product.lesson_id)
+        .map((product) => Number(product.lesson_id))
+    );
+    const legacyCourseIds = new Set(
+      (db.prepare(
+        "SELECT course_id FROM member_course_access WHERE member_id = ? AND granted = 1"
+      ).all(memberId) as Array<{ course_id: number }>).map((row) => Number(row.course_id))
+    );
+    const courses = db.prepare(`
+      SELECT c.*, COUNT(l.id) as lesson_count
+      FROM courses c
+      LEFT JOIN lessons l ON l.course_id = c.id
+      GROUP BY c.id
+      ORDER BY c.sort_order ASC, c.created_at DESC
+    `).all() as any[];
+
+    const visible = courses.filter((course) => {
+      const membershipCourse = isMembershipCourse(course);
+      const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
+      if (isAudioCurriculum) {
+        if (membershipCourse && communityAccess) return true;
+        if (legacyCourseIds.has(Number(course.id))) return true;
+        const lessonIds = db.prepare("SELECT id FROM lessons WHERE course_id = ?")
+          .all(course.id) as Array<{ id: number }>;
+        return lessonIds.some((lesson) => entitledDigitalLessonIds.has(Number(lesson.id)));
+      }
+      return (membershipCourse && communityAccess) || legacyCourseIds.has(Number(course.id));
+    });
+    res.json(visible);
+  });
+
+  app.get("/api/member/courses/:id", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const member = loadMemberById(memberId);
+    const communityAccess = memberAccessScopes(member).community;
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(req.params.id) as any;
+    if (!course) return res.status(404).json({ ok: false, error: "Not found" });
+
+    const legacyGrant = Boolean(db.prepare(`
+      SELECT 1 AS ok FROM member_course_access
+      WHERE member_id = ? AND course_id = ? AND granted = 1
+      LIMIT 1
+    `).get(memberId, course.id));
+    const membershipCourse = isMembershipCourse(course);
+    const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
+    const rawLessons = db.prepare(
+      "SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC"
+    ).all(course.id) as any[];
+
+    if (!isAudioCurriculum && !(membershipCourse && communityAccess) && !legacyGrant) {
+      return res.status(403).json({ ok: false, error: "An active Papa Life Membership is required for this course." });
+    }
+
+    if (isAudioCurriculum) {
+      const hasAnyDigitalModule = (membershipCourse && communityAccess) || legacyGrant || rawLessons.some((lesson) =>
+        memberCanAccessLesson(db, memberId, Number(lesson.id))
+      );
+      if (!hasAnyDigitalModule) {
+        return res.status(403).json({ ok: false, error: "An active Papa Life Membership or a purchased digital module is required for this curriculum." });
+      }
+      const lessons = rawLessons.map((lesson) => {
+        const entitled = (membershipCourse && communityAccess) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        const repairedAudioUrl = protectedPapaAudioUrl(Number(lesson.id), Number(lesson.sort_order));
+        return {
+          ...lesson,
+          content_url: entitled ? (repairedAudioUrl || lesson.content_url) : null,
+          entitled,
+          locked: !entitled,
+        };
+      });
+      return res.json({ ...course, lessons });
+    }
+
+    res.json({ ...course, lessons: rawLessons.map((lesson) => ({ ...lesson, entitled: true, locked: false })) });
+  });
+
+  // ── Member portal: protected curriculum audio ─────────────────────────────
+
+  app.get("/api/member/audio/:lessonId", requireMemberPortalAccess, (req, res) => {
+    const memberId = Number((req.session as any).memberId);
+    const lessonId = Number(req.params.lessonId);
+    if (!Number.isInteger(lessonId) || lessonId <= 0) {
+      return res.status(400).json({ ok: false, error: "Invalid lesson ID" });
+    }
+
+    const lesson = db.prepare(`
+      SELECT l.id, l.course_id, l.sort_order, c.title AS course_title
+      FROM lessons l
+      JOIN courses c ON c.id = l.course_id
+      WHERE l.id = ?
+    `).get(lessonId) as {
+      id: number;
+      course_id: number;
+      sort_order: number;
+      course_title: string;
+    } | undefined;
+
+    if (!lesson) {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy not found" });
+    }
+    const isMembershipAudioCourse = isMembershipCourse({ id: lesson.course_id })
+      || lesson.course_title === "Papa Life Audio Curriculum";
+    if (!isMembershipAudioCourse) {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy not found" });
+    }
+
+    const member = loadMemberById(memberId);
+    const allowed = (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community)
+      || memberCanAccessLesson(db, memberId, lesson.id)
+      || memberHasLegacyCourseGrant(db, memberId, lesson.course_id);
+    if (!allowed) {
+      return res.status(403).json({ ok: false, error: "You do not have access to this audio module." });
+    }
+
+    const audioPath = protectedPapaAudioPath(Number(lesson.sort_order));
+    if (!audioPath || !fs.existsSync(audioPath)) {
+      return res.status(404).json({ ok: false, error: "Audio delivery copy unavailable" });
+    }
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Cache-Control", "private, max-age=3600");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    return res.sendFile(audioPath);
+  });
+
+  // ── Member portal: progress ───────────────────────────────────────────────
+
+  app.get("/api/member/progress", requireMemberPortalAccess, (req, res) => {
+    const memberId = (req.session as any).memberId;
     const progress = db.prepare("SELECT lesson_id, completed_at FROM member_progress WHERE member_id = ?").all(memberId);
     res.json(progress);
   });

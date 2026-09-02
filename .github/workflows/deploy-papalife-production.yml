@@ -156,7 +156,7 @@ jobs:
           cd "$APP_DIR"
           python3 - "$REMOTE_TOKEN_FILE" <<'PYENV'
           from pathlib import Path
-          import json
+          import re
           import sys
 
           env_path = Path('.env')
@@ -167,7 +167,11 @@ jobs:
 
           lines = env_path.read_text().splitlines() if env_path.exists() else []
           key = 'AI_BOSS_NODE_HEARTBEAT_TOKEN='
-          serialized = key + json.dumps(token)
+          # Heartbeat tokens are generated as 32 random bytes rendered in hex.
+          # Refuse any unexpected format rather than trying to quote arbitrary secret text.
+          if not re.fullmatch(r'[0-9A-Fa-f]{64}', token):
+            raise SystemExit("BLOCKED: heartbeat token must be exactly 64 hexadecimal characters")
+          serialized = key + token
           out = []
           replaced = False
           for line in lines:

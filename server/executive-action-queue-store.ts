@@ -43,6 +43,10 @@ export const executiveActionInputSchema = z
     source_conversation_ref: z.string().trim().max(160).nullable().optional(),
     action_payload: z.record(z.string(), z.unknown()).nullable().optional(),
     human_impact_observation_id: z.number().int().positive().nullable().optional(),
+    project_key: z.string().trim().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/).nullable().optional(),
+    work_kind: z.enum(["action", "task", "follow_up"]).default("action"),
+    due_at: z.string().datetime().nullable().optional(),
+    waiting_on: z.string().trim().max(240).nullable().optional(),
   })
   .strict();
 
@@ -99,6 +103,10 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
       source_conversation_ref TEXT,
       action_payload_json TEXT,
       human_impact_observation_id INTEGER REFERENCES human_impact_observations(id) ON DELETE SET NULL,
+      project_key TEXT,
+      work_kind TEXT NOT NULL DEFAULT 'action',
+      due_at TEXT,
+      waiting_on TEXT,
       status TEXT NOT NULL CHECK (status IN (
         'proposed', 'awaiting_approval', 'approved', 'executing',
         'completed', 'failed', 'declined'
@@ -138,6 +146,19 @@ export function ensureExecutiveActionQueueTables(db: BetterSqliteDatabase) {
   if (!actionColumns.some((column) => column.name === "action_payload_json")) {
     db.exec("ALTER TABLE executive_actions ADD COLUMN action_payload_json TEXT");
   }
+  if (!actionColumns.some((column) => column.name === "project_key")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN project_key TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "work_kind")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN work_kind TEXT NOT NULL DEFAULT 'action'");
+  }
+  if (!actionColumns.some((column) => column.name === "due_at")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN due_at TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "waiting_on")) {
+    db.exec("ALTER TABLE executive_actions ADD COLUMN waiting_on TEXT");
+  }
+  db.exec("CREATE INDEX IF NOT EXISTS idx_executive_actions_project_due ON executive_actions(project_key, due_at)");
 }
 
 export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: ExecutiveActionInput) {
@@ -169,8 +190,8 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
           action_type, target_system, target_ref, requested_outcome, authority_level,
           execution_route, approval_required, provider_id,
           estimated_external_ai_cost_micros, source_conversation_ref, action_payload_json,
-          human_impact_observation_id, status, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+          human_impact_observation_id, project_key, work_kind, due_at, waiting_on, status, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
       )
       .run(
         parsed.action_type,
@@ -185,6 +206,10 @@ export function createExecutiveAction(db: BetterSqliteDatabase, rawInput: Execut
         parsed.source_conversation_ref || null,
         parsed.action_payload ? JSON.stringify(parsed.action_payload) : null,
         parsed.human_impact_observation_id || null,
+        parsed.project_key || null,
+        parsed.work_kind,
+        parsed.due_at || null,
+        parsed.waiting_on || null,
         status
       );
     const id = Number(result.lastInsertRowid);

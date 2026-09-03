@@ -44,6 +44,12 @@ import {
 } from "./executive-action-queue-store";
 import { executeApprovedExecutiveAction } from "./executive-action-executor";
 import {
+  ensureAiBossProjectTables,
+  getAiBossProjectWork,
+  listAiBossProjects,
+  saveAiBossProject,
+} from "./ai-boss-project-store";
+import {
   ensureAiBossMobileTables,
   getAiBossMissionControl,
   recordAiBossNodeHeartbeat,
@@ -722,6 +728,7 @@ ensureResearchTables(db);
 ensureExecutiveMemoryTables(db);
 ensureHumanImpactTables(db);
 ensureExecutiveActionQueueTables(db);
+ensureAiBossProjectTables(db);
 ensureAiBossMobileTables(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
@@ -6189,6 +6196,36 @@ async function startServer() {
   app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
     try {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const projects = listAiBossProjects(db, {
+        status: String(req.query.status || "").trim() || undefined,
+        limit: Number(req.query.limit || 50),
+      });
+      res.json({ ok: true, projects });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, project: saveAiBossProject(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/ai-boss/projects/:key", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const result = getAiBossProjectWork(db, String(req.params.key || ""));
+      if (!result) return res.status(404).json({ ok: false, error: "Project not found" });
+      res.json({ ok: true, ...result });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }

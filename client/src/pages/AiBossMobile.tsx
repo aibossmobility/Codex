@@ -1,6 +1,6 @@
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { Activity, Brain, CalendarDays, CheckCircle2, CircleAlert, Clock3, Laptop, Loader2, Mail, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone } from "lucide-react";
+import { Activity, Brain, CalendarDays, CheckCircle2, CircleAlert, Clock3, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,8 @@ type Mission = {
   queue: { awaiting_approval: number; approved: number; executing: number; failed: number; waiting_for_mac: number };
   nodes: Array<{ node_id: string; display_name: string; online: boolean; capabilities: string[]; last_seen_at: string }>;
 };
+
+type CaptureMode = "father" | "boss" | null;
 
 const liveUrl = "https://meetn.com/briankeithhill";
 const youtubeStudioUrl = "https://studio.youtube.com/";
@@ -30,6 +32,10 @@ export default function AiBossMobile() {
   const [loading, setLoading] = useState(true);
   const [instruction, setInstruction] = useState("");
   const [saving, setSaving] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -54,40 +60,102 @@ export default function AiBossMobile() {
       else if (!data.user?.researchLabAccess) navigate("/crm-console");
       else void load();
     }).catch(() => navigate("/login"));
-    return () => manifest.remove();
+    return () => {
+      recognitionRef.current?.abort?.();
+      manifest.remove();
+    };
   }, [load, navigate]);
 
-  async function captureInstruction(event: FormEvent) {
-    event.preventDefault();
-    if (!instruction.trim()) return;
+  async function saveCapture(text: string, mode: Exclude<CaptureMode, null>) {
+    const clean = text.trim();
+    if (!clean) return;
     setSaving(true);
     try {
+      const summary = mode === "father" ? `I just met a father. ${clean}` : clean;
       await apiJson("/api/admin/executive-conversations", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          session_ref: `mobile-${Date.now()}`,
+          session_ref: `${mode}-mobile-${Date.now()}`,
           channel: "other",
-          summary: instruction.trim(),
-          user_intent: instruction.trim(),
-          next_action: "Review and route through AI Boss OS authority controls.",
+          summary,
+          user_intent: summary,
+          next_action: mode === "father"
+            ? "Create or update the relationship record, preserve the encounter notes, and identify the next appropriate Papa Life follow-up."
+            : "Review and route through AI Boss OS authority controls; execute permitted work and queue anything requiring the Mac or approval.",
           status: "active",
         }),
       });
       setInstruction("");
-      toast.success("Instruction captured. It will not be lost if the Mac goes offline.");
+      transcriptRef.current = "";
+      toast.success(mode === "father" ? "Father encounter remembered by AI Boss OS." : "Instruction captured by AI Boss OS.");
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Instruction could not be captured.");
     } finally {
       setSaving(false);
+      setCaptureMode(null);
     }
+  }
+
+  function startVoice(mode: Exclude<CaptureMode, null>) {
+    if (listening || saving) return;
+    setCaptureMode(mode);
+    setInstruction("");
+    transcriptRef.current = "";
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.message("Voice capture is not available here. Type below and send it to AI Boss.");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognitionRef.current = recognition;
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      let finalText = transcriptRef.current;
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const phrase = event.results[index][0]?.transcript || "";
+        if (event.results[index].isFinal) finalText += `${phrase} `;
+        else interim += phrase;
+      }
+      transcriptRef.current = finalText;
+      setInstruction(`${finalText}${interim}`.trim());
+    };
+    recognition.onerror = (event: any) => {
+      setListening(false);
+      if (event.error !== "aborted" && event.error !== "no-speech") toast.error("I couldn't hear that clearly. Tap again and speak normally.");
+    };
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+      const finalText = transcriptRef.current.trim();
+      if (finalText) void saveCapture(finalText, mode);
+    };
+    recognition.start();
+    setListening(true);
+  }
+
+  function stopVoice() {
+    recognitionRef.current?.stop?.();
+  }
+
+  async function captureInstruction(event: FormEvent) {
+    event.preventDefault();
+    if (!instruction.trim()) return;
+    await saveCapture(instruction, captureMode || "boss");
   }
 
   return (
     <div className="min-h-screen bg-[#090909] text-white pb-24">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
-        <div className="max-w-5xl mx-auto flex items-center gap-3"><Brain className="w-7 h-7 text-primary" /><div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Papa Life Mission Control</p></div><Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button></div>
+        <div className="max-w-5xl mx-auto flex items-center gap-3">
+          <Brain className="w-7 h-7 text-primary" />
+          <div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
+          <Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
+        </div>
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
@@ -99,9 +167,42 @@ export default function AiBossMobile() {
           <StatusCard icon={Smartphone} label="Phone requests" value={String(mission?.open_mobile_instructions || 0)} tone="neutral" />
         </section>
 
+        <Card className="bg-[#111] border-brand-yellow/30 overflow-hidden">
+          <CardContent className="p-5 sm:p-7">
+            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life Field Action</p>
+            <button
+              type="button"
+              onClick={() => (listening && captureMode === "father" ? stopVoice() : startVoice("father"))}
+              disabled={saving}
+              className="mx-auto mt-5 flex aspect-square w-[min(72vw,360px)] max-w-full flex-col items-center justify-center rounded-full border-[10px] border-[#f2cb58] bg-[#d9aa21] px-8 text-center text-black transition active:scale-[0.98] disabled:opacity-70"
+            >
+              {saving && captureMode === "father" ? <Loader2 className="mb-4 h-9 w-9 animate-spin" /> : listening && captureMode === "father" ? <Mic className="mb-4 h-9 w-9 animate-pulse" /> : null}
+              <span className="text-lg font-black tracking-[0.14em]">I JUST</span>
+              <span className="mt-2 text-[clamp(1.9rem,7vw,2.8rem)] font-black leading-none">MET A FATHER</span>
+              <span className="mt-4 text-base font-bold">{listening && captureMode === "father" ? "Listening… tap when finished" : "Tap to remember what happened"}</span>
+            </button>
+            <div className="mt-5 flex justify-center">
+              <Button variant="ghost" className="text-white underline underline-offset-4" onClick={() => navigate("/crm-console")}><Users className="mr-2 h-4 w-4" />View relationships</Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="bg-[#111] border-white/10">
-          <CardHeader><CardTitle className="text-white">What do you want done?</CardTitle><p className="text-sm text-gray-500">Capture an instruction from your phone. AI Boss OS stores it now and routes it later without requiring a paid model call.</p></CardHeader>
-          <CardContent><form onSubmit={captureInstruction} className="space-y-3"><Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="Check Papa Life, review my Gmail, prepare a follow-up, or queue work for my Mac…" className="min-h-28 bg-black/50 border-white/10 text-base" /><Button type="submit" disabled={saving || !instruction.trim()} className="w-full sm:w-auto">{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to AI Boss</Button></form></CardContent>
+          <CardHeader>
+            <CardTitle className="text-white">Talk to AI Boss</CardTitle>
+            <p className="text-sm text-gray-500">Tell AI Boss what you want done from your Android phone. It can store the instruction immediately and route it through the operating system.</p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={captureInstruction} className="space-y-3">
+              <Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="Check my Gmail, review my calendar, prepare a follow-up, remember something, or queue work for my Mac…" className="min-h-28 bg-black/50 border-white/10 text-base" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Button type="button" variant="outline" disabled={saving} onClick={() => (listening && captureMode === "boss" ? stopVoice() : startVoice("boss"))} className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10">
+                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "boss" ? "Finish speaking" : "Speak to AI Boss"}
+                </Button>
+                <Button type="submit" disabled={saving || !instruction.trim()}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to AI Boss</Button>
+              </div>
+            </form>
+          </CardContent>
         </Card>
 
         <Card className="bg-[#111] border-brand-yellow/30">

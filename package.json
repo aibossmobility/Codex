@@ -23,6 +23,7 @@
     "test:gmail-connector": "node --import tsx server/ai-boss-gmail-connector.test.ts",
     "start:gmail-connector": "node dist/ai-boss-gmail-connector.js",
     "test:mobile-control": "node --import tsx server/ai-boss-mobile-store.test.ts",
+    "test:project-ledger": "node --import tsx server/ai-boss-project-store.test.ts",
     "start:node-heartbeat": "node dist/ai-boss-node-heartbeat.js"
   },
   "dependencies": {

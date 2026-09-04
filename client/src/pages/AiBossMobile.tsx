@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { Activity, Brain, CalendarDays, CheckCircle2, CircleAlert, Clock3, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users } from "lucide-react";
+import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,19 @@ type Mission = {
   open_mobile_instructions: number;
   queue: { awaiting_approval: number; approved: number; executing: number; failed: number; waiting_for_mac: number };
   nodes: Array<{ node_id: string; display_name: string; online: boolean; capabilities: string[]; last_seen_at: string }>;
+  campaigns: Array<{
+    source: "zipshare" | "heycatch";
+    campaign_key: string;
+    display_name: string;
+    tracking_url: string | null;
+    status: "connected" | "tracking" | "attention";
+    clicks: number;
+    enrollments: number;
+    posts_distributed: number;
+    follow_ups_needed: number;
+    latest_activity: string | null;
+    last_synced_at: string;
+  }>;
 };
 
 type CaptureMode = "father" | "boss" | null;
@@ -205,6 +218,38 @@ export default function AiBossMobile() {
           </CardContent>
         </Card>
 
+        <Card className="bg-[#111] border-white/10">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-3">
+              <div><p className="text-xs uppercase tracking-widest text-primary">Campaigns & Analytics</p><CardTitle className="mt-1 text-white">Managed by AI Boss OS</CardTitle></div>
+              <BarChart3 className="w-8 h-8 text-primary" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {(mission?.campaigns || []).map((campaign) => (
+              <div key={`${campaign.source}-${campaign.campaign_key}`} className="rounded-xl border border-white/10 bg-black/40 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-white">{campaign.display_name}</p>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${campaign.status === "connected" ? "bg-primary/15 text-primary" : campaign.status === "attention" ? "bg-brand-red/15 text-brand-red" : "bg-brand-yellow/15 text-brand-yellow"}`}>{campaign.status}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">{campaign.campaign_key} · Last sync {campaign.last_synced_at}</p>
+                  </div>
+                  {campaign.tracking_url ? <a href={campaign.tracking_url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${campaign.display_name}`}><ExternalLink className="h-4 w-4 text-gray-400" /></a> : null}
+                </div>
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <Metric label="Clicks" value={campaign.clicks} />
+                  <Metric label="Enrollments" value={campaign.enrollments} />
+                  <Metric label="Posts" value={campaign.posts_distributed} />
+                  <Metric label="Follow-ups" value={campaign.follow_ups_needed} />
+                </div>
+                {campaign.latest_activity ? <p className="mt-3 text-sm text-gray-400">{campaign.latest_activity}</p> : null}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         <Card className="bg-[#111] border-brand-yellow/30">
           <CardHeader><div className="flex items-center justify-between gap-3"><div><p className="text-xs uppercase tracking-widest text-brand-yellow">Tuesday Live</p><CardTitle className="mt-1 text-white">{todayTopic}</CardTitle></div><Mic2 className="w-8 h-8 text-brand-yellow" /></div></CardHeader>
           <CardContent className="space-y-4">
@@ -228,4 +273,5 @@ export default function AiBossMobile() {
 
 function StatusCard({ icon: Icon, label, value, tone }: { icon: typeof Activity; label: string; value: string; tone: "good" | "waiting" | "neutral" }) { const color = tone === "good" ? "text-primary" : tone === "waiting" ? "text-brand-yellow" : "text-gray-300"; return <div className="rounded-xl border border-white/10 bg-[#111] p-3"><Icon className={`w-4 h-4 ${color}`} /><p className="mt-3 text-xs text-gray-500">{label}</p><p className={`text-lg font-bold ${color}`}>{value}</p></div>; }
 function QuickLink({ icon: Icon, label, onClick }: { icon: typeof Brain; label: string; onClick: () => void }) { return <button onClick={onClick} className="rounded-xl border border-white/10 bg-[#111] p-4 text-left hover:border-primary/40"><Icon className="w-5 h-5 text-primary" /><p className="mt-3 text-sm font-medium">{label}</p></button>; }
+function Metric({ label, value }: { label: string; value: number }) { return <div className="rounded-lg border border-white/10 bg-[#111] p-3"><p className="text-xs text-gray-500">{label}</p><p className="mt-1 text-lg font-bold text-white">{value}</p></div>; }
 function Checklist({ items }: { items: string[] }) { return <div className="rounded-lg bg-black/40 p-4"><p className="font-semibold">Go-live checklist</p><ul className="mt-2 space-y-2">{items.map((item) => <li key={item} className="flex gap-2 text-gray-400"><CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />{item}</li>)}</ul></div>; }

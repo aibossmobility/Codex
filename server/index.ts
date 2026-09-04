@@ -49,6 +49,7 @@ import {
   listAiBossProjects,
   saveAiBossProject,
 } from "./ai-boss-project-store";
+import { ensureAiBossCampaignTables, getAiBossCampaigns, seedAiBossCampaigns, upsertAiBossCampaignSnapshot } from "./ai-boss-campaign-store";
 import {
   ensureAiBossMobileTables,
   getAiBossMissionControl,
@@ -730,6 +731,8 @@ ensureHumanImpactTables(db);
 ensureExecutiveActionQueueTables(db);
 ensureAiBossProjectTables(db);
 ensureAiBossMobileTables(db);
+ensureAiBossCampaignTables(db);
+seedAiBossCampaigns(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
@@ -6247,9 +6250,25 @@ async function startServer() {
     }
   });
 
+
+  app.post("/api/ai-boss/campaigns/snapshot", (req, res) => {
+    try {
+      const expected = String(process.env.AI_BOSS_CAMPAIGN_SYNC_TOKEN || "").trim();
+      if (!expected) return res.status(503).json({ ok: false, error: "Campaign sync is not configured" });
+      const provided = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const expectedBuffer = Buffer.from(expected);
+      const providedBuffer = Buffer.from(provided);
+      if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+        return res.status(401).json({ ok: false, error: "Unauthorized" });
+      }
+      res.json({ ok: true, campaign: upsertAiBossCampaignSnapshot(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
   app.get("/api/admin/ai-boss/mission-control", requireAuth, requireResearchLabAccess, (_req, res) => {
     try {
-      res.json({ ok: true, mission: getAiBossMissionControl(db) });
+      res.json({ ok: true, mission: { ...getAiBossMissionControl(db), campaigns: getAiBossCampaigns(db) } });
     } catch (e) {
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }

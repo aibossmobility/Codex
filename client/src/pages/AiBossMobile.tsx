@@ -36,6 +36,7 @@ export default function AiBossMobile() {
   const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef("");
+  const saveVoiceOnEndRef = useRef(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,6 +62,7 @@ export default function AiBossMobile() {
       else void load();
     }).catch(() => navigate("/login"));
     return () => {
+      saveVoiceOnEndRef.current = false;
       recognitionRef.current?.abort?.();
       manifest.remove();
     };
@@ -88,13 +90,13 @@ export default function AiBossMobile() {
       });
       setInstruction("");
       transcriptRef.current = "";
+      setCaptureMode(null);
       toast.success(mode === "father" ? "Father encounter remembered by AI Boss OS." : "Instruction captured by AI Boss OS.");
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Instruction could not be captured.");
     } finally {
       setSaving(false);
-      setCaptureMode(null);
     }
   }
 
@@ -103,6 +105,7 @@ export default function AiBossMobile() {
     setCaptureMode(mode);
     setInstruction("");
     transcriptRef.current = "";
+    saveVoiceOnEndRef.current = false;
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.message("Voice capture is not available here. Type below and send it to AI Boss.");
@@ -132,13 +135,16 @@ export default function AiBossMobile() {
       setListening(false);
       recognitionRef.current = null;
       const finalText = transcriptRef.current.trim();
-      if (finalText) void saveCapture(finalText, mode);
+      const shouldSave = saveVoiceOnEndRef.current;
+      saveVoiceOnEndRef.current = false;
+      if (shouldSave && finalText) void saveCapture(finalText, mode);
     };
     recognition.start();
     setListening(true);
   }
 
   function stopVoice() {
+    saveVoiceOnEndRef.current = true;
     recognitionRef.current?.stop?.();
   }
 

@@ -8,7 +8,11 @@ db.exec(`
   CREATE TABLE executive_conversation_briefs (channel TEXT, status TEXT);
   INSERT INTO executive_actions VALUES ('awaiting_approval', 'direct'), ('approved', 'local');
   ALTER TABLE executive_conversation_briefs ADD COLUMN session_ref TEXT;
-  INSERT INTO executive_conversation_briefs VALUES ('other', 'active', 'mobile-1');
+  INSERT INTO executive_conversation_briefs VALUES
+    ('other', 'active', 'mobile-1'),
+    ('other', 'active', 'boss-mobile-2'),
+    ('other', 'waiting', 'father-mobile-3'),
+    ('other', 'active', 'web-4');
 `);
 ensureAiBossMobileTables(db);
 assert.equal(getAiBossMissionControl(db).queue.waiting_for_mac, 1);
@@ -21,5 +25,5 @@ recordAiBossNodeHeartbeat(db, {
 const mission = getAiBossMissionControl(db);
 assert.equal(mission.mac_online, true);
 assert.equal(mission.queue.waiting_for_mac, 0);
-assert.equal(mission.open_mobile_instructions, 1);
-console.log("✓ Mobile mission control tracks node presence and deferred local work");
+assert.equal(mission.open_mobile_instructions, 3);
+console.log("✓ Mobile mission control tracks node presence, deferred local work, and all mobile capture types");

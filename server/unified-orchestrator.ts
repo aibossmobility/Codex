@@ -89,6 +89,24 @@ function assertValidDependencyGraph(steps: Array<{ step_id: string; depends_on: 
   for (const step of steps) visit(step.step_id);
 }
 
+function dependencyOrderedSteps<T extends { step_id: string; depends_on: string[] }>(steps: T[]) {
+  const byId = new Map(steps.map((step) => [step.step_id, step]));
+  const ordered: T[] = [];
+  const visited = new Set<string>();
+
+  function add(stepId: string) {
+    if (visited.has(stepId)) return;
+    const step = byId.get(stepId);
+    if (!step) return;
+    for (const dependency of step.depends_on) add(dependency);
+    visited.add(stepId);
+    ordered.push(step);
+  }
+
+  for (const step of steps) add(step.step_id);
+  return ordered;
+}
+
 export function planUnifiedOrchestration(rawInput: UnifiedOrchestrationInput): UnifiedOrchestrationPlan {
   const parsed = unifiedOrchestrationInputSchema.parse(rawInput);
   assertValidDependencyGraph(parsed.steps);
@@ -131,8 +149,12 @@ export function enqueueUnifiedOrchestration(
   const actionIdsByStep = new Map<string, number>();
 
   const transaction = db.transaction(() => {
-    const actions = plan.steps.map((step) => {
-      const dependencyActionIds = step.depends_on.map((dependency) => actionIdsByStep.get(dependency)).filter(Boolean) as number[];
+    const actions = dependencyOrderedSteps(plan.steps).map((step) => {
+      const dependencyActionIds = step.depends_on.map((dependency) => {
+        const actionId = actionIdsByStep.get(dependency);
+        if (!actionId) throw new Error(`Dependency action was not created for ${dependency}.`);
+        return actionId;
+      });
       const action = createExecutiveAction(db, {
         action_type: step.action_type,
         target_system: step.target_system,

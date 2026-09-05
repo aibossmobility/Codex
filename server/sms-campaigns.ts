@@ -34,8 +34,8 @@ export function ensureSmsCampaignTables(db: Database.Database) {
   `);
 }
 
-export function ghlSmsConfigured(db: Database.Database): boolean {
-  const creds = resolveGhlCredentials(db);
+export function ghlSmsConfigured(db: Database.Database, adminUserId: number): boolean {
+  const creds = resolveGhlCredentials(db, adminUserId);
   return Boolean(creds?.token && creds?.locationId);
 }
 
@@ -72,8 +72,12 @@ export function registerSmsCampaignRoutes(
 ) {
   ensureSmsCampaignTables(db);
 
-  app.get("/api/sms/provider-status", requireAuth, (_req, res) => {
-    const creds = resolveGhlCredentials(db);
+  app.get("/api/sms/provider-status", requireAuth, (req, res) => {
+    const adminId = Number((req.session as { adminId?: number }).adminId);
+    if (!Number.isInteger(adminId) || adminId < 1) {
+      return res.status(401).json({ configured: false, error: "Authenticated administrator required" });
+    }
+    const creds = resolveGhlCredentials(db, adminId);
     res.json({
       configured: Boolean(creds?.token && creds?.locationId),
       provider: "gohighlevel",
@@ -225,7 +229,11 @@ export function registerSmsCampaignRoutes(
   });
 
   app.post("/api/sms/campaigns/:id/send-batch", requireAuth, async (req, res) => {
-    const ghlCredentials = resolveGhlCredentials(db);
+    const adminId = Number((req.session as { adminId?: number }).adminId);
+    if (!Number.isInteger(adminId) || adminId < 1) {
+      return res.status(401).json({ ok: false, error: "Authenticated administrator required" });
+    }
+    const ghlCredentials = resolveGhlCredentials(db, adminId);
     if (!ghlCredentials?.token || !ghlCredentials.locationId) {
       return res.status(503).json({
         ok: false,

@@ -6266,6 +6266,23 @@ async function startServer() {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
+  app.post("/api/admin/ai-boss/android-companion/heartbeat", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const input = req.body && typeof req.body === "object" ? req.body as Record<string, unknown> : {};
+      res.json({
+        ok: true,
+        node: recordAiBossNodeHeartbeat(db, {
+          node_id: input.node_id,
+          display_name: input.display_name || "Brian's Android phone",
+          node_kind: "android",
+          capabilities: ["mobile_capture", "approvals", "instruction_queue"],
+        }),
+      });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
   app.get("/api/admin/ai-boss/mission-control", requireAuth, requireResearchLabAccess, (_req, res) => {
     try {
       res.json({ ok: true, mission: { ...getAiBossMissionControl(db), campaigns: getAiBossCampaigns(db) } });

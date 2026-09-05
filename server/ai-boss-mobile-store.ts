@@ -79,7 +79,7 @@ export function getAiBossMissionControl(db: BetterSqliteDatabase) {
   const nodes = getAiBossNodes(db);
   const macOnline = nodes.some((node) => node.node_kind === "mac" && node.online);
   const openInstructions = (db.prepare(
-    "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND session_ref LIKE 'mobile-%' AND status IN ('active', 'waiting')"
+    "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%') AND status IN ('active', 'waiting')"
   ).get() as { count: number }).count;
   return {
     nodes,

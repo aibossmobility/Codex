@@ -78,10 +78,55 @@ export function seedAiBossCampaigns(db: BetterSqliteDatabase) {
 export function getAiBossCampaigns(db: BetterSqliteDatabase) {
   ensureAiBossCampaignTables(db);
   seedAiBossCampaigns(db);
-  return db.prepare(`
+  const rows = db.prepare(`
     SELECT source, campaign_key, display_name, tracking_url, status, clicks, enrollments,
       posts_distributed, follow_ups_needed, latest_activity, last_synced_at
     FROM ai_boss_campaign_snapshots
     ORDER BY CASE source WHEN 'heycatch' THEN 0 ELSE 1 END, display_name
-  `).all();
+  `).all() as Array<Record<string, unknown>>;
+
+  try {
+    const node = db.prepare(`
+      SELECT capabilities_json FROM ai_boss_nodes
+      WHERE node_kind = 'mac' ORDER BY last_seen_at DESC LIMIT 1
+    `).get() as { capabilities_json?: string } | undefined;
+    const capabilities = JSON.parse(String(node?.capabilities_json || "[]")) as string[];
+    const metrics = new Map<string, { clicks?: number; enrollments?: number }>();
+    let lastSync = 0;
+
+    for (const capability of capabilities) {
+      const parts = String(capability).split(":");
+      if (parts[0] !== "zipshare") continue;
+      if (parts[1] === "last_sync") {
+        lastSync = Number(parts[2] || 0);
+        continue;
+      }
+      if (parts.length !== 4) continue;
+      const code = parts[1];
+      const metricName = parts[2];
+      const rawValue = parts[3];
+      if (metricName !== "clicks" && metricName !== "enrollments") continue;
+      const current = metrics.get(code) || {};
+      current[metricName] = Math.max(0, Number(rawValue || 0));
+      metrics.set(code, current);
+    }
+
+    if (metrics.size) {
+      return rows.map((row) => {
+        if (row.source !== "zipshare") return row;
+        const live = metrics.get(String(row.campaign_key));
+        if (!live) return row;
+        return {
+          ...row,
+          status: "connected",
+          clicks: live.clicks || 0,
+          enrollments: live.enrollments || 0,
+          latest_activity: "Synced from authenticated ZIPShare Partner Office via Brian's Mac.",
+          last_synced_at: lastSync ? new Date(lastSync).toISOString() : row.last_synced_at,
+        };
+      });
+    }
+  } catch {}
+
+  return rows;
 }

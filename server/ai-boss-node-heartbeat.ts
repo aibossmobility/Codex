@@ -20,12 +20,17 @@ function metric(text: string, code: string, label: string) {
 
 function refreshZipShareMetrics() {
   try {
-    const script = `tell application "Google Chrome 3"\nset targetTab to missing value\nrepeat with w in windows\nrepeat with t in tabs of w\nif (URL of t as text) contains "zipshare.ai/office" then set targetTab to t\nend repeat\nend repeat\nif targetTab is missing value then return ""\nreturn execute javascript "document.body.innerText" in targetTab\nend tell`;
-    const text = execFileSync("osascript", ["-e", script], { encoding: "utf8", timeout: 10_000 });
-    if (!text) return;
+    const npx = "/Users/bossmobility/.nvm/versions/node/v24.19.0/bin/npx";
+    const common = ["-y", "agent-browser@0.36.0", "--profile", "Default", "--session", "zipshare-heartbeat"];
+    execFileSync(npx, [...common, "open", "https://zipshare.ai/office?tab=share"], { encoding: "utf8", timeout: 30_000 });
+    execFileSync(npx, [...common, "wait", "1500"], { encoding: "utf8", timeout: 10_000 });
+    const text = execFileSync(npx, [...common, "get", "text", "body"], { encoding: "utf8", timeout: 15_000 });
+    if (!text.includes("Code: AIBOSSZIP") || !text.includes("Code: PAPALIFECOACH")) {
+      throw new Error("ZIPShare campaign portfolio is not available in the authenticated background session.");
+    }
     zipShareMetrics = {
-      AIBOSSZIP: { clicks: metric(text, "AIBOSSZIP", "Clicks"), enrollments: metric(text, "AIBOSSZIP", "Enrollments") },
-      PAPALIFECOACH: { clicks: metric(text, "PAPALIFECOACH", "Clicks"), enrollments: metric(text, "PAPALIFECOACH", "Enrollments") },
+      AIBOSSZIP: { clicks: 0, enrollments: metric(text, "AIBOSSZIP", "Enrollments") },
+      PAPALIFECOACH: { clicks: 0, enrollments: metric(text, "PAPALIFECOACH", "Enrollments") },
     };
     zipShareLastSync = new Date().toISOString();
   } catch (error) {

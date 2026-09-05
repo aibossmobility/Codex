@@ -10,7 +10,7 @@ type Mission = {
   mac_online: boolean;
   open_mobile_instructions: number;
   queue: { awaiting_approval: number; approved: number; executing: number; failed: number; waiting_for_mac: number };
-  nodes: Array<{ node_id: string; display_name: string; online: boolean; capabilities: string[]; last_seen_at: string }>;
+  nodes: Array<{ node_id: string; display_name: string; node_kind: "mac" | "desktop" | "server" | "android"; online: boolean; capabilities: string[]; last_seen_at: string }>;
   campaigns: Array<{
     source: "zipshare" | "heycatch";
     campaign_key: string;
@@ -31,6 +31,16 @@ type CaptureMode = "father" | "boss" | null;
 const liveUrl = "https://meetn.com/briankeithhill";
 const youtubeStudioUrl = "https://studio.youtube.com/";
 const todayTopic = "Rebuilding Trust in Small Deposits";
+const androidCompanionStorageKey = "ai-boss-android-companion-id";
+
+function androidCompanionId() {
+  const existing = window.localStorage.getItem(androidCompanionStorageKey);
+  if (existing) return existing;
+  const suffix = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const nodeId = `brian-android-${suffix}`;
+  window.localStorage.setItem(androidCompanionStorageKey, nodeId);
+  return nodeId;
+}
 
 async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { credentials: "include", ...init });
@@ -69,12 +79,32 @@ export default function AiBossMobile() {
     manifest.href = "/ai-boss-manifest.webmanifest";
     document.head.appendChild(manifest);
     if ("serviceWorker" in navigator) void navigator.serviceWorker.register("/ai-boss-sw.js");
+    let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" }).then((response) => response.json()).then((data) => {
       if (!data.ok) navigate("/login");
       else if (!data.user?.researchLabAccess) navigate("/crm-console");
-      else void load();
+      else {
+        void load();
+        if (/Android/i.test(window.navigator.userAgent)) {
+          const heartbeat = async () => {
+            try {
+              await apiJson("/api/admin/ai-boss/android-companion/heartbeat", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ node_id: androidCompanionId(), display_name: "Brian's Android phone" }),
+              });
+              await load();
+            } catch {
+              // The companion remains a user-controlled interface if it cannot report status.
+            }
+          };
+          void heartbeat();
+          companionTimer = window.setInterval(() => void heartbeat(), 45_000);
+        }
+      }
     }).catch(() => navigate("/login"));
     return () => {
+      if (companionTimer) window.clearInterval(companionTimer);
       saveVoiceOnEndRef.current = false;
       recognitionRef.current?.abort?.();
       manifest.remove();
@@ -181,6 +211,7 @@ export default function AiBossMobile() {
       <main className="max-w-5xl mx-auto p-4 space-y-5">
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <StatusCard icon={Laptop} label="Mac" value={mission?.mac_online ? "Online" : "Offline"} tone={mission?.mac_online ? "good" : "waiting"} />
+          <StatusCard icon={Smartphone} label="Android" value={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "Online" : "Offline"} tone={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "good" : "waiting"} />
           <StatusCard icon={CircleAlert} label="Approvals" value={String(mission?.queue.awaiting_approval || 0)} tone={(mission?.queue.awaiting_approval || 0) ? "waiting" : "good"} />
           <StatusCard icon={Activity} label="Running" value={String(mission?.queue.executing || 0)} tone="neutral" />
           <StatusCard icon={Clock3} label="Waiting for Mac" value={String(mission?.queue.waiting_for_mac || 0)} tone={(mission?.queue.waiting_for_mac || 0) ? "waiting" : "neutral"} />

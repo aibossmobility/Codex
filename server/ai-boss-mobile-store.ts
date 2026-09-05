@@ -4,14 +4,14 @@ import { z } from "zod";
 const heartbeatSchema = z.object({
   node_id: z.string().trim().min(2).max(100),
   display_name: z.string().trim().min(2).max(120),
-  node_kind: z.enum(["mac", "desktop", "server"]),
+  node_kind: z.enum(["mac", "desktop", "server", "android"]),
   capabilities: z.array(z.string().trim().min(1).max(80)).max(50).default([]),
 }).strict();
 
 type AiBossNode = {
   node_id: string;
   display_name: string;
-  node_kind: "mac" | "desktop" | "server";
+  node_kind: "mac" | "desktop" | "server" | "android";
   capabilities_json: string;
   last_seen_at: string;
   online: boolean;

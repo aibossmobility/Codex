@@ -33,7 +33,7 @@ interface RecipientRow {
 }
 
 export default function SmsCampaigns() {
-  const [twilioOk, setTwilioOk] = useState<boolean | null>(null);
+  const [smsProviderOk, setSmsProviderOk] = useState<boolean | null>(null);
   const [campaigns, setCampaigns] = useState<CampaignRow[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [recipients, setRecipients] = useState<RecipientRow[]>([]);
@@ -45,12 +45,12 @@ export default function SmsCampaigns() {
 
   const loadCampaigns = useCallback(async () => {
     const [tRes, cRes] = await Promise.all([
-      fetch("/api/sms/twilio-status"),
+      fetch("/api/sms/provider-status"),
       fetch("/api/sms/campaigns"),
     ]);
     if (tRes.ok) {
       const t = await tRes.json();
-      setTwilioOk(!!t.configured);
+      setSmsProviderOk(!!t.configured);
     }
     if (cRes.ok) setCampaigns(await cRes.json());
   }, []);
@@ -155,7 +155,7 @@ export default function SmsCampaigns() {
             Boss Mobile-only tool: build lists from CRM leads who opted into{" "}
             <strong className="text-gray-400">marketing</strong> SMS, personalize with{" "}
             <code className="text-primary">{"{{first_name}}"}</code>, <code className="text-primary">{"{{last_name}}"}</code>,{" "}
-            <code className="text-primary">{"{{business_name}}"}</code>, then send in batches via Twilio.
+            <code className="text-primary">{"{{business_name}}"}</code>, then send in batches through your connected GoHighLevel phone service.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void loadCampaigns()} className="border-white/15 text-gray-300">
@@ -163,17 +163,14 @@ export default function SmsCampaigns() {
         </Button>
       </div>
 
-      {twilioOk === false && (
+      {smsProviderOk === false && (
         <Card className="bg-amber-950/30 border-amber-700/40">
           <CardContent className="py-4 flex gap-3 items-start text-amber-200/90 text-sm">
             <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400" />
             <div>
-              <p className="font-semibold text-amber-100">Twilio not configured on the server</p>
+              <p className="font-semibold text-amber-100">GoHighLevel SMS connection needs attention</p>
               <p className="mt-1 text-amber-200/80">
-                Set <code className="bg-black/30 px-1 rounded">TWILIO_ACCOUNT_SID</code>,{" "}
-                <code className="bg-black/30 px-1 rounded">TWILIO_AUTH_TOKEN</code>, and either{" "}
-                <code className="bg-black/30 px-1 rounded">TWILIO_MESSAGING_SERVICE_SID</code> (recommended) or{" "}
-                <code className="bg-black/30 px-1 rounded">TWILIO_FROM_NUMBER</code>, then restart the app.
+                Save the GoHighLevel Private Integration token and Location ID under CRM → Settings, with Conversations/SMS permission enabled.
               </p>
             </div>
           </CardContent>
@@ -268,7 +265,7 @@ export default function SmsCampaigns() {
                     size="sm"
                     disabled={
                       sending ||
-                      twilioOk === false ||
+                      smsProviderOk === false ||
                       (selected.status !== "ready" && selected.status !== "sending") ||
                       selected.pending_count === 0
                     }

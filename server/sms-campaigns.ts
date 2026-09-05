@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import type { Express } from "express";
 import type Database from "better-sqlite3";
+import { resolveGhlCredentials } from "./ghl-integration-store";
+import { ghlNurtureSmsSend, ghlUpsertContactWithTags } from "./ghl-api";
 
 export function ensureSmsCampaignTables(db: Database.Database) {
   db.exec(`
@@ -32,12 +34,9 @@ export function ensureSmsCampaignTables(db: Database.Database) {
   `);
 }
 
-export function twilioEnvConfigured(): boolean {
-  const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const token = process.env.TWILIO_AUTH_TOKEN?.trim();
-  const from = process.env.TWILIO_FROM_NUMBER?.trim();
-  const ms = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
-  return !!(sid && token && (from || ms));
+export function ghlSmsConfigured(db: Database.Database): boolean {
+  const creds = resolveGhlCredentials(db);
+  return Boolean(creds?.token && creds?.locationId);
 }
 
 /** US-focused: 10 digits -> +1…; 11 starting with 1 -> +…; other E.164 if already + */
@@ -64,35 +63,6 @@ function personalizeBody(
     .replace(/\{\{\s*business_name\s*\}\}/gi, row.business_name || "");
 }
 
-async function twilioSendSms(to: string, body: string): Promise<{ sid: string } | { error: string }> {
-  const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const token = process.env.TWILIO_AUTH_TOKEN?.trim();
-  const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
-  const fromNumber = process.env.TWILIO_FROM_NUMBER?.trim();
-  if (!sid || !token) return { error: "Twilio credentials missing (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)" };
-  if (!messagingServiceSid && !fromNumber) {
-    return { error: "Set TWILIO_MESSAGING_SERVICE_SID or TWILIO_FROM_NUMBER" };
-  }
-  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
-  const form = new URLSearchParams();
-  form.set("To", to);
-  if (messagingServiceSid) form.set("MessagingServiceSid", messagingServiceSid);
-  else form.set("From", fromNumber!);
-  form.set("Body", body.slice(0, 1600));
-  const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: form.toString(),
-  });
-  const j = (await r.json()) as { sid?: string; message?: string; code?: number };
-  if (!r.ok) return { error: j.message || `Twilio HTTP ${r.status}` };
-  if (!j.sid) return { error: "Twilio returned no SID" };
-  return { sid: j.sid };
-}
-
 type RequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
 export function registerSmsCampaignRoutes(
@@ -102,8 +72,14 @@ export function registerSmsCampaignRoutes(
 ) {
   ensureSmsCampaignTables(db);
 
-  app.get("/api/sms/twilio-status", requireAuth, (_req, res) => {
-    res.json({ configured: twilioEnvConfigured() });
+  app.get("/api/sms/provider-status", requireAuth, (_req, res) => {
+    const creds = resolveGhlCredentials(db);
+    res.json({
+      configured: Boolean(creds?.token && creds?.locationId),
+      provider: "gohighlevel",
+      credential_source: creds?.source || null,
+      location_configured: Boolean(creds?.locationId),
+    });
   });
 
   app.get("/api/sms/campaigns", requireAuth, (_req, res) => {
@@ -249,11 +225,11 @@ export function registerSmsCampaignRoutes(
   });
 
   app.post("/api/sms/campaigns/:id/send-batch", requireAuth, async (req, res) => {
-    if (!twilioEnvConfigured()) {
+    const ghlCredentials = resolveGhlCredentials(db);
+    if (!ghlCredentials?.token || !ghlCredentials.locationId) {
       return res.status(503).json({
         ok: false,
-        error:
-          "Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_MESSAGING_SERVICE_SID or TWILIO_FROM_NUMBER on the server.",
+        error: "GoHighLevel SMS is not configured. Save the Private Integration token and Location ID under CRM → Settings.",
       });
     }
     const id = Number(req.params.id);
@@ -270,12 +246,22 @@ export function registerSmsCampaignRoutes(
 
     const pending = db
       .prepare(
-        `SELECT id, phone_e164, personalized_body FROM sms_campaign_recipients
-         WHERE campaign_id = ? AND send_status = 'pending'
-         ORDER BY id ASC
+        `SELECT r.id, r.phone_e164, r.personalized_body,
+                l.first_name, l.last_name, l.business_email
+         FROM sms_campaign_recipients r
+         JOIN leads l ON l.id = r.lead_id
+         WHERE r.campaign_id = ? AND r.send_status = 'pending'
+         ORDER BY r.id ASC
          LIMIT ?`
       )
-      .all(id, limit) as { id: number; phone_e164: string; personalized_body: string }[];
+      .all(id, limit) as {
+        id: number;
+        phone_e164: string;
+        personalized_body: string;
+        first_name: string;
+        last_name: string;
+        business_email: string;
+      }[];
 
     if (pending.length === 0) {
       db.prepare(`UPDATE sms_campaigns SET status = 'completed', updated_at = datetime('now') WHERE id = ?`).run(
@@ -296,15 +282,46 @@ export function registerSmsCampaignRoutes(
     let sent = 0;
     let failed = 0;
     for (const row of pending) {
-      const result = await twilioSendSms(row.phone_e164, row.personalized_body);
-      if ("sid" in result) {
-        updSent.run(result.sid, row.id);
+      const contactResult = await ghlUpsertContactWithTags(
+        {
+          firstName: row.first_name,
+          lastName: row.last_name || undefined,
+          email: row.business_email,
+          phone: row.phone_e164,
+          tags: ["ai_boss_sms_campaign"],
+        },
+        ghlCredentials
+      );
+      if (!contactResult.ok) {
+        updFail.run(`GHL contact sync failed: ${contactResult.error}`, row.id);
+        failed++;
+        continue;
+      }
+
+      const contactId = String(contactResult.data.contact_id || "").trim();
+      if (!contactId) {
+        updFail.run("GHL contact sync returned no contact ID", row.id);
+        failed++;
+        continue;
+      }
+
+      const result = await ghlNurtureSmsSend(
+        { ghl_contact_id: contactId, body: row.personalized_body },
+        ghlCredentials
+      );
+      if (result.ok) {
+        const providerId = String(
+          (result.data.ghl as Record<string, unknown> | undefined)?.messageId ||
+          (result.data.ghl as Record<string, unknown> | undefined)?.id ||
+          contactId
+        );
+        updSent.run(providerId, row.id);
         sent++;
       } else {
         updFail.run(result.error, row.id);
         failed++;
       }
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 150));
     }
 
     const remaining = (

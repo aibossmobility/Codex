@@ -128,6 +128,7 @@ export default function AiBossMobile() {
       setInstruction(`${finalText}${interim}`.trim());
     };
     recognition.onerror = (event: any) => {
+      saveVoiceOnEndRef.current = false;
       setListening(false);
       if (event.error !== "aborted" && event.error !== "no-speech") toast.error("I couldn't hear that clearly. Tap again and speak normally.");
     };

@@ -2365,9 +2365,10 @@ function GhlIntegrationSettings() {
 
               <p className="text-gray-400 text-xs leading-relaxed">
                 In GHL: <strong className="text-gray-300">Settings → Private Integrations</strong> → create or
-                open your integration → copy the token. Enable <strong className="text-gray-300">SMS</strong> and{" "}
-                <strong className="text-gray-300">Opportunities</strong> scopes if you use nurture SMS and pipeline
-                stage moves.
+                open your integration → copy the token. Before any SMS campaign can safely send, enable{" "}
+                <strong className="text-gray-300">Contacts write</strong> and{" "}
+                <strong className="text-gray-300">Conversations/SMS</strong> permissions. Enable{" "}
+                <strong className="text-gray-300">Opportunities</strong> only if you also use pipeline stage moves.
               </p>
 
               <div className="space-y-2">

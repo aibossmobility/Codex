@@ -20,11 +20,13 @@ function metric(text: string, code: string, label: string) {
 
 function refreshZipShareMetrics() {
   try {
-    const npx = "/Users/bossmobility/.nvm/versions/node/v24.19.0/bin/npx";
-    const common = ["-y", "agent-browser@0.36.0", "--profile", "Default", "--session", "zipshare-heartbeat"];
-    execFileSync(npx, [...common, "open", "https://zipshare.ai/office?tab=share"], { encoding: "utf8", timeout: 30_000 });
-    execFileSync(npx, [...common, "wait", "1500"], { encoding: "utf8", timeout: 10_000 });
-    const text = execFileSync(npx, [...common, "get", "text", "body"], { encoding: "utf8", timeout: 15_000 });
+    const nodeBin = "/Users/bossmobility/.nvm/versions/node/v24.19.0/bin/node";
+    const npxCli = "/Users/bossmobility/.nvm/versions/node/v24.19.0/lib/node_modules/npm/bin/npx-cli.js";
+    const common = [npxCli, "-y", "agent-browser@0.36.0", "--profile", "Default", "--session", "zipshare-heartbeat"];
+    const childEnv = { ...process.env, PATH: `/Users/bossmobility/.nvm/versions/node/v24.19.0/bin:${process.env.PATH || "/usr/bin:/bin:/usr/sbin:/sbin"}` };
+    execFileSync(nodeBin, [...common, "open", "https://zipshare.ai/office?tab=share"], { encoding: "utf8", timeout: 30_000, env: childEnv });
+    execFileSync(nodeBin, [...common, "wait", "1500"], { encoding: "utf8", timeout: 10_000, env: childEnv });
+    const text = execFileSync(nodeBin, [...common, "get", "text", "body"], { encoding: "utf8", timeout: 15_000, env: childEnv });
     if (!text.includes("Code: AIBOSSZIP") || !text.includes("Code: PAPALIFECOACH")) {
       throw new Error("ZIPShare campaign portfolio is not available in the authenticated background session.");
     }

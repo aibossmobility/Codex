@@ -170,7 +170,7 @@ export default function SmsCampaigns() {
             <div>
               <p className="font-semibold text-amber-100">GoHighLevel SMS connection needs attention</p>
               <p className="mt-1 text-amber-200/80">
-                Save the GoHighLevel Private Integration token and Location ID under CRM → Settings, with Conversations/SMS permission enabled.
+                Save the GoHighLevel Private Integration token and Location ID under CRM → Settings. The token must have Contacts write access and Conversations/SMS permission before any campaign can safely send.
               </p>
             </div>
           </CardContent>

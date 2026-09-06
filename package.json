@@ -5,11 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --host",
-    "build": "node scripts/generate-master-knowledge-page.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-local-bridge.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-gmail-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-node-heartbeat.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "node scripts/generate-master-knowledge-page.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-local-bridge.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-gmail-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-node-heartbeat.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-youtube-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "prestart": "node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && pnpm test:youtube-growth && pnpm test:youtube-connector",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
     "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
     "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
@@ -25,7 +25,10 @@
     "test:mobile-control": "node --import tsx server/ai-boss-mobile-store.test.ts",
     "test:project-ledger": "node --import tsx server/ai-boss-project-store.test.ts",
     "start:node-heartbeat": "node dist/ai-boss-node-heartbeat.js",
-    "ai-boss:zipshare-sync": "tsx server/ai-boss-zipshare-sync.ts"
+    "ai-boss:zipshare-sync": "tsx server/ai-boss-zipshare-sync.ts",
+    "test:youtube-growth": "node --import tsx server/ai-boss-youtube-growth.test.ts",
+    "test:youtube-connector": "node --import tsx server/ai-boss-youtube-connector.test.ts",
+    "start:youtube-connector": "node dist/ai-boss-youtube-connector.js"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

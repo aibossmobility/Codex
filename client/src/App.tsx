@@ -28,6 +28,7 @@ import Booking from "./pages/Booking";
 import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
+import YouTubeGrowth from "./pages/YouTubeGrowth";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
@@ -111,6 +112,7 @@ function Router() {
       <Route path={"/booking"} component={Booking} />
       <Route path={"/research-lab"} component={ResearchLab} />
       <Route path={"/executive-memory"} component={ExecutiveMemory} />
+      <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

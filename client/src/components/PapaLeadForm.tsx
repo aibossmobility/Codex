@@ -20,17 +20,69 @@ type PapaLeadFormProps = {
   submitLabel?: string;
 };
 
+type Attribution = {
+  source?: string;
+  campaign?: string;
+  medium?: string;
+  content?: string;
+  term?: string;
+  referrer?: string;
+  landing_path?: string;
+  first_touch_at?: string;
+};
+
+const ATTRIBUTION_STORAGE_KEY = "papa_life_first_touch_attribution";
+const ZIPSHARE_CAMPAIGNS = new Set(["PAPALIFECOACH", "AIBOSSZIP"]);
+
 const SMS_CONSENT_TEXT =
   "By submitting this form, you agree to receive text messages from Papa Life regarding coaching appointments, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";
+
+function captureAttribution(): Attribution {
+  if (typeof window === "undefined") return {};
+
+  const params = new URLSearchParams(window.location.search);
+  const referralCode = (params.get("ref") || "").trim().toUpperCase();
+  const explicitCampaign = (params.get("utm_campaign") || "").trim();
+  const campaign = explicitCampaign || (ZIPSHARE_CAMPAIGNS.has(referralCode) ? referralCode : "");
+  const source = (params.get("utm_source") || (campaign && ZIPSHARE_CAMPAIGNS.has(campaign.toUpperCase()) ? "zipshare" : "")).trim();
+
+  const current: Attribution = {
+    ...(source ? { source } : {}),
+    ...(campaign ? { campaign } : {}),
+    ...(params.get("utm_medium") ? { medium: params.get("utm_medium")!.trim() } : {}),
+    ...(params.get("utm_content") ? { content: params.get("utm_content")!.trim() } : {}),
+    ...(params.get("utm_term") ? { term: params.get("utm_term")!.trim() } : {}),
+    ...(document.referrer ? { referrer: document.referrer } : {}),
+    landing_path: `${window.location.pathname}${window.location.search}`,
+    first_touch_at: new Date().toISOString(),
+  };
+
+  try {
+    const storedRaw = window.localStorage.getItem(ATTRIBUTION_STORAGE_KEY);
+    if (storedRaw) {
+      const stored = JSON.parse(storedRaw) as Attribution;
+      if (stored && typeof stored === "object") return stored;
+    }
+    if (current.source || current.campaign) {
+      window.localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(current));
+    }
+  } catch {
+    // Attribution must never block form submission.
+  }
+
+  return current;
+}
 
 export function PapaLeadForm({ onSuccess, submitLabel = "Get My Results →" }: PapaLeadFormProps) {
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [attribution, setAttribution] = useState<Attribution>({});
   const [smsConsent, setSmsConsent] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    setAttribution(captureAttribution());
     let cancelled = false;
     (async () => {
       try {
@@ -76,10 +128,21 @@ export function PapaLeadForm({ onSuccess, submitLabel = "Get My Results →" }: 
     if (!validate()) return;
     setSubmitting(true);
     try {
+      const attributionAnswers = Object.fromEntries(
+        Object.entries(attribution)
+          .filter(([, value]) => Boolean(String(value || "").trim()))
+          .map(([key, value]) => [`attribution_${key}`, String(value)])
+      );
       const res = await fetch("/api/papa-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: { ...answers, sms_consent: smsConsent ? "true" : "" } }),
+        body: JSON.stringify({
+          answers: {
+            ...answers,
+            sms_consent: smsConsent ? "true" : "",
+            ...attributionAnswers,
+          },
+        }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -94,7 +157,9 @@ export function PapaLeadForm({ onSuccess, submitLabel = "Get My Results →" }: 
           body: JSON.stringify({
             email,
             event_type: "content_click",
-            event_detail: "Completed relationship assessment (papa_lead)",
+            event_detail: attribution.campaign
+              ? `Completed relationship assessment (papa_lead) — ${attribution.source || "unknown"}/${attribution.campaign}`
+              : "Completed relationship assessment (papa_lead)",
           }),
         }).catch(() => undefined);
       }
@@ -133,8 +198,7 @@ export function PapaLeadForm({ onSuccess, submitLabel = "Get My Results →" }: 
       );
     }
 
-    const inputType =
-      q.input_type === "email" ? "email" : q.input_type === "tel" ? "tel" : "text";
+    const inputType = q.input_type === "email" ? "email" : q.input_type === "tel" ? "tel" : "text";
 
     return (
       <input
@@ -184,7 +248,7 @@ export function PapaLeadForm({ onSuccess, submitLabel = "Get My Results →" }: 
           </Label>
           {q.help_text ? <p className="text-xs text-gray-500">{q.help_text}</p> : null}
           {renderField(q)}
-          {(q.question_key === "phone" || q.input_type === "tel") ? (
+          {q.question_key === "phone" || q.input_type === "tel" ? (
             <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs leading-relaxed text-gray-400">
               <input
                 type="checkbox"

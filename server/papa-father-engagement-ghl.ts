@@ -36,6 +36,17 @@ function value(answers: Answers, key: string): string {
   return raw == null ? "" : String(raw).trim();
 }
 
+function normalizedCampaign(answers: Answers): string {
+  return value(answers, "attribution_campaign").toUpperCase();
+}
+
+function normalizedSource(answers: Answers): string {
+  const explicit = value(answers, "attribution_source").toLowerCase();
+  const campaign = normalizedCampaign(answers);
+  if (explicit) return explicit;
+  return campaign === "PAPALIFECOACH" || campaign === "AIBOSSZIP" ? "zipshare" : "";
+}
+
 function contactIdFromPayload(data: Record<string, unknown>): string | null {
   const direct = data.id || data.contactId;
   if (direct) return String(direct);
@@ -90,6 +101,8 @@ export async function syncPapaFatherEngagementToGhl(
     return;
   }
 
+  const campaign = normalizedCampaign(input.answers);
+  const source = normalizedSource(input.answers);
   const [firstName, ...lastNameParts] = input.first_name.trim().split(/\s+/).filter(Boolean);
   const customFields = [
     { id: FIELD_IDS.relationship_status, fieldValue: value(input.answers, "relationship_status") },
@@ -100,6 +113,10 @@ export async function syncPapaFatherEngagementToGhl(
     { id: FIELD_IDS.sensitive_or_personal_response, fieldValue: value(input.answers, "sensitive_or_personal_response") },
   ].filter((field) => Boolean(String(field.fieldValue || "").trim()));
 
+  const contactSource = source === "zipshare" && campaign
+    ? `ZIPShare — ${campaign}`
+    : "PapaLifeCoach.com 2-Minute Fatherhood Check-In";
+
   const upsert = await requestJson(
     "/contacts/upsert",
     "POST",
@@ -109,7 +126,7 @@ export async function syncPapaFatherEngagementToGhl(
       ...(lastNameParts.length ? { lastName: lastNameParts.join(" ") } : {}),
       email,
       ...(input.phone?.trim() ? { phone: input.phone.trim() } : {}),
-      source: "PapaLifeCoach.com 2-Minute Fatherhood Check-In",
+      source: contactSource,
       customFields,
     },
     creds
@@ -118,10 +135,14 @@ export async function syncPapaFatherEngagementToGhl(
   const contactId = contactIdFromPayload(upsert);
   if (!contactId) throw new Error("GHL contact upsert returned no contact id");
 
+  const tags = ["Papa Life—Fatherhood Check-In"];
+  if (source === "zipshare") tags.push("Source—ZIPShare");
+  if (campaign) tags.push(`Campaign—${campaign}`);
+
   await requestJson(
     `/contacts/${encodeURIComponent(contactId)}/tags`,
     "POST",
-    { tags: ["Papa Life—Fatherhood Check-In"] },
+    { tags },
     creds
   );
 
@@ -131,7 +152,7 @@ export async function syncPapaFatherEngagementToGhl(
     {
       pipelineId: PAPA_FATHER_ENGAGEMENT_PIPELINE_ID,
       locationId: creds.locationId,
-      name: `${input.first_name.trim()} — Fatherhood Check-In`,
+      name: `${input.first_name.trim()} — Fatherhood Check-In${campaign ? ` — ${campaign}` : ""}`,
       pipelineStageId: PAPA_BRIAN_REVIEW_STAGE_ID,
       status: "open",
       contactId,
@@ -147,12 +168,16 @@ export async function syncPapaFatherEngagementToGhl(
     "POST",
     {
       title: "Brian Review Needed",
-      body: "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
+      body: campaign
+        ? `Review this Fatherhood Check-In before follow-up is sent. Attribution: ${source || "unknown"}/${campaign}.`
+        : "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
       dueDate,
       completed: false,
     },
     creds
   );
 
-  console.info(`[ghl] father engagement synced contact ${contactId} to Brian Review Needed with review task`);
+  console.info(
+    `[ghl] father engagement synced contact ${contactId} to Brian Review Needed${campaign ? ` (${source || "unknown"}/${campaign})` : ""}`
+  );
 }

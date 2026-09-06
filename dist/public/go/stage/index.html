@@ -12,10 +12,8 @@
     <script>
       const params = new URLSearchParams(window.location.search);
       const source = params.get("src") || "site";
-      const url = new URL("https://fatherhood5-c3sirayz.manus.space/");
-      url.searchParams.set("utm_source", source);
-      url.searchParams.set("utm_medium", "bossmobile_site");
-      url.searchParams.set("utm_campaign", "fatherhood_stage_tool");
+      const url = new URL("/my-journey", window.location.origin);
+      url.searchParams.set("from", "fatherhood-stage");
       fetch("/api/traffic-click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,6 +28,6 @@
     </script>
   </head>
   <body>
-    <p>Opening the fatherhood stage tool...</p>
+    <p>Opening your Papa Life fatherhood journey...</p>
   </body>
 </html>

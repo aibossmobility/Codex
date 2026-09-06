@@ -2,6 +2,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
+import { useEffect } from "react";
+import { captureFirstTouchAttribution } from "./lib/attribution";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { GlobalBookingButton } from "./components/GlobalBookingButton";
 import { PapaAiWidget } from "./components/PapaAiWidget";
@@ -152,6 +154,10 @@ function GlobalPapaAiWidget() {
 }
 
 function App() {
+  useEffect(() => {
+    captureFirstTouchAttribution();
+  }, []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">

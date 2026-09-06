@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { getFirstTouchAttribution } from "@/lib/attribution";
 
 const relationshipOptions = ["Close—strengthen", "Communication difficult", "Limited contact", "Disconnected", "Unsure"];
 const concernOptions = ["I feel judged", "I feel shut out", "I don’t know what to say", "I’m afraid of making it worse", "I’m not sure"];
@@ -34,6 +35,12 @@ export function FatherEngagementFollowUpForm() {
     }
     setSubmitting(true);
     try {
+      const attribution = getFirstTouchAttribution();
+      const attributionAnswers = Object.fromEntries(
+        Object.entries(attribution)
+          .filter(([, value]) => Boolean(String(value || "").trim()))
+          .map(([key, value]) => [`attribution_${key}`, String(value)])
+      );
       const response = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,6 +61,7 @@ export function FatherEngagementFollowUpForm() {
             consent_follow_up: "true",
             sms_consent: form.phone.trim() && smsConsent ? "true" : "",
             father_engagement_opt_in: "true",
+            ...attributionAnswers,
           },
         }),
       });

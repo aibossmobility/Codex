@@ -475,6 +475,193 @@ function updatePricingSettings(db2, patch) {
   return merged;
 }
 
+// server/ghl-integration-store.ts
+import crypto from "crypto";
+var ALGO = "aes-256-gcm";
+function encryptionKey() {
+  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
+  return crypto.createHash("sha256").update(raw).digest();
+}
+function decrypt(blob) {
+  const buf = Buffer.from(blob, "base64");
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const data = buf.subarray(28);
+  const key = encryptionKey();
+  const decipher = crypto.createDecipheriv(ALGO, key, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
+}
+function envCredentials() {
+  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
+  if (!token) return null;
+  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
+  return { token, locationId, source: "env" };
+}
+function resolveGhlCredentials(db2, adminUserId) {
+  const env = envCredentials();
+  if (env) return env;
+  let uid = adminUserId;
+  if (uid == null) {
+    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
+    uid = row?.id;
+  }
+  if (uid == null) return null;
+  const stored = db2.prepare(
+    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
+  ).get(uid);
+  if (!stored?.api_token_enc) return null;
+  try {
+    const token = decrypt(stored.api_token_enc);
+    return {
+      token,
+      locationId: stored.location_id?.trim() || void 0,
+      source: "dashboard"
+    };
+  } catch {
+    return null;
+  }
+}
+
+// server/papa-father-engagement-ghl.ts
+var GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+var GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
+var PAPA_FATHER_ENGAGEMENT_PIPELINE_ID = process.env.GHL_PAPA_FATHER_ENGAGEMENT_PIPELINE_ID?.trim() || "vPAlmSzBI5ufgmMgniOB";
+var PAPA_BRIAN_REVIEW_STAGE_ID = process.env.GHL_PAPA_BRIAN_REVIEW_STAGE_ID?.trim() || "93609656-433c-4489-a4fd-f6ee6845f4b7";
+var FIELD_IDS = {
+  relationship_status: "JBXjAvQx9txLaI6ZwJQc",
+  fathers_stated_hope: "K4aO0yWrSokcj1qStgQX",
+  primary_concern: "glcIkE9CFPA7JKfWPB5D",
+  preferred_next_step: "TI9r47A2Iwfl6Vyovqnh",
+  brian_review_status: "VjXCs7vl9HhSDWKvEEZu",
+  sensitive_or_personal_response: "57X1xM3MZGmwTGeGMM3s",
+  brian_review_decision: "nfIWfbI29k3PTyUXfOPj"
+};
+function headers(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Version: GHL_VERSION
+  };
+}
+function value(answers, key) {
+  const raw = answers[key];
+  return raw == null ? "" : String(raw).trim();
+}
+function normalizedCampaign(answers) {
+  return value(answers, "attribution_campaign").toUpperCase();
+}
+function normalizedSource(answers) {
+  const explicit = value(answers, "attribution_source").toLowerCase();
+  const campaign = normalizedCampaign(answers);
+  if (explicit) return explicit;
+  return campaign === "PAPALIFECOACH" || campaign === "AIBOSSZIP" ? "zipshare" : "";
+}
+function contactIdFromPayload(data) {
+  const direct = data.id || data.contactId;
+  if (direct) return String(direct);
+  const contact = data.contact;
+  if (contact && typeof contact === "object") {
+    const id = contact.id || contact.contactId;
+    if (id) return String(id);
+  }
+  return null;
+}
+async function requestJson(path3, method, body, creds) {
+  const response = await fetch(`${GHL_BASE}${path3}`, {
+    method,
+    headers: headers(creds.token),
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text.slice(0, 500) };
+  }
+  if (!response.ok) {
+    const message = String(data.message || text || response.statusText);
+    throw new Error(`GHL ${method} ${path3} failed (${response.status}): ${message}`);
+  }
+  return data;
+}
+async function syncPapaFatherEngagementToGhl(db2, input) {
+  const email = input.email?.trim().toLowerCase() || "";
+  if (!email) return;
+  const creds = resolveGhlCredentials(db2);
+  if (!creds?.token || !creds.locationId) {
+    console.warn("[ghl] father engagement sync skipped: credentials/location not configured");
+    return;
+  }
+  const campaign = normalizedCampaign(input.answers);
+  const source = normalizedSource(input.answers);
+  const [firstName, ...lastNameParts] = input.first_name.trim().split(/\s+/).filter(Boolean);
+  const customFields = [
+    { id: FIELD_IDS.relationship_status, fieldValue: value(input.answers, "relationship_status") },
+    { id: FIELD_IDS.fathers_stated_hope, fieldValue: value(input.answers, "fathers_stated_hope") },
+    { id: FIELD_IDS.primary_concern, fieldValue: value(input.answers, "primary_concern") },
+    { id: FIELD_IDS.preferred_next_step, fieldValue: value(input.answers, "preferred_next_step") },
+    { id: FIELD_IDS.brian_review_status, fieldValue: "Review Needed" },
+    { id: FIELD_IDS.sensitive_or_personal_response, fieldValue: value(input.answers, "sensitive_or_personal_response") }
+  ].filter((field) => Boolean(String(field.fieldValue || "").trim()));
+  const contactSource = source === "zipshare" && campaign ? `ZIPShare \u2014 ${campaign}` : "PapaLifeCoach.com 2-Minute Fatherhood Check-In";
+  const upsert = await requestJson(
+    "/contacts/upsert",
+    "POST",
+    {
+      locationId: creds.locationId,
+      firstName: firstName || input.first_name.trim(),
+      ...lastNameParts.length ? { lastName: lastNameParts.join(" ") } : {},
+      email,
+      ...input.phone?.trim() ? { phone: input.phone.trim() } : {},
+      source: contactSource,
+      customFields
+    },
+    creds
+  );
+  const contactId = contactIdFromPayload(upsert);
+  if (!contactId) throw new Error("GHL contact upsert returned no contact id");
+  const tags = ["Papa Life\u2014Fatherhood Check-In"];
+  if (source === "zipshare") tags.push("Source\u2014ZIPShare");
+  if (campaign) tags.push(`Campaign\u2014${campaign}`);
+  await requestJson(
+    `/contacts/${encodeURIComponent(contactId)}/tags`,
+    "POST",
+    { tags },
+    creds
+  );
+  await requestJson(
+    "/opportunities/",
+    "POST",
+    {
+      pipelineId: PAPA_FATHER_ENGAGEMENT_PIPELINE_ID,
+      locationId: creds.locationId,
+      name: `${input.first_name.trim()} \u2014 Fatherhood Check-In${campaign ? ` \u2014 ${campaign}` : ""}`,
+      pipelineStageId: PAPA_BRIAN_REVIEW_STAGE_ID,
+      status: "open",
+      contactId
+    },
+    creds
+  );
+  const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1e3).toISOString();
+  await requestJson(
+    `/contacts/${encodeURIComponent(contactId)}/tasks`,
+    "POST",
+    {
+      title: "Brian Review Needed",
+      body: campaign ? `Review this Fatherhood Check-In before follow-up is sent. Attribution: ${source || "unknown"}/${campaign}.` : "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
+      dueDate,
+      completed: false
+    },
+    creds
+  );
+  console.info(
+    `[ghl] father engagement synced contact ${contactId} to Brian Review Needed${campaign ? ` (${source || "unknown"}/${campaign})` : ""}`
+  );
+}
+
 // server/sync-intake-to-crm.ts
 var PAPA_FUNNEL_ISSUE_TAGS = [
   "communication",
@@ -494,12 +681,32 @@ function syncIntakeSubmissionToCrmLead(db2, input) {
   const businessEmail = input.email && input.email.trim() ? input.email.trim().toLowerCase() : `intake-${input.intakeId}@placeholder.bossmobile.local`;
   const mobilePhone = input.phone && input.phone.trim() ? input.phone.trim() : "\u2014";
   const invitedBy = input.invited_by ?? "strategist_intake";
-  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : `strategist intake (${input.source})`;
+  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : invitedBy === "papa_lead_assessment" ? "Papa Life 2-Minute Fatherhood Check-In" : `strategist intake (${input.source})`;
+  let submittedAnswers = {};
+  try {
+    const intake = db2.prepare("SELECT answers_json FROM intake_submissions WHERE id = ?").get(input.intakeId);
+    if (intake?.answers_json) submittedAnswers = JSON.parse(intake.answers_json);
+  } catch (e) {
+    console.warn("[crm] could not parse intake answers_json:", e);
+  }
+  const answerText = (key) => {
+    const raw = submittedAnswers[key];
+    return raw == null ? "" : String(raw).trim();
+  };
+  const isFatherEngagement = invitedBy === "papa_lead_assessment" || answerText("father_engagement_opt_in").toLowerCase() === "true";
+  const fatherEngagementDetails = isFatherEngagement ? [
+    answerText("relationship_status") ? `Relationship Status: ${answerText("relationship_status")}` : null,
+    answerText("fathers_stated_hope") ? `Father's Stated Hope: ${answerText("fathers_stated_hope")}` : null,
+    answerText("primary_concern") ? `Primary Concern: ${answerText("primary_concern")}` : null,
+    answerText("preferred_next_step") ? `Preferred Next Step: ${answerText("preferred_next_step")}` : null,
+    "Brian Review Status: Review Needed"
+  ].filter(Boolean) : [];
   const noteBody = [
     `Source: ${sourceLabel}`,
     `Intake submission id: ${input.intakeId}`,
     isPapaFunnelIssueTag(input.routed_pillar) ? `CRM tag: ${input.routed_pillar}` : `Primary pillar: ${input.routed_pillar}`,
     input.disconnected_pillar ? `Disconnected pillar: ${input.disconnected_pillar}` : null,
+    ...fatherEngagementDetails,
     "",
     "Situation:",
     input.situation,
@@ -540,6 +747,14 @@ ${input.vision}` : ""
   db2.prepare("INSERT INTO lead_notes (lead_id, body) VALUES (?, ?)").run(leadId, noteBody);
   if (isPapaFunnelIssueTag(input.routed_pillar)) {
     db2.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(leadId, input.routed_pillar);
+  }
+  if (isFatherEngagement) {
+    void syncPapaFatherEngagementToGhl(db2, {
+      first_name: input.first_name,
+      email: input.email,
+      phone: input.phone,
+      answers: submittedAnswers
+    }).catch((err) => console.error("[ghl] father engagement bridge failed:", err));
   }
   return { lead_id: leadId };
 }
@@ -1227,56 +1442,6 @@ function normalizeLessonContent(rawUrl, previousContentUrl, contentTypeHint) {
 
 // server/ghl-automation.ts
 import { randomBytes } from "crypto";
-
-// server/ghl-integration-store.ts
-import crypto from "crypto";
-var ALGO = "aes-256-gcm";
-function encryptionKey() {
-  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
-  return crypto.createHash("sha256").update(raw).digest();
-}
-function decrypt(blob) {
-  const buf = Buffer.from(blob, "base64");
-  const iv = buf.subarray(0, 12);
-  const tag = buf.subarray(12, 28);
-  const data = buf.subarray(28);
-  const key = encryptionKey();
-  const decipher = crypto.createDecipheriv(ALGO, key, iv);
-  decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
-}
-function envCredentials() {
-  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
-  if (!token) return null;
-  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
-  return { token, locationId, source: "env" };
-}
-function resolveGhlCredentials(db2, adminUserId) {
-  const env = envCredentials();
-  if (env) return env;
-  let uid = adminUserId;
-  if (uid == null) {
-    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
-    uid = row?.id;
-  }
-  if (uid == null) return null;
-  const stored = db2.prepare(
-    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
-  ).get(uid);
-  if (!stored?.api_token_enc) return null;
-  try {
-    const token = decrypt(stored.api_token_enc);
-    return {
-      token,
-      locationId: stored.location_id?.trim() || void 0,
-      source: "dashboard"
-    };
-  } catch {
-    return null;
-  }
-}
-
-// server/ghl-automation.ts
 var PAPA_VOICE_SYSTEM = `You are Brian Keith Hill's Papa Life AI strategist \u2014 warm, direct, faith-informed, 9th-grade reading level.
 Brand: Boss Mobile Life Coach / PAPA Life \u2014 fathers of adult children rebuilding connection.
 Never sound corporate. Sound like Brian talking to one dad at a time.`;
@@ -1415,11 +1580,11 @@ function buildOutboundCloudPayload(input, result) {
 }
 async function postJsonToCloudWebhook(db2, url, payload, alertId) {
   const secret = webhookSecret();
-  const headers2 = { "Content-Type": "application/json" };
-  if (secret) headers2.Authorization = `Bearer ${secret}`;
+  const headers3 = { "Content-Type": "application/json" };
+  if (secret) headers3.Authorization = `Bearer ${secret}`;
   const r = await fetch(url, {
     method: "POST",
-    headers: headers2,
+    headers: headers3,
     body: JSON.stringify(payload)
   });
   const body = await r.text();
@@ -1670,14 +1835,14 @@ function automationStatusPayload(db2) {
 }
 
 // server/ghl-api.ts
-var GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
-var GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
-function headers(token) {
+var GHL_BASE2 = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+var GHL_VERSION2 = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
+function headers2(token) {
   return {
     Authorization: `Bearer ${token}`,
     Accept: "application/json",
     "Content-Type": "application/json",
-    Version: GHL_VERSION
+    Version: GHL_VERSION2
   };
 }
 function smsScopeHint(message) {
@@ -1721,9 +1886,9 @@ async function ghlMoveOpportunityStage(args, creds) {
     ...args.pipeline_id || args.pipelineId ? { pipelineId: String(args.pipeline_id || args.pipelineId).trim() } : {},
     ...args.status ? { status: String(args.status).trim() } : {}
   });
-  const r = await fetch(`${GHL_BASE}/opportunities/${encodeURIComponent(oppId)}`, {
+  const r = await fetch(`${GHL_BASE2}/opportunities/${encodeURIComponent(oppId)}`, {
     method: "PUT",
-    headers: headers(creds.token),
+    headers: headers2(creds.token),
     body: JSON.stringify(body)
   });
   const text = await r.text();
@@ -1773,9 +1938,9 @@ async function ghlNurtureSmsSend(args, creds) {
     };
   }
   const payload = { type: "SMS", contactId, message };
-  const r = await fetch(`${GHL_BASE}/conversations/messages`, {
+  const r = await fetch(`${GHL_BASE2}/conversations/messages`, {
     method: "POST",
-    headers: headers(creds.token),
+    headers: headers2(creds.token),
     body: JSON.stringify(payload)
   });
   const text = await r.text();
@@ -1816,10 +1981,10 @@ var GHL_API_VERSION = process.env.GHL_API_VERSION || "2021-07-28";
 function configured(name) {
   return Boolean((process.env[name] || "").trim());
 }
-function redact(value) {
-  if (!value) return "not configured";
-  if (value.length <= 8) return "configured";
-  return `${value.slice(0, 3)}\u2026${value.slice(-3)}`;
+function redact(value2) {
+  if (!value2) return "not configured";
+  if (value2.length <= 8) return "configured";
+  return `${value2.slice(0, 3)}\u2026${value2.slice(-3)}`;
 }
 async function fetchWithTimeout(url, init = {}, timeoutMs = 1e4) {
   const controller = new AbortController();

@@ -10,8 +10,8 @@ import session from "express-session";
 import bcrypt from "bcryptjs";
 import connectSqlite3 from "connect-sqlite3";
 import multer from "multer";
-import { nanoid } from "nanoid";
-import { createHash } from "crypto";
+import { nanoid as nanoid2 } from "nanoid";
+import { createHash, timingSafeEqual } from "crypto";
 import dotenv from "dotenv";
 
 // server/research-store.ts
@@ -254,6 +254,1184 @@ function isResearchLabWebUser(username) {
   if (allow.size === 0) return false;
   const u = String(username ?? "").trim().toLowerCase();
   return u.length > 0 && allow.has(u);
+}
+
+// server/executive-memory-store.ts
+import { z } from "zod";
+var memoryCategory = z.enum([
+  "identity",
+  "preference",
+  "relationship",
+  "commitment",
+  "project",
+  "decision",
+  "fact"
+]);
+var sensitivity = z.enum(["standard", "sensitive", "restricted"]);
+var executiveMemoryInputSchema = z.object({
+  canonical_key: z.string().trim().min(3).max(160).regex(/^[a-z0-9][a-z0-9._-]*$/),
+  category: memoryCategory,
+  value: z.string().trim().min(1).max(4e3),
+  context: z.string().trim().max(2e3).nullable().optional(),
+  source_ref: z.string().trim().max(240).nullable().optional(),
+  sensitivity,
+  confidence: z.number().min(0).max(1).default(1),
+  effective_at: z.string().datetime().optional()
+}).strict();
+var executiveConversationInputSchema = z.object({
+  session_ref: z.string().trim().min(3).max(160),
+  channel: z.enum([
+    "chatgpt",
+    "email",
+    "calendar",
+    "web",
+    "file",
+    "desktop_commander",
+    "github",
+    "ghl",
+    "other"
+  ]),
+  summary: z.string().trim().min(1).max(6e3),
+  user_intent: z.string().trim().max(2e3).nullable().optional(),
+  next_action: z.string().trim().max(2e3).nullable().optional(),
+  status: z.enum(["active", "waiting", "completed", "blocked"]).default("active"),
+  occurred_at: z.string().datetime().optional()
+}).strict();
+function ensureExecutiveMemoryTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS executive_memory_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      canonical_key TEXT NOT NULL,
+      version INTEGER NOT NULL,
+      category TEXT NOT NULL,
+      value TEXT NOT NULL,
+      context TEXT,
+      source_ref TEXT,
+      sensitivity TEXT NOT NULL,
+      confidence REAL NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('active', 'superseded', 'archived')),
+      effective_at TEXT NOT NULL,
+      superseded_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(canonical_key, version)
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_executive_memory_active_key
+      ON executive_memory_items(canonical_key) WHERE status = 'active';
+    CREATE INDEX IF NOT EXISTS idx_executive_memory_category_status
+      ON executive_memory_items(category, status);
+
+    CREATE TABLE IF NOT EXISTS executive_conversation_briefs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_ref TEXT NOT NULL UNIQUE,
+      channel TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      user_intent TEXT,
+      next_action TEXT,
+      status TEXT NOT NULL CHECK (status IN ('active', 'waiting', 'completed', 'blocked')),
+      occurred_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_executive_conversations_status_time
+      ON executive_conversation_briefs(status, occurred_at DESC);
+  `);
+}
+function rememberExecutiveMemory(db2, rawInput) {
+  const input = executiveMemoryInputSchema.parse(rawInput);
+  const effectiveAt = input.effective_at || (/* @__PURE__ */ new Date()).toISOString();
+  const transaction = db2.transaction(() => {
+    const current = db2.prepare(
+      `SELECT id, version FROM executive_memory_items
+         WHERE canonical_key = ? AND status = 'active'`
+    ).get(input.canonical_key);
+    if (current) {
+      db2.prepare(
+        `UPDATE executive_memory_items
+         SET status = 'superseded', superseded_at = datetime('now') WHERE id = ?`
+      ).run(current.id);
+    }
+    const version = (current?.version || 0) + 1;
+    const result = db2.prepare(
+      `INSERT INTO executive_memory_items (
+          canonical_key, version, category, value, context, source_ref,
+          sensitivity, confidence, status, effective_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
+    ).run(
+      input.canonical_key,
+      version,
+      input.category,
+      input.value,
+      input.context || null,
+      input.source_ref || null,
+      input.sensitivity,
+      input.confidence,
+      effectiveAt
+    );
+    return { id: Number(result.lastInsertRowid), version, superseded_id: current?.id || null };
+  });
+  return transaction();
+}
+function listExecutiveMemories(db2, options = {}) {
+  const conditions = [options.includeArchived ? "1 = 1" : "status = 'active'"];
+  const values = [];
+  if (options.category) {
+    conditions.push("category = ?");
+    values.push(options.category);
+  }
+  if (options.query) {
+    conditions.push("(canonical_key LIKE ? OR value LIKE ? OR context LIKE ?)");
+    const query = `%${options.query}%`;
+    values.push(query, query, query);
+  }
+  const limit = Math.min(Math.max(options.limit || 100, 1), 500);
+  values.push(limit);
+  return db2.prepare(
+    `SELECT * FROM executive_memory_items
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END, effective_at DESC, id DESC
+       LIMIT ?`
+  ).all(...values);
+}
+function getExecutiveMemoryHistory(db2, canonicalKey) {
+  return db2.prepare(
+    `SELECT * FROM executive_memory_items
+       WHERE canonical_key = ? ORDER BY version DESC`
+  ).all(canonicalKey);
+}
+function archiveExecutiveMemory(db2, id) {
+  return db2.prepare(
+    `UPDATE executive_memory_items
+       SET status = 'archived', superseded_at = COALESCE(superseded_at, datetime('now'))
+       WHERE id = ? AND status = 'active'`
+  ).run(id).changes;
+}
+function saveExecutiveConversationBrief(db2, rawInput) {
+  const input = executiveConversationInputSchema.parse(rawInput);
+  const occurredAt = input.occurred_at || (/* @__PURE__ */ new Date()).toISOString();
+  db2.prepare(
+    `INSERT INTO executive_conversation_briefs (
+      session_ref, channel, summary, user_intent, next_action, status, occurred_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(session_ref) DO UPDATE SET
+      channel = excluded.channel,
+      summary = excluded.summary,
+      user_intent = excluded.user_intent,
+      next_action = excluded.next_action,
+      status = excluded.status,
+      occurred_at = excluded.occurred_at,
+      updated_at = datetime('now')`
+  ).run(
+    input.session_ref,
+    input.channel,
+    input.summary,
+    input.user_intent || null,
+    input.next_action || null,
+    input.status,
+    occurredAt
+  );
+  return db2.prepare("SELECT * FROM executive_conversation_briefs WHERE session_ref = ?").get(input.session_ref);
+}
+function listExecutiveConversationBriefs(db2, options = {}) {
+  const limit = Math.min(Math.max(options.limit || 50, 1), 200);
+  if (options.status) {
+    return db2.prepare(
+      `SELECT * FROM executive_conversation_briefs
+         WHERE status = ? ORDER BY occurred_at DESC, id DESC LIMIT ?`
+    ).all(options.status, limit);
+  }
+  return db2.prepare(
+    `SELECT * FROM executive_conversation_briefs
+       ORDER BY occurred_at DESC, id DESC LIMIT ?`
+  ).all(limit);
+}
+
+// server/executive-action-queue-store.ts
+import { z as z2 } from "zod";
+var actionTargetSystems = [
+  "gmail",
+  "calendar",
+  "web",
+  "files",
+  "desktop_commander",
+  "github",
+  "ghl",
+  "papa_life",
+  "human_impact",
+  "system"
+];
+var actionTypes = [
+  "read",
+  "search",
+  "create",
+  "update",
+  "send",
+  "publish",
+  "delete",
+  "execute",
+  "analyze"
+];
+var executionRoutes = ["direct", "local", "local_model", "cloud_model"];
+var authorityLevels = ["observe", "act_reversible", "act_external", "sensitive"];
+var executiveActionInputSchema = z2.object({
+  action_type: z2.enum(actionTypes),
+  target_system: z2.enum(actionTargetSystems),
+  target_ref: z2.string().trim().max(500).nullable().optional(),
+  requested_outcome: z2.string().trim().min(3).max(4e3),
+  authority_level: z2.enum(authorityLevels),
+  execution_route: z2.enum(executionRoutes).optional(),
+  approval_required: z2.boolean().optional(),
+  provider_id: z2.string().trim().max(100).nullable().optional(),
+  estimated_external_ai_cost_micros: z2.number().int().min(0).max(1e8).default(0),
+  source_conversation_ref: z2.string().trim().max(160).nullable().optional(),
+  action_payload: z2.record(z2.string(), z2.unknown()).nullable().optional(),
+  human_impact_observation_id: z2.number().int().positive().nullable().optional(),
+  project_key: z2.string().trim().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/).nullable().optional(),
+  work_kind: z2.enum(["action", "task", "follow_up"]).default("action"),
+  due_at: z2.string().datetime().nullable().optional(),
+  waiting_on: z2.string().trim().max(240).nullable().optional()
+}).strict();
+var decisionSchema = z2.object({
+  decision: z2.enum(["approve", "decline"]),
+  note: z2.string().trim().max(2e3).nullable().optional()
+}).strict();
+var deterministicActionTypes = /* @__PURE__ */ new Set(["read", "search", "create", "update", "send", "publish", "delete", "execute"]);
+function defaultExecutionRoute(input) {
+  if (input.action_type === "analyze") return "local_model";
+  if (input.target_system === "files" || input.target_system === "desktop_commander") {
+    return "local";
+  }
+  if (deterministicActionTypes.has(input.action_type)) return "direct";
+  return "local";
+}
+function actionRequiresApproval(input) {
+  const mandatory = input.authority_level === "act_external" || input.authority_level === "sensitive" || ["create", "update", "send", "publish", "delete", "execute"].includes(input.action_type) || input.execution_route === "cloud_model";
+  return mandatory || input.approval_required === true;
+}
+function ensureExecutiveActionQueueTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS executive_actions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      action_type TEXT NOT NULL,
+      target_system TEXT NOT NULL,
+      target_ref TEXT,
+      requested_outcome TEXT NOT NULL,
+      authority_level TEXT NOT NULL,
+      execution_route TEXT NOT NULL,
+      approval_required INTEGER NOT NULL,
+      provider_id TEXT,
+      estimated_external_ai_cost_micros INTEGER NOT NULL DEFAULT 0,
+      source_conversation_ref TEXT,
+      action_payload_json TEXT,
+      human_impact_observation_id INTEGER REFERENCES human_impact_observations(id) ON DELETE SET NULL,
+      project_key TEXT,
+      work_kind TEXT NOT NULL DEFAULT 'action',
+      due_at TEXT,
+      waiting_on TEXT,
+      status TEXT NOT NULL CHECK (status IN (
+        'proposed', 'awaiting_approval', 'approved', 'executing',
+        'completed', 'failed', 'declined'
+      )),
+      result_summary TEXT,
+      result_json TEXT,
+      error_summary TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      approved_at TEXT,
+      completed_at TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_executive_actions_status_created
+      ON executive_actions(status, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_executive_actions_target_created
+      ON executive_actions(target_system, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS executive_action_audit (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      action_id INTEGER NOT NULL REFERENCES executive_actions(id) ON DELETE CASCADE,
+      event_type TEXT NOT NULL,
+      from_status TEXT,
+      to_status TEXT,
+      note TEXT,
+      actor TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_executive_action_audit_action
+      ON executive_action_audit(action_id, id ASC);
+  `);
+  const actionColumns = db2.prepare("PRAGMA table_info(executive_actions)").all();
+  if (!actionColumns.some((column) => column.name === "result_json")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN result_json TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "action_payload_json")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN action_payload_json TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "project_key")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN project_key TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "work_kind")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN work_kind TEXT NOT NULL DEFAULT 'action'");
+  }
+  if (!actionColumns.some((column) => column.name === "due_at")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN due_at TEXT");
+  }
+  if (!actionColumns.some((column) => column.name === "waiting_on")) {
+    db2.exec("ALTER TABLE executive_actions ADD COLUMN waiting_on TEXT");
+  }
+  db2.exec("CREATE INDEX IF NOT EXISTS idx_executive_actions_project_due ON executive_actions(project_key, due_at)");
+}
+function createExecutiveAction(db2, rawInput) {
+  const parsed = executiveActionInputSchema.parse(rawInput);
+  const executionRoute = parsed.execution_route || defaultExecutionRoute(parsed);
+  const approvalRequired = actionRequiresApproval({ ...parsed, execution_route: executionRoute });
+  if (executionRoute === "cloud_model" && !parsed.provider_id) {
+    throw new Error("Cloud-model actions must name the optional provider so usage stays visible.");
+  }
+  if (executionRoute !== "cloud_model" && parsed.estimated_external_ai_cost_micros > 0) {
+    throw new Error("External AI cost must be zero unless execution_route is cloud_model.");
+  }
+  if (["direct", "local"].includes(executionRoute) && parsed.provider_id) {
+    throw new Error("Direct and local actions cannot depend on an AI provider.");
+  }
+  const status = approvalRequired ? "awaiting_approval" : "approved";
+  const transaction = db2.transaction(() => {
+    if (parsed.human_impact_observation_id) {
+      const observation = db2.prepare("SELECT id FROM human_impact_observations WHERE id = ?").get(parsed.human_impact_observation_id);
+      if (!observation) throw new Error("Human-impact observation not found.");
+    }
+    const result = db2.prepare(
+      `INSERT INTO executive_actions (
+          action_type, target_system, target_ref, requested_outcome, authority_level,
+          execution_route, approval_required, provider_id,
+          estimated_external_ai_cost_micros, source_conversation_ref, action_payload_json,
+          human_impact_observation_id, project_key, work_kind, due_at, waiting_on, status, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+    ).run(
+      parsed.action_type,
+      parsed.target_system,
+      parsed.target_ref || null,
+      parsed.requested_outcome,
+      parsed.authority_level,
+      executionRoute,
+      approvalRequired ? 1 : 0,
+      parsed.provider_id || (executionRoute === "local_model" ? "local_default" : null),
+      parsed.estimated_external_ai_cost_micros,
+      parsed.source_conversation_ref || null,
+      parsed.action_payload ? JSON.stringify(parsed.action_payload) : null,
+      parsed.human_impact_observation_id || null,
+      parsed.project_key || null,
+      parsed.work_kind,
+      parsed.due_at || null,
+      parsed.waiting_on || null,
+      status
+    );
+    const id = Number(result.lastInsertRowid);
+    db2.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'created', NULL, ?, ?, 'system')`
+    ).run(id, status, `Route selected: ${executionRoute}; approval required: ${approvalRequired}`);
+    return getExecutiveActionById(db2, id);
+  });
+  return transaction();
+}
+function getExecutiveActionById(db2, id) {
+  return db2.prepare("SELECT * FROM executive_actions WHERE id = ?").get(id);
+}
+function listExecutiveActions(db2, options = {}) {
+  const conditions = [];
+  const values = [];
+  if (options.status) {
+    conditions.push("status = ?");
+    values.push(options.status);
+  }
+  if (options.targetSystem) {
+    conditions.push("target_system = ?");
+    values.push(options.targetSystem);
+  }
+  values.push(Math.min(Math.max(options.limit || 100, 1), 500));
+  return db2.prepare(
+    `SELECT * FROM executive_actions
+       ${conditions.length ? `WHERE ${conditions.join(" AND ")}` : ""}
+       ORDER BY CASE status WHEN 'awaiting_approval' THEN 0 WHEN 'failed' THEN 1 ELSE 2 END,
+                created_at DESC, id DESC LIMIT ?`
+  ).all(...values);
+}
+function decideExecutiveAction(db2, id, rawDecision) {
+  const input = decisionSchema.parse(rawDecision);
+  const transaction = db2.transaction(() => {
+    const current = getExecutiveActionById(db2, id);
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "awaiting_approval") {
+      throw new Error(`Only awaiting_approval actions can be decided; current status is ${current.status}`);
+    }
+    const toStatus = input.decision === "approve" ? "approved" : "declined";
+    db2.prepare(
+      `UPDATE executive_actions SET status = ?, updated_at = datetime('now'),
+       approved_at = CASE WHEN ? = 'approved' THEN datetime('now') ELSE approved_at END
+       WHERE id = ?`
+    ).run(toStatus, toStatus, id);
+    db2.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, ?, 'awaiting_approval', ?, ?, 'brian')`
+    ).run(id, input.decision, toStatus, input.note || null);
+    return getExecutiveActionById(db2, id);
+  });
+  return transaction();
+}
+function beginExecutiveActionExecution(db2, id, actor = "executor") {
+  const transaction = db2.transaction(() => {
+    const current = getExecutiveActionById(db2, id);
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "approved") {
+      throw new Error(`Only approved actions can execute; current status is ${current.status}`);
+    }
+    db2.prepare(
+      `UPDATE executive_actions SET status = 'executing', updated_at = datetime('now'),
+       error_summary = NULL WHERE id = ?`
+    ).run(id);
+    db2.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_started', 'approved', 'executing', NULL, ?)`
+    ).run(id, actor);
+    return getExecutiveActionById(db2, id);
+  });
+  return transaction();
+}
+function completeExecutiveActionExecution(db2, id, summary, actor = "executor", details) {
+  let resultJson = null;
+  if (details !== void 0) {
+    resultJson = JSON.stringify(details) ?? JSON.stringify(String(details));
+    if (Buffer.byteLength(resultJson, "utf8") > 1e6) {
+      throw new Error("Executor result exceeds the 1 MB storage limit.");
+    }
+  }
+  const transaction = db2.transaction(() => {
+    const current = getExecutiveActionById(db2, id);
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "executing") {
+      throw new Error(`Only executing actions can complete; current status is ${current.status}`);
+    }
+    db2.prepare(
+      `UPDATE executive_actions SET status = 'completed', result_summary = ?, result_json = ?, error_summary = NULL,
+       updated_at = datetime('now'), completed_at = datetime('now') WHERE id = ?`
+    ).run(summary.slice(0, 4e3), resultJson, id);
+    db2.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_completed', 'executing', 'completed', ?, ?)`
+    ).run(id, summary.slice(0, 2e3), actor);
+    return getExecutiveActionById(db2, id);
+  });
+  return transaction();
+}
+function failExecutiveActionExecution(db2, id, errorSummary, actor = "executor") {
+  const transaction = db2.transaction(() => {
+    const current = getExecutiveActionById(db2, id);
+    if (!current) throw new Error("Action not found");
+    if (current.status !== "executing") {
+      throw new Error(`Only executing actions can fail; current status is ${current.status}`);
+    }
+    db2.prepare(
+      `UPDATE executive_actions SET status = 'failed', error_summary = ?,
+       updated_at = datetime('now'), completed_at = datetime('now') WHERE id = ?`
+    ).run(errorSummary.slice(0, 4e3), id);
+    db2.prepare(
+      `INSERT INTO executive_action_audit
+       (action_id, event_type, from_status, to_status, note, actor)
+       VALUES (?, 'execution_failed', 'executing', 'failed', ?, ?)`
+    ).run(id, errorSummary.slice(0, 2e3), actor);
+    return getExecutiveActionById(db2, id);
+  });
+  return transaction();
+}
+function getExecutiveActionAudit(db2, id) {
+  return db2.prepare("SELECT * FROM executive_action_audit WHERE action_id = ? ORDER BY id ASC").all(id);
+}
+
+// server/executive-action-limits.ts
+var DEFAULT_EXECUTOR_RESULT_MAX_BYTES = 9e5;
+var MIN_EXECUTOR_RESULT_MAX_BYTES = 1e3;
+var MAX_EXECUTOR_RESULT_MAX_BYTES = 9e5;
+function resolveExecutorResultMaxBytes() {
+  const configured = Number(process.env.AI_BOSS_EXECUTOR_RESULT_MAX_BYTES || DEFAULT_EXECUTOR_RESULT_MAX_BYTES);
+  if (!Number.isFinite(configured)) return DEFAULT_EXECUTOR_RESULT_MAX_BYTES;
+  return Math.min(
+    Math.max(Math.round(configured), MIN_EXECUTOR_RESULT_MAX_BYTES),
+    MAX_EXECUTOR_RESULT_MAX_BYTES
+  );
+}
+
+// server/executive-action-executor.ts
+function executorRegistryKey(targetSystem, executionRoute) {
+  return `${targetSystem}:${executionRoute}`;
+}
+function resolveExecutorTimeoutMs() {
+  const configured = Number(process.env.AI_BOSS_EXECUTOR_TIMEOUT_MS || 15e3);
+  if (!Number.isFinite(configured)) return 15e3;
+  return Math.min(Math.max(Math.round(configured), 1e3), 12e4);
+}
+async function readBoundedResponseText(response) {
+  const maxBytes = resolveExecutorResultMaxBytes();
+  const declaredLength = Number(response.headers.get("content-length") || 0);
+  if (declaredLength > maxBytes) throw new Error(`Connector response exceeds the ${maxBytes}-byte result limit.`);
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks = [];
+  let totalBytes = 0;
+  while (true) {
+    const { done, value: value2 } = await reader.read();
+    if (done) break;
+    totalBytes += value2.byteLength;
+    if (totalBytes > maxBytes) {
+      await reader.cancel();
+      throw new Error(`Connector response exceeds the ${maxBytes}-byte result limit.`);
+    }
+    chunks.push(value2);
+  }
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString("utf8");
+}
+function resolveDesktopCommanderEndpoint() {
+  return String(process.env.AI_BOSS_DESKTOP_COMMANDER_ENDPOINT || "").trim();
+}
+function resolveDesktopCommanderToken() {
+  return String(process.env.AI_BOSS_LOCAL_BRIDGE_TOKEN || "").trim();
+}
+function createDesktopCommanderExecutor(fetchImpl = fetch) {
+  return async (action) => {
+    if (action.execution_route !== "local") {
+      throw new Error(`Desktop Commander executor only supports the local route; received ${action.execution_route}.`);
+    }
+    if (!["read", "search"].includes(action.action_type)) {
+      throw new Error(`Desktop Commander executor only permits read/search actions; received ${action.action_type}.`);
+    }
+    const endpoint = resolveDesktopCommanderEndpoint();
+    if (!endpoint) {
+      throw new Error("Desktop Commander executor is not configured on this runtime.");
+    }
+    const response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...resolveDesktopCommanderToken() ? { authorization: `Bearer ${resolveDesktopCommanderToken()}` } : {}
+      },
+      body: JSON.stringify({
+        action_id: action.id,
+        action_type: action.action_type,
+        target_system: action.target_system,
+        target_ref: action.target_ref,
+        requested_outcome: action.requested_outcome,
+        authority_level: action.authority_level
+      }),
+      signal: AbortSignal.timeout(resolveExecutorTimeoutMs())
+    });
+    const text = await readBoundedResponseText(response);
+    if (!response.ok) {
+      throw new Error(`Desktop Commander bridge returned ${response.status}: ${text.slice(0, 500)}`);
+    }
+    let details = text;
+    try {
+      details = text ? JSON.parse(text) : null;
+    } catch {
+    }
+    return { summary: "Desktop Commander action completed through the configured local bridge.", details };
+  };
+}
+function resolveGmailConnectorEndpoint() {
+  return String(process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT || "").trim();
+}
+function resolveGmailConnectorToken() {
+  return String(process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN || "").trim();
+}
+function parseGmailSendPayload(action) {
+  if (action.approval_required !== 1 || !["act_external", "sensitive"].includes(action.authority_level)) {
+    throw new Error("Gmail send actions require explicit external-action approval.");
+  }
+  let payload = null;
+  try {
+    payload = action.action_payload_json ? JSON.parse(action.action_payload_json) : null;
+  } catch {
+    throw new Error("Gmail send action payload is not valid JSON.");
+  }
+  if (!payload || !["send", "reply"].includes(payload.mode) || typeof payload.body !== "string" || !payload.body.trim()) {
+    throw new Error("Gmail send actions require a structured send/reply payload with a non-empty body.");
+  }
+  if (payload.mode === "send") {
+    if (typeof payload.to !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.to)) {
+      throw new Error("Gmail send payload requires a valid recipient email address.");
+    }
+    if (typeof payload.subject !== "string" || !payload.subject.trim()) {
+      throw new Error("Gmail send payload requires a subject.");
+    }
+  }
+  if (payload.mode === "reply" && (typeof payload.message_id !== "string" || !payload.message_id.trim())) {
+    throw new Error("Gmail reply payload requires the original message ID.");
+  }
+  return payload;
+}
+function createGmailExecutor(fetchImpl = fetch) {
+  return async (action) => {
+    if (action.execution_route !== "direct") {
+      throw new Error(`Gmail connector executor only supports the direct route; received ${action.execution_route}.`);
+    }
+    if (!["read", "search", "send"].includes(action.action_type)) {
+      throw new Error(`Gmail executor only permits read/search/send actions; received ${action.action_type}.`);
+    }
+    const endpoint = resolveGmailConnectorEndpoint();
+    if (!endpoint) {
+      throw new Error("Gmail connector executor is not configured on this runtime.");
+    }
+    const token = resolveGmailConnectorToken();
+    if (!token) {
+      throw new Error("Gmail connector token is not configured on this runtime.");
+    }
+    const response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(action.action_type === "send" ? {
+        action_id: action.id,
+        operation: "send",
+        payload: parseGmailSendPayload(action)
+      } : {
+        action_id: action.id,
+        operation: action.action_type,
+        target_ref: action.target_ref,
+        requested_outcome: action.requested_outcome
+      }),
+      signal: AbortSignal.timeout(resolveExecutorTimeoutMs())
+    });
+    const text = await readBoundedResponseText(response);
+    if (!response.ok) {
+      throw new Error(`Gmail connector returned ${response.status}: ${text.slice(0, 500)}`);
+    }
+    let details = text;
+    try {
+      details = text ? JSON.parse(text) : null;
+    } catch {
+    }
+    return { summary: action.action_type === "send" ? "Approved Gmail send/reply completed through the configured connector." : "Gmail read/search action completed through the configured connector.", details };
+  };
+}
+function defaultExecutorRegistry() {
+  return {
+    [executorRegistryKey("gmail", "direct")]: createGmailExecutor(),
+    [executorRegistryKey("desktop_commander", "local")]: createDesktopCommanderExecutor(),
+    [executorRegistryKey("files", "local")]: createDesktopCommanderExecutor()
+  };
+}
+async function executeApprovedExecutiveAction(db2, id, registry = defaultExecutorRegistry()) {
+  const row = getExecutiveActionById(db2, id);
+  if (!row) throw new Error("Action not found");
+  if (row.status !== "approved") {
+    throw new Error(`Only approved actions can execute; current status is ${row.status}`);
+  }
+  const registryKey = executorRegistryKey(row.target_system, row.execution_route);
+  const executor = registry[registryKey];
+  if (!executor) {
+    throw new Error(`No executor is registered for target/route: ${row.target_system}/${row.execution_route}`);
+  }
+  beginExecutiveActionExecution(db2, id, "executor");
+  try {
+    const result = await executor({ ...row, status: "executing" });
+    return completeExecutiveActionExecution(db2, id, result.summary, "executor", result.details);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    failExecutiveActionExecution(db2, id, message, "executor");
+    throw error;
+  }
+}
+
+// server/ai-boss-project-store.ts
+import { z as z3 } from "zod";
+var projectInputSchema = z3.object({
+  project_key: z3.string().trim().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/),
+  title: z3.string().trim().min(3).max(200),
+  outcome: z3.string().trim().min(3).max(2e3),
+  status: z3.enum(["active", "waiting", "completed", "archived"]).default("active"),
+  priority: z3.enum(["now", "next", "later"]).default("next"),
+  source_ref: z3.string().trim().max(240).nullable().optional()
+}).strict();
+function ensureAiBossProjectTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS ai_boss_projects (
+      project_key TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      outcome TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('active', 'waiting', 'completed', 'archived')),
+      priority TEXT NOT NULL CHECK (priority IN ('now', 'next', 'later')),
+      source_ref TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_ai_boss_projects_status_priority
+      ON ai_boss_projects(status, priority, updated_at DESC);
+  `);
+}
+function saveAiBossProject(db2, raw) {
+  const input = projectInputSchema.parse(raw);
+  db2.prepare(`
+    INSERT INTO ai_boss_projects (project_key, title, outcome, status, priority, source_ref, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(project_key) DO UPDATE SET
+      title = excluded.title,
+      outcome = excluded.outcome,
+      status = excluded.status,
+      priority = excluded.priority,
+      source_ref = excluded.source_ref,
+      updated_at = datetime('now')
+  `).run(input.project_key, input.title, input.outcome, input.status, input.priority, input.source_ref || null);
+  return db2.prepare("SELECT * FROM ai_boss_projects WHERE project_key = ?").get(input.project_key);
+}
+function listAiBossProjects(db2, options = {}) {
+  const limit = Math.min(Math.max(options.limit || 50, 1), 200);
+  if (options.status) {
+    return db2.prepare(`
+      SELECT * FROM ai_boss_projects WHERE status = ?
+      ORDER BY CASE priority WHEN 'now' THEN 0 WHEN 'next' THEN 1 ELSE 2 END,
+               updated_at DESC LIMIT ?
+    `).all(options.status, limit);
+  }
+  return db2.prepare(`
+    SELECT * FROM ai_boss_projects
+    ORDER BY CASE status WHEN 'active' THEN 0 WHEN 'waiting' THEN 1 WHEN 'completed' THEN 2 ELSE 3 END,
+             CASE priority WHEN 'now' THEN 0 WHEN 'next' THEN 1 ELSE 2 END,
+             updated_at DESC LIMIT ?
+  `).all(limit);
+}
+function getAiBossProjectWork(db2, projectKey) {
+  const project = db2.prepare("SELECT * FROM ai_boss_projects WHERE project_key = ?").get(projectKey);
+  if (!project) return null;
+  const work = db2.prepare(`
+    SELECT * FROM executive_actions WHERE project_key = ?
+    ORDER BY CASE status
+      WHEN 'awaiting_approval' THEN 0 WHEN 'failed' THEN 1 WHEN 'approved' THEN 2
+      WHEN 'executing' THEN 3 WHEN 'proposed' THEN 4 ELSE 5 END,
+      COALESCE(due_at, '9999-12-31T23:59:59.999Z'), created_at DESC
+  `).all(projectKey);
+  return { project, work };
+}
+
+// server/ai-boss-campaign-store.ts
+import { z as z4 } from "zod";
+var campaignSnapshotSchema = z4.object({
+  source: z4.enum(["zipshare", "heycatch"]),
+  campaign_key: z4.string().trim().min(2).max(80),
+  display_name: z4.string().trim().min(2).max(140),
+  tracking_url: z4.string().url().optional(),
+  status: z4.enum(["connected", "tracking", "attention"]).default("tracking"),
+  clicks: z4.number().int().nonnegative().optional(),
+  enrollments: z4.number().int().nonnegative().optional(),
+  checkins: z4.number().int().nonnegative().optional(),
+  memberships: z4.number().int().nonnegative().optional(),
+  membership_revenue_cents: z4.number().int().nonnegative().optional(),
+  posts_distributed: z4.number().int().nonnegative().optional(),
+  follow_ups_needed: z4.number().int().nonnegative().optional(),
+  latest_activity: z4.string().trim().max(500).optional(),
+  raw: z4.record(z4.string(), z4.unknown()).optional()
+}).strict();
+function ensureColumn(db2, name, definition) {
+  const columns = db2.prepare(`PRAGMA table_info(ai_boss_campaign_snapshots)`).all();
+  if (!columns.some((column) => column.name === name)) {
+    db2.exec(`ALTER TABLE ai_boss_campaign_snapshots ADD COLUMN ${name} ${definition}`);
+  }
+}
+function ensureAiBossCampaignTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS ai_boss_campaign_snapshots (
+      source TEXT NOT NULL,
+      campaign_key TEXT NOT NULL,
+      display_name TEXT NOT NULL,
+      tracking_url TEXT,
+      status TEXT NOT NULL DEFAULT 'tracking',
+      clicks INTEGER NOT NULL DEFAULT 0,
+      enrollments INTEGER NOT NULL DEFAULT 0,
+      checkins INTEGER NOT NULL DEFAULT 0,
+      memberships INTEGER NOT NULL DEFAULT 0,
+      membership_revenue_cents INTEGER NOT NULL DEFAULT 0,
+      posts_distributed INTEGER NOT NULL DEFAULT 0,
+      follow_ups_needed INTEGER NOT NULL DEFAULT 0,
+      latest_activity TEXT,
+      raw_json TEXT NOT NULL DEFAULT '{}',
+      last_synced_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (source, campaign_key)
+    );
+  `);
+  ensureColumn(db2, "checkins", "INTEGER NOT NULL DEFAULT 0");
+  ensureColumn(db2, "memberships", "INTEGER NOT NULL DEFAULT 0");
+  ensureColumn(db2, "membership_revenue_cents", "INTEGER NOT NULL DEFAULT 0");
+}
+function upsertAiBossCampaignSnapshot(db2, raw) {
+  ensureAiBossCampaignTables(db2);
+  const input = campaignSnapshotSchema.parse(raw);
+  db2.prepare(`
+    INSERT INTO ai_boss_campaign_snapshots
+      (source, campaign_key, display_name, tracking_url, status, clicks, enrollments, checkins, memberships,
+       membership_revenue_cents, posts_distributed, follow_ups_needed, latest_activity, raw_json, last_synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(source, campaign_key) DO UPDATE SET
+      display_name = excluded.display_name,
+      tracking_url = COALESCE(excluded.tracking_url, ai_boss_campaign_snapshots.tracking_url),
+      status = excluded.status,
+      clicks = excluded.clicks,
+      enrollments = excluded.enrollments,
+      checkins = excluded.checkins,
+      memberships = excluded.memberships,
+      membership_revenue_cents = excluded.membership_revenue_cents,
+      posts_distributed = excluded.posts_distributed,
+      follow_ups_needed = excluded.follow_ups_needed,
+      latest_activity = excluded.latest_activity,
+      raw_json = excluded.raw_json,
+      last_synced_at = datetime('now')
+  `).run(
+    input.source,
+    input.campaign_key,
+    input.display_name,
+    input.tracking_url || null,
+    input.status,
+    input.clicks || 0,
+    input.enrollments || 0,
+    input.checkins || 0,
+    input.memberships || 0,
+    input.membership_revenue_cents || 0,
+    input.posts_distributed || 0,
+    input.follow_ups_needed || 0,
+    input.latest_activity || null,
+    JSON.stringify(input.raw || {})
+  );
+  return db2.prepare(`
+    SELECT source, campaign_key, display_name, tracking_url, status, clicks, enrollments, checkins, memberships,
+      membership_revenue_cents, posts_distributed, follow_ups_needed, latest_activity, last_synced_at
+    FROM ai_boss_campaign_snapshots WHERE source = ? AND campaign_key = ?
+  `).get(input.source, input.campaign_key);
+}
+function seedAiBossCampaigns(db2) {
+  const defaults2 = [
+    { source: "zipshare", campaign_key: "AIBOSSZIP", display_name: "ZIPShare \u2014 AI Boss Mobility", tracking_url: "https://zipshare.ai/?ref=AIBOSSZIP", status: "tracking", posts_distributed: 1, latest_activity: "AI Boss Mobility campaign link active." },
+    { source: "zipshare", campaign_key: "PAPALIFECOACH", display_name: "ZIPShare \u2014 Papa Life", tracking_url: "https://zipshare.ai/?ref=PAPALIFECOACH", status: "tracking", posts_distributed: 2, latest_activity: "Papa Life campaign link active." },
+    { source: "heycatch", campaign_key: "PAPALIFE", display_name: "HeyCatch \u2014 PapaLifeCoach.com", tracking_url: "https://papalifecoach.com/", status: "connected", latest_activity: "Website analytics integration installed." }
+  ];
+  for (const item of defaults2) {
+    db2.prepare(`
+      INSERT OR IGNORE INTO ai_boss_campaign_snapshots
+        (source, campaign_key, display_name, tracking_url, status, posts_distributed, latest_activity)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(item.source, item.campaign_key, item.display_name, item.tracking_url, item.status, item.posts_distributed || 0, item.latest_activity);
+  }
+}
+function getAiBossCampaigns(db2) {
+  ensureAiBossCampaignTables(db2);
+  seedAiBossCampaigns(db2);
+  const rows = db2.prepare(`
+    SELECT source, campaign_key, display_name, tracking_url, status, clicks, enrollments, checkins, memberships,
+      membership_revenue_cents, posts_distributed, follow_ups_needed, latest_activity, last_synced_at
+    FROM ai_boss_campaign_snapshots
+    ORDER BY CASE source WHEN 'heycatch' THEN 0 ELSE 1 END, display_name
+  `).all();
+  try {
+    const node = db2.prepare(`
+      SELECT capabilities_json FROM ai_boss_nodes
+      WHERE node_kind = 'mac' ORDER BY last_seen_at DESC LIMIT 1
+    `).get();
+    const capabilities = JSON.parse(String(node?.capabilities_json || "[]"));
+    const metrics = /* @__PURE__ */ new Map();
+    let lastSync = 0;
+    for (const capability of capabilities) {
+      const parts = String(capability).split(":");
+      if (parts[0] !== "zipshare") continue;
+      if (parts[1] === "last_sync") {
+        lastSync = Number(parts[2] || 0);
+        continue;
+      }
+      if (parts.length !== 4) continue;
+      const code = parts[1];
+      const metricName = parts[2];
+      const rawValue = parts[3];
+      if (!["clicks", "enrollments", "checkins", "memberships", "membership_revenue_cents"].includes(metricName)) continue;
+      const current = metrics.get(code) || {};
+      current[metricName] = Math.max(0, Number(rawValue || 0));
+      metrics.set(code, current);
+    }
+    if (metrics.size) {
+      return rows.map((row) => {
+        if (row.source !== "zipshare") return row;
+        const live = metrics.get(String(row.campaign_key));
+        if (!live) return row;
+        return {
+          ...row,
+          status: "connected",
+          clicks: live.clicks ?? row.clicks ?? 0,
+          enrollments: live.enrollments ?? row.enrollments ?? 0,
+          checkins: live.checkins ?? row.checkins ?? 0,
+          memberships: live.memberships ?? row.memberships ?? 0,
+          membership_revenue_cents: live.membership_revenue_cents ?? row.membership_revenue_cents ?? 0,
+          latest_activity: "Synced from authenticated ZIPShare and Papa Life conversion tracking via Brian's Mac.",
+          last_synced_at: lastSync ? new Date(lastSync).toISOString() : row.last_synced_at
+        };
+      });
+    }
+  } catch {
+  }
+  return rows;
+}
+
+// server/ai-boss-mobile-store.ts
+import { z as z5 } from "zod";
+var heartbeatSchema = z5.object({
+  node_id: z5.string().trim().min(2).max(100),
+  display_name: z5.string().trim().min(2).max(120),
+  node_kind: z5.enum(["mac", "desktop", "server", "android"]),
+  capabilities: z5.array(z5.string().trim().min(1).max(80)).max(50).default([])
+}).strict();
+function ensureAiBossMobileTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS ai_boss_nodes (
+      node_id TEXT PRIMARY KEY,
+      display_name TEXT NOT NULL,
+      node_kind TEXT NOT NULL,
+      capabilities_json TEXT NOT NULL DEFAULT '[]',
+      last_seen_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_ai_boss_nodes_last_seen ON ai_boss_nodes(last_seen_at DESC);
+  `);
+}
+function recordAiBossNodeHeartbeat(db2, raw) {
+  const input = heartbeatSchema.parse(raw);
+  db2.prepare(`
+    INSERT INTO ai_boss_nodes (node_id, display_name, node_kind, capabilities_json, last_seen_at, updated_at)
+    VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+    ON CONFLICT(node_id) DO UPDATE SET
+      display_name = excluded.display_name,
+      node_kind = excluded.node_kind,
+      capabilities_json = excluded.capabilities_json,
+      last_seen_at = datetime('now'),
+      updated_at = datetime('now')
+  `).run(input.node_id, input.display_name, input.node_kind, JSON.stringify(input.capabilities));
+  return getAiBossNodes(db2).find((node) => node.node_id === input.node_id);
+}
+function getAiBossNodes(db2, onlineWindowSeconds = 90) {
+  const boundedWindow = Math.min(Math.max(Math.round(onlineWindowSeconds), 30), 600);
+  const rows = db2.prepare(`
+    SELECT node_id, display_name, node_kind, capabilities_json, last_seen_at,
+      CASE WHEN last_seen_at >= datetime('now', ?) THEN 1 ELSE 0 END AS online
+    FROM ai_boss_nodes ORDER BY last_seen_at DESC
+  `).all(`-${boundedWindow} seconds`);
+  return rows.map((row) => ({
+    node_id: String(row.node_id),
+    display_name: String(row.display_name),
+    node_kind: heartbeatSchema.shape.node_kind.parse(row.node_kind),
+    capabilities_json: String(row.capabilities_json || "[]"),
+    last_seen_at: String(row.last_seen_at),
+    online: Boolean(row.online),
+    capabilities: JSON.parse(String(row.capabilities_json || "[]"))
+  }));
+}
+function getAiBossMissionControl(db2) {
+  const counts = db2.prepare(`
+    SELECT
+      SUM(CASE WHEN status = 'awaiting_approval' THEN 1 ELSE 0 END) AS awaiting_approval,
+      SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) AS approved,
+      SUM(CASE WHEN status = 'executing' THEN 1 ELSE 0 END) AS executing,
+      SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed,
+      SUM(CASE WHEN status = 'approved' AND execution_route = 'local' THEN 1 ELSE 0 END) AS local_ready
+    FROM executive_actions
+  `).get();
+  const nodes = getAiBossNodes(db2);
+  const macOnline = nodes.some((node) => node.node_kind === "mac" && node.online);
+  const openInstructions = db2.prepare(
+    "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%') AND status IN ('active', 'waiting')"
+  ).get().count;
+  return {
+    nodes,
+    mac_online: macOnline,
+    queue: {
+      awaiting_approval: counts.awaiting_approval || 0,
+      approved: counts.approved || 0,
+      executing: counts.executing || 0,
+      failed: counts.failed || 0,
+      waiting_for_mac: macOnline ? 0 : counts.local_ready || 0
+    },
+    open_mobile_instructions: openInstructions
+  };
+}
+
+// server/human-impact-store.ts
+import { z as z6 } from "zod";
+var HUMAN_IMPACT_DIMENSIONS = [
+  "reflection",
+  "decision",
+  "communication",
+  "action",
+  "relationship"
+];
+var score = z6.number().int().min(1).max(5);
+var humanImpactObservationSchema = z6.object({
+  participant_ref: z6.string().trim().min(3).max(120),
+  interaction_ref: z6.string().trim().min(1).max(120).nullable().optional(),
+  program: z6.string().trim().min(1).max(80).default("papa_life"),
+  guidance_channel: z6.enum([
+    "ai_coach",
+    "human_coaching",
+    "tuesday_live",
+    "fatherhood_check_in",
+    "fatherhood_journey",
+    "email",
+    "other"
+  ]),
+  phase: z6.enum(["baseline", "follow_up"]),
+  reflection_score: score,
+  decision_score: score,
+  communication_score: score,
+  action_score: score,
+  relationship_score: score,
+  outcome: z6.enum([
+    "not_yet_observed",
+    "reflection_only",
+    "decision_made",
+    "communication_attempted",
+    "human_contact_made",
+    "relationship_improved",
+    "relationship_unchanged",
+    "relationship_worsened"
+  ]),
+  evidence_note: z6.string().trim().max(2e3).nullable().optional(),
+  consent_scope: z6.enum(["program_improvement", "research_opt_in"]),
+  observed_at: z6.string().datetime().optional()
+}).strict();
+function ensureHumanImpactTables(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS human_impact_observations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      participant_ref TEXT NOT NULL,
+      interaction_ref TEXT,
+      program TEXT NOT NULL DEFAULT 'papa_life',
+      guidance_channel TEXT NOT NULL,
+      phase TEXT NOT NULL CHECK (phase IN ('baseline', 'follow_up')),
+      reflection_score INTEGER NOT NULL CHECK (reflection_score BETWEEN 1 AND 5),
+      decision_score INTEGER NOT NULL CHECK (decision_score BETWEEN 1 AND 5),
+      communication_score INTEGER NOT NULL CHECK (communication_score BETWEEN 1 AND 5),
+      action_score INTEGER NOT NULL CHECK (action_score BETWEEN 1 AND 5),
+      relationship_score INTEGER NOT NULL CHECK (relationship_score BETWEEN 1 AND 5),
+      outcome TEXT NOT NULL,
+      evidence_note TEXT,
+      consent_scope TEXT NOT NULL CHECK (consent_scope IN ('program_improvement', 'research_opt_in')),
+      observed_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_human_impact_participant_time
+      ON human_impact_observations(participant_ref, observed_at);
+    CREATE INDEX IF NOT EXISTS idx_human_impact_program_phase
+      ON human_impact_observations(program, phase);
+  `);
+}
+function createHumanImpactObservation(db2, rawInput) {
+  const input = humanImpactObservationSchema.parse(rawInput);
+  const observedAt = input.observed_at || (/* @__PURE__ */ new Date()).toISOString();
+  const result = db2.prepare(
+    `INSERT INTO human_impact_observations (
+        participant_ref, interaction_ref, program, guidance_channel, phase,
+        reflection_score, decision_score, communication_score, action_score,
+        relationship_score, outcome, evidence_note, consent_scope, observed_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    input.participant_ref,
+    input.interaction_ref || null,
+    input.program,
+    input.guidance_channel,
+    input.phase,
+    input.reflection_score,
+    input.decision_score,
+    input.communication_score,
+    input.action_score,
+    input.relationship_score,
+    input.outcome,
+    input.evidence_note || null,
+    input.consent_scope,
+    observedAt
+  );
+  return Number(result.lastInsertRowid);
+}
+function listHumanImpactObservations(db2, options = {}) {
+  const limit = Math.min(Math.max(options.limit || 100, 1), 500);
+  if (options.participantRef) {
+    return db2.prepare(
+      `SELECT * FROM human_impact_observations
+         WHERE participant_ref = ? ORDER BY observed_at DESC, id DESC LIMIT ?`
+    ).all(options.participantRef, limit);
+  }
+  return db2.prepare(
+    `SELECT * FROM human_impact_observations
+       ORDER BY observed_at DESC, id DESC LIMIT ?`
+  ).all(limit);
+}
+function summarizeHumanImpact(db2, program = "papa_life") {
+  const rows = db2.prepare(
+    `WITH valid_pairs AS (
+        SELECT
+          f.id AS follow_up_id,
+          f.participant_ref,
+          b.reflection_score AS baseline_reflection,
+          f.reflection_score AS follow_up_reflection,
+          b.decision_score AS baseline_decision,
+          f.decision_score AS follow_up_decision,
+          b.communication_score AS baseline_communication,
+          f.communication_score AS follow_up_communication,
+          b.action_score AS baseline_action,
+          f.action_score AS follow_up_action,
+          b.relationship_score AS baseline_relationship,
+          f.relationship_score AS follow_up_relationship,
+          ROW_NUMBER() OVER (
+            PARTITION BY f.participant_ref
+            ORDER BY f.observed_at DESC, f.id DESC
+          ) AS participant_rank
+        FROM human_impact_observations f
+        JOIN human_impact_observations b ON b.id = (
+          SELECT candidate.id
+          FROM human_impact_observations candidate
+          WHERE candidate.program = f.program
+            AND candidate.participant_ref = f.participant_ref
+            AND candidate.phase = 'baseline'
+            AND (
+              candidate.observed_at < f.observed_at
+              OR (candidate.observed_at = f.observed_at AND candidate.id < f.id)
+            )
+            AND (
+              f.interaction_ref IS NULL
+              OR candidate.interaction_ref = f.interaction_ref
+            )
+          ORDER BY candidate.observed_at DESC, candidate.id DESC
+          LIMIT 1
+        )
+        WHERE f.program = ? AND f.phase = 'follow_up'
+      )
+      SELECT * FROM valid_pairs WHERE participant_rank = 1`
+  ).all(program);
+  const deltas = Object.fromEntries(
+    HUMAN_IMPACT_DIMENSIONS.map((dimension) => {
+      const values = rows.map(
+        (row) => Number(row[`follow_up_${dimension}`]) - Number(row[`baseline_${dimension}`])
+      );
+      const average = values.length ? Math.round(values.reduce((sum, value2) => sum + value2, 0) / values.length * 100) / 100 : null;
+      return [dimension, { average_delta: average, improved: values.filter((v) => v > 0).length }];
+    })
+  );
+  const observationCount = db2.prepare("SELECT COUNT(*) AS count FROM human_impact_observations WHERE program = ?").get(program).count;
+  return {
+    program,
+    observation_count: observationCount,
+    paired_participant_count: rows.length,
+    dimensions: deltas,
+    interpretation: "Directional program-learning signals only. These scores do not establish clinical or causal claims."
+  };
 }
 
 // server/site-ctas-store.ts
@@ -829,6 +2007,382 @@ function completeCommerceEvent(db2, eventKey, status, error) {
   `).run(status, error || null, eventKey);
 }
 
+// server/ghl-integration-store.ts
+import crypto from "crypto";
+var ALGO = "aes-256-gcm";
+function encryptionKey() {
+  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
+  return crypto.createHash("sha256").update(raw).digest();
+}
+function encrypt(plaintext) {
+  const iv = crypto.randomBytes(12);
+  const key = encryptionKey();
+  const cipher = crypto.createCipheriv(ALGO, key, iv);
+  const enc = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return Buffer.concat([iv, tag, enc]).toString("base64");
+}
+function decrypt(blob) {
+  const buf = Buffer.from(blob, "base64");
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const data = buf.subarray(28);
+  const key = encryptionKey();
+  const decipher = crypto.createDecipheriv(ALGO, key, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
+}
+function maskToken(token) {
+  const t = token.trim();
+  if (t.length <= 8) return "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022";
+  return `${t.slice(0, 4)}\u2026${t.slice(-4)}`;
+}
+function envCredentials() {
+  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
+  if (!token) return null;
+  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
+  return { token, locationId, source: "env" };
+}
+function seedPapaLeadCheckIn(db2) {
+  const rows = [
+    {
+      key: "first_name",
+      label: "Name",
+      type: "text",
+      required: 1,
+      order: 1,
+      placeholder: "Your name",
+      options: []
+    },
+    {
+      key: "email",
+      label: "Email",
+      type: "email",
+      required: 1,
+      order: 2,
+      placeholder: "you@example.com",
+      options: []
+    },
+    {
+      key: "phone",
+      label: "Mobile",
+      type: "tel",
+      required: 0,
+      order: 3,
+      placeholder: "Your best mobile number",
+      options: []
+    },
+    {
+      key: "relationship_status",
+      label: "How would you describe your relationship with your adult child right now?",
+      type: "select",
+      required: 1,
+      order: 4,
+      placeholder: null,
+      options: ["Close\u2014strengthen", "Communication difficult", "Limited contact", "Disconnected", "Unsure"]
+    },
+    {
+      key: "fathers_stated_hope",
+      label: "What do you hope will be different?",
+      type: "text",
+      required: 1,
+      order: 5,
+      placeholder: "In a few words, what are you hoping for?",
+      options: []
+    },
+    {
+      key: "primary_concern",
+      label: "What is your biggest concern right now?",
+      type: "select",
+      required: 1,
+      order: 6,
+      placeholder: null,
+      options: ["I feel judged", "I feel shut out", "I don\u2019t know what to say", "I\u2019m afraid of making it worse", "I\u2019m not sure"]
+    },
+    {
+      key: "preferred_next_step",
+      label: "What would be most helpful as a next step?",
+      type: "select",
+      required: 1,
+      order: 7,
+      placeholder: null,
+      options: ["Watch Tuesday Live", "Get weekly email", "Personal conversation", "I\u2019ll think about it"]
+    },
+    {
+      key: "father_of_adult_child",
+      label: "I am the father of an adult child.",
+      type: "select",
+      required: 1,
+      order: 8,
+      placeholder: null,
+      options: ["Yes"]
+    }
+  ];
+  const upsert = db2.prepare(`
+    INSERT INTO form_questions
+      (form_key, question_key, label, input_type, required, sort_order, placeholder, options_json, active, updated_at)
+    VALUES
+      ('papa_lead', @key, @label, @type, @required, @order, @placeholder, @options_json, 1, datetime('now'))
+    ON CONFLICT(form_key, question_key) DO UPDATE SET
+      label = excluded.label,
+      input_type = excluded.input_type,
+      required = excluded.required,
+      sort_order = excluded.sort_order,
+      placeholder = excluded.placeholder,
+      options_json = excluded.options_json,
+      active = 1,
+      updated_at = datetime('now')
+  `);
+  const keep = rows.map((row) => row.key);
+  const tx = db2.transaction(() => {
+    for (const row of rows) {
+      upsert.run({ ...row, options_json: JSON.stringify(row.options) });
+    }
+    const placeholders = keep.map(() => "?").join(",");
+    db2.prepare(
+      `UPDATE form_questions SET active = 0, updated_at = datetime('now')
+       WHERE form_key = 'papa_lead' AND question_key NOT IN (${placeholders})`
+    ).run(...keep);
+  });
+  tx();
+}
+function ensureGhlIntegrationTable(db2) {
+  db2.exec(`
+    CREATE TABLE IF NOT EXISTS admin_ghl_integrations (
+      admin_user_id INTEGER PRIMARY KEY REFERENCES admin_users(id) ON DELETE CASCADE,
+      api_token_enc TEXT NOT NULL,
+      location_id TEXT,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+  try {
+    seedPapaLeadCheckIn(db2);
+  } catch (e) {
+    console.error("[forms] could not seed papa_lead check-in:", e);
+  }
+}
+function getGhlIntegrationPublic(db2, adminUserId) {
+  const env = envCredentials();
+  if (env) {
+    return {
+      configured: true,
+      token_preview: maskToken(env.token),
+      location_id: env.locationId ?? null,
+      updated_at: null,
+      source: "env"
+    };
+  }
+  const row = db2.prepare(
+    `SELECT api_token_enc, location_id, updated_at
+       FROM admin_ghl_integrations WHERE admin_user_id = ?`
+  ).get(adminUserId);
+  if (!row?.api_token_enc) {
+    return {
+      configured: false,
+      token_preview: null,
+      location_id: null,
+      updated_at: null,
+      source: null
+    };
+  }
+  let preview = null;
+  try {
+    preview = maskToken(decrypt(row.api_token_enc));
+  } catch {
+    preview = "(stored \u2014 re-save if tools fail)";
+  }
+  return {
+    configured: true,
+    token_preview: preview,
+    location_id: row.location_id?.trim() || null,
+    updated_at: row.updated_at,
+    source: "dashboard"
+  };
+}
+function saveGhlIntegration(db2, adminUserId, apiToken, locationId) {
+  const token = apiToken.trim();
+  if (token.length < 16) {
+    throw new Error("API token looks too short \u2014 paste the full Private Integration token from GHL");
+  }
+  const loc = locationId?.trim() || null;
+  db2.prepare(
+    `INSERT INTO admin_ghl_integrations (admin_user_id, api_token_enc, location_id, updated_at)
+     VALUES (?, ?, ?, datetime('now'))
+     ON CONFLICT(admin_user_id) DO UPDATE SET
+       api_token_enc = excluded.api_token_enc,
+       location_id = excluded.location_id,
+       updated_at = datetime('now')`
+  ).run(adminUserId, encrypt(token), loc);
+  return getGhlIntegrationPublic(db2, adminUserId);
+}
+function clearGhlIntegration(db2, adminUserId) {
+  db2.prepare("DELETE FROM admin_ghl_integrations WHERE admin_user_id = ?").run(adminUserId);
+  return getGhlIntegrationPublic(db2, adminUserId);
+}
+function resolveGhlCredentials(db2, adminUserId) {
+  const env = envCredentials();
+  if (env) return env;
+  let uid = adminUserId;
+  if (uid == null) {
+    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
+    uid = row?.id;
+  }
+  if (uid == null) return null;
+  const stored = db2.prepare(
+    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
+  ).get(uid);
+  if (!stored?.api_token_enc) return null;
+  try {
+    const token = decrypt(stored.api_token_enc);
+    return {
+      token,
+      locationId: stored.location_id?.trim() || void 0,
+      source: "dashboard"
+    };
+  } catch {
+    return null;
+  }
+}
+
+// server/papa-father-engagement-ghl.ts
+var GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+var GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
+var PAPA_FATHER_ENGAGEMENT_PIPELINE_ID = process.env.GHL_PAPA_FATHER_ENGAGEMENT_PIPELINE_ID?.trim() || "vPAlmSzBI5ufgmMgniOB";
+var PAPA_BRIAN_REVIEW_STAGE_ID = process.env.GHL_PAPA_BRIAN_REVIEW_STAGE_ID?.trim() || "93609656-433c-4489-a4fd-f6ee6845f4b7";
+var FIELD_IDS = {
+  relationship_status: "JBXjAvQx9txLaI6ZwJQc",
+  fathers_stated_hope: "K4aO0yWrSokcj1qStgQX",
+  primary_concern: "glcIkE9CFPA7JKfWPB5D",
+  preferred_next_step: "TI9r47A2Iwfl6Vyovqnh",
+  brian_review_status: "VjXCs7vl9HhSDWKvEEZu",
+  sensitive_or_personal_response: "57X1xM3MZGmwTGeGMM3s",
+  brian_review_decision: "nfIWfbI29k3PTyUXfOPj"
+};
+function headers(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Version: GHL_VERSION
+  };
+}
+function value(answers, key) {
+  const raw = answers[key];
+  return raw == null ? "" : String(raw).trim();
+}
+function normalizedCampaign(answers) {
+  return value(answers, "attribution_campaign").toUpperCase();
+}
+function normalizedSource(answers) {
+  const explicit = value(answers, "attribution_source").toLowerCase();
+  const campaign = normalizedCampaign(answers);
+  if (explicit) return explicit;
+  return campaign === "PAPALIFECOACH" || campaign === "AIBOSSZIP" ? "zipshare" : "";
+}
+function contactIdFromPayload(data) {
+  const direct = data.id || data.contactId;
+  if (direct) return String(direct);
+  const contact = data.contact;
+  if (contact && typeof contact === "object") {
+    const id = contact.id || contact.contactId;
+    if (id) return String(id);
+  }
+  return null;
+}
+async function requestJson(path4, method, body, creds) {
+  const response = await fetch(`${GHL_BASE}${path4}`, {
+    method,
+    headers: headers(creds.token),
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text.slice(0, 500) };
+  }
+  if (!response.ok) {
+    const message = String(data.message || text || response.statusText);
+    throw new Error(`GHL ${method} ${path4} failed (${response.status}): ${message}`);
+  }
+  return data;
+}
+async function syncPapaFatherEngagementToGhl(db2, input) {
+  const email = input.email?.trim().toLowerCase() || "";
+  if (!email) return;
+  const creds = resolveGhlCredentials(db2);
+  if (!creds?.token || !creds.locationId) {
+    console.warn("[ghl] father engagement sync skipped: credentials/location not configured");
+    return;
+  }
+  const campaign = normalizedCampaign(input.answers);
+  const source = normalizedSource(input.answers);
+  const [firstName, ...lastNameParts] = input.first_name.trim().split(/\s+/).filter(Boolean);
+  const customFields = [
+    { id: FIELD_IDS.relationship_status, fieldValue: value(input.answers, "relationship_status") },
+    { id: FIELD_IDS.fathers_stated_hope, fieldValue: value(input.answers, "fathers_stated_hope") },
+    { id: FIELD_IDS.primary_concern, fieldValue: value(input.answers, "primary_concern") },
+    { id: FIELD_IDS.preferred_next_step, fieldValue: value(input.answers, "preferred_next_step") },
+    { id: FIELD_IDS.brian_review_status, fieldValue: "Review Needed" },
+    { id: FIELD_IDS.sensitive_or_personal_response, fieldValue: value(input.answers, "sensitive_or_personal_response") }
+  ].filter((field) => Boolean(String(field.fieldValue || "").trim()));
+  const contactSource = source === "zipshare" && campaign ? `ZIPShare \u2014 ${campaign}` : "PapaLifeCoach.com 2-Minute Fatherhood Check-In";
+  const upsert = await requestJson(
+    "/contacts/upsert",
+    "POST",
+    {
+      locationId: creds.locationId,
+      firstName: firstName || input.first_name.trim(),
+      ...lastNameParts.length ? { lastName: lastNameParts.join(" ") } : {},
+      email,
+      ...input.phone?.trim() ? { phone: input.phone.trim() } : {},
+      source: contactSource,
+      customFields
+    },
+    creds
+  );
+  const contactId = contactIdFromPayload(upsert);
+  if (!contactId) throw new Error("GHL contact upsert returned no contact id");
+  const tags = ["Papa Life\u2014Fatherhood Check-In"];
+  if (source === "zipshare") tags.push("Source\u2014ZIPShare");
+  if (campaign) tags.push(`Campaign\u2014${campaign}`);
+  await requestJson(
+    `/contacts/${encodeURIComponent(contactId)}/tags`,
+    "POST",
+    { tags },
+    creds
+  );
+  await requestJson(
+    "/opportunities/",
+    "POST",
+    {
+      pipelineId: PAPA_FATHER_ENGAGEMENT_PIPELINE_ID,
+      locationId: creds.locationId,
+      name: `${input.first_name.trim()} \u2014 Fatherhood Check-In${campaign ? ` \u2014 ${campaign}` : ""}`,
+      pipelineStageId: PAPA_BRIAN_REVIEW_STAGE_ID,
+      status: "open",
+      contactId
+    },
+    creds
+  );
+  const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1e3).toISOString();
+  await requestJson(
+    `/contacts/${encodeURIComponent(contactId)}/tasks`,
+    "POST",
+    {
+      title: "Brian Review Needed",
+      body: campaign ? `Review this Fatherhood Check-In before follow-up is sent. Attribution: ${source || "unknown"}/${campaign}.` : "Review this Fatherhood Check-In before any Papa Life follow-up is sent.",
+      dueDate,
+      completed: false
+    },
+    creds
+  );
+  console.info(
+    `[ghl] father engagement synced contact ${contactId} to Brian Review Needed${campaign ? ` (${source || "unknown"}/${campaign})` : ""}`
+  );
+}
+
 // server/sync-intake-to-crm.ts
 var PAPA_FUNNEL_ISSUE_TAGS = [
   "communication",
@@ -855,12 +2409,32 @@ function syncIntakeSubmissionToCrmLead(db2, input) {
   const businessEmail = input.email && input.email.trim() ? input.email.trim().toLowerCase() : `intake-${input.intakeId}@placeholder.bossmobile.local`;
   const mobilePhone = input.phone && input.phone.trim() ? input.phone.trim() : "\u2014";
   const invitedBy = input.invited_by ?? "strategist_intake";
-  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : `strategist intake (${input.source})`;
+  const sourceLabel = invitedBy === "papa_funnel_intake" ? "Papa Life homepage funnel" : invitedBy === "papa_life_action_coach" ? "Papa Life Action Coach" : invitedBy === "papa_lead_assessment" ? "Papa Life 2-Minute Fatherhood Check-In" : `strategist intake (${input.source})`;
+  let submittedAnswers = {};
+  try {
+    const intake = db2.prepare("SELECT answers_json FROM intake_submissions WHERE id = ?").get(input.intakeId);
+    if (intake?.answers_json) submittedAnswers = JSON.parse(intake.answers_json);
+  } catch (e) {
+    console.warn("[crm] could not parse intake answers_json:", e);
+  }
+  const answerText = (key) => {
+    const raw = submittedAnswers[key];
+    return raw == null ? "" : String(raw).trim();
+  };
+  const isFatherEngagement = invitedBy === "papa_lead_assessment" || answerText("father_engagement_opt_in").toLowerCase() === "true";
+  const fatherEngagementDetails = isFatherEngagement ? [
+    answerText("relationship_status") ? `Relationship Status: ${answerText("relationship_status")}` : null,
+    answerText("fathers_stated_hope") ? `Father's Stated Hope: ${answerText("fathers_stated_hope")}` : null,
+    answerText("primary_concern") ? `Primary Concern: ${answerText("primary_concern")}` : null,
+    answerText("preferred_next_step") ? `Preferred Next Step: ${answerText("preferred_next_step")}` : null,
+    "Brian Review Status: Review Needed"
+  ].filter(Boolean) : [];
   const noteBody = [
     `Source: ${sourceLabel}`,
     `Intake submission id: ${input.intakeId}`,
     isPapaFunnelIssueTag(input.routed_pillar) ? `CRM tag: ${input.routed_pillar}` : `Primary pillar: ${input.routed_pillar}`,
     input.disconnected_pillar ? `Disconnected pillar: ${input.disconnected_pillar}` : null,
+    ...fatherEngagementDetails,
     "",
     "Situation:",
     input.situation,
@@ -902,6 +2476,14 @@ ${input.vision}` : ""
   if (isPapaFunnelIssueTag(input.routed_pillar)) {
     db2.prepare("INSERT OR IGNORE INTO lead_tags (lead_id, tag_slug) VALUES (?, ?)").run(leadId, input.routed_pillar);
   }
+  if (isFatherEngagement) {
+    void syncPapaFatherEngagementToGhl(db2, {
+      first_name: input.first_name,
+      email: input.email,
+      phone: input.phone,
+      answers: submittedAnswers
+    }).catch((err) => console.error("[ghl] father engagement bridge failed:", err));
+  }
   return { lead_id: leadId };
 }
 function backfillIntakeSubmissionsToCrmLeads(db2) {
@@ -928,6 +2510,159 @@ function backfillIntakeSubmissionsToCrmLeads(db2) {
     created += 1;
   }
   return { created };
+}
+
+// server/ghl-api.ts
+var GHL_BASE2 = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+var GHL_VERSION2 = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
+function headers2(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Version: GHL_VERSION2
+  };
+}
+function smsScopeHint(message) {
+  if (/sms|scope|permission|not enabled|forbidden/i.test(message)) {
+    return "GHL SMS scope is not enabled on your private integration token. In GoHighLevel \u2192 Settings \u2192 Private Integrations \u2192 enable SMS/Conversations, then save the token again under CRM \u2192 Settings.";
+  }
+  return null;
+}
+function notConfiguredFix() {
+  return "Open CRM \u2192 Settings on bossmobilelifecoach.com and paste your Go High Level Private Integration token. Or set GHL_API_TOKEN in server .env (optional override).";
+}
+function parseJsonResponse(text) {
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    return { raw: text.slice(0, 500) };
+  }
+}
+function contactIdFromPayload2(data) {
+  const direct = data.id || data.contactId;
+  if (direct) return String(direct);
+  const contact = data.contact;
+  if (contact && typeof contact === "object") {
+    const id = contact.id || contact.contactId;
+    if (id) return String(id);
+  }
+  return null;
+}
+async function ghlUpsertContactWithTags(args, creds) {
+  if (!creds?.token) {
+    return {
+      ok: false,
+      error: "Go High Level API token is not configured",
+      action: "not_configured",
+      fix: notConfiguredFix()
+    };
+  }
+  const locationId = String(creds.locationId || "").trim();
+  if (!locationId) {
+    return {
+      ok: false,
+      error: "Go High Level location ID is not configured",
+      action: "missing_location_id",
+      fix: "Open CRM \u2192 Settings on bossmobilelifecoach.com and save the HighLevel Location ID."
+    };
+  }
+  const email = String(args.email || "").trim().toLowerCase();
+  const firstName = String(args.firstName || "").trim();
+  if (!email) return { ok: false, error: "email is required" };
+  if (!firstName) return { ok: false, error: "firstName is required" };
+  const tags = Array.from(
+    new Set((args.tags || []).map((tag) => String(tag).trim()).filter(Boolean))
+  );
+  const payload = {
+    locationId,
+    firstName,
+    email,
+    ...args.lastName ? { lastName: args.lastName } : {},
+    ...args.phone ? { phone: args.phone } : {},
+    ...args.source ? { source: args.source } : {},
+    ...tags.length ? { tags } : {},
+    ...args.customFields && Object.keys(args.customFields).length ? { customFields: args.customFields } : {}
+  };
+  const r = await fetch(`${GHL_BASE2}/contacts/upsert`, {
+    method: "POST",
+    headers: headers2(creds.token),
+    body: JSON.stringify(payload)
+  });
+  const text = await r.text();
+  const data = parseJsonResponse(text);
+  if (!r.ok) {
+    const msg = String(data.message || text || r.statusText);
+    return { ok: false, error: msg, status: r.status };
+  }
+  return {
+    ok: true,
+    data: {
+      contact_id: contactIdFromPayload2(data),
+      tags,
+      credential_source: creds.source,
+      ghl: data
+    }
+  };
+}
+async function ghlNurtureSmsSend(args, creds) {
+  if (!creds?.token) {
+    return {
+      ok: false,
+      error: "Go High Level API token is not configured",
+      action: "not_configured",
+      fix: notConfiguredFix()
+    };
+  }
+  const contactId = String(args.ghl_contact_id || args.contact_id || "").trim();
+  const message = String(args.body || "").trim();
+  if (!contactId) return { ok: false, error: "ghl_contact_id or contact_id is required" };
+  if (!message) return { ok: false, error: "body is required" };
+  if (args.dry_run) {
+    return {
+      ok: true,
+      data: {
+        dry_run: true,
+        ghl_contact_id: contactId,
+        body: message,
+        type: "SMS",
+        credential_source: creds.source
+      }
+    };
+  }
+  const payload = { type: "SMS", contactId, message };
+  const r = await fetch(`${GHL_BASE2}/conversations/messages`, {
+    method: "POST",
+    headers: headers2(creds.token),
+    body: JSON.stringify(payload)
+  });
+  const text = await r.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text.slice(0, 500) };
+  }
+  if (!r.ok) {
+    const msg = String(data.message || text || r.statusText);
+    const fix = smsScopeHint(msg);
+    return {
+      ok: false,
+      error: msg,
+      status: r.status,
+      action: fix ? "ghl_sms_scope_required" : void 0,
+      fix: fix || void 0
+    };
+  }
+  return {
+    ok: true,
+    data: {
+      ghl_contact_id: contactId,
+      body: message,
+      credential_source: creds.source,
+      ghl: data
+    }
+  };
 }
 
 // server/sms-campaigns.ts
@@ -960,13 +2695,6 @@ function ensureSmsCampaignTables(db2) {
       ON sms_campaign_recipients(campaign_id, send_status);
   `);
 }
-function twilioEnvConfigured() {
-  const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const token = process.env.TWILIO_AUTH_TOKEN?.trim();
-  const from = process.env.TWILIO_FROM_NUMBER?.trim();
-  const ms = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
-  return !!(sid && token && (from || ms));
-}
 function normalizeToE164(raw) {
   const t = raw.trim();
   if (t.startsWith("+")) {
@@ -982,38 +2710,20 @@ function normalizeToE164(raw) {
 function personalizeBody(template, row) {
   return template.replace(/\{\{\s*first_name\s*\}\}/gi, row.first_name || "").replace(/\{\{\s*last_name\s*\}\}/gi, row.last_name || "").replace(/\{\{\s*business_name\s*\}\}/gi, row.business_name || "");
 }
-async function twilioSendSms(to, body) {
-  const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const token = process.env.TWILIO_AUTH_TOKEN?.trim();
-  const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
-  const fromNumber = process.env.TWILIO_FROM_NUMBER?.trim();
-  if (!sid || !token) return { error: "Twilio credentials missing (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)" };
-  if (!messagingServiceSid && !fromNumber) {
-    return { error: "Set TWILIO_MESSAGING_SERVICE_SID or TWILIO_FROM_NUMBER" };
-  }
-  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
-  const form = new URLSearchParams();
-  form.set("To", to);
-  if (messagingServiceSid) form.set("MessagingServiceSid", messagingServiceSid);
-  else form.set("From", fromNumber);
-  form.set("Body", body.slice(0, 1600));
-  const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: form.toString()
-  });
-  const j = await r.json();
-  if (!r.ok) return { error: j.message || `Twilio HTTP ${r.status}` };
-  if (!j.sid) return { error: "Twilio returned no SID" };
-  return { sid: j.sid };
-}
 function registerSmsCampaignRoutes(app, db2, requireAuth2) {
   ensureSmsCampaignTables(db2);
-  app.get("/api/sms/twilio-status", requireAuth2, (_req, res) => {
-    res.json({ configured: twilioEnvConfigured() });
+  app.get("/api/sms/provider-status", requireAuth2, (req, res) => {
+    const adminId = Number(req.session.adminId);
+    if (!Number.isInteger(adminId) || adminId < 1) {
+      return res.status(401).json({ configured: false, error: "Authenticated administrator required" });
+    }
+    const creds = resolveGhlCredentials(db2, adminId);
+    res.json({
+      configured: Boolean(creds?.token && creds?.locationId),
+      provider: "gohighlevel",
+      credential_source: creds?.source || null,
+      location_configured: Boolean(creds?.locationId)
+    });
   });
   app.get("/api/sms/campaigns", requireAuth2, (_req, res) => {
     const rows = db2.prepare(
@@ -1121,10 +2831,15 @@ function registerSmsCampaignRoutes(app, db2, requireAuth2) {
     res.json({ ok: true, added, skipped, total_leads_marketing: leads.length });
   });
   app.post("/api/sms/campaigns/:id/send-batch", requireAuth2, async (req, res) => {
-    if (!twilioEnvConfigured()) {
+    const adminId = Number(req.session.adminId);
+    if (!Number.isInteger(adminId) || adminId < 1) {
+      return res.status(401).json({ ok: false, error: "Authenticated administrator required" });
+    }
+    const ghlCredentials = resolveGhlCredentials(db2, adminId);
+    if (!ghlCredentials?.token || !ghlCredentials.locationId) {
       return res.status(503).json({
         ok: false,
-        error: "Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_MESSAGING_SERVICE_SID or TWILIO_FROM_NUMBER on the server."
+        error: "GoHighLevel SMS is not configured. Save the Private Integration token and Location ID under CRM \u2192 Settings."
       });
     }
     const id = Number(req.params.id);
@@ -1135,9 +2850,12 @@ function registerSmsCampaignRoutes(app, db2, requireAuth2) {
       return res.status(400).json({ ok: false, error: "Build audience first (campaign must be ready or sending)" });
     }
     const pending = db2.prepare(
-      `SELECT id, phone_e164, personalized_body FROM sms_campaign_recipients
-         WHERE campaign_id = ? AND send_status = 'pending'
-         ORDER BY id ASC
+      `SELECT r.id, r.phone_e164, r.personalized_body,
+                l.first_name, l.last_name, l.business_email
+         FROM sms_campaign_recipients r
+         JOIN leads l ON l.id = r.lead_id
+         WHERE r.campaign_id = ? AND r.send_status = 'pending'
+         ORDER BY r.id ASC
          LIMIT ?`
     ).all(id, limit);
     if (pending.length === 0) {
@@ -1156,15 +2874,42 @@ function registerSmsCampaignRoutes(app, db2, requireAuth2) {
     let sent = 0;
     let failed = 0;
     for (const row of pending) {
-      const result = await twilioSendSms(row.phone_e164, row.personalized_body);
-      if ("sid" in result) {
-        updSent.run(result.sid, row.id);
+      const contactResult = await ghlUpsertContactWithTags(
+        {
+          firstName: row.first_name,
+          lastName: row.last_name || void 0,
+          email: row.business_email,
+          phone: row.phone_e164,
+          tags: ["ai_boss_sms_campaign"]
+        },
+        ghlCredentials
+      );
+      if (!contactResult.ok) {
+        updFail.run(`GHL contact sync failed: ${contactResult.error}`, row.id);
+        failed++;
+        continue;
+      }
+      const contactId = String(contactResult.data.contact_id || "").trim();
+      if (!contactId) {
+        updFail.run("GHL contact sync returned no contact ID", row.id);
+        failed++;
+        continue;
+      }
+      const result = await ghlNurtureSmsSend(
+        { ghl_contact_id: contactId, body: row.personalized_body },
+        ghlCredentials
+      );
+      if (result.ok) {
+        const providerId = String(
+          result.data.ghl?.messageId || result.data.ghl?.id || contactId
+        );
+        updSent.run(providerId, row.id);
         sent++;
       } else {
         updFail.run(result.error, row.id);
         failed++;
       }
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 150));
     }
     const remaining = db2.prepare(
       `SELECT COUNT(*) as c FROM sms_campaign_recipients WHERE campaign_id = ? AND send_status = 'pending'`
@@ -1178,221 +2923,303 @@ function registerSmsCampaignRoutes(app, db2, requireAuth2) {
   });
 }
 
-// server/ghl-integration-store.ts
-import crypto from "crypto";
-var ALGO = "aes-256-gcm";
-function encryptionKey() {
-  const raw = process.env.INTEGRATION_ENCRYPTION_KEY?.trim() || process.env.SESSION_SECRET?.trim() || "papalife-integration-key-rotate-in-production";
-  return crypto.createHash("sha256").update(raw).digest();
+// server/ai-boss-youtube-integration.ts
+import { nanoid } from "nanoid";
+
+// server/ai-boss-youtube-connector.ts
+import http from "node:http";
+var DEFAULT_PORT = 8789;
+var MAX_REQUEST_BYTES = 128e3;
+var YOUTUBE_READ_SCOPES = [
+  "https://www.googleapis.com/auth/youtube.readonly",
+  "https://www.googleapis.com/auth/yt-analytics.readonly"
+];
+function requiredEnv(name) {
+  const value2 = String(process.env[name] || "").trim();
+  if (!value2) throw new Error(`${name} is not configured.`);
+  return value2;
 }
-function encrypt(plaintext) {
-  const iv = crypto.randomBytes(12);
-  const key = encryptionKey();
-  const cipher = crypto.createCipheriv(ALGO, key, iv);
-  const enc = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return Buffer.concat([iv, tag, enc]).toString("base64");
+function buildYouTubeAuthorizationUrl(state) {
+  const params = new URLSearchParams({
+    client_id: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_ID"),
+    redirect_uri: requiredEnv("AI_BOSS_YOUTUBE_REDIRECT_URI"),
+    response_type: "code",
+    access_type: "offline",
+    prompt: "consent",
+    include_granted_scopes: "true",
+    scope: YOUTUBE_READ_SCOPES.join(" "),
+    state
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
-function decrypt(blob) {
-  const buf = Buffer.from(blob, "base64");
-  const iv = buf.subarray(0, 12);
-  const tag = buf.subarray(12, 28);
-  const data = buf.subarray(28);
-  const key = encryptionKey();
-  const decipher = crypto.createDecipheriv(ALGO, key, iv);
-  decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
+async function exchangeYouTubeAuthorizationCode(code, fetchImpl = fetch) {
+  const body = new URLSearchParams({
+    code,
+    client_id: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_ID"),
+    client_secret: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_SECRET"),
+    redirect_uri: requiredEnv("AI_BOSS_YOUTUBE_REDIRECT_URI"),
+    grant_type: "authorization_code"
+  });
+  const response = await fetchImpl("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body
+  });
+  const data = await response.json();
+  if (!response.ok || !data.access_token) throw new Error(data.error_description || `Google token exchange failed (${response.status}).`);
+  return data;
 }
-function maskToken(token) {
-  const t = token.trim();
-  if (t.length <= 8) return "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022";
-  return `${t.slice(0, 4)}\u2026${t.slice(-4)}`;
+async function getAccessToken(fetchImpl, refreshToken) {
+  const body = new URLSearchParams({
+    client_id: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_ID"),
+    client_secret: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_SECRET"),
+    refresh_token: refreshToken || requiredEnv("AI_BOSS_YOUTUBE_REFRESH_TOKEN"),
+    grant_type: "refresh_token"
+  });
+  const response = await fetchImpl("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body
+  });
+  const data = await response.json();
+  if (!response.ok || !data.access_token) throw new Error(data.error_description || `Google token refresh failed (${response.status}).`);
+  return data.access_token;
 }
-function envCredentials() {
-  const token = process.env.GHL_API_TOKEN?.trim() || process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() || "";
-  if (!token) return null;
-  const locationId = process.env.GHL_LOCATION_ID?.trim() || void 0;
-  return { token, locationId, source: "env" };
+async function googleJson(fetchImpl, url, accessToken) {
+  const response = await fetchImpl(url, { headers: { authorization: `Bearer ${accessToken}` } });
+  const text = await response.text();
+  if (!response.ok) throw new Error(`YouTube API ${response.status}: ${text.slice(0, 800)}`);
+  return text ? JSON.parse(text) : null;
 }
-function ensureGhlIntegrationTable(db2) {
+async function executeYouTubeConnectorAction(action, fetchImpl = fetch, refreshToken) {
+  const accessToken = await getAccessToken(fetchImpl, refreshToken);
+  if (action.operation === "channel") {
+    return googleJson(fetchImpl, "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&mine=true", accessToken);
+  }
+  if (action.operation === "videos") {
+    const channel = await googleJson(fetchImpl, "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true", accessToken);
+    const uploads = channel?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploads) throw new Error("No uploads playlist found for the authorized YouTube channel.");
+    const maxResults = Math.max(1, Math.min(Number(action.max_results || 50), 50));
+    const playlist = await googleJson(fetchImpl, `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${encodeURIComponent(uploads)}&maxResults=${maxResults}`, accessToken);
+    const ids2 = (playlist?.items || []).map((item) => item?.contentDetails?.videoId).filter(Boolean);
+    if (!ids2.length) return { items: [] };
+    return googleJson(fetchImpl, `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${encodeURIComponent(ids2.join(","))}`, accessToken);
+  }
+  const ids = (action.video_ids || []).filter(Boolean);
+  const filters = ids.length ? `&filters=${encodeURIComponent(`video==${ids.join(",")}`)}` : "";
+  const metrics = ["views", "estimatedMinutesWatched", "averageViewDuration", "averageViewPercentage", "subscribersGained", "videoThumbnailImpressions", "videoThumbnailImpressionsClickRate"].join(",");
+  const url = `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel%3D%3DMINE&startDate=${encodeURIComponent(action.start_date)}&endDate=${encodeURIComponent(action.end_date)}&metrics=${encodeURIComponent(metrics)}&dimensions=video${filters}`;
+  return googleJson(fetchImpl, url, accessToken);
+}
+function connectorToken() {
+  return requiredEnv("AI_BOSS_YOUTUBE_CONNECTOR_TOKEN");
+}
+function createYouTubeConnectorServer() {
+  return http.createServer((req, res) => {
+    if (req.method !== "POST" || req.url !== "/youtube") {
+      res.writeHead(404).end("Not found");
+      return;
+    }
+    let expectedToken = "";
+    try {
+      expectedToken = connectorToken();
+    } catch {
+      res.writeHead(503).end("Connector not configured");
+      return;
+    }
+    if (req.headers.authorization !== `Bearer ${expectedToken}`) {
+      res.writeHead(401).end("Unauthorized");
+      return;
+    }
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > MAX_REQUEST_BYTES) req.destroy(new Error("Request too large"));
+      else chunks.push(chunk);
+    });
+    req.on("end", async () => {
+      try {
+        const action = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        const result = await executeYouTubeConnectorAction(action);
+        res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(result));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        res.writeHead(400, { "content-type": "application/json" }).end(JSON.stringify({ error: message }));
+      }
+    });
+  });
+}
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  const port = Number(process.env.AI_BOSS_YOUTUBE_CONNECTOR_PORT || DEFAULT_PORT);
+  createYouTubeConnectorServer().listen(port, "127.0.0.1", () => {
+    console.log(`AI Boss YouTube connector listening on http://127.0.0.1:${port}/youtube`);
+  });
+}
+
+// server/ai-boss-youtube-growth.ts
+var clamp = (value2, min = 0, max = 100) => Math.min(max, Math.max(min, value2));
+function scoreYouTubeOpportunity(metrics) {
+  const diagnosis = [];
+  const actions = /* @__PURE__ */ new Set();
+  const ctr = metrics.clickThroughRate;
+  const avgViewPct = metrics.averageViewPercentage;
+  const viewsPerImpression = metrics.impressions > 0 ? metrics.views / metrics.impressions : 0;
+  const subscriberYield = metrics.views > 0 ? metrics.subscribersGained / metrics.views : 0;
+  let score2 = 0;
+  if (metrics.impressions >= 1e3 && ctr < 4) {
+    score2 += 35;
+    diagnosis.push("YouTube is showing the video, but relatively few viewers are clicking.");
+    actions.add("thumbnail");
+    actions.add("title");
+  } else if (metrics.impressions < 1e3 && ctr >= 5) {
+    score2 += 25;
+    diagnosis.push("The packaging converts reasonably well, but the video has limited reach.");
+    actions.add("description");
+    actions.add("topic_followup");
+  }
+  if (avgViewPct < 30) {
+    score2 += 30;
+    diagnosis.push("Viewer retention is weak enough that the opening and pacing should be reviewed.");
+    actions.add("retention");
+  } else if (avgViewPct >= 50) {
+    score2 += 15;
+    diagnosis.push("Watch time is comparatively strong, so packaging improvements may unlock more traffic.");
+    actions.add("thumbnail");
+    actions.add("title");
+  }
+  if (subscriberYield >= 0.01) {
+    score2 += 15;
+    diagnosis.push("The video converts viewers into subscribers, making it a good candidate to expand reach.");
+    actions.add("topic_followup");
+  }
+  if (viewsPerImpression < 0.03 && metrics.impressions >= 500) {
+    score2 += 10;
+    actions.add("thumbnail");
+    actions.add("title");
+  }
+  if (diagnosis.length === 0) {
+    diagnosis.push("No obvious bottleneck was detected from the current baseline metrics.");
+  }
+  return {
+    videoId: metrics.videoId,
+    priorityScore: clamp(score2),
+    diagnosis,
+    recommendedActions: Array.from(actions)
+  };
+}
+function pickPilotVideos(videos, limit = 3) {
+  return videos.map(scoreYouTubeOpportunity).sort((a, b) => b.priorityScore - a.priorityScore).slice(0, Math.max(1, limit));
+}
+
+// server/ai-boss-youtube-integration.ts
+function ensureYouTubeIntegrationTables(db2) {
   db2.exec(`
-    CREATE TABLE IF NOT EXISTS admin_ghl_integrations (
-      admin_user_id INTEGER PRIMARY KEY REFERENCES admin_users(id) ON DELETE CASCADE,
-      api_token_enc TEXT NOT NULL,
-      location_id TEXT,
+    CREATE TABLE IF NOT EXISTS ai_boss_youtube_integrations (
+      admin_id INTEGER PRIMARY KEY,
+      refresh_token TEXT,
+      scope TEXT,
+      connected_at TEXT,
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS ai_boss_youtube_oauth_states (
+      state TEXT PRIMARY KEY,
+      admin_id INTEGER NOT NULL,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
 }
-function getGhlIntegrationPublic(db2, adminUserId) {
-  const env = envCredentials();
-  if (env) {
-    return {
-      configured: true,
-      token_preview: maskToken(env.token),
-      location_id: env.locationId ?? null,
-      updated_at: null,
-      source: "env"
-    };
-  }
-  const row = db2.prepare(
-    `SELECT api_token_enc, location_id, updated_at
-       FROM admin_ghl_integrations WHERE admin_user_id = ?`
-  ).get(adminUserId);
-  if (!row?.api_token_enc) {
-    return {
-      configured: false,
-      token_preview: null,
-      location_id: null,
-      updated_at: null,
-      source: null
-    };
-  }
-  let preview = null;
-  try {
-    preview = maskToken(decrypt(row.api_token_enc));
-  } catch {
-    preview = "(stored \u2014 re-save if tools fail)";
-  }
-  return {
-    configured: true,
-    token_preview: preview,
-    location_id: row.location_id?.trim() || null,
-    updated_at: row.updated_at,
-    source: "dashboard"
-  };
+function rowForAdmin(db2, adminId) {
+  return db2.prepare(`SELECT refresh_token, scope, connected_at, updated_at FROM ai_boss_youtube_integrations WHERE admin_id = ?`).get(adminId);
 }
-function saveGhlIntegration(db2, adminUserId, apiToken, locationId) {
-  const token = apiToken.trim();
-  if (token.length < 16) {
-    throw new Error("API token looks too short \u2014 paste the full Private Integration token from GHL");
-  }
-  const loc = locationId?.trim() || null;
-  db2.prepare(
-    `INSERT INTO admin_ghl_integrations (admin_user_id, api_token_enc, location_id, updated_at)
-     VALUES (?, ?, ?, datetime('now'))
-     ON CONFLICT(admin_user_id) DO UPDATE SET
-       api_token_enc = excluded.api_token_enc,
-       location_id = excluded.location_id,
-       updated_at = datetime('now')`
-  ).run(adminUserId, encrypt(token), loc);
-  return getGhlIntegrationPublic(db2, adminUserId);
+function durationDaysAgo(days) {
+  const d = /* @__PURE__ */ new Date();
+  d.setUTCDate(d.getUTCDate() - days);
+  return d.toISOString().slice(0, 10);
 }
-function clearGhlIntegration(db2, adminUserId) {
-  db2.prepare("DELETE FROM admin_ghl_integrations WHERE admin_user_id = ?").run(adminUserId);
-  return getGhlIntegrationPublic(db2, adminUserId);
+function todayUtc() {
+  return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 }
-function resolveGhlCredentials(db2, adminUserId) {
-  const env = envCredentials();
-  if (env) return env;
-  let uid = adminUserId;
-  if (uid == null) {
-    const row = db2.prepare("SELECT id FROM admin_users ORDER BY id ASC LIMIT 1").get();
-    uid = row?.id;
-  }
-  if (uid == null) return null;
-  const stored = db2.prepare(
-    `SELECT api_token_enc, location_id FROM admin_ghl_integrations WHERE admin_user_id = ?`
-  ).get(uid);
-  if (!stored?.api_token_enc) return null;
-  try {
-    const token = decrypt(stored.api_token_enc);
-    return {
-      token,
-      locationId: stored.location_id?.trim() || void 0,
-      source: "dashboard"
-    };
-  } catch {
-    return null;
-  }
+function analyticsRows(report) {
+  const names = (report?.columnHeaders || []).map((h) => h.name);
+  return (report?.rows || []).map((row) => Object.fromEntries(names.map((name, i) => [name, row[i]])));
 }
-
-// server/ghl-api.ts
-var GHL_BASE = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
-var GHL_VERSION = process.env.GHL_API_VERSION?.trim() || "2021-07-28";
-function headers(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Version: GHL_VERSION
-  };
-}
-function notConfiguredFix() {
-  return "Open CRM \u2192 Settings on bossmobilelifecoach.com and paste your Go High Level Private Integration token. Or set GHL_API_TOKEN in server .env (optional override).";
-}
-function parseJsonResponse(text) {
-  try {
-    return text ? JSON.parse(text) : {};
-  } catch {
-    return { raw: text.slice(0, 500) };
-  }
-}
-function contactIdFromPayload(data) {
-  const direct = data.id || data.contactId;
-  if (direct) return String(direct);
-  const contact = data.contact;
-  if (contact && typeof contact === "object") {
-    const id = contact.id || contact.contactId;
-    if (id) return String(id);
-  }
-  return null;
-}
-async function ghlUpsertContactWithTags(args, creds) {
-  if (!creds?.token) {
-    return {
-      ok: false,
-      error: "Go High Level API token is not configured",
-      action: "not_configured",
-      fix: notConfiguredFix()
-    };
-  }
-  const locationId = String(creds.locationId || "").trim();
-  if (!locationId) {
-    return {
-      ok: false,
-      error: "Go High Level location ID is not configured",
-      action: "missing_location_id",
-      fix: "Open CRM \u2192 Settings on bossmobilelifecoach.com and save the HighLevel Location ID."
-    };
-  }
-  const email = String(args.email || "").trim().toLowerCase();
-  const firstName = String(args.firstName || "").trim();
-  if (!email) return { ok: false, error: "email is required" };
-  if (!firstName) return { ok: false, error: "firstName is required" };
-  const tags = Array.from(
-    new Set((args.tags || []).map((tag) => String(tag).trim()).filter(Boolean))
-  );
-  const payload = {
-    locationId,
-    firstName,
-    email,
-    ...args.lastName ? { lastName: args.lastName } : {},
-    ...args.phone ? { phone: args.phone } : {},
-    ...args.source ? { source: args.source } : {},
-    ...tags.length ? { tags } : {},
-    ...args.customFields && Object.keys(args.customFields).length ? { customFields: args.customFields } : {}
-  };
-  const r = await fetch(`${GHL_BASE}/contacts/upsert`, {
-    method: "POST",
-    headers: headers(creds.token),
-    body: JSON.stringify(payload)
-  });
-  const text = await r.text();
-  const data = parseJsonResponse(text);
-  if (!r.ok) {
-    const msg = String(data.message || text || r.statusText);
-    return { ok: false, error: msg, status: r.status };
-  }
-  return {
-    ok: true,
-    data: {
-      contact_id: contactIdFromPayload(data),
-      tags,
-      credential_source: creds.source,
-      ghl: data
+function registerYouTubeIntegrationRoutes(app, db2, requireAuth2, requireResearchLabAccess2) {
+  ensureYouTubeIntegrationTables(db2);
+  const guarded = [requireAuth2, requireResearchLabAccess2];
+  app.get("/api/admin/ai-boss/youtube/status", ...guarded, async (req, res) => {
+    const adminId = Number(req.session.adminId);
+    const row = rowForAdmin(db2, adminId);
+    if (!row?.refresh_token) return res.json({ ok: true, connected: false });
+    try {
+      const channel = await executeYouTubeConnectorAction({ operation: "channel" }, fetch, row.refresh_token);
+      const item = channel?.items?.[0];
+      return res.json({ ok: true, connected: true, channel: item ? { id: item.id, title: item.snippet?.title, statistics: item.statistics } : null, connectedAt: row.connected_at });
+    } catch (error) {
+      return res.status(502).json({ ok: false, connected: true, error: error instanceof Error ? error.message : String(error) });
     }
-  };
+  });
+  app.get("/api/admin/ai-boss/youtube/authorization-url", ...guarded, (req, res) => {
+    const adminId = Number(req.session.adminId);
+    db2.prepare(`DELETE FROM ai_boss_youtube_oauth_states WHERE expires_at < datetime('now')`).run();
+    const state = nanoid(32);
+    db2.prepare(`INSERT INTO ai_boss_youtube_oauth_states (state, admin_id, expires_at) VALUES (?, ?, datetime('now', '+15 minutes'))`).run(state, adminId);
+    res.json({ ok: true, url: buildYouTubeAuthorizationUrl(state) });
+  });
+  app.get("/ai-boss/youtube/callback", requireAuth2, requireResearchLabAccess2, async (req, res) => {
+    const adminId = Number(req.session.adminId);
+    const code = String(req.query.code || "");
+    const state = String(req.query.state || "");
+    if (!code || !state) return res.status(400).send("Missing YouTube authorization code or state.");
+    const pending = db2.prepare(`SELECT admin_id FROM ai_boss_youtube_oauth_states WHERE state = ? AND expires_at >= datetime('now')`).get(state);
+    if (!pending || Number(pending.admin_id) !== adminId) return res.status(400).send("YouTube authorization state is invalid or expired.");
+    try {
+      const token = await exchangeYouTubeAuthorizationCode(code);
+      if (!token.refresh_token) return res.status(400).send("Google did not return an offline refresh token. Please reconnect and approve access again.");
+      db2.prepare(`
+        INSERT INTO ai_boss_youtube_integrations (admin_id, refresh_token, scope, connected_at, updated_at)
+        VALUES (?, ?, ?, datetime('now'), datetime('now'))
+        ON CONFLICT(admin_id) DO UPDATE SET refresh_token = excluded.refresh_token, scope = excluded.scope, connected_at = datetime('now'), updated_at = datetime('now')
+      `).run(adminId, token.refresh_token, String(token.scope || ""));
+      db2.prepare(`DELETE FROM ai_boss_youtube_oauth_states WHERE state = ?`).run(state);
+      return res.redirect("/ai-boss/youtube-growth?youtube=connected");
+    } catch (error) {
+      return res.status(502).send(`YouTube authorization failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  });
+  app.get("/api/admin/ai-boss/youtube/pilot", ...guarded, async (req, res) => {
+    const adminId = Number(req.session.adminId);
+    const row = rowForAdmin(db2, adminId);
+    if (!row?.refresh_token) return res.status(409).json({ ok: false, error: "YouTube is not connected." });
+    try {
+      const videos = await executeYouTubeConnectorAction({ operation: "videos", max_results: 50 }, fetch, row.refresh_token);
+      const items = videos?.items || [];
+      const ids = items.map((v) => v.id).filter(Boolean);
+      const report = await executeYouTubeConnectorAction({ operation: "analytics", start_date: durationDaysAgo(28), end_date: todayUtc(), video_ids: ids }, fetch, row.refresh_token);
+      const rows = analyticsRows(report);
+      const byId = new Map(rows.map((r) => [String(r.video), r]));
+      const metrics = items.map((v) => {
+        const r = byId.get(String(v.id)) || {};
+        return {
+          videoId: String(v.id),
+          title: String(v.snippet?.title || "Untitled"),
+          impressions: Number(r.videoThumbnailImpressions || 0),
+          clickThroughRate: Number(r.videoThumbnailImpressionsClickRate || 0),
+          views: Number(r.views || 0),
+          watchTimeMinutes: Number(r.estimatedMinutesWatched || 0),
+          averageViewDurationSeconds: Number(r.averageViewDuration || 0),
+          averageViewPercentage: Number(r.averageViewPercentage || 0),
+          subscribersGained: Number(r.subscribersGained || 0)
+        };
+      });
+      const selected = pickPilotVideos(metrics, 3).map((recommendation) => ({ recommendation, metrics: metrics.find((m) => m.videoId === recommendation.videoId) }));
+      res.json({ ok: true, period: { start: durationDaysAgo(28), end: todayUtc() }, selected });
+    } catch (error) {
+      res.status(502).json({ ok: false, error: error instanceof Error ? error.message : String(error) });
+    }
+  });
 }
 
 // server/ghl-automation.ts
@@ -1541,11 +3368,11 @@ function buildOutboundCloudPayload(input, result) {
 }
 async function postJsonToCloudWebhook(db2, url, payload, alertId) {
   const secret = webhookSecret();
-  const headers2 = { "Content-Type": "application/json" };
-  if (secret) headers2.Authorization = `Bearer ${secret}`;
+  const headers3 = { "Content-Type": "application/json" };
+  if (secret) headers3.Authorization = `Bearer ${secret}`;
   const r = await fetch(url, {
     method: "POST",
-    headers: headers2,
+    headers: headers3,
     body: JSON.stringify(payload)
   });
   const body = await r.text();
@@ -1882,12 +3709,12 @@ function findPapaLifeKbContext(query, limit = 3) {
   if (!terms.length) return [];
   return chunks.map((chunk) => {
     const lower = chunk.text.toLowerCase();
-    const score = terms.reduce((sum, term) => {
+    const score2 = terms.reduce((sum, term) => {
       const exact = lower.includes(term) ? 2 : 0;
       const prefix = lower.includes(term.slice(0, 5)) ? 1 : 0;
       return sum + exact + prefix;
     }, 0);
-    return { ...chunk, score };
+    return { ...chunk, score: score2 };
   }).filter((chunk) => chunk.score > 0).sort((a, b) => b.score - a.score).slice(0, limit).map(({ source, index, text }) => ({ source, index, text }));
 }
 function buildPapaLifeKbPromptContext(query) {
@@ -2160,8 +3987,8 @@ function findPapaResources(query, limit = 6) {
       resource.description,
       ...resource.keywords
     ].join(" ").toLowerCase();
-    const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
-    return { resource, score };
+    const score2 = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+    return { resource, score: score2 };
   });
   return scored.sort((a, b) => b.score - a.score || a.resource.title.localeCompare(b.resource.title)).slice(0, limit).map((item) => item.resource);
 }
@@ -2177,11 +4004,11 @@ function buildAssessmentReport(answers) {
     current.count += 1;
     groups.set(answer.pillar, current);
   }
-  const scores = Array.from(groups.entries()).map(([pillar, value]) => ({
+  const scores = Array.from(groups.entries()).map(([pillar, value2]) => ({
     pillar,
-    score: value.total,
-    max: value.count * 5,
-    percent: Math.round(value.total / (value.count * 5) * 100)
+    score: value2.total,
+    max: value2.count * 5,
+    percent: Math.round(value2.total / (value2.count * 5) * 100)
   }));
   const focus = [...scores].sort((a, b) => a.percent - b.percent)[0];
   const strength = [...scores].sort((a, b) => b.percent - a.percent)[0];
@@ -2212,8 +4039,8 @@ function resolveConfiguredProvider() {
   if (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY) return "gemini";
   return "local";
 }
-function normalizeProvider(value) {
-  const provider = String(value || "").trim().toLowerCase();
+function normalizeProvider(value2) {
+  const provider = String(value2 || "").trim().toLowerCase();
   if (provider === "openai" || provider === "anthropic" || provider === "gemini") return provider;
   return "local";
 }
@@ -2404,7 +4231,7 @@ var mediaUpload = multer({
     },
     filename: (_req, file, cb) => {
       const ext = path3.extname(file.originalname || "") || "";
-      cb(null, `${nanoid(18)}${ext}`);
+      cb(null, `${nanoid2(18)}${ext}`);
     }
   }),
   limits: { fileSize: 500 * 1024 * 1024 },
@@ -2525,6 +4352,18 @@ db.exec(`
     lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
     completed_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(member_id, lesson_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS member_journey_steps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    step_key TEXT NOT NULL,
+    response TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'in_progress',
+    started_at TEXT NOT NULL DEFAULT (datetime('now')),
+    completed_at TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(member_id, step_key)
   );
 
   CREATE TABLE IF NOT EXISTS journal_prompts (
@@ -2987,6 +4826,13 @@ try {
 } catch {
 }
 ensureResearchTables(db);
+ensureExecutiveMemoryTables(db);
+ensureHumanImpactTables(db);
+ensureExecutiveActionQueueTables(db);
+ensureAiBossProjectTables(db);
+ensureAiBossMobileTables(db);
+ensureAiBossCampaignTables(db);
+seedAiBossCampaigns(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
@@ -3157,44 +5003,44 @@ function formatAmountDisplay(amountCents, currency) {
     minimumFractionDigits: 2
   }).format(amountCents / 100);
 }
-function normalizeReportDate(value) {
-  const text = String(value || "").trim();
+function normalizeReportDate(value2) {
+  const text = String(value2 || "").trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
   return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 }
-function normalizeReportFields(value) {
+function normalizeReportFields(value2) {
   return {
-    outreach: String(value?.outreach || "").trim(),
-    contentCreation: String(value?.contentCreation || "").trim(),
-    scheduling: String(value?.scheduling || "").trim(),
-    automation: String(value?.automation || "").trim(),
-    coaching: String(value?.coaching || "").trim(),
-    pipeline: String(value?.pipeline || "").trim(),
-    revenue: String(value?.revenue || "").trim(),
-    research: String(value?.research || "").trim(),
-    win: String(value?.win || "").trim()
+    outreach: String(value2?.outreach || "").trim(),
+    contentCreation: String(value2?.contentCreation || "").trim(),
+    scheduling: String(value2?.scheduling || "").trim(),
+    automation: String(value2?.automation || "").trim(),
+    coaching: String(value2?.coaching || "").trim(),
+    pipeline: String(value2?.pipeline || "").trim(),
+    revenue: String(value2?.revenue || "").trim(),
+    research: String(value2?.research || "").trim(),
+    win: String(value2?.win || "").trim()
   };
 }
-function normalizeOutcomes(value) {
-  if (!Array.isArray(value)) return [];
-  return value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 30);
+function normalizeOutcomes(value2) {
+  if (!Array.isArray(value2)) return [];
+  return value2.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 30);
 }
-function textOrNoneForReport(value) {
-  return value.trim() || "(none logged)";
+function textOrNoneForReport(value2) {
+  return value2.trim() || "(none logged)";
 }
-function cleanPublicText(value, max = 4e3) {
-  return String(value ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+function cleanPublicText(value2, max = 4e3) {
+  return String(value2 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 }
-function normalizePapaAiLead(value) {
-  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+function normalizePapaAiLead(value2) {
+  const source = value2 && typeof value2 === "object" && !Array.isArray(value2) ? value2 : {};
   return {
     first_name: cleanPublicText(source.first_name ?? source.firstName, 80),
     email: cleanPublicText(source.email, 160).toLowerCase(),
     phone: cleanPublicText(source.phone, 40)
   };
 }
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+function isValidEmail(value2) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value2);
 }
 function elevenLabsApiHeaders() {
   return {
@@ -3315,8 +5161,8 @@ function publicVoiceWebSocketUrl(req, signedUrl) {
   const isLocalHost = /^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(host);
   const protocol = isLocalHost && forwardedProto === "http" ? "ws" : "wss";
   const proxied = new URL(`${protocol}://${host}/api/ai/voice/ws`);
-  upstream.searchParams.forEach((value, key) => {
-    proxied.searchParams.append(key, value);
+  upstream.searchParams.forEach((value2, key) => {
+    proxied.searchParams.append(key, value2);
   });
   return proxied.toString();
 }
@@ -3361,7 +5207,7 @@ function proxyElevenLabsVoiceWebSocket(req, socket, head) {
     if (!upstream.destroyed) upstream.destroy();
   };
   upstream.once("secureConnect", () => {
-    const headers2 = [
+    const headers3 = [
       `GET ${upstreamPath} HTTP/1.1`,
       "Host: api.elevenlabs.io",
       "Upgrade: websocket",
@@ -3371,8 +5217,8 @@ function proxyElevenLabsVoiceWebSocket(req, socket, head) {
       "Origin: https://bossmobilelifecoach.com"
     ];
     const protocol = req.headers["sec-websocket-protocol"];
-    if (protocol) headers2.push(`Sec-WebSocket-Protocol: ${protocol}`);
-    upstream.write(`${headers2.join("\r\n")}\r
+    if (protocol) headers3.push(`Sec-WebSocket-Protocol: ${protocol}`);
+    upstream.write(`${headers3.join("\r\n")}\r
 \r
 `);
     if (head.length > 0) upstream.write(head);
@@ -3388,8 +5234,8 @@ function buildConversationSummary(message, reply = "") {
   const clean = `${message} ${reply}`.replace(/\s+/g, " ").trim();
   return clean.length > 360 ? `${clean.slice(0, 357)}...` : clean;
 }
-function ghlTagSlug(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
+function ghlTagSlug(value2) {
+  return value2.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
 }
 async function syncPapaAiContactToGhl(input) {
   if (!input.email || !isValidEmail(input.email)) return null;
@@ -3447,9 +5293,9 @@ function adminNotificationProvider() {
 function adminNotificationFrom() {
   return process.env.ADMIN_NOTIFICATION_FROM?.trim() || "Papa Life <notifications@bossmobilelifecoach.com>";
 }
-function extractEmailAddress(value) {
-  const match = value.match(/<([^>]+)>/);
-  return (match?.[1] || value).trim();
+function extractEmailAddress(value2) {
+  const match = value2.match(/<([^>]+)>/);
+  return (match?.[1] || value2).trim();
 }
 function adminNotificationStatus() {
   const provider = adminNotificationProvider();
@@ -3890,7 +5736,7 @@ function findOrCreatePaidMembershipMember(input) {
   if (member) return { member, created: false };
   if (!isValidEmail(input.email)) throw new Error("A valid customer email is required to create the Papa Life account.");
   const names = splitPaidMemberName(input.displayName, input.firstName, input.lastName);
-  const temporaryPasswordHash = bcrypt.hashSync(nanoid(48), 12);
+  const temporaryPasswordHash = bcrypt.hashSync(nanoid2(48), 12);
   const enrolledAt = (/* @__PURE__ */ new Date()).toISOString();
   const result = db.prepare(
     `INSERT INTO members
@@ -3902,7 +5748,7 @@ function findOrCreatePaidMembershipMember(input) {
   return { member, created: true };
 }
 function issueMemberAccountActivation(memberId) {
-  const rawToken = nanoid(48);
+  const rawToken = nanoid2(48);
   const tokenHash = createHash("sha256").update(rawToken).digest("hex");
   const expiresAt = new Date(Date.now() + MEMBER_ACCOUNT_ACTIVATION_HOURS * 60 * 60 * 1e3).toISOString();
   db.prepare(
@@ -3922,6 +5768,58 @@ function memberActivationByToken(rawToken) {
      WHERE a.token_hash = ? AND a.purpose = 'set_password'
      LIMIT 1`
   ).get(tokenHash);
+}
+function issueMemberPasswordReset(memberId) {
+  const rawToken = nanoid2(48);
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1e3).toISOString();
+  db.prepare(
+    "UPDATE member_account_activations SET used_at = COALESCE(used_at, datetime('now')) WHERE member_id = ? AND purpose = 'reset_password' AND used_at IS NULL"
+  ).run(memberId);
+  db.prepare(
+    "INSERT INTO member_account_activations (member_id, token_hash, purpose, expires_at) VALUES (?, ?, 'reset_password', ?)"
+  ).run(memberId, tokenHash, expiresAt);
+  return { rawToken, expiresAt };
+}
+function memberPasswordResetByToken(rawToken) {
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  return db.prepare(
+    `SELECT a.id, a.member_id, a.expires_at, a.used_at, m.email, m.first_name, m.last_name, m.status
+     FROM member_account_activations a
+     JOIN members m ON m.id = a.member_id
+     WHERE a.token_hash = ? AND a.purpose = 'reset_password'
+     LIMIT 1`
+  ).get(tokenHash);
+}
+async function sendMemberPasswordResetEmail(input) {
+  const provider = adminNotificationProvider();
+  const subject = "Reset your Papa Life password";
+  const text = `Hello ${input.firstName || "Papa Life member"},
+
+We received a request to reset your Papa Life password. Use this secure link within two hours:
+${input.resetUrl}
+
+If you did not request this, you can ignore this message. Your current password will remain unchanged.
+
+Papa Life`;
+  if (!provider || !isValidEmail(input.recipient)) {
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: isValidEmail(input.recipient) ? input.recipient : null, subject, status: "skipped", error: "No supported transactional email sender is configured", payload: { member_id: input.memberId } });
+    return { ok: false, skipped: true };
+  }
+  const from = process.env.MEMBER_NOTIFICATION_FROM?.trim() || adminNotificationFrom();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8e3);
+  try {
+    const response = provider === "resend" ? await fetch("https://api.resend.com/emails", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [input.recipient], subject, text }) }) : await fetch("https://api.sendgrid.com/v3/mail/send", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ personalizations: [{ to: [{ email: input.recipient }] }], from: { email: extractEmailAddress(from) }, subject, content: [{ type: "text/plain", value: text }] }) });
+    const responseText = await response.text().catch(() => "");
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: input.recipient, subject, status: response.ok ? "sent" : "error", response_status: response.status, error: response.ok ? null : responseText.slice(0, 1e3), payload: { member_id: input.memberId } });
+    return { ok: response.ok };
+  } catch (error) {
+    logNotificationEvent({ event_type: "member_password_reset", provider, recipient: input.recipient, subject, status: "error", error: error?.message || "Password reset email failed", payload: { member_id: input.memberId } });
+    return { ok: false };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 function recentMemberPaymentEvents(limit = 25) {
   return db.prepare(
@@ -4010,12 +5908,13 @@ var allowedAiOrigins = /* @__PURE__ */ new Set([
 ]);
 var contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com",
+  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com https://in.heycatch.ai",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai",
   "media-src 'self' blob: data:",
+  "frame-src 'self' https://meetn.com",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -4075,7 +5974,7 @@ var STATIC_SERVER_PAGES = {
     sections: [
       {
         heading: "Start with clarity",
-        body: "Take the free relationship assessment to name where things stand and identify the first honest step toward closing the gap."
+        body: "Take the 2-minute fatherhood check-in to name where things stand and identify the first honest step toward closing the gap."
       },
       {
         heading: "Learn the new role",
@@ -4086,7 +5985,7 @@ var STATIC_SERVER_PAGES = {
         body: "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships."
       }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
@@ -4099,6 +5998,36 @@ var STATIC_SERVER_PAGES = {
       { heading: "Resource guidance", body: "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises." }
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" }
+  },
+  "/tuesday": {
+    title: "Papa Life Tuesday Live | August 25, 2026 Replay",
+    description: "Watch the Papa Life Tuesday Live replay for August 25, 2026: Consistency After the Conversation.",
+    keywords: "Papa Life Tuesday Live, fathers of adult children, Consistency After the Conversation, Brian Keith Hill",
+    eyebrow: "Papa Life Tuesday Live Replay",
+    headline: "Consistency After the Conversation",
+    intro: "The conversation is only the beginning. Stay present, keep your word, and rebuild trust through small, consistent deposits over time.",
+    sections: [
+      {
+        heading: "For Fathers of Adult Children",
+        body: "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late."
+      }
+    ],
+    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" }
+  },
+  "/tuesday-live": {
+    title: "Papa Life Tuesday Live | August 25, 2026 Replay",
+    description: "Watch the Papa Life Tuesday Live replay for August 25, 2026: Consistency After the Conversation.",
+    keywords: "Papa Life Tuesday Live, fathers of adult children, Consistency After the Conversation, Brian Keith Hill",
+    eyebrow: "Papa Life Tuesday Live Replay",
+    headline: "Consistency After the Conversation",
+    intro: "The conversation is only the beginning. Stay present, keep your word, and rebuild trust through small, consistent deposits over time.",
+    sections: [
+      {
+        heading: "For Fathers of Adult Children",
+        body: "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late."
+      }
+    ],
+    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" }
   },
   "/resources": {
     title: "Papa Life Resources | Boss Mobile Life Coach",
@@ -4158,7 +6087,7 @@ var STATIC_SERVER_PAGES = {
       { heading: "Start here", body: "If you are a father trying to reconnect with an adult child, the free assessment is the best first step." },
       { heading: "For broader support", body: "Use the AI Coach or membership path to get oriented around resources and next actions." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/papa-first-lesson": {
     title: "Free Papa Life Workshop | First Lesson",
@@ -4173,19 +6102,33 @@ var STATIC_SERVER_PAGES = {
     cta: { label: "Watch the Free Lesson", href: "/papa-first-lesson" }
   },
   "/assessment": {
-    title: "Free PAPA Fatherhood Assessment | Papa Life",
-    description: "Score yourself across Purpose, Authority, Presence, and Alignment. A free five-minute assessment for fathers of adult children.",
+    title: "2-Minute Fatherhood Check-In | Papa Life",
+    description: "A short fatherhood check-in to help you see where things stand with your adult child and choose a practical next step.",
     keywords: "father adult child relationship assessment, PAPA framework, fatherhood coaching",
-    eyebrow: "Free Assessment",
+    eyebrow: "Fatherhood Check-In",
     headline: "Your grown child stopped talking to you. It does not have to stay that way.",
-    intro: "Take the free assessment to see where things stand with your adult son or daughter and identify a first step toward closing the gap.",
+    intro: "Take the 2-minute check-in to see where things stand with your adult son or daughter and identify a first step toward closing the gap.",
     sections: [
       { heading: "Purpose", body: "Know who you are now that fatherhood is no longer centered on daily provision and control." },
       { heading: "Authority", body: "Lead through character, humility, and consistency instead of pressure or position." },
       { heading: "Presence", body: "Listen before fixing and become safe enough for honest conversation." },
       { heading: "Alignment", body: "Close the gap between your values, words, and daily actions." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
+  },
+  "/my-journey": {
+    title: "My Fatherhood Journey | Papa Life",
+    description: "A private, interactive Papa Life journey that helps fathers reflect, practice healthier relationship patterns, and track meaningful growth.",
+    eyebrow: "Your Private Journey",
+    headline: "Turn the wheel and take the next honest step.",
+    intro: "Move through awareness, engagement, understanding, action, and reconnection with guided reflection focused on your relationship with your child.",
+    sections: [
+      { heading: "See where you are", body: "Choose your season of fatherhood and your child's life stage so the journey meets you where the relationship is today." },
+      { heading: "Do the work", body: "Use PIES and FOES reflection, relationship practices, and private prompts to turn insight into one practical action." },
+      { heading: "Return and continue", body: "Save your progress privately, revisit completed steps, and keep building presence, safety, and trust over time." }
+    ],
+    cta: { label: "Start My Fatherhood Journey", href: "/my-journey" },
+    noindex: true
   },
   "/relationship-assessment": {
     title: "Free Father-Adult Child Relationship Assessment | Boss Mobile Life Coach",
@@ -4200,16 +6143,16 @@ var STATIC_SERVER_PAGES = {
     cta: { label: "Begin Assessment", href: "/relationship-assessment" }
   },
   "/marlee-assessment": {
-    title: "Marlee Motivation Assessment | Papa Life",
-    description: "Join Brian Keith Hill's Papa Life Marlee workspace and complete a motivational assessment for self-awareness, communication, leadership, and relationship growth.",
-    eyebrow: "Marlee Assessment",
-    headline: "Understand what motivates you and how your style affects relationships.",
-    intro: "The Marlee assessment supports Papa Life fathers with self-awareness around communication, decision-making, and leadership.",
+    title: "2-Minute Fatherhood Check-In | Papa Life",
+    description: "Where Are You With Your Adult Child? Take the 2-Minute Check-In and identify a practical place to begin rebuilding connection.",
+    eyebrow: "2-Minute Fatherhood Check-In",
+    headline: "Where Are You With Your Adult Child?",
+    intro: "Take the 2-Minute Check-In to notice where things stand today and choose an honest, practical next step.",
     sections: [
-      { heading: "Better self-awareness", body: "Learn how your natural style may show up in family conversations and repair attempts." },
-      { heading: "Use it with PAPA", body: "Pair Marlee insights with Purpose, Authority, Presence, and Alignment." }
+      { heading: "A place to begin", body: "Notice how communication feels, where trust may need rebuilding, and what you can begin changing first." },
+      { heading: "A practical next step", body: "Use what you notice as a starting point for reflection, a Papa Life conversation, or one small action." }
     ],
-    cta: { label: "Open Marlee Assessment", href: "/marlee-assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/marlee-assessment" }
   },
   "/adult-son-relationship": {
     title: "Adult Son Relationship Help for Fathers | Boss Mobile Life Coach",
@@ -4222,7 +6165,7 @@ var STATIC_SERVER_PAGES = {
       { heading: "What fathers get wrong", body: "Fixing instead of listening, lecturing when he needed space, and treating conversations like performance reviews." },
       { heading: "A better path forward", body: "The PAPA Framework gives language and steps when emotions run high and words fail." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/adult-daughter-relationship": {
     title: "Adult Daughter Relationship Help for Fathers | Boss Mobile Life Coach",
@@ -4235,7 +6178,7 @@ var STATIC_SERVER_PAGES = {
       { heading: "Why daughters pull away", body: "Old hurts, unspoken expectations, and a lack of emotional safety can create distance." },
       { heading: "What changes", body: "Presence over performance, curiosity over control, and small steady contact over dramatic speeches." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/why-adult-children-pull-away": {
     title: "Why Adult Children Pull Away From Their Fathers | Boss Mobile Life Coach",
@@ -4261,7 +6204,7 @@ var STATIC_SERVER_PAGES = {
       { heading: "What estrangement asks", body: "Not a performance of change, but real change. Not one letter that fixes years, but a new way of showing up." },
       { heading: "Start where you are", body: "Name the truth without drowning in blame and get support so you are not navigating this alone." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/welcome-to-papa-life": {
     title: "Papa Life | Help for Fathers of Adult Children",
@@ -4289,7 +6232,7 @@ var STATIC_SERVER_PAGES = {
       { heading: "Presence", body: "Show up without fixing everything and let your child feel seen, not managed." },
       { heading: "Alignment", body: "Close the gap between who you say you are and how you live." }
     ],
-    cta: { label: "Take the Assessment", href: "/assessment" }
+    cta: { label: "Take the 2-Minute Check-In", href: "/assessment" }
   },
   "/about-brian-keith-hill": {
     title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
@@ -4336,6 +6279,24 @@ var STATIC_SERVER_PAGES = {
     intro: "Members can access course lessons, progress tracking, journal prompts, and the Papa Life resource library.",
     sections: [{ heading: "Member portal", body: "Use your Papa Life account to continue lessons and track your progress." }],
     cta: { label: "Sign In", href: "/member-login" },
+    noindex: true
+  },
+  "/member-forgot-password": {
+    title: "Reset Papa Life Password",
+    description: "Request a secure password-reset link for your Papa Life member account.",
+    eyebrow: "Member Access",
+    headline: "Get back into your Papa Life account.",
+    intro: "Enter your member email address to request a secure, time-limited password-reset link.",
+    sections: [{ heading: "Secure recovery", body: "For privacy, the response does not reveal whether an email address is registered." }],
+    noindex: true
+  },
+  "/member-reset-password": {
+    title: "Choose a New Papa Life Password",
+    description: "Use a secure reset link to choose a new Papa Life member password.",
+    eyebrow: "Member Access",
+    headline: "Choose a new password.",
+    intro: "Valid reset links are time-limited and can be used only once.",
+    sections: [{ heading: "Secure reset", body: "If your link has expired or was already used, request a new one from the forgot-password page." }],
     noindex: true
   },
   "/member-register": {
@@ -4514,8 +6475,8 @@ var STATIC_SERVER_PAGES = {
     noindex: true
   }
 };
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+function escapeHtml(value2) {
+  return String(value2 ?? "").replace(/[&<>"']/g, (ch) => {
     switch (ch) {
       case "&":
         return "&amp;";
@@ -5012,6 +6973,7 @@ async function startServer() {
     });
   });
   registerSmsCampaignRoutes(app, db, requireAuth);
+  registerYouTubeIntegrationRoutes(app, db, requireAuth, requireResearchLabAccess);
   app.get("/api/admin/papa-daily-work-reports", requireAuth, (_req, res) => {
     const reports = db.prepare(
       `SELECT id, report_date, title, outcomes, win, ventures_saved, created_at
@@ -5164,6 +7126,45 @@ async function startServer() {
       access,
       billing_required: !access.portal
     });
+  });
+  app.post("/api/member/auth/forgot-password", async (req, res) => {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const generic = { ok: true, message: "If that email belongs to an active Papa Life account, a secure reset link has been sent." };
+    if (!isValidEmail(email)) return res.json(generic);
+    const member = loadMemberByEmail(email);
+    if (!member || member.status !== "active") return res.json(generic);
+    const reset = issueMemberPasswordReset(member.id);
+    const resetUrl = `${appBaseUrl(req)}/member-reset-password?token=${encodeURIComponent(reset.rawToken)}`;
+    await sendMemberPasswordResetEmail({ recipient: member.email, firstName: member.first_name, resetUrl, expiresAt: reset.expiresAt, memberId: member.id });
+    return res.json(generic);
+  });
+  app.get("/api/member/auth/reset-password", (req, res) => {
+    const token = cleanPublicText(req.query?.token, 200);
+    const reset = token ? memberPasswordResetByToken(token) : null;
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    return res.json({ ok: true, first_name: reset.first_name, email: reset.email });
+  });
+  app.post("/api/member/auth/reset-password", async (req, res) => {
+    const token = cleanPublicText(req.body?.token, 200);
+    const password = String(req.body?.password || "");
+    const confirmPassword = String(req.body?.confirm_password || "");
+    if (!token || password.length < 8) return res.status(400).json({ ok: false, error: "A valid link and password of at least 8 characters are required" });
+    if (password !== confirmPassword) return res.status(400).json({ ok: false, error: "Passwords do not match" });
+    const reset = memberPasswordResetByToken(token);
+    const expiresAt = reset?.expires_at ? new Date(reset.expires_at).getTime() : 0;
+    if (!reset || reset.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || reset.status !== "active") {
+      return res.status(400).json({ ok: false, error: "This password-reset link is invalid or has expired" });
+    }
+    const consumed = db.prepare("UPDATE member_account_activations SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL").run(reset.id);
+    if (!consumed.changes) return res.status(400).json({ ok: false, error: "This password-reset link has already been used" });
+    db.prepare("UPDATE members SET password_hash = ? WHERE id = ?").run(await bcrypt.hash(password, 12), reset.member_id);
+    const member = loadMemberById(Number(reset.member_id));
+    req.session.memberId = member.id;
+    req.session.memberUser = memberSessionPayload(member);
+    return res.json({ ok: true, redirect: "/portal" });
   });
   app.get("/api/member/auth/activate", (req, res) => {
     const token = cleanPublicText(req.query?.token, 200);
@@ -5930,6 +7931,51 @@ async function startServer() {
     db.prepare("DELETE FROM member_progress WHERE member_id = ? AND lesson_id = ?").run(memberId, req.params.lesson_id);
     res.json({ ok: true });
   });
+  app.get("/api/member/journey", requireMemberAuth, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const steps = db.prepare(
+      `SELECT step_key, response, status, started_at, completed_at, updated_at
+       FROM member_journey_steps WHERE member_id = ? ORDER BY id`
+    ).all(memberId);
+    res.json({ ok: true, steps });
+  });
+  app.put("/api/member/journey/:stepKey", requireMemberAuth, (req, res) => {
+    const memberId = Number(req.session.memberId);
+    const stepKey = String(req.params.stepKey || "").trim();
+    const allowedSteps = ["awareness", "engage", "understand", "take_action", "reconnection"];
+    if (!allowedSteps.includes(stepKey)) {
+      return res.status(400).json({ ok: false, error: "Unknown journey destination" });
+    }
+    const response = cleanPublicText(String(req.body?.response || ""), 4e3);
+    const status = req.body?.status === "completed" ? "completed" : "in_progress";
+    db.prepare(
+      `INSERT INTO member_journey_steps (member_id, step_key, response, status, completed_at, updated_at)
+       VALUES (?, ?, ?, ?, CASE WHEN ? = 'completed' THEN datetime('now') ELSE NULL END, datetime('now'))
+       ON CONFLICT(member_id, step_key) DO UPDATE SET
+         response = excluded.response,
+         status = excluded.status,
+         completed_at = CASE
+           WHEN excluded.status = 'completed' THEN COALESCE(member_journey_steps.completed_at, datetime('now'))
+           ELSE member_journey_steps.completed_at
+         END,
+         updated_at = datetime('now')`
+    ).run(memberId, stepKey, response, status, status);
+    res.json({ ok: true, step_key: stepKey, status });
+  });
+  app.get("/api/admin/father-journeys", requireAuth, requireResearchLabAccess, (_req, res) => {
+    const journeys = db.prepare(
+      `SELECT m.id AS member_id, m.first_name, m.last_name, m.email,
+              COUNT(js.id) AS started_steps,
+              SUM(CASE WHEN js.status = 'completed' THEN 1 ELSE 0 END) AS completed_steps,
+              MAX(js.updated_at) AS last_activity
+       FROM members m
+       LEFT JOIN member_journey_steps js ON js.member_id = m.id
+       WHERE js.id IS NOT NULL
+       GROUP BY m.id
+       ORDER BY last_activity DESC`
+    ).all();
+    res.json({ ok: true, journeys });
+  });
   app.get("/api/journal-prompts", requireMemberAuth, (_req, res) => {
     const prompts = db.prepare("SELECT * FROM journal_prompts ORDER BY pillar ASC, sort_order ASC").all();
     res.json(prompts);
@@ -6424,7 +8470,7 @@ async function startServer() {
         const ghlCredentials = resolveGhlCredentials(db);
         if (ghlCredentials) {
           const [contactFirstName, ...contactLastNameParts] = first_name.split(/\s+/);
-          const tagValue = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+          const tagValue = (value2) => value2.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
           const result2 = await ghlUpsertContactWithTags(
             {
               firstName: contactFirstName || first_name,
@@ -6880,7 +8926,7 @@ async function startServer() {
     const leadRows = rows.filter(actionCoachLead);
     const conversationRows = rows.filter((row) => row.mode === "action_coach_chat");
     const priorityLeads = leadRows.filter((row) => (row.conversation_summary || "").includes("priority_follow_up"));
-    const importantQuestions = conversationRows.map((row) => row.user_message?.trim()).filter((value) => Boolean(value)).slice(0, 5);
+    const importantQuestions = conversationRows.map((row) => row.user_message?.trim()).filter((value2) => Boolean(value2)).slice(0, 5);
     res.json({
       ok: true,
       report_date: requestedDate || (/* @__PURE__ */ new Date()).toISOString().slice(0, 10),
@@ -7298,6 +9344,220 @@ async function startServer() {
       res.status(500).json({ ok: false, error: String(e) });
     }
   });
+  app.post("/api/admin/human-impact/observations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = createHumanImpactObservation(db, req.body);
+      res.status(201).json({ ok: true, id });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/human-impact/observations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const participantRef = String(req.query.participant_ref || "").trim() || void 0;
+      const requestedLimit = Number(req.query.limit || 100);
+      const observations = listHumanImpactObservations(db, {
+        participantRef,
+        limit: Number.isFinite(requestedLimit) ? requestedLimit : 100
+      });
+      res.json({ ok: true, observations });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/human-impact/summary", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const program = String(req.query.program || "papa_life").trim() || "papa_life";
+      res.json({ ok: true, summary: summarizeHumanImpact(db, program) });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const memories = listExecutiveMemories(db, {
+        query: String(req.query.query || "").trim() || void 0,
+        category: String(req.query.category || "").trim() || void 0,
+        includeArchived: req.query.include_archived === "true" || req.query.include_archived === "1",
+        limit: Number(req.query.limit || 100)
+      });
+      res.json({ ok: true, memories });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, ...rememberExecutiveMemory(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/executive-memory/:key/history", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.json({ ok: true, history: getExecutiveMemoryHistory(db, String(req.params.key || "")) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/executive-memory/:id/archive", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      const archived = archiveExecutiveMemory(db, id);
+      if (!archived) return res.status(404).json({ ok: false, error: "Active memory not found" });
+      res.json({ ok: true, id });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const conversations = listExecutiveConversationBriefs(db, {
+        status: String(req.query.status || "").trim() || void 0,
+        limit: Number(req.query.limit || 50)
+      });
+      res.json({ ok: true, conversations });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const projects = listAiBossProjects(db, {
+        status: String(req.query.status || "").trim() || void 0,
+        limit: Number(req.query.limit || 50)
+      });
+      res.json({ ok: true, projects });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, project: saveAiBossProject(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/ai-boss/projects/:key", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const result = getAiBossProjectWork(db, String(req.params.key || ""));
+      if (!result) return res.status(404).json({ ok: false, error: "Project not found" });
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/ai-boss/nodes/heartbeat", (req, res) => {
+    try {
+      const expected = String(process.env.AI_BOSS_NODE_HEARTBEAT_TOKEN || "").trim();
+      if (!expected) return res.status(503).json({ ok: false, error: "Node heartbeat is not configured" });
+      const provided = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const expectedBuffer = Buffer.from(expected);
+      const providedBuffer = Buffer.from(provided);
+      if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+        return res.status(401).json({ ok: false, error: "Unauthorized" });
+      }
+      res.json({ ok: true, node: recordAiBossNodeHeartbeat(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/ai-boss/campaigns/snapshot", (req, res) => {
+    try {
+      const expected = String(process.env.AI_BOSS_CAMPAIGN_SYNC_TOKEN || "").trim();
+      if (!expected) return res.status(503).json({ ok: false, error: "Campaign sync is not configured" });
+      const provided = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const expectedBuffer = Buffer.from(expected);
+      const providedBuffer = Buffer.from(provided);
+      if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+        return res.status(401).json({ ok: false, error: "Unauthorized" });
+      }
+      res.json({ ok: true, campaign: upsertAiBossCampaignSnapshot(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/ai-boss/android-companion/heartbeat", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const input = req.body && typeof req.body === "object" ? req.body : {};
+      res.json({
+        ok: true,
+        node: recordAiBossNodeHeartbeat(db, {
+          node_id: input.node_id,
+          display_name: input.display_name || "Brian's Android phone",
+          node_kind: "android",
+          capabilities: ["mobile_capture", "approvals", "instruction_queue"]
+        })
+      });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/ai-boss/mission-control", requireAuth, requireResearchLabAccess, (_req, res) => {
+    try {
+      res.json({ ok: true, mission: { ...getAiBossMissionControl(db), campaigns: getAiBossCampaigns(db) } });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.get("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const actions = listExecutiveActions(db, {
+        status: String(req.query.status || "").trim() || void 0,
+        targetSystem: String(req.query.target_system || "").trim() || void 0,
+        limit: Number(req.query.limit || 100)
+      });
+      res.json({ ok: true, actions });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, action: createExecutiveAction(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/action-queue/:id/decision", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      res.json({ ok: true, action: decideExecutiveAction(db, id, req.body) });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      res.status(message === "Action not found" ? 404 : 400).json({ ok: false, error: message });
+    }
+  });
+  app.get("/api/admin/action-queue/:id/audit", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      res.json({ ok: true, audit: getExecutiveActionAudit(db, id) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+  app.post("/api/admin/action-queue/:id/execute", requireAuth, requireResearchLabAccess, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
+      const action = await executeApprovedExecutiveAction(db, id);
+      res.json({ ok: true, action });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      res.status(message === "Action not found" ? 404 : 400).json({ ok: false, error: message });
+    }
+  });
   app.get("/api/ctas", (req, res) => {
     try {
       const single = String(req.query.placement || "").trim();
@@ -7469,6 +9729,10 @@ async function startServer() {
     const source = encodeURIComponent(String(req.query.src || "site"));
     res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);
   });
+  app.get(/^\/([a-z0-9])$/, (req, res) => {
+    const campaign = encodeURIComponent(String(req.params[0] || ""));
+    res.redirect(302, `/?utm_source=heycatch&utm_campaign=${campaign}`);
+  });
   app.use("/api", (_req, res) => {
     res.status(404).json({ ok: false, error: "Not found" });
   });
@@ -7498,12 +9762,14 @@ async function startServer() {
   });
   if (process.env.NODE_ENV === "test") {
     console.info("[elevenlabs] external voice verification skipped in isolated test mode");
+  } else if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID || !ELEVENLABS_EXPECTED_VOICE_ID) {
+    console.warn("[elevenlabs] voice coach is not configured; website startup will continue without voice features");
   } else {
     await assertElevenLabsVoiceConfig("startup");
   }
-  const port = process.env.PORT || 3e3;
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  const port = Number(process.env.PORT || 3e3);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on http://0.0.0.0:${port}/`);
   });
 }
 startServer().catch((error) => {

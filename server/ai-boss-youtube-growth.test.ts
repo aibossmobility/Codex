@@ -9,6 +9,7 @@ const packagingProblem = scoreYouTubeOpportunity({
   views: 120,
   watchTimeMinutes: 900,
   averageViewDurationSeconds: 450,
+  averageViewPercentage: 62,
   subscribersGained: 3,
 });
 assert.equal(packagingProblem.recommendedActions.includes("thumbnail"), true);
@@ -22,14 +23,15 @@ const retentionProblem = scoreYouTubeOpportunity({
   views: 90,
   watchTimeMinutes: 120,
   averageViewDurationSeconds: 80,
+  averageViewPercentage: 18,
   subscribersGained: 0,
 });
 assert.equal(retentionProblem.recommendedActions.includes("retention"), true);
 
 const selected = pickPilotVideos([
-  { videoId: "c", title: "C", impressions: 100, clickThroughRate: 6, views: 8, watchTimeMinutes: 60, averageViewDurationSeconds: 420, subscribersGained: 0 },
-  { videoId: "a", title: "A", impressions: 5000, clickThroughRate: 2, views: 100, watchTimeMinutes: 700, averageViewDurationSeconds: 420, subscribersGained: 2 },
-  { videoId: "b", title: "B", impressions: 2000, clickThroughRate: 3, views: 60, watchTimeMinutes: 50, averageViewDurationSeconds: 60, subscribersGained: 0 },
+  { videoId: "c", title: "C", impressions: 100, clickThroughRate: 6, views: 8, watchTimeMinutes: 60, averageViewDurationSeconds: 420, averageViewPercentage: 58, subscribersGained: 0 },
+  { videoId: "a", title: "A", impressions: 5000, clickThroughRate: 2, views: 100, watchTimeMinutes: 700, averageViewDurationSeconds: 420, averageViewPercentage: 58, subscribersGained: 2 },
+  { videoId: "b", title: "B", impressions: 2000, clickThroughRate: 3, views: 60, watchTimeMinutes: 50, averageViewDurationSeconds: 60, averageViewPercentage: 15, subscribersGained: 0 },
 ], 2);
 assert.equal(selected.length, 2);
 assert.equal(selected[0].priorityScore >= selected[1].priorityScore, true);

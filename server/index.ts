@@ -100,6 +100,7 @@ import {
   syncIntakeSubmissionToCrmLead,
 } from "./sync-intake-to-crm";
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
+import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import {
   ensureGhlIntegrationTable,
   getGhlIntegrationPublic,
@@ -3267,6 +3268,7 @@ async function startServer() {
   });
 
   registerSmsCampaignRoutes(app, db, requireAuth);
+  registerYouTubeIntegrationRoutes(app, db, requireAuth, requireResearchLabAccess);
 
   // ── Protected: Papa Life daily work reports ───────────────────────────────
 

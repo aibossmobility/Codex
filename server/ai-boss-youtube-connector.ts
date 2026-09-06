@@ -52,11 +52,11 @@ export async function exchangeYouTubeAuthorizationCode(code: string, fetchImpl: 
   return data;
 }
 
-async function getAccessToken(fetchImpl: FetchLike) {
+async function getAccessToken(fetchImpl: FetchLike, refreshToken?: string) {
   const body = new URLSearchParams({
     client_id: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_ID"),
     client_secret: requiredEnv("AI_BOSS_YOUTUBE_CLIENT_SECRET"),
-    refresh_token: requiredEnv("AI_BOSS_YOUTUBE_REFRESH_TOKEN"),
+    refresh_token: refreshToken || requiredEnv("AI_BOSS_YOUTUBE_REFRESH_TOKEN"),
     grant_type: "refresh_token",
   });
   const response = await fetchImpl("https://oauth2.googleapis.com/token", {
@@ -76,8 +76,8 @@ async function googleJson(fetchImpl: FetchLike, url: string, accessToken: string
   return text ? JSON.parse(text) : null;
 }
 
-export async function executeYouTubeConnectorAction(action: YouTubeAction, fetchImpl: FetchLike = fetch) {
-  const accessToken = await getAccessToken(fetchImpl);
+export async function executeYouTubeConnectorAction(action: YouTubeAction, fetchImpl: FetchLike = fetch, refreshToken?: string) {
+  const accessToken = await getAccessToken(fetchImpl, refreshToken);
   if (action.operation === "channel") {
     return googleJson(fetchImpl, "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&mine=true", accessToken);
   }
@@ -93,7 +93,7 @@ export async function executeYouTubeConnectorAction(action: YouTubeAction, fetch
   }
   const ids = (action.video_ids || []).filter(Boolean);
   const filters = ids.length ? `&filters=${encodeURIComponent(`video==${ids.join(",")}`)}` : "";
-  const metrics = ["views","estimatedMinutesWatched","averageViewDuration","subscribersGained","videoThumbnailImpressions","videoThumbnailImpressionsClickRate"].join(",");
+  const metrics = ["views","estimatedMinutesWatched","averageViewDuration","averageViewPercentage","subscribersGained","videoThumbnailImpressions","videoThumbnailImpressionsClickRate"].join(",");
   const url = `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel%3D%3DMINE&startDate=${encodeURIComponent(action.start_date)}&endDate=${encodeURIComponent(action.end_date)}&metrics=${encodeURIComponent(metrics)}&dimensions=video${filters}`;
   return googleJson(fetchImpl, url, accessToken);
 }

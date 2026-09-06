@@ -6,6 +6,7 @@ export type YouTubeVideoMetrics = {
   views: number;
   watchTimeMinutes: number;
   averageViewDurationSeconds: number;
+  averageViewPercentage: number;
   subscribersGained: number;
 };
 
@@ -28,7 +29,7 @@ export function scoreYouTubeOpportunity(metrics: YouTubeVideoMetrics): YouTubeOp
   const actions = new Set<YouTubeOptimizationRecommendation["recommendedActions"][number]>();
 
   const ctr = metrics.clickThroughRate;
-  const avgView = metrics.averageViewDurationSeconds;
+  const avgViewPct = metrics.averageViewPercentage;
   const viewsPerImpression = metrics.impressions > 0 ? metrics.views / metrics.impressions : 0;
   const subscriberYield = metrics.views > 0 ? metrics.subscribersGained / metrics.views : 0;
 
@@ -46,11 +47,11 @@ export function scoreYouTubeOpportunity(metrics: YouTubeVideoMetrics): YouTubeOp
     actions.add("topic_followup");
   }
 
-  if (avgView < 180) {
+  if (avgViewPct < 30) {
     score += 30;
     diagnosis.push("Viewer retention is weak enough that the opening and pacing should be reviewed.");
     actions.add("retention");
-  } else if (avgView >= 300) {
+  } else if (avgViewPct >= 50) {
     score += 15;
     diagnosis.push("Watch time is comparatively strong, so packaging improvements may unlock more traffic.");
     actions.add("thumbnail");
@@ -77,7 +78,7 @@ export function scoreYouTubeOpportunity(metrics: YouTubeVideoMetrics): YouTubeOp
     videoId: metrics.videoId,
     priorityScore: clamp(score),
     diagnosis,
-    recommendedActions: [...actions],
+    recommendedActions: Array.from(actions),
   };
 }
 

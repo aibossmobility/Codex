@@ -31,6 +31,7 @@ import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
 import AiBossApprovals from "./pages/AiBossApprovals";
+import AiBossTakeover from "./pages/AiBossTakeover";
 import YouTubeGrowth from "./pages/YouTubeGrowth";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
@@ -59,15 +60,11 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path="/media-library">
-        <Redirect to="/courses" />
-      </Route>
+      <Route path="/media-library"><Redirect to="/courses" /></Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />
       <Route path={"/login"} component={Login} />
-      <Route path="/dashboard">
-        <Redirect to="/crm-console" />
-      </Route>
+      <Route path="/dashboard"><Redirect to="/crm-console" /></Route>
       <Route path={"/crm"} component={CrmIntake} />
       <Route path={"/crm-console"} component={Dashboard} />
       <Route path="/papa-intro" component={PapaIntroVideo} />
@@ -117,6 +114,7 @@ function Router() {
       <Route path={"/executive-memory"} component={ExecutiveMemory} />
       <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
+      <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
@@ -128,38 +126,18 @@ function GlobalPapaAiWidget() {
   const [location] = useLocation();
   const path = location.replace(/\/$/, "") || "/";
   const hiddenPrefixes = [
-    "/ai-coach",
-    "/crm",
-    "/crm-console",
-    "/dashboard",
-    "/login",
-    "/member-login",
-    "/member-register",
-    "/member-activate",
-    "/member-billing",
-    "/portal",
-    "/my-journey",
-    "/join",
-    "/research-lab",
-    "/executive-memory",
-    "/ai-boss",
-    "/admin",
-    "/strategist",
-    "/theme-matrix",
-    "/operators",
-    "/governance",
+    "/ai-coach", "/crm", "/crm-console", "/dashboard", "/login", "/member-login",
+    "/member-register", "/member-activate", "/member-billing", "/portal", "/my-journey",
+    "/join", "/research-lab", "/executive-memory", "/ai-boss", "/admin", "/strategist",
+    "/theme-matrix", "/operators", "/governance",
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
-
   if (shouldHide) return null;
   return <PapaAiWidget />;
 }
 
 function App() {
-  useEffect(() => {
-    captureFirstTouchAttribution();
-  }, []);
-
+  useEffect(() => { captureFirstTouchAttribution(); }, []);
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">

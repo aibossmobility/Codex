@@ -18,6 +18,19 @@ type AiBossNode = {
   capabilities: string[];
 };
 
+type PendingApproval = {
+  id: number;
+  action_type: string;
+  target_system: string;
+  target_ref: string | null;
+  requested_outcome: string;
+  authority_level: string;
+  execution_route: string;
+  estimated_external_ai_cost_micros: number;
+  created_at: string;
+  waits_for_mac: boolean;
+};
+
 export function ensureAiBossMobileTables(db: BetterSqliteDatabase) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS ai_boss_nodes (
@@ -66,6 +79,29 @@ export function getAiBossNodes(db: BetterSqliteDatabase, onlineWindowSeconds = 9
   }));
 }
 
+function getPendingApprovals(db: BetterSqliteDatabase, macOnline: boolean): PendingApproval[] {
+  const rows = db.prepare(`
+    SELECT id, action_type, target_system, target_ref, requested_outcome,
+      authority_level, execution_route, estimated_external_ai_cost_micros, created_at
+    FROM executive_actions
+    WHERE status = 'awaiting_approval'
+    ORDER BY created_at ASC, id ASC
+    LIMIT 25
+  `).all() as Array<Record<string, unknown>>;
+  return rows.map((row) => ({
+    id: Number(row.id),
+    action_type: String(row.action_type),
+    target_system: String(row.target_system),
+    target_ref: row.target_ref == null ? null : String(row.target_ref),
+    requested_outcome: String(row.requested_outcome),
+    authority_level: String(row.authority_level),
+    execution_route: String(row.execution_route),
+    estimated_external_ai_cost_micros: Number(row.estimated_external_ai_cost_micros || 0),
+    created_at: String(row.created_at),
+    waits_for_mac: !macOnline && String(row.execution_route) === "local",
+  }));
+}
+
 export function getAiBossMissionControl(db: BetterSqliteDatabase) {
   const counts = db.prepare(`
     SELECT
@@ -78,12 +114,16 @@ export function getAiBossMissionControl(db: BetterSqliteDatabase) {
   `).get() as Record<string, number | null>;
   const nodes = getAiBossNodes(db);
   const macOnline = nodes.some((node) => node.node_kind === "mac" && node.online);
+  const androidOnline = nodes.some((node) => node.node_kind === "android" && node.online);
   const openInstructions = (db.prepare(
     "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%') AND status IN ('active', 'waiting')"
   ).get() as { count: number }).count;
   return {
     nodes,
     mac_online: macOnline,
+    android_online: androidOnline,
+    active_companion: androidOnline ? "android" : macOnline ? "mac" : null,
+    pending_approvals: getPendingApprovals(db, macOnline),
     queue: {
       awaiting_approval: counts.awaiting_approval || 0,
       approved: counts.approved || 0,

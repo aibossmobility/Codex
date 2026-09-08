@@ -16,6 +16,7 @@ type ExecutiveActionRow = {
   authority_level: string;
   execution_route: string;
   approval_required: number;
+  provider_id?: string | null;
   action_payload_json?: string | null;
   status: string;
 };
@@ -191,11 +192,88 @@ export function createGmailExecutor(fetchImpl: typeof fetch = fetch): ExecutiveA
   };
 }
 
+function parseCloudModelPayload(action: ExecutiveActionRow) {
+  let payload: any = null;
+  try {
+    payload = action.action_payload_json ? JSON.parse(action.action_payload_json) : {};
+  } catch {
+    throw new Error("Cloud-model action payload is not valid JSON.");
+  }
+  const input = typeof payload?.input === "string" && payload.input.trim()
+    ? payload.input.trim()
+    : action.requested_outcome.trim();
+  const instructions = typeof payload?.instructions === "string" ? payload.instructions.trim() : "";
+  return { input, instructions };
+}
+
+function extractXaiResponseText(json: any) {
+  if (typeof json?.output_text === "string" && json.output_text.trim()) return json.output_text.trim();
+  const parts = Array.isArray(json?.output)
+    ? json.output.flatMap((item: any) => Array.isArray(item?.content) ? item.content : [])
+    : [];
+  const text = parts
+    .map((part: any) => typeof part?.text === "string" ? part.text : "")
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  return text;
+}
+
+export function createCloudModelExecutor(fetchImpl: typeof fetch = fetch): ExecutiveActionExecutor {
+  return async (action) => {
+    if (action.execution_route !== "cloud_model") {
+      throw new Error(`Cloud-model executor requires cloud_model route; received ${action.execution_route}.`);
+    }
+    const provider = String(action.provider_id || "").trim().toLowerCase();
+    if (!["xai", "grok"].includes(provider)) {
+      throw new Error(`Cloud-model provider is not registered in this executor: ${provider || "missing"}.`);
+    }
+    const key = String(process.env.XAI_API_KEY || "").trim();
+    if (!key) throw new Error("xAI is not configured on this runtime. Set XAI_API_KEY server-side.");
+
+    const { input, instructions } = parseCloudModelPayload(action);
+    const baseUrl = String(process.env.XAI_BASE_URL || "https://api.x.ai/v1").replace(/\/$/, "");
+    const response = await fetchImpl(`${baseUrl}/responses`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: process.env.XAI_MODEL || "grok-4.6",
+        input: instructions ? `${instructions}\n\n${input}` : input,
+      }),
+      signal: AbortSignal.timeout(resolveExecutorTimeoutMs()),
+    });
+    const text = await readBoundedResponseText(response);
+    let json: any = null;
+    try { json = text ? JSON.parse(text) : null; } catch {
+      throw new Error(`xAI returned a non-JSON response (${response.status}).`);
+    }
+    if (!response.ok) {
+      throw new Error(json?.error?.message || `xAI request failed with status ${response.status}.`);
+    }
+    const output = extractXaiResponseText(json);
+    if (!output) throw new Error("xAI returned no response text.");
+    return {
+      summary: "Unified OS cloud-model action completed through xAI Grok.",
+      details: {
+        provider: "xai",
+        model: process.env.XAI_MODEL || "grok-4.6",
+        output,
+        response_id: json?.id || null,
+        usage: json?.usage || null,
+      },
+    };
+  };
+}
+
 export function defaultExecutorRegistry(): ExecutorRegistry {
   return {
     [executorRegistryKey("gmail", "direct")]: createGmailExecutor(),
     [executorRegistryKey("desktop_commander", "local")]: createDesktopCommanderExecutor(),
     [executorRegistryKey("files", "local")]: createDesktopCommanderExecutor(),
+    [executorRegistryKey("system", "cloud_model")]: createCloudModelExecutor(),
   };
 }
 

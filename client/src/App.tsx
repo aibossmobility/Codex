@@ -32,6 +32,7 @@ import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
 import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
+import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
 import YouTubeGrowth from "./pages/YouTubeGrowth";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
@@ -67,7 +68,7 @@ function Router() {
       <Route path="/dashboard"><Redirect to="/crm-console" /></Route>
       <Route path={"/crm"} component={CrmIntake} />
       <Route path={"/crm-console"} component={Dashboard} />
-      <Route path="/papa-intro" component={PapaIntroVideo} />
+      <Route path={"/papa-intro"} component={PapaIntroVideo} />
       <Route path="/papa-journal" component={PapaJournal} />
       <Route path="/papa-first-lesson" component={PapaFirstLesson} />
       <Route path="/papa-daily-work-report" component={PapaDailyWorkReport} />
@@ -115,6 +116,7 @@ function Router() {
       <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
+      <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

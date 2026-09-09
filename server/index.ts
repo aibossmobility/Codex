@@ -2842,8 +2842,28 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
   };
 }
 
+function aiBossServerPage(): ServerRenderedPage {
+  const page: StaticServerPage = {
+    title: "AI Boss OS | Papa Life Coach",
+    description: "Private AI Boss OS workspace for Papa Life operations.",
+    eyebrow: "AI Boss OS",
+    headline: "Private operations workspace",
+    intro: "Please sign in to continue to AI Boss OS.",
+    sections: [],
+    noindex: true,
+  };
+  return {
+    status: 200,
+    title: page.title,
+    description: page.description,
+    bodyHtml: serverPageShell(page),
+    noindex: true,
+  };
+}
+
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
+  if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses") return coursesServerPage();
 

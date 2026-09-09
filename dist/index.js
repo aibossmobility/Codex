@@ -1234,6 +1234,28 @@ function getAiBossNodes(db2, onlineWindowSeconds = 90) {
     capabilities: JSON.parse(String(row.capabilities_json || "[]"))
   }));
 }
+function getPendingApprovals(db2, macOnline) {
+  const rows = db2.prepare(`
+    SELECT id, action_type, target_system, target_ref, requested_outcome,
+      authority_level, execution_route, estimated_external_ai_cost_micros, created_at
+    FROM executive_actions
+    WHERE status = 'awaiting_approval'
+    ORDER BY created_at ASC, id ASC
+    LIMIT 25
+  `).all();
+  return rows.map((row) => ({
+    id: Number(row.id),
+    action_type: String(row.action_type),
+    target_system: String(row.target_system),
+    target_ref: row.target_ref == null ? null : String(row.target_ref),
+    requested_outcome: String(row.requested_outcome),
+    authority_level: String(row.authority_level),
+    execution_route: String(row.execution_route),
+    estimated_external_ai_cost_micros: Number(row.estimated_external_ai_cost_micros || 0),
+    created_at: String(row.created_at),
+    waits_for_mac: !macOnline && String(row.execution_route) === "local"
+  }));
+}
 function getAiBossMissionControl(db2) {
   const counts = db2.prepare(`
     SELECT
@@ -1246,12 +1268,16 @@ function getAiBossMissionControl(db2) {
   `).get();
   const nodes = getAiBossNodes(db2);
   const macOnline = nodes.some((node) => node.node_kind === "mac" && node.online);
+  const androidOnline = nodes.some((node) => node.node_kind === "android" && node.online);
   const openInstructions = db2.prepare(
     "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%') AND status IN ('active', 'waiting')"
   ).get().count;
   return {
     nodes,
     mac_online: macOnline,
+    android_online: androidOnline,
+    active_companion: androidOnline ? "android" : macOnline ? "mac" : null,
+    pending_approvals: getPendingApprovals(db2, macOnline),
     queue: {
       awaiting_approval: counts.awaiting_approval || 0,
       approved: counts.approved || 0,
@@ -3051,7 +3077,7 @@ function createYouTubeConnectorServer() {
     });
   });
 }
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.env.AI_BOSS_YOUTUBE_CONNECTOR_STANDALONE === "1") {
   const port = Number(process.env.AI_BOSS_YOUTUBE_CONNECTOR_PORT || DEFAULT_PORT);
   createYouTubeConnectorServer().listen(port, "127.0.0.1", () => {
     console.log(`AI Boss YouTube connector listening on http://127.0.0.1:${port}/youtube`);
@@ -6620,6 +6646,24 @@ function renderServerPage(rawUrl) {
   const pathname = normalizeAppPath(rawUrl);
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses") return coursesServerPage();
+  if (/^\/ai-boss(?:\/|$)/.test(pathname)) {
+    return {
+      status: 200,
+      title: "AI Boss OS | Papa Life",
+      description: "Authenticated AI Boss OS operations for Papa Life.",
+      noindex: true,
+      bodyHtml: serverPageShell({
+        title: "AI Boss OS | Papa Life",
+        description: "Authenticated AI Boss OS operations for Papa Life.",
+        eyebrow: "Papa Life",
+        headline: "AI Boss OS",
+        intro: "Sign in to access the protected AI Boss companion and operations console.",
+        sections: [],
+        cta: { label: "Sign In", href: "/login" },
+        noindex: true
+      })
+    };
+  }
   const courseMatch = pathname.match(/^\/courses\/(\d+)$/);
   if (courseMatch) return courseDetailServerPage(Number(courseMatch[1]));
   return staticServerPage(pathname) || notFoundServerPage();

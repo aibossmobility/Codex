@@ -13,7 +13,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const MCP_PORT = parseInt(process.env.MCP_PORT || "3009", 10);
 const MCP_BEARER_TOKEN = process.env.MCP_BEARER_TOKEN || "";
-const MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://bossmobilelifecoach.com";
+const MCP_BASE_URL = process.env.PUBLIC_MCP_BASE_URL || "https://papalifecoach.com";
 
 const OAUTH_CODE_TTL_MS = 5 * 60 * 1000;
 const OAUTH_ACCESS_TTL_SEC = 60 * 60;

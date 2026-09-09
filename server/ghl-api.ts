@@ -164,7 +164,7 @@ export async function ghlUpsertContactWithTags(
       ok: false,
       error: "Go High Level location ID is not configured",
       action: "missing_location_id",
-      fix: "Open CRM → Settings on bossmobilelifecoach.com and save the HighLevel Location ID.",
+      fix: "Open CRM → Settings on papalifecoach.com and save the HighLevel Location ID.",
     };
   }
 

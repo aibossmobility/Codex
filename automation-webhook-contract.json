@@ -4,7 +4,7 @@
   "version": "1.1.0",
   "description": "This legacy contract documents optional lead-intake synchronization between bossmobilelifecoach.com and a cloud automation service. It is not part of the Papa Life Commercial System launch path, payment-to-access flow, production verification, or launch-readiness workflow.",
   "commercial_system_status": "out_of_scope_for_membership_checkout_to_course_11",
-  "base_url": "https://bossmobilelifecoach.com",
+  "base_url": "https://papalifecoach.com",
   "auth": {
     "type": "bearer",
     "header": "Authorization",
@@ -31,7 +31,7 @@
       "outreach_note": "string — optional Papa Life note for GHL",
       "alert_id": "number",
       "lead_id": "number",
-      "site_origin": "https://bossmobilelifecoach.com"
+      "site_origin": "https://papalifecoach.com"
     },
     "example": {
       "event": "ghl_new_contact",
@@ -48,7 +48,7 @@
       "outreach_note": "Hey Marcus, I'm Brian...",
       "alert_id": 12,
       "lead_id": 45,
-      "site_origin": "https://bossmobilelifecoach.com"
+      "site_origin": "https://papalifecoach.com"
     }
   },
   "inbound": {

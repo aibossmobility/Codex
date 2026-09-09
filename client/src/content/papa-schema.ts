@@ -1,4 +1,4 @@
-const SITE = "https://bossmobilelifecoach.com";
+const SITE = "https://papalifecoach.com";
 
 export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",

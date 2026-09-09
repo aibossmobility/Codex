@@ -34,6 +34,7 @@ export default function TuesdayLiveFallback() {
   const [, navigate] = useLocation();
   const [activeSlide, setActiveSlide] = useState(0);
   const [isNarrating, setIsNarrating] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
   const topic = useMemo(topicForToday, []);
   const slides = useMemo(() => [
     {
@@ -109,7 +110,25 @@ export default function TuesdayLiveFallback() {
     speakNext(begin);
   };
 
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!active) return;
+        if (!data.ok) navigate("/login");
+        else if (!data.user?.researchLabAccess) navigate("/crm-console");
+        else setAuthorized(true);
+      })
+      .catch(() => navigate("/login"));
+    return () => { active = false; };
+  }, [navigate]);
+
   useEffect(() => () => window.speechSynthesis.cancel(), []);
+
+  if (!authorized) {
+    return <div className="flex min-h-screen items-center justify-center bg-[#090909] p-6 text-center text-sm text-gray-400">Checking private AI Boss access…</div>;
+  }
 
   const current = slides[activeSlide];
   const panelClass = current.tone === "red"

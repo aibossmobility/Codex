@@ -30,7 +30,7 @@
     "ai-boss:zipshare-sync": "tsx server/ai-boss-zipshare-sync.ts",
     "test:youtube-growth": "node --import tsx server/ai-boss-youtube-growth.test.ts",
     "test:youtube-connector": "node --import tsx server/ai-boss-youtube-connector.test.ts",
-    "start:youtube-connector": "node dist/ai-boss-youtube-connector.js"
+    "start:youtube-connector": "AI_BOSS_YOUTUBE_CONNECTOR_STANDALONE=1 node dist/ai-boss-youtube-connector.js"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

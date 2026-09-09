@@ -137,7 +137,11 @@ export function createYouTubeConnectorServer() {
   });
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+// This module is also imported by the main Papa Life server. An
+// import.meta.url/process.argv entrypoint check becomes true after esbuild
+// bundles it into dist/index.js, which would incorrectly start a second HTTP
+// listener inside GoDaddy. Require an explicit standalone marker instead.
+if (process.env.AI_BOSS_YOUTUBE_CONNECTOR_STANDALONE === "1") {
   const port = Number(process.env.AI_BOSS_YOUTUBE_CONNECTOR_PORT || DEFAULT_PORT);
   createYouTubeConnectorServer().listen(port, "127.0.0.1", () => {
     console.log(`AI Boss YouTube connector listening on http://127.0.0.1:${port}/youtube`);

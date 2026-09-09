@@ -2847,6 +2847,29 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses") return coursesServerPage();
 
+  // AI Boss routes are authenticated client views. Serve the SPA shell with a
+  // noindex placeholder so the client can redirect unauthenticated visitors to
+  // /login. Returning the public 404 page here prevents the Android companion
+  // and Tuesday Live fallback from ever reaching the client router.
+  if (/^\/ai-boss(?:\/|$)/.test(pathname)) {
+    return {
+      status: 200,
+      title: "AI Boss OS | Papa Life",
+      description: "Authenticated AI Boss OS operations for Papa Life.",
+      noindex: true,
+      bodyHtml: serverPageShell({
+        title: "AI Boss OS | Papa Life",
+        description: "Authenticated AI Boss OS operations for Papa Life.",
+        eyebrow: "Papa Life",
+        headline: "AI Boss OS",
+        intro: "Sign in to access the protected AI Boss companion and operations console.",
+        sections: [],
+        cta: { label: "Sign In", href: "/login" },
+        noindex: true,
+      }),
+    };
+  }
+
   const courseMatch = pathname.match(/^\/courses\/(\d+)$/);
   if (courseMatch) return courseDetailServerPage(Number(courseMatch[1]));
 

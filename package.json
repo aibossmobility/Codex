@@ -23,6 +23,8 @@
     "test:gmail-connector": "node --import tsx server/ai-boss-gmail-connector.test.ts",
     "start:gmail-connector": "node dist/ai-boss-gmail-connector.js",
     "test:mobile-control": "node --import tsx server/ai-boss-mobile-store.test.ts",
+    "test:takeover": "node --import tsx client/src/lib/ai-boss-companion.test.ts && node --import tsx server/ai-boss-mobile-store.test.ts",
+    "test:tuesday-live": "node --import tsx client/src/lib/tuesday-live-session.test.ts",
     "test:project-ledger": "node --import tsx server/ai-boss-project-store.test.ts",
     "start:node-heartbeat": "node dist/ai-boss-node-heartbeat.js",
     "ai-boss:zipshare-sync": "tsx server/ai-boss-zipshare-sync.ts",

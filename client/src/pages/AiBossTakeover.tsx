@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { ANDROID_COMPANION_STORAGE_KEY, ANDROID_HEARTBEAT_INTERVAL_MS, isAndroidUserAgent, mobileTakeoverSessionRef, phoneIsInControl } from "@/lib/ai-boss-companion";
 
 type Mission = {
   mac_online: boolean;
@@ -27,6 +28,7 @@ export default function AiBossTakeover() {
   const [instruction, setInstruction] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,14 +43,39 @@ export default function AiBossTakeover() {
   }, []);
 
   useEffect(() => {
+    let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" })
       .then((response) => response.json())
       .then((data) => {
         if (!data.ok) navigate("/login");
         else if (!data.user?.researchLabAccess) navigate("/crm-console");
-        else void load();
+        else {
+          setAuthorized(true);
+          void load();
+          if (isAndroidUserAgent(window.navigator.userAgent)) {
+            const heartbeat = async () => {
+              const existing = window.localStorage.getItem(ANDROID_COMPANION_STORAGE_KEY);
+              const suffix = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+              const nodeId = existing || `brian-android-${suffix}`;
+              if (!existing) window.localStorage.setItem(ANDROID_COMPANION_STORAGE_KEY, nodeId);
+              try {
+                await apiJson("/api/admin/ai-boss/android-companion/heartbeat", {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify({ node_id: nodeId, display_name: "Brian's Android phone" }),
+                });
+                await load();
+              } catch {
+                // Keep the user-controlled page available if status reporting fails.
+              }
+            };
+            void heartbeat();
+            companionTimer = window.setInterval(() => void heartbeat(), ANDROID_HEARTBEAT_INTERVAL_MS);
+          }
+        }
       })
       .catch(() => navigate("/login"));
+    return () => { if (companionTimer) window.clearInterval(companionTimer); };
   }, [load, navigate]);
 
   async function sendInstruction(event: FormEvent) {
@@ -61,7 +88,7 @@ export default function AiBossTakeover() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          session_ref: `android-takeover-${Date.now()}`,
+          session_ref: mobileTakeoverSessionRef(),
           channel: "other",
           summary: clean,
           user_intent: clean,
@@ -79,7 +106,9 @@ export default function AiBossTakeover() {
     }
   }
 
-  const phoneInControl = mission?.active_companion === "android" || (!!mission?.android_online && !mission?.mac_online);
+  const phoneInControl = phoneIsInControl(mission);
+
+  if (!authorized) return <div className="min-h-screen bg-[#090909]" aria-label="Checking AI Boss access" />;
 
   return (
     <div className="min-h-screen bg-[#090909] text-white pb-24">

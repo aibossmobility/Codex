@@ -27,6 +27,7 @@ db.exec(`
     ('other', 'active', 'mobile-1'),
     ('other', 'active', 'boss-mobile-2'),
     ('other', 'waiting', 'father-mobile-3'),
+    ('other', 'active', 'mobile-takeover-4'),
     ('other', 'active', 'web-4');
 `);
 ensureAiBossMobileTables(db);
@@ -63,6 +64,6 @@ assert.equal(mission.mac_online, true);
 assert.equal(mission.android_online, true);
 assert.equal(mission.active_companion, "android");
 assert.equal(mission.queue.waiting_for_mac, 0);
-assert.equal(mission.open_mobile_instructions, 3);
+assert.equal(mission.open_mobile_instructions, 4);
 assert.equal(mission.nodes.some((node) => node.node_kind === "android" && node.online), true);
 console.log("✓ Mobile mission control supports Android-primary status, approvals, and offline-Mac safety");

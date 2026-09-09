@@ -2679,7 +2679,7 @@ function escapeHtml(value: unknown) {
 function normalizeAppPath(rawUrl: string) {
   let pathname = "/";
   try {
-    pathname = new URL(rawUrl, "https://bossmobilelifecoach.com").pathname;
+    pathname = new URL(rawUrl, "https://papalifecoach.com").pathname;
   } catch {
     pathname = rawUrl.split("?")[0] || "/";
   }

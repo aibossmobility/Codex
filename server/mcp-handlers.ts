@@ -977,7 +977,7 @@ export async function handlePapalifeTool(
     }
 
     case "papalife_get_webhook_contract": {
-      const base = process.env.PUBLIC_SITE_URL || "https://bossmobilelifecoach.com";
+      const base = process.env.PUBLIC_SITE_URL || "https://papalifecoach.com";
       const contractPath = path.resolve(process.cwd(), "automation-webhook-contract.json");
       const raw = fs.existsSync(contractPath) ? fs.readFileSync(contractPath, "utf8") : null;
       return {
@@ -1053,7 +1053,7 @@ export async function handlePapalifeTool(
     }
 
     case "get_site_endpoints": {
-      const base = process.env.PUBLIC_SITE_URL || "https://bossmobilelifecoach.com";
+      const base = process.env.PUBLIC_SITE_URL || "https://papalifecoach.com";
       const mcpBase = process.env.PUBLIC_MCP_BASE_URL || base;
       return {
         publicSite: base,

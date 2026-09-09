@@ -11,7 +11,7 @@ Use these tools to turn your **lesson outlines, research dumps, course scripts, 
 
 ### Content sources for video scripts
 
-1. **Site pages** — fetch any page from bossmobilelifecoach.com with \`bossmobile_heygen_fetch_page\`.
+1. **Site pages** — fetch any page from papalifecoach.com with \`bossmobile_heygen_fetch_page\`.
 2. **Course / lesson content** — call \`get_content_tree\` to see your curriculum, then reference lesson descriptions in your script prompt.
 3. **Research dumps** — call \`get_brand_research_dump\` (with \`include_raw: true\`) to pull raw notes and executive summaries from the Research Lab.
 4. **Google Drive docs** — paste the shareable link or exported text into \`bossmobile_heygen_script_from_text\` so the AI can turn it into spoken narration.
@@ -126,7 +126,7 @@ function anthropicModel(): string {
 }
 
 function siteBase(): string {
-  const raw = process.env.PUBLIC_MCP_BASE_URL?.trim() || "https://bossmobilelifecoach.com";
+  const raw = process.env.PUBLIC_MCP_BASE_URL?.trim() || "https://papalifecoach.com";
   return raw.replace(/\/$/, "");
 }
 

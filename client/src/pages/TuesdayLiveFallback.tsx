@@ -1,90 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, ExternalLink, Mic2, Pause, Play, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
-const LIVE_HOST_URL = "https://meetn.com/briankeithhill";
-const SEASON_START = new Date("2026-07-07T12:00:00-07:00");
-
-const TOPICS = [
-  "Listening Without Defending",
-  "Owning Impact Without Shame",
-  "The First Repair Sentence",
-  "Presence Over Pressure",
-  "When Your Adult Child Pulls Away",
-  "Authority Without Control",
-  "Apology Without Explanation",
-  "Consistency After the Conversation",
-  "Rebuilding Trust in Small Deposits",
-  "When Silence Feels Personal",
-  "Leading With Purpose, Not Panic",
-  "Becoming Safe to Talk To",
-];
-
-function topicForToday() {
-  const now = new Date();
-  const currentTuesday = new Date(now);
-  currentTuesday.setDate(now.getDate() - ((now.getDay() + 5) % 7));
-  const week = Math.floor((currentTuesday.getTime() - SEASON_START.getTime()) / (7 * 24 * 60 * 60 * 1000));
-  return TOPICS[Math.max(0, Math.min(TOPICS.length - 1, week))];
-}
+import { TUESDAY_LIVE_SESSION, TUESDAY_LIVE_SLIDES } from "@/lib/tuesday-live-session";
 
 export default function TuesdayLiveFallback() {
   const [, navigate] = useLocation();
   const [activeSlide, setActiveSlide] = useState(0);
   const [isNarrating, setIsNarrating] = useState(false);
-  const topic = useMemo(topicForToday, []);
-  const slides = useMemo(() => [
-    {
-      label: "WELCOME",
-      tone: "yellow",
-      heading: topic,
-      body: "Welcome, fathers. Today is a place for honest reflection, practical next steps, and hope. You are not here to defend yourself. You are here to become the father your adult child can experience as safe, steady, and present.",
-    },
-    {
-      label: "THE PROBLEM",
-      tone: "red",
-      heading: "Silence can feel personal.",
-      body: "When an adult child is quiet, a father can feel rejected, forgotten, or pushed aside. That hurt can lead us to demand an answer, explain ourselves, or press for a conversation before trust has room to breathe.",
-    },
-    {
-      label: "PRESENCE",
-      tone: "green",
-      heading: "Be steady before you speak.",
-      body: "Presence means staying emotionally available without chasing, controlling, or making every contact carry the weight of the whole relationship. A calm father creates more room for an honest conversation.",
-    },
-    {
-      label: "PURPOSE",
-      tone: "yellow",
-      heading: "Choose faithfulness over panic.",
-      body: "Your purpose is not to force a response today. Your purpose is to practice faithful love, humility, and patience. You can keep growing even while the relationship is quiet.",
-    },
-    {
-      label: "AUTHORITY",
-      tone: "red",
-      heading: "Trustworthiness is real authority.",
-      body: "Authority is not control. It is the character people can rely on. Keep small promises. Respect boundaries. Apologize without turning your impact into an argument.",
-    },
-    {
-      label: "ALIGNMENT",
-      tone: "green",
-      heading: "Let your actions match your hope.",
-      body: "Ask yourself: What is one way I have made their silence about me? Then choose one small action that makes your love easier to believe.",
-    },
-    {
-      label: "THIS WEEK",
-      tone: "yellow",
-      heading: "One pressure-free action",
-      body: "Send one simple message: I am thinking of you. No need to respond. I love you, and I am working on being a better listener. Do not ask for praise, proof, or an immediate answer.",
-    },
-    {
-      label: "CLOSING PRAYER",
-      tone: "green",
-      heading: "A father can become safe again.",
-      body: "Father, help us not to let silence make us fearful or controlling. Teach us to be humble, patient, and trustworthy in small things. As long as we are both alive, it is never too late. Amen.",
-    },
-  ], [topic]);
+  const [authorized, setAuthorized] = useState(false);
+  const topic = TUESDAY_LIVE_SESSION.topic;
+  const slides = TUESDAY_LIVE_SLIDES;
+
+  useEffect(() => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.ok) navigate("/login");
+        else if (!data.user?.researchLabAccess) navigate("/crm-console");
+        else setAuthorized(true);
+      })
+      .catch(() => navigate("/login"));
+  }, [navigate]);
 
   const speakFrom = (index: number) => {
     window.speechSynthesis.cancel();
@@ -110,6 +48,8 @@ export default function TuesdayLiveFallback() {
   };
 
   useEffect(() => () => window.speechSynthesis.cancel(), []);
+
+  if (!authorized) return <div className="min-h-screen bg-[#090909]" aria-label="Checking AI Boss access" />;
 
   const current = slides[activeSlide];
   const panelClass = current.tone === "red"
@@ -166,7 +106,7 @@ export default function TuesdayLiveFallback() {
           </Button>
         </div>
 
-        <Button className="h-14 w-full bg-brand-red text-white hover:bg-brand-red/90" onClick={() => window.open(LIVE_HOST_URL, "_blank", "noopener,noreferrer")}>
+        <Button className="h-14 w-full bg-brand-red text-white hover:bg-brand-red/90" onClick={() => window.open(TUESDAY_LIVE_SESSION.liveHostUrl, "_blank", "noopener,noreferrer")}>
           <Mic2 className="mr-2 h-5 w-5" />Open Meetn host room
           <ExternalLink className="ml-2 h-4 w-4" />
         </Button>

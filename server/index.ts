@@ -2863,7 +2863,7 @@ function aiBossServerPage(): ServerRenderedPage {
 
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
-  if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
+  if (pathname === "/ai-boss" || pathname.startsWith("/ai-boss/")) return aiBossServerPage();
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses") return coursesServerPage();
 

@@ -124,67 +124,20 @@ jobs:
           SSH_USER: ${{ secrets.PAPALIFE_SSH_USER }}
           SSH_PORT: ${{ secrets.PAPALIFE_SSH_PORT }}
           DEPLOY_SHA: ${{ needs.validate-and-build.outputs.deploy_sha }}
-          AI_BOSS_NODE_HEARTBEAT_TOKEN: ${{ secrets.AI_BOSS_NODE_HEARTBEAT_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -z "${AI_BOSS_NODE_HEARTBEAT_TOKEN:-}" ]]; then
-            echo "Missing required production secret: AI_BOSS_NODE_HEARTBEAT_TOKEN"
-            exit 1
-          fi
-          TOKEN_FILE="$RUNNER_TEMP/ai-boss-heartbeat-token"
-          printf '%s' "$AI_BOSS_NODE_HEARTBEAT_TOKEN" > "$TOKEN_FILE"
-          chmod 600 "$TOKEN_FILE"
-          REMOTE_TOKEN_FILE="/tmp/ai-boss-heartbeat-token-${GITHUB_RUN_ID}"
-          scp -i ~/.ssh/papalife_deploy -P "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes \
-            "$TOKEN_FILE" "$SSH_USER@$SSH_HOST:$REMOTE_TOKEN_FILE"
           ssh -i ~/.ssh/papalife_deploy \
             -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$SSH_USER@$SSH_HOST" \
-            bash -s -- "$DEPLOY_SHA" "$REMOTE_TOKEN_FILE" <<'REMOTE'
+            bash -s -- "$DEPLOY_SHA" <<'REMOTE'
           set -euo pipefail
 
           TARGET_SHA="$1"
-          REMOTE_TOKEN_FILE="$2"
           APP_DIR="/var/www/html/bossmobilelifecoach.com"
-
-          trap 'rm -f "$REMOTE_TOKEN_FILE"' EXIT
-          [[ -s "$REMOTE_TOKEN_FILE" ]] || { echo "BLOCKED: heartbeat token file was empty"; exit 1; }
-
           cd "$APP_DIR"
-          python3 - "$REMOTE_TOKEN_FILE" <<'PYENV'
-          from pathlib import Path
-          import re
-          import sys
-
-          env_path = Path('.env')
-          token_path = Path(sys.argv[1])
-          token = token_path.read_text()
-          if not token:
-            raise SystemExit("BLOCKED: heartbeat token file was empty")
-
-          lines = env_path.read_text().splitlines() if env_path.exists() else []
-          key = 'AI_BOSS_NODE_HEARTBEAT_TOKEN='
-          # Heartbeat tokens are generated as 32 random bytes rendered in hex.
-          # Refuse any unexpected format rather than trying to quote arbitrary secret text.
-          if not re.fullmatch(r'[0-9A-Fa-f]{64}', token):
-            raise SystemExit("BLOCKED: heartbeat token must be exactly 64 hexadecimal characters")
-          serialized = key + token
-          out = []
-          replaced = False
-          for line in lines:
-            if line.startswith(key):
-              out.append(serialized)
-              replaced = True
-            else:
-              out.append(line)
-          if not replaced:
-            out.append(serialized)
-          env_path.write_text('\n'.join(out) + '\n')
-          PYENV
-          chmod 600 .env
           test -d .git || { echo "BLOCKED: production directory is not a Git checkout"; exit 1; }
 
           CURRENT_BRANCH="$(git branch --show-current)"
@@ -217,16 +170,42 @@ jobs:
             exit 1
           }
 
+          ROLLBACK_DIR="$APP_DIR/.deploy-rollbacks/$(date -u +%Y%m%dT%H%M%SZ)-${PRE_DEPLOY_SHA:0:12}"
+          mkdir -p "$ROLLBACK_DIR"
+          git archive --format=tar "$PRE_DEPLOY_SHA" > "$ROLLBACK_DIR/tracked-files.tar"
+          printf '%s\n' "$PRE_DEPLOY_SHA" > "$ROLLBACK_DIR/pre-deploy-sha"
+          git diff --name-only --diff-filter=A "$PRE_DEPLOY_SHA" "$TARGET_SHA" > "$ROLLBACK_DIR/added-files"
+          echo "Rollback copy: $ROLLBACK_DIR"
+
+          DEPLOYMENT_STARTED=0
+          rollback() {
+            local exit_code=$?
+            if [[ "$DEPLOYMENT_STARTED" -eq 1 ]]; then
+              echo "Deployment failed; restoring $PRE_DEPLOY_SHA from $ROLLBACK_DIR"
+              tar -xf "$ROLLBACK_DIR/tracked-files.tar" -C "$APP_DIR"
+              while IFS= read -r added_file; do
+                [[ -n "$added_file" ]] && rm -f -- "$APP_DIR/$added_file"
+              done < "$ROLLBACK_DIR/added-files"
+              git reset --mixed "$PRE_DEPLOY_SHA"
+              corepack enable >/dev/null 2>&1 || true
+              pnpm install --frozen-lockfile
+              pnpm build
+              sudo -n /usr/local/bin/pm2 restart papalife
+              curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ >/dev/null
+              echo "ROLLBACK_OK sha=$PRE_DEPLOY_SHA"
+            fi
+            exit "$exit_code"
+          }
+          trap rollback ERR
+
+          DEPLOYMENT_STARTED=1
           git merge --ff-only "$TARGET_SHA"
 
           corepack enable >/dev/null 2>&1 || true
           pnpm install --frozen-lockfile
           pnpm build
 
-          # Keep the two service restarts separate. Brian's sudo allowance
-          # depends on these exact commands and they must never be combined.
-          sudo /usr/local/bin/pm2 restart papalife
-          sudo /usr/local/bin/pm2 restart papalife-mcp-http
+          sudo -n /usr/local/bin/pm2 restart papalife
 
           curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ >/dev/null
           curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ai-coach >/dev/null
@@ -234,5 +213,7 @@ jobs:
           curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/tuesday-live >/dev/null
           curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/membership >/dev/null
 
+          DEPLOYMENT_STARTED=0
+          trap - ERR
           echo "DEPLOYMENT_OK sha=$TARGET_SHA"
           REMOTE

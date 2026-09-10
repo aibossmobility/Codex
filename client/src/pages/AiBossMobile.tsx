@@ -87,12 +87,17 @@ export default function AiBossMobile() {
       else {
         void load();
         if (/Android/i.test(window.navigator.userAgent)) {
+          const isTablet = /Tablet|Nexus 7|Nexus 9|SM-T|Pixel C/i.test(window.navigator.userAgent);
           const heartbeat = async () => {
             try {
               await apiJson("/api/admin/ai-boss/android-companion/heartbeat", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify({ node_id: androidCompanionId(), display_name: "Brian's Android phone" }),
+                body: JSON.stringify({
+                  node_id: androidCompanionId(),
+                  display_name: isTablet ? "Brian's Android tablet" : "Brian's Android phone",
+                  capabilities: ["google_messages_surface", isTablet ? "tablet" : "phone"],
+                }),
               });
               await load();
             } catch {

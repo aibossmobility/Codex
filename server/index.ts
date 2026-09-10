@@ -6314,13 +6314,19 @@ async function startServer() {
   app.post("/api/admin/ai-boss/android-companion/heartbeat", requireAuth, requireResearchLabAccess, (req, res) => {
     try {
       const input = req.body && typeof req.body === "object" ? req.body as Record<string, unknown> : {};
+      const reportedCapabilities = Array.isArray(input.capabilities)
+        ? input.capabilities.filter((value): value is string => typeof value === "string")
+        : [];
       res.json({
         ok: true,
         node: recordAiBossNodeHeartbeat(db, {
           node_id: input.node_id,
-          display_name: input.display_name || "Brian's Android phone",
+          display_name: input.display_name || "Brian's Android device",
           node_kind: "android",
-          capabilities: ["mobile_capture", "approvals", "instruction_queue"],
+          capabilities: Array.from(new Set([
+            "mobile_capture", "approvals", "instruction_queue",
+            ...reportedCapabilities.filter((value) => ["google_messages_surface", "phone", "tablet"].includes(value)),
+          ])),
         }),
       });
     } catch (e) {

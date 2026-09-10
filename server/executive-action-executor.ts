@@ -191,9 +191,51 @@ export function createGmailExecutor(fetchImpl: typeof fetch = fetch): ExecutiveA
   };
 }
 
+function resolveWorkspaceConnectorEndpoint() {
+  return String(process.env.AI_BOSS_GOOGLE_WORKSPACE_CONNECTOR_ENDPOINT || "").trim();
+}
+
+function resolveWorkspaceConnectorToken() {
+  return String(process.env.AI_BOSS_GOOGLE_WORKSPACE_CONNECTOR_TOKEN || "").trim();
+}
+
+export function createGoogleWorkspaceExecutor(
+  system: "google_calendar" | "google_drive",
+  fetchImpl: typeof fetch = fetch,
+): ExecutiveActionExecutor {
+  return async (action) => {
+    if (action.execution_route !== "direct") {
+      throw new Error(`Google Workspace connector only supports the direct route; received ${action.execution_route}.`);
+    }
+    if (!["read", "search"].includes(action.action_type)) {
+      throw new Error("Google Workspace mutations require a separately approved implementation.");
+    }
+    const endpoint = resolveWorkspaceConnectorEndpoint();
+    const token = resolveWorkspaceConnectorToken();
+    if (!endpoint || !token) throw new Error("Google Workspace connector is not configured on this runtime.");
+    const response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        system: system === "google_calendar" ? "calendar" : "drive",
+        operation: action.action_type,
+        target_ref: action.target_ref,
+      }),
+      signal: AbortSignal.timeout(resolveExecutorTimeoutMs()),
+    });
+    const text = await readBoundedResponseText(response);
+    if (!response.ok) throw new Error(`Google Workspace connector returned ${response.status}: ${text.slice(0, 500)}`);
+    let details: unknown = text;
+    try { details = text ? JSON.parse(text) : null; } catch {}
+    return { summary: `${system === "google_calendar" ? "Calendar" : "Drive"} read/search completed through Google Workspace.`, details };
+  };
+}
+
 export function defaultExecutorRegistry(): ExecutorRegistry {
   return {
     [executorRegistryKey("gmail", "direct")]: createGmailExecutor(),
+    [executorRegistryKey("google_calendar", "direct")]: createGoogleWorkspaceExecutor("google_calendar"),
+    [executorRegistryKey("google_drive", "direct")]: createGoogleWorkspaceExecutor("google_drive"),
     [executorRegistryKey("desktop_commander", "local")]: createDesktopCommanderExecutor(),
     [executorRegistryKey("files", "local")]: createDesktopCommanderExecutor(),
   };

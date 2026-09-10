@@ -4,6 +4,8 @@ import { z } from "zod";
 export const actionTargetSystems = [
   "gmail",
   "calendar",
+  "google_calendar",
+  "google_drive",
   "web",
   "files",
   "desktop_commander",

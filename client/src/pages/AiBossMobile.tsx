@@ -123,24 +123,28 @@ export default function AiBossMobile() {
     setSaving(true);
     try {
       const summary = mode === "father" ? `I just met a father. ${clean}` : clean;
-      await apiJson("/api/admin/executive-conversations", {
+      const result = await apiJson<{ routing: "workspace_completed" | "deterministic_workspace" | "captured_for_review"; execution_error?: string | null }>("/api/admin/ai-boss/instructions", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           session_ref: `${mode}-mobile-${Date.now()}`,
-          channel: "other",
-          summary,
-          user_intent: summary,
-          next_action: mode === "father"
-            ? "Create or update the relationship record, preserve the encounter notes, and identify the next appropriate Papa Life follow-up."
-            : "Review and route through AI Boss OS authority controls; execute permitted work and queue anything requiring the Mac or approval.",
-          status: "active",
+          instruction: summary,
         }),
       });
       setInstruction("");
       transcriptRef.current = "";
       setCaptureMode(null);
-      toast.success(mode === "father" ? "Father encounter remembered by AI Boss OS." : "Instruction captured by AI Boss OS.");
+      toast.success(
+        mode === "father"
+          ? "Father encounter remembered by AI Boss OS."
+          : result.routing === "workspace_completed"
+            ? "Google Workspace request completed with no model credits."
+            : result.routing === "deterministic_workspace"
+              ? result.execution_error
+                ? "Request saved. Google Workspace needs its hosted connection before it can run with the Mac off."
+                : "Google Workspace request routed with no model credits."
+            : "Instruction captured by AI Boss OS for review."
+      );
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Instruction could not be captured.");

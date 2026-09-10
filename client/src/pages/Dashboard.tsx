@@ -2254,7 +2254,7 @@ function GhlIntegrationSettings() {
                       : " · KB not loaded"}
                   </p>
                 </div>
-                {statusBadge(integrationStatus.ai.live_ai_enabled && Boolean(integrationStatus.ai.knowledge_base?.enabled))}
+                {statusBadge(Boolean(integrationStatus.ai.knowledge_base?.enabled), integrationStatus.ai.live_ai_enabled ? "Ready" : "Ready · local")}
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div>
@@ -2278,11 +2278,7 @@ function GhlIntegrationSettings() {
                     {integrationStatus.crm.cloud_webhook_configured ? " · cloud webhook set" : " · cloud webhook missing"}
                   </p>
                 </div>
-                {statusBadge(
-                  integrationStatus.crm.ghl_api_configured &&
-                    integrationStatus.crm.cloud_webhook_configured &&
-                    integrationStatus.crm.webhook_auth_configured
-                )}
+                {statusBadge(integrationStatus.crm.ghl_api_configured, "Ready · direct")}
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>

@@ -6,6 +6,7 @@ import {
   getExecutiveActionById,
 } from "./executive-action-queue-store";
 import { resolveExecutorResultMaxBytes } from "./executive-action-limits";
+import { executeWorkspaceAction } from "./ai-boss-google-workspace-connector";
 
 type ExecutiveActionRow = {
   id: number;
@@ -212,7 +213,17 @@ export function createGoogleWorkspaceExecutor(
     }
     const endpoint = resolveWorkspaceConnectorEndpoint();
     const token = resolveWorkspaceConnectorToken();
-    if (!endpoint || !token) throw new Error("Google Workspace connector is not configured on this runtime.");
+    if (!endpoint || !token) {
+      const details = await executeWorkspaceAction({
+        system: system === "google_calendar" ? "calendar" : "drive",
+        operation: action.action_type as "read" | "search",
+        target_ref: action.target_ref,
+      }, fetchImpl);
+      return {
+        summary: `${system === "google_calendar" ? "Calendar" : "Drive"} read/search completed through hosted Google Workspace OAuth.`,
+        details,
+      };
+    }
     const response = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Bearer ${token}` },

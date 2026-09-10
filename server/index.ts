@@ -101,6 +101,7 @@ import {
 } from "./sync-intake-to-crm";
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
+import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import {
   ensureGhlIntegrationTable,
   getGhlIntegrationPublic,
@@ -1304,6 +1305,10 @@ function savePapaAiInteraction(input: {
 }
 
 function adminNotificationProvider() {
+  if (
+    process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT?.trim() &&
+    process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN?.trim()
+  ) return "gmail";
   if (process.env.RESEND_API_KEY?.trim()) return "resend";
   if (process.env.SENDGRID_API_KEY?.trim()) return "sendgrid";
   return null;
@@ -1391,7 +1396,20 @@ async function sendAdminNotification(input: {
     const controller = new AbortController();
     timeout = setTimeout(() => controller.abort(), 8000);
     let response: globalThis.Response;
-    if (provider === "resend") {
+    if (provider === "gmail") {
+      response = await fetch(process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT!.trim(), {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN?.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          operation: "send",
+          action_payload: { to: recipient, subject: input.subject, body: input.summary },
+        }),
+      });
+    } else if (provider === "resend") {
       response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         signal: controller.signal,
@@ -1483,7 +1501,20 @@ async function sendMemberAccountActivationEmail(input: {
     timeout = setTimeout(() => controller.abort(), 8000);
     const from = process.env.MEMBER_NOTIFICATION_FROM?.trim() || adminNotificationFrom();
     let response: globalThis.Response;
-    if (provider === "resend") {
+    if (provider === "gmail") {
+      response = await fetch(process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT!.trim(), {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN?.trim()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          operation: "send",
+          action_payload: { to: input.recipient, subject, body: text },
+        }),
+      });
+    } else if (provider === "resend") {
       response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         signal: controller.signal,
@@ -1904,9 +1935,22 @@ async function sendMemberPasswordResetEmail(input: {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
   try {
-    const response = provider === "resend"
-      ? await fetch("https://api.resend.com/emails", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [input.recipient], subject, text }) })
-      : await fetch("https://api.sendgrid.com/v3/mail/send", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ personalizations: [{ to: [{ email: input.recipient }] }], from: { email: extractEmailAddress(from) }, subject, content: [{ type: "text/plain", value: text }] }) });
+    const response = provider === "gmail"
+      ? await fetch(process.env.AI_BOSS_GMAIL_CONNECTOR_ENDPOINT!.trim(), {
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${process.env.AI_BOSS_GMAIL_CONNECTOR_TOKEN?.trim()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            operation: "send",
+            action_payload: { to: input.recipient, subject, body: text },
+          }),
+        })
+      : provider === "resend"
+        ? await fetch("https://api.resend.com/emails", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [input.recipient], subject, text }) })
+        : await fetch("https://api.sendgrid.com/v3/mail/send", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY?.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify({ personalizations: [{ to: [{ email: input.recipient }] }], from: { email: extractEmailAddress(from) }, subject, content: [{ type: "text/plain", value: text }] }) });
     const responseText = await response.text().catch(() => "");
     logNotificationEvent({ event_type: "member_password_reset", provider, recipient: input.recipient, subject, status: response.ok ? "sent" : "error", response_status: response.status, error: response.ok ? null : responseText.slice(0, 1000), payload: { member_id: input.memberId } });
     return { ok: response.ok };
@@ -6244,6 +6288,49 @@ async function startServer() {
   app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
     try {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/ai-boss/instructions", requireAuth, requireResearchLabAccess, async (req, res) => {
+    try {
+      const instruction = String(req.body?.instruction || "").trim();
+      if (!instruction) return res.status(400).json({ ok: false, error: "Instruction is required" });
+      const sessionRef = String(req.body?.session_ref || `boss-mobile-${Date.now()}`).slice(0, 160);
+      const conversation = saveExecutiveConversationBrief(db, {
+        session_ref: sessionRef,
+        channel: "other",
+        summary: instruction,
+        user_intent: instruction,
+        next_action: "Review and route through AI Boss OS authority controls.",
+        status: "active",
+      });
+      const routed = routeAiBossInstruction(instruction);
+      const action = routed
+        ? createExecutiveAction(db, { ...routed, source_conversation_ref: sessionRef })
+        : null;
+      let execution = null;
+      let executionError = null;
+      if (action && ["google_calendar", "google_drive"].includes(String((action as any).target_system))) {
+        try {
+          execution = await executeApprovedExecutiveAction(db, Number((action as any).id));
+        } catch (error) {
+          executionError = error instanceof Error ? error.message : String(error);
+        }
+      }
+      res.status(201).json({
+        ok: true,
+        conversation,
+        action: execution || action,
+        routing: execution
+          ? "workspace_completed"
+          : action
+            ? "deterministic_workspace"
+            : "captured_for_review",
+        execution_error: executionError,
+        external_ai_cost_micros: 0,
+      });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }

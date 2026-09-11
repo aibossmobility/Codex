@@ -21,6 +21,28 @@ export type GhlCredentials = {
   source: "dashboard" | "env";
 };
 
+export const ISHARE_GHL_LOCATION_ID = "BYx4g32AidgEkTBg7nLQ";
+
+export function assertIShareGhlLocation(credentials: GhlCredentials | null): GhlCredentials {
+  if (!credentials?.token) {
+    throw new Error("iShare HighLevel credentials are not configured");
+  }
+  const locationId = credentials.locationId?.trim();
+  if (locationId !== ISHARE_GHL_LOCATION_ID) {
+    throw new Error(
+      `Blocked iShare HighLevel operation: expected location ${ISHARE_GHL_LOCATION_ID}, received ${locationId || "none"}`
+    );
+  }
+  return credentials;
+}
+
+export function resolveIShareGhlCredentials(
+  db: BetterSqliteDatabase,
+  adminUserId?: number
+): GhlCredentials {
+  return assertIShareGhlLocation(resolveGhlCredentials(db, adminUserId));
+}
+
 function encryptionKey(): Buffer {
   const raw =
     process.env.INTEGRATION_ENCRYPTION_KEY?.trim() ||

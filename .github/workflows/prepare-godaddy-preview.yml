@@ -1,0 +1,124 @@
+name: Prepare Papa Life GoDaddy Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_ref:
+        description: "Git ref or commit SHA to package for GoDaddy Preview"
+        required: true
+        default: "main"
+        type: string
+  pull_request:
+    paths:
+      - ".github/workflows/prepare-godaddy-preview.yml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "server/**"
+      - "client/**"
+      - "scripts/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: papalife-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare-and-validate:
+    name: Build and validate Preview package
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out requested ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.preview_ref || github.sha }}
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build SQLite runtime dependency
+        run: |
+          pnpm --dir node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3 run install
+          pnpm --dir node_modules/.pnpm/better-sqlite3@12.8.0/node_modules/better-sqlite3 run install
+      - name: Run TypeScript and automated checks
+        run: pnpm check
+      - name: Build Papa Life
+        run: pnpm build
+      - name: Start isolated Preview server
+        env:
+          PORT: "4173"
+          NODE_ENV: production
+          SESSION_SECRET: preview-validation-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/papalife-preview.log 2>&1 &
+          echo $! > /tmp/papalife-preview.pid
+      - name: Verify health and AI Boss direct routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cleanup() {
+            if [[ -f /tmp/papalife-preview.pid ]]; then
+              kill "$(cat /tmp/papalife-preview.pid)" 2>/dev/null || true
+            fi
+          }
+          trap cleanup EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:4173/api/health >/dev/null; then
+              break
+            fi
+            if [[ "$attempt" -eq 30 ]]; then
+              cat /tmp/papalife-preview.log
+              exit 1
+            fi
+            sleep 1
+          done
+          for route in /ai-boss /ai-boss/approvals /ai-boss/takeover /ai-boss/tuesday-live; do
+            code="$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:4173$route")"
+            if [[ "$code" != "200" ]]; then
+              echo "Preview validation failed: $route returned $code"
+              cat /tmp/papalife-preview.log
+              exit 1
+            fi
+            echo "PREVIEW_ROUTE_OK $route status=$code"
+          done
+      - name: Create GoDaddy Preview package
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p preview-package/scripts
+          mkdir -p preview-package/dist
+          rsync -a --exclude 'private-resources/papa-life-audio/' dist/ preview-package/dist/
+          cp package.json pnpm-lock.yaml preview-package/
+          cp scripts/recover-sqlite-wal.mjs preview-package/scripts/
+          tar -czf papalife-godaddy-preview.tgz -C preview-package .
+          package_bytes="$(stat -c '%s' papalife-godaddy-preview.tgz)"
+          max_bytes=$((95 * 1024 * 1024))
+          if (( package_bytes > max_bytes )); then
+            echo "Preview package is ${package_bytes} bytes; limit is ${max_bytes} bytes"
+            find preview-package -type f -printf '%s %p\n' | sort -nr | head -n 25
+            exit 1
+          fi
+          echo "PREVIEW_PACKAGE_OK bytes=$package_bytes media=preserved-separately"
+          sha256sum papalife-godaddy-preview.tgz > papalife-godaddy-preview.tgz.sha256
+      - name: Upload Preview package
+        uses: actions/upload-artifact@v4
+        with:
+          name: papalife-godaddy-preview-${{ github.sha }}
+          path: |
+            papalife-godaddy-preview.tgz
+            papalife-godaddy-preview.tgz.sha256
+          if-no-files-found: error
+          retention-days: 7

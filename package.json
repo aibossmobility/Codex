@@ -22,6 +22,7 @@
     "test:gmail-executor": "node --import tsx server/executive-action-executor.test.ts",
     "test:gmail-connector": "node --import tsx server/ai-boss-gmail-connector.test.ts",
     "start:gmail-connector": "node dist/ai-boss-gmail-connector.js",
+    "start:google-workspace-connector": "AI_BOSS_GOOGLE_WORKSPACE_CONNECTOR_STANDALONE=1 node dist/ai-boss-google-workspace-connector.js",
     "test:mobile-control": "node --import tsx server/ai-boss-mobile-store.test.ts",
     "test:android-sms-relay": "node --import tsx server/android-sms-relay-store.test.ts",
     "test:takeover": "node --import tsx client/src/lib/ai-boss-companion.test.ts && node --import tsx server/ai-boss-mobile-store.test.ts",

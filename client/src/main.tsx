@@ -12,4 +12,12 @@ analytics.init({
   },
 });
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/ai-boss-sw.js").catch((error) => {
+      console.warn("AI Boss OS service worker registration failed", error);
+    });
+  });
+}
+
 createRoot(document.getElementById("root")!).render(<App />);

@@ -212,13 +212,21 @@ export default function AiBossMobile() {
     <div className="min-h-screen bg-[#090909] text-white pb-24">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <Brain className="w-7 h-7 text-primary" />
+          <img src="/images/ai-boss-digital-interface.webp" alt="AI Boss OS digital interface" className="h-9 w-9 rounded-lg object-cover ring-1 ring-brand-yellow/50" />
           <div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
           <Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
+        <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
+          <img src="/images/ai-boss-digital-interface.webp" alt="Agentic Task Master AI Boss OS interface" className="h-44 w-full object-cover object-[center_42%] opacity-70 sm:h-56" />
+          <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">Boss Mobility</p>
+            <h2 className="mt-1 text-2xl font-black sm:text-3xl">AI Boss OS</h2>
+            <p className="mt-1 max-w-xl text-sm text-white/75">Your secure mobile command center for Papa Life, Google Workspace, approvals, and Android messaging.</p>
+          </div>
+        </section>
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <StatusCard icon={Laptop} label="Mac" value={mission?.mac_online ? "Online" : "Offline"} tone={mission?.mac_online ? "good" : "waiting"} />
           <StatusCard icon={Smartphone} label="Android" value={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "Online" : "Offline"} tone={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "good" : "waiting"} />

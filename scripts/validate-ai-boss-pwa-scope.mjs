@@ -17,6 +17,7 @@ assert.match(aiBossMobile, /serviceWorker\.register\("\/ai-boss-sw\.js"\)/, "The
 
 const manifest = JSON.parse(manifestText);
 assert.equal(manifest.start_url, "/ai-boss");
+assert.equal(manifest.scope, "/ai-boss");
 assert.equal(manifest.display, "standalone");
 assert.ok(Array.isArray(manifest.icons) && manifest.icons.length > 0, "The AI Boss manifest must include an icon");
 

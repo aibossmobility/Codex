@@ -99,10 +99,19 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p preview-package/scripts
-          cp -R dist preview-package/dist
+          mkdir -p preview-package/dist
+          rsync -a --exclude 'private-resources/papa-life-audio/' dist/ preview-package/dist/
           cp package.json pnpm-lock.yaml preview-package/
           cp scripts/recover-sqlite-wal.mjs preview-package/scripts/
           tar -czf papalife-godaddy-preview.tgz -C preview-package .
+          package_bytes="$(stat -c '%s' papalife-godaddy-preview.tgz)"
+          max_bytes=$((95 * 1024 * 1024))
+          if (( package_bytes > max_bytes )); then
+            echo "Preview package is ${package_bytes} bytes; limit is ${max_bytes} bytes"
+            find preview-package -type f -printf '%s %p\n' | sort -nr | head -n 25
+            exit 1
+          fi
+          echo "PREVIEW_PACKAGE_OK bytes=$package_bytes media=preserved-separately"
           sha256sum papalife-godaddy-preview.tgz > papalife-godaddy-preview.tgz.sha256
       - name: Upload Preview package
         uses: actions/upload-artifact@v4

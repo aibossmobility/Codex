@@ -6,5 +6,12 @@
   "background_color": "#0a0a0a",
   "theme_color": "#f5c518",
   "description": "Brian Keith Hill's private Papa Life executive command center",
-  "icons": [{ "src": "/images/papa-life-logo.png", "sizes": "512x512", "type": "image/png" }]
+  "icons": [
+    {
+      "src": "/images/papa-life-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "scope": "/ai-boss"
 }

@@ -95,7 +95,7 @@ function Router() {
       <Route path={"/join"} component={Join} />
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/my-journey" component={FatherJourney} />
-      <Route path="/assessment" component={RelationshipAssessment} />
+      <Route path="/assessment"><Redirect to="/my-journey" /></Route>
       <Route path="/relationship-assessment" component={RelationshipAssessment} />
       <Route path="/marlee-assessment" component={MarleeAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />

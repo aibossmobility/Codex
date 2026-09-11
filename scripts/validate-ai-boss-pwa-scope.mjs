@@ -13,7 +13,8 @@ assert.doesNotMatch(sharedHtml, /apple-mobile-web-app-title[^>]+AI Boss/, "Share
 assert.doesNotMatch(appEntry, /ai-boss-sw\.js/, "The shared application entry must not register the AI Boss service worker");
 
 assert.match(aiBossMobile, /ai-boss-manifest\.webmanifest/, "The AI Boss route must inject its install manifest");
-assert.match(aiBossMobile, /serviceWorker\.register\("\/ai-boss-sw\.js"\)/, "The AI Boss route must register its service worker");
+assert.match(aiBossMobile, /serviceWorker\.register\(aiBossScriptPath, \{ scope: "\/ai-boss" \}\)/, "The AI Boss route must register its service worker with AI Boss-only scope");
+assert.match(aiBossMobile, /registration\.unregister\(\)/, "The AI Boss route must remove legacy root-scoped AI Boss workers");
 
 const manifest = JSON.parse(manifestText);
 assert.equal(manifest.start_url, "/ai-boss");

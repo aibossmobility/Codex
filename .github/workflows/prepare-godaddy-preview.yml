@@ -47,6 +47,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Build SQLite runtime dependency
+        run: pnpm rebuild sqlite3
       - name: Run TypeScript and automated checks
         run: pnpm check
       - name: Build Papa Life

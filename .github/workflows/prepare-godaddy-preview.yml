@@ -48,7 +48,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build SQLite runtime dependency
-        run: pnpm --dir node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3 run install
+        run: |
+          pnpm --dir node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3 run install
+          pnpm --dir node_modules/.pnpm/better-sqlite3@12.8.0/node_modules/better-sqlite3 run install
       - name: Run TypeScript and automated checks
         run: pnpm check
       - name: Build Papa Life

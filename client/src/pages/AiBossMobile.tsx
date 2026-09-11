@@ -79,12 +79,25 @@ export default function AiBossMobile() {
     manifest.rel = "manifest";
     manifest.href = "/ai-boss-manifest.webmanifest";
     document.head.appendChild(manifest);
-    if ("serviceWorker" in navigator) void navigator.serviceWorker.register("/ai-boss-sw.js");
     let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" }).then((response) => response.json()).then((data) => {
       if (!data.ok) navigate("/login");
       else if (!data.user?.researchLabAccess) navigate("/crm-console");
       else {
+        if ("serviceWorker" in navigator) {
+          void navigator.serviceWorker.getRegistrations().then(async (registrations) => {
+            const aiBossScriptPath = "/ai-boss-sw.js";
+            await Promise.all(
+              registrations
+                .filter((registration) => {
+                  const scriptUrl = registration.active?.scriptURL || registration.waiting?.scriptURL || registration.installing?.scriptURL;
+                  return Boolean(scriptUrl && new URL(scriptUrl).pathname === aiBossScriptPath && new URL(registration.scope).pathname === "/");
+                })
+                .map((registration) => registration.unregister())
+            );
+            await navigator.serviceWorker.register(aiBossScriptPath, { scope: "/ai-boss" });
+          }).catch((error) => console.warn("AI Boss OS service worker registration failed", error));
+        }
         void load();
         if (/Android/i.test(window.navigator.userAgent)) {
           const isTablet = /Tablet|Nexus 7|Nexus 9|SM-T|Pixel C/i.test(window.navigator.userAgent);

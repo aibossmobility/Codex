@@ -56,6 +56,15 @@ import {
   recordAiBossNodeHeartbeat,
 } from "./ai-boss-mobile-store";
 import {
+  approveAndroidSmsReply,
+  claimApprovedAndroidSmsReply,
+  completeAndroidSmsReply,
+  ensureAndroidSmsRelayTables,
+  ingestAndroidSms,
+  listAndroidSms,
+  queueAndroidSmsReply,
+} from "./android-sms-relay-store";
+import {
   createHumanImpactObservation,
   ensureHumanImpactTables,
   listHumanImpactObservations,
@@ -733,6 +742,7 @@ ensureHumanImpactTables(db);
 ensureExecutiveActionQueueTables(db);
 ensureAiBossProjectTables(db);
 ensureAiBossMobileTables(db);
+ensureAndroidSmsRelayTables(db);
 ensureAiBossCampaignTables(db);
 seedAiBossCampaigns(db);
 ensureSiteCtasTable(db);
@@ -6415,6 +6425,63 @@ async function startServer() {
             ...reportedCapabilities.filter((value) => ["google_messages_surface", "phone", "tablet"].includes(value)),
           ])),
         }),
+      });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  function requireAndroidRelay(req: Request, res: Response, next: NextFunction) {
+    const expected = String(process.env.AI_BOSS_ANDROID_RELAY_TOKEN || "").trim();
+    if (!expected) return res.status(503).json({ ok: false, error: "Android SMS relay is not configured" });
+    const provided = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+    const expectedBuffer = Buffer.from(expected);
+    const providedBuffer = Buffer.from(provided);
+    if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+    next();
+  }
+
+  app.post("/api/ai-boss/android-relay/messages", requireAndroidRelay, (req, res) => {
+    try {
+      res.json({ ok: true, message: ingestAndroidSms(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/admin/ai-boss/android-relay/messages", requireAuth, requireResearchLabAccess, (req, res) => {
+    res.json({ ok: true, messages: listAndroidSms(db, Number(req.query.limit || 100)) });
+  });
+
+  app.post("/api/admin/ai-boss/android-relay/replies", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.status(201).json({ ok: true, reply: queueAndroidSmsReply(db, req.body) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.post("/api/admin/ai-boss/android-relay/replies/:id/approve", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      res.json({ ok: true, reply: approveAndroidSmsReply(db, Number(req.params.id)) });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get("/api/ai-boss/android-relay/replies/next", requireAndroidRelay, (req, res) => {
+    const deviceId = String(req.query.device_id || "").trim();
+    if (!deviceId) return res.status(400).json({ ok: false, error: "device_id is required" });
+    res.json({ ok: true, reply: claimApprovedAndroidSmsReply(db, deviceId) });
+  });
+
+  app.post("/api/ai-boss/android-relay/replies/:id/result", requireAndroidRelay, (req, res) => {
+    try {
+      res.json({
+        ok: true,
+        reply: completeAndroidSmsReply(db, Number(req.params.id), Boolean(req.body?.delivered), req.body?.error),
       });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });

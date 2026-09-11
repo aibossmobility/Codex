@@ -9,7 +9,7 @@
     "prestart": "node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
-    "check": "tsc --noEmit && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay",
+    "check": "tsc --noEmit && pnpm test:ai-boss-pwa-scope && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
     "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
     "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
@@ -33,7 +33,8 @@
     "test:youtube-growth": "node --import tsx server/ai-boss-youtube-growth.test.ts",
     "test:youtube-connector": "node --import tsx server/ai-boss-youtube-connector.test.ts",
     "test:instruction-router": "node --import tsx server/ai-boss-instruction-router.test.ts",
-    "start:youtube-connector": "AI_BOSS_YOUTUBE_CONNECTOR_STANDALONE=1 node dist/ai-boss-youtube-connector.js"
+    "start:youtube-connector": "AI_BOSS_YOUTUBE_CONNECTOR_STANDALONE=1 node dist/ai-boss-youtube-connector.js",
+    "test:ai-boss-pwa-scope": "node scripts/validate-ai-boss-pwa-scope.mjs"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

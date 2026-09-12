@@ -75,7 +75,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native SQLite binding
-        run: pnpm rebuild better-sqlite3
+        run: pnpm --dir "$(find node_modules/.pnpm -maxdepth 1 -type d -name 'better-sqlite3@*' -print -quit)/node_modules/better-sqlite3" run install
 
       - name: Run TypeScript check
         run: pnpm check
@@ -192,7 +192,7 @@ jobs:
               git reset --mixed "$PRE_DEPLOY_SHA"
               corepack enable >/dev/null 2>&1 || true
               pnpm install --frozen-lockfile
-          pnpm rebuild better-sqlite3
+          pnpm --dir "$(find node_modules/.pnpm -maxdepth 1 -type d -name 'better-sqlite3@*' -print -quit)/node_modules/better-sqlite3" run install
               pnpm build
               sudo -n /usr/local/bin/pm2 restart papalife
               curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ >/dev/null
@@ -207,7 +207,7 @@ jobs:
 
           corepack enable >/dev/null 2>&1 || true
           pnpm install --frozen-lockfile
-          pnpm rebuild better-sqlite3
+          pnpm --dir "$(find node_modules/.pnpm -maxdepth 1 -type d -name 'better-sqlite3@*' -print -quit)/node_modules/better-sqlite3" run install
           pnpm build
 
           sudo -n /usr/local/bin/pm2 restart papalife

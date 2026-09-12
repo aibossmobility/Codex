@@ -1,11 +1,11 @@
 packages:
   - .
 
-allowBuilds:
-  '@tailwindcss/oxide': true
-  better-sqlite3: true
-  esbuild: true
-  sqlite3: true
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - better-sqlite3
+  - esbuild
+  - sqlite3
 
 overrides:
   'tailwindcss>nanoid': 3.3.7

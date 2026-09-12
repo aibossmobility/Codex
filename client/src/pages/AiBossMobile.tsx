@@ -82,7 +82,6 @@ export default function AiBossMobile() {
     let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" }).then((response) => response.json()).then((data) => {
       if (!data.ok) navigate("/login");
-      else if (!data.user?.researchLabAccess) navigate("/crm-console");
       else {
         if ("serviceWorker" in navigator) {
           void navigator.serviceWorker.getRegistrations().then(async (registrations) => {

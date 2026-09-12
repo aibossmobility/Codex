@@ -2918,6 +2918,24 @@ function aiBossServerPage(): ServerRenderedPage {
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
   if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
+  if (pathname === "/executive-memory") {
+    const page: StaticServerPage = {
+      title: "Executive Memory | AI Boss OS",
+      description: "Private executive memory workspace for Papa Life operations.",
+      eyebrow: "AI Boss OS",
+      headline: "Executive Memory",
+      intro: "Please sign in to continue to the private executive memory workspace.",
+      sections: [],
+      noindex: true,
+    };
+    return {
+      status: 200,
+      title: page.title,
+      description: page.description,
+      bodyHtml: serverPageShell(page),
+      noindex: true,
+    };
+  }
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses") return coursesServerPage();
 
@@ -6303,7 +6321,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/ai-boss/instructions", requireAuth, requireResearchLabAccess, async (req, res) => {
+  app.post("/api/admin/ai-boss/instructions", requireAuth, async (req, res) => {
     try {
       const instruction = String(req.body?.instruction || "").trim();
       if (!instruction) return res.status(400).json({ ok: false, error: "Instruction is required" });
@@ -6346,7 +6364,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/ai-boss/projects", requireAuth, (req, res) => {
     try {
       const projects = listAiBossProjects(db, {
         status: String(req.query.status || "").trim() || undefined,
@@ -6358,7 +6376,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/ai-boss/projects", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/ai-boss/projects", requireAuth, (req, res) => {
     try {
       res.status(201).json({ ok: true, project: saveAiBossProject(db, req.body) });
     } catch (e) {
@@ -6366,7 +6384,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/ai-boss/projects/:key", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/ai-boss/projects/:key", requireAuth, (req, res) => {
     try {
       const result = getAiBossProjectWork(db, String(req.params.key || ""));
       if (!result) return res.status(404).json({ ok: false, error: "Project not found" });
@@ -6408,7 +6426,7 @@ async function startServer() {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
-  app.post("/api/admin/ai-boss/android-companion/heartbeat", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/ai-boss/android-companion/heartbeat", requireAuth, (req, res) => {
     try {
       const input = req.body && typeof req.body === "object" ? req.body as Record<string, unknown> : {};
       const reportedCapabilities = Array.isArray(input.capabilities)
@@ -6451,11 +6469,11 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/ai-boss/android-relay/messages", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/ai-boss/android-relay/messages", requireAuth, (req, res) => {
     res.json({ ok: true, messages: listAndroidSms(db, Number(req.query.limit || 100)) });
   });
 
-  app.post("/api/admin/ai-boss/android-relay/replies", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/ai-boss/android-relay/replies", requireAuth, (req, res) => {
     try {
       res.status(201).json({ ok: true, reply: queueAndroidSmsReply(db, req.body) });
     } catch (e) {
@@ -6463,7 +6481,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/ai-boss/android-relay/replies/:id/approve", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/ai-boss/android-relay/replies/:id/approve", requireAuth, (req, res) => {
     try {
       res.json({ ok: true, reply: approveAndroidSmsReply(db, Number(req.params.id)) });
     } catch (e) {
@@ -6488,7 +6506,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/ai-boss/mission-control", requireAuth, requireResearchLabAccess, (_req, res) => {
+  app.get("/api/admin/ai-boss/mission-control", requireAuth, (_req, res) => {
     try {
       res.json({ ok: true, mission: { ...getAiBossMissionControl(db), campaigns: getAiBossCampaigns(db) } });
     } catch (e) {

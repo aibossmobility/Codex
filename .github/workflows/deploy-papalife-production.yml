@@ -74,6 +74,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Rebuild native SQLite binding
+        run: pnpm rebuild better-sqlite3
+
       - name: Run TypeScript check
         run: pnpm check
 
@@ -189,6 +192,7 @@ jobs:
               git reset --mixed "$PRE_DEPLOY_SHA"
               corepack enable >/dev/null 2>&1 || true
               pnpm install --frozen-lockfile
+          pnpm rebuild better-sqlite3
               pnpm build
               sudo -n /usr/local/bin/pm2 restart papalife
               curl --fail --silent --show-error --location --max-time 20 https://papalifecoach.com/ >/dev/null
@@ -203,6 +207,7 @@ jobs:
 
           corepack enable >/dev/null 2>&1 || true
           pnpm install --frozen-lockfile
+          pnpm rebuild better-sqlite3
           pnpm build
 
           sudo -n /usr/local/bin/pm2 restart papalife

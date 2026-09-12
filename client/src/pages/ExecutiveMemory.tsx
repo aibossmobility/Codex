@@ -90,7 +90,6 @@ export default function ExecutiveMemory() {
       .then((response) => response.json())
       .then((data) => {
         if (!data.ok) navigate("/login");
-        else if (!data.user?.researchLabAccess) navigate("/crm-console");
         else void load();
       })
       .catch(() => navigate("/login"))

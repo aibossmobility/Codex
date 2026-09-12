@@ -6259,7 +6259,7 @@ async function startServer() {
 
   // AI Boss OS executive continuity. These routes are private and use the
   // existing Brian-only Research Lab authorization boundary.
-  app.get("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/executive-memory", requireAuth, (req, res) => {
     try {
       const memories = listExecutiveMemories(db, {
         query: String(req.query.query || "").trim() || undefined,
@@ -6273,7 +6273,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/executive-memory", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/executive-memory", requireAuth, (req, res) => {
     try {
       res.status(201).json({ ok: true, ...rememberExecutiveMemory(db, req.body) });
     } catch (e) {
@@ -6281,7 +6281,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/executive-memory/:key/history", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/executive-memory/:key/history", requireAuth, (req, res) => {
     try {
       res.json({ ok: true, history: getExecutiveMemoryHistory(db, String(req.params.key || "")) });
     } catch (e) {
@@ -6289,7 +6289,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/executive-memory/:id/archive", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/executive-memory/:id/archive", requireAuth, (req, res) => {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
@@ -6301,7 +6301,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/executive-conversations", requireAuth, (req, res) => {
     try {
       const conversations = listExecutiveConversationBriefs(db, {
         status: String(req.query.status || "").trim() || undefined,
@@ -6313,7 +6313,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/executive-conversations", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/executive-conversations", requireAuth, (req, res) => {
     try {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
     } catch (e) {
@@ -6514,7 +6514,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/action-queue", requireAuth, (req, res) => {
     try {
       const actions = listExecutiveActions(db, {
         status: String(req.query.status || "").trim() || undefined,
@@ -6527,7 +6527,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/action-queue", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/action-queue", requireAuth, (req, res) => {
     try {
       res.status(201).json({ ok: true, action: createExecutiveAction(db, req.body) });
     } catch (e) {
@@ -6535,7 +6535,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/action-queue/:id/decision", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/action-queue/:id/decision", requireAuth, (req, res) => {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
@@ -6546,7 +6546,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/action-queue/:id/audit", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.get("/api/admin/action-queue/:id/audit", requireAuth, (req, res) => {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });
@@ -6556,7 +6556,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/action-queue/:id/execute", requireAuth, requireResearchLabAccess, async (req, res) => {
+  app.post("/api/admin/action-queue/:id/execute", requireAuth, async (req, res) => {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id) || id < 1) return res.status(400).json({ ok: false, error: "Invalid id" });

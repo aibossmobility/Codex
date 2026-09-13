@@ -388,7 +388,7 @@ function render(page) {
     `<meta name="twitter:title" content="${escapeHtml(page.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(page.description)}" />`,
     `<meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`,
-  ].join("\\n    ");
+  ].join("\n    ");
   const canonical = `<link rel="canonical" href="${canonicalUrl}" />`;
   html = html.replace("</head>", `    ${socialMeta}\n    ${canonical}\n  </head>`);
   if (page.keywords) html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);

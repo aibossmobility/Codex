@@ -385,12 +385,12 @@ export function buildAssessmentReport(answers: AssessmentAnswer[]) {
 
 function resolveConfiguredProvider(): PapaAiProvider {
   const preferred = normalizeProvider(process.env.DEFAULT_AI_PROVIDER);
+  if (preferred === "gemini" && (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY)) return "gemini";
   if (preferred === "openai" && process.env.OPENAI_API_KEY) return "openai";
   if (preferred === "anthropic" && process.env.ANTHROPIC_API_KEY) return "anthropic";
-  if (preferred === "gemini" && (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY)) return "gemini";
+  if (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY) return "gemini";
   if (process.env.OPENAI_API_KEY) return "openai";
   if (process.env.ANTHROPIC_API_KEY) return "anthropic";
-  if (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY) return "gemini";
   return "local";
 }
 

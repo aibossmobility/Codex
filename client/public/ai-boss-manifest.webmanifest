@@ -8,9 +8,9 @@
   "description": "Brian Keith Hill's private Papa Life executive command center",
   "icons": [
     {
-      "src": "/images/ai-boss-digital-interface.webp",
+      "src": "/images/papa-life-logo.png",
       "sizes": "any",
-      "type": "image/webp",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],

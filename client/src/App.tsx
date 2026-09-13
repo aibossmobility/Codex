@@ -118,6 +118,7 @@ function Router() {
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
       <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
       <Route path={"/all-pages"} component={AllPages} />
       <Route path={"/404"} component={NotFound} />
@@ -149,11 +150,11 @@ function GlobalAllPagesButton() {
       .then((data) => setIsAdmin(Boolean(data.ok)))
       .catch(() => setIsAdmin(false));
   }, [location]);
-  if (!isAdmin || location === "/all-pages" || location === "/login") return null;
+  if (!isAdmin || location === "/all-pages" || location === "/ai-boss/all-pages" || location === "/login") return null;
   return (
     <button
       type="button"
-      onClick={() => navigate("/all-pages")}
+      onClick={() => navigate("/ai-boss/all-pages")}
       className="fixed bottom-4 left-4 z-50 rounded-full border border-brand-yellow/50 bg-black/90 px-4 py-2 text-sm font-bold text-brand-yellow shadow-lg backdrop-blur hover:bg-brand-yellow hover:text-black"
     >
       All Pages

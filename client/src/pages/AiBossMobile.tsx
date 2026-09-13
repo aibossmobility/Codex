@@ -29,6 +29,11 @@ type Mission = {
 
 type CaptureMode = "father" | "boss" | null;
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
+
 const liveUrl = TUESDAY_LIVE_SESSION.liveHostUrl;
 const youtubeStudioUrl = TUESDAY_LIVE_SESSION.youtubeStudioUrl;
 const todayTopic = TUESDAY_LIVE_SESSION.topic;
@@ -58,6 +63,8 @@ export default function AiBossMobile() {
   const [saving, setSaving] = useState(false);
   const [listening, setListening] = useState(false);
   const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef("");
   const saveVoiceOnEndRef = useRef(false);
@@ -75,6 +82,20 @@ export default function AiBossMobile() {
   }, []);
 
   useEffect(() => {
+    const onBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    const onAppInstalled = () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+      toast.success("AI Boss OS is installed on this device.");
+    };
+    const standalone = window.matchMedia?.("(display-mode: standalone)")?.matches || (window.navigator as any).standalone === true;
+    setIsInstalled(Boolean(standalone));
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    window.addEventListener("appinstalled", onAppInstalled);
+
     const manifest = document.createElement("link");
     manifest.rel = "manifest";
     manifest.href = "/ai-boss-manifest.webmanifest";
@@ -125,9 +146,24 @@ export default function AiBossMobile() {
       if (companionTimer) window.clearInterval(companionTimer);
       saveVoiceOnEndRef.current = false;
       recognitionRef.current?.abort?.();
+      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", onAppInstalled);
       manifest.remove();
     };
   }, [load, navigate]);
+
+  async function installAiBoss() {
+    if (!installPrompt) {
+      toast.message("Use Chrome's Add to Home screen / Install app option on this device.");
+      return;
+    }
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === "accepted") {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+    }
+  }
 
   async function saveCapture(text: string, mode: Exclude<CaptureMode, null>) {
     const clean = text.trim();
@@ -226,8 +262,15 @@ export default function AiBossMobile() {
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-brand-yellow/50" />
           <div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
-          <Button size="sm" variant="outline" className="ml-auto border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/ai-boss/all-pages")}>All Pages</Button>
-          <Button size="icon" variant="ghost" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
+          <div className="ml-auto flex items-center gap-2">
+            {!isInstalled && (
+              <Button size="sm" className="bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => void installAiBoss()}>
+                <Smartphone className="mr-2 h-4 w-4" />Install
+              </Button>
+            )}
+            <Button size="sm" variant="outline" className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/ai-boss/all-pages")}>All Pages</Button>
+            <Button size="icon" variant="ghost" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
+          </div>
         </div>
       </header>
 

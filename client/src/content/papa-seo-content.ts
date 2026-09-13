@@ -17,7 +17,7 @@ export type SeoArticle = {
 };
 
 export const ASSESSMENT_PAGE = {
-  title: "Free Father–Adult Child Relationship Assessment | Boss Mobile Life Coach",
+  title: "Free Father–Adult Child Relationship Assessment | Papa Life Coach",
   description:
     "Take the free relationship assessment. See where things stand with your adult son or daughter — and your first step toward closing the gap.",
   keywords:
@@ -43,7 +43,7 @@ export const ASSESSMENT_PAGE = {
 export const SEO_PAGES: SeoArticle[] = [
   {
     slug: "/adult-son-relationship",
-    title: "Adult Son Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Son Relationship Help for Fathers | Papa Life Coach",
     description:
       "Guidance for fathers rebuilding connection with an adult son — without control, lectures, or walking on eggshells.",
     keywords: "adult son relationship, father son estrangement, reconnect with adult son",
@@ -79,7 +79,7 @@ export const SEO_PAGES: SeoArticle[] = [
   },
   {
     slug: "/adult-daughter-relationship",
-    title: "Adult Daughter Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Daughter Relationship Help for Fathers | Papa Life Coach",
     description:
       "Support for fathers who want a deeper, safer connection with an adult daughter — after years of tension, silence, or misunderstanding.",
     keywords: "adult daughter relationship, father daughter estrangement, reconnect with adult daughter",
@@ -115,7 +115,7 @@ export const SEO_PAGES: SeoArticle[] = [
   },
   {
     slug: "/why-adult-children-pull-away",
-    title: "Why Adult Children Pull Away From Their Fathers | Boss Mobile Life Coach",
+    title: "Why Adult Children Pull Away From Their Fathers | Papa Life Coach",
     description:
       "Understand why grown sons and daughters create distance — and what fathers can do that actually helps.",
     keywords: "why adult children pull away, adult child distance, fatherhood transition",
@@ -151,7 +151,7 @@ export const SEO_PAGES: SeoArticle[] = [
   },
   {
     slug: "/father-child-estrangement",
-    title: "Father–Child Estrangement Help | Boss Mobile Life Coach",
+    title: "Father–Child Estrangement Help | Papa Life Coach",
     description:
       "Hope and practical steps for fathers in estrangement with an adult son or daughter — from a coach who lived it.",
     keywords: "father child estrangement, estranged adult child, reconcile with adult child",
@@ -235,7 +235,7 @@ export const SEO_PAGES: SeoArticle[] = [
     title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
     description:
       "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
-    keywords: "Brian Keith Hill, Boss Mobility, Boss Mobile Life Coach, Papa Life founder, fatherhood coach",
+    keywords: "Brian Keith Hill, Boss Mobility, Papa Life Coach, Papa Life founder, fatherhood coach",
     headline: "Brian Keith Hill",
     subheadline: "Founder of Boss Mobility and Papa Life",
     sections: [

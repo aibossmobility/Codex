@@ -2060,10 +2060,10 @@ function requireResearchLabAccess(req: Request, res: Response, next: NextFunctio
 }
 
 const allowedAiOrigins = new Set([
-  "https://bossmobilelifecoach.com",
-  "https://www.bossmobilelifecoach.com",
   "https://papalifecoach.com",
   "https://www.papalifecoach.com",
+  "https://bossmobilelifecoach.com",
+  "https://www.bossmobilelifecoach.com",
   "http://localhost:3000",
   "http://localhost:4173",
 ]);
@@ -2158,7 +2158,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     description:
       "Papa Life helps fathers understand distance, tension, and changing roles with adult children and begin rebuilding connection with humility, faith, and practical next steps.",
     keywords: "fathers of adult children, fatherhood assessment, reconnect with adult child, PAPA Framework, Papa Life",
-    eyebrow: "Boss Mobile Life Coach",
+    eyebrow: "Papa Life Coach",
     headline: "Papa Life gives fathers a practical path back to connection.",
     intro:
       "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers assessment, guided lessons, AI coaching, and the PAPA Framework: Purpose, Authority, Presence, and Alignment.",
@@ -2232,7 +2232,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" },
   },
   "/resources": {
-    title: "Papa Life Resources | Boss Mobile Life Coach",
+    title: "Papa Life Resources | Papa Life Coach",
     description: "Free and member resources for fathers rebuilding connection with adult children through Papa Life.",
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
@@ -2245,7 +2245,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "View Courses", href: "/courses" },
   },
   "/books": {
-    title: "Papa Life Books | Boss Mobile Life Coach",
+    title: "Papa Life Books | Papa Life Coach",
     description: "Books and written resources from Brian Keith Hill for fathers navigating distance with adult children.",
     eyebrow: "Books",
     headline: "Written guidance for the fatherhood season no one prepared you for.",
@@ -2258,7 +2258,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Start the Free Workshop", href: "/papa-first-lesson" },
   },
   "/podcast": {
-    title: "Papa Life Podcast | Boss Mobile Life Coach",
+    title: "Papa Life Podcast | Papa Life Coach",
     description: "Podcast resources for fathers learning to reconnect with adult children through humility, presence, and practical action.",
     eyebrow: "Podcast",
     headline: "Listen for language, perspective, and next steps.",
@@ -2271,7 +2271,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Explore Papa Life", href: "/membership" },
   },
   "/membership": {
-    title: "Papa Life Membership | Boss Mobile Life Coach",
+    title: "Papa Life Membership | Papa Life Coach",
     description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
     eyebrow: "Membership",
     headline: "Build consistency instead of relying on one emotional moment.",
@@ -2284,12 +2284,12 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Join Papa Life", href: "/go/join" },
   },
   "/contact": {
-    title: "Contact Boss Mobile Life Coach",
-    description: "Contact Brian Keith Hill and Boss Mobile Life Coach about Papa Life, fatherhood coaching, and support.",
+    title: "Contact Papa Life Coach",
+    description: "Contact Brian Keith Hill and Papa Life Coach about Papa Life, fatherhood coaching, and support.",
     eyebrow: "Contact",
     headline: "Reach out when you are ready for support.",
     intro:
-      "Boss Mobile Life Coach supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
+      "Papa Life Coach supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
     sections: [
       { heading: "Start here", body: "If you are a father trying to reconnect with an adult child, the free assessment is the best first step." },
       { heading: "For broader support", body: "Use the AI Coach or membership path to get oriented around resources and next actions." },
@@ -2343,7 +2343,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/relationship-assessment": {
-    title: "Free Father-Adult Child Relationship Assessment | Boss Mobile Life Coach",
+    title: "Free Father-Adult Child Relationship Assessment | Papa Life Coach",
     description:
       "Take the free relationship assessment and see where things stand with your adult son or daughter.",
     eyebrow: "Relationship Assessment",
@@ -2371,7 +2371,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Take the 2-Minute Check-In", href: "/marlee-assessment" },
   },
   "/adult-son-relationship": {
-    title: "Adult Son Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Son Relationship Help for Fathers | Papa Life Coach",
     description:
       "Guidance for fathers rebuilding connection with an adult son without control, lectures, or walking on eggshells.",
     keywords: "adult son relationship, father son estrangement, reconnect with adult son",
@@ -2386,7 +2386,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/adult-daughter-relationship": {
-    title: "Adult Daughter Relationship Help for Fathers | Boss Mobile Life Coach",
+    title: "Adult Daughter Relationship Help for Fathers | Papa Life Coach",
     description:
       "Support for fathers who want a deeper, safer connection with an adult daughter after years of tension, silence, or misunderstanding.",
     keywords: "adult daughter relationship, father daughter estrangement, reconnect with adult daughter",
@@ -2401,7 +2401,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/why-adult-children-pull-away": {
-    title: "Why Adult Children Pull Away From Their Fathers | Boss Mobile Life Coach",
+    title: "Why Adult Children Pull Away From Their Fathers | Papa Life Coach",
     description:
       "Understand why grown sons and daughters create distance and what fathers can do that actually helps.",
     keywords: "why adult children pull away, adult child distance, fatherhood transition",
@@ -2416,7 +2416,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Start with the Assessment", href: "/assessment" },
   },
   "/father-child-estrangement": {
-    title: "Father-Child Estrangement Help | Boss Mobile Life Coach",
+    title: "Father-Child Estrangement Help | Papa Life Coach",
     description:
       "Hope and practical steps for fathers in estrangement with an adult son or daughter from a coach who lived it.",
     keywords: "father child estrangement, estranged adult child, reconcile with adult child",
@@ -2466,7 +2466,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
     description:
       "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
-    keywords: "Brian Keith Hill, Boss Mobility, Boss Mobile Life Coach, Papa Life founder, fatherhood coach",
+    keywords: "Brian Keith Hill, Boss Mobility, Papa Life Coach, Papa Life founder, fatherhood coach",
     eyebrow: "Founder of Boss Mobility and Papa Life",
     headline: "Brian Keith Hill",
     intro:
@@ -2480,24 +2480,24 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Explore Papa Life", href: "/" },
   },
   "/privacy": {
-    title: "Privacy Policy | Boss Mobile Life Coach",
-    description: "How Boss Mobile Life Coach and Papa Life handle visitor, lead, AI coach, and member information.",
+    title: "Privacy Policy | Papa Life Coach",
+    description: "How Papa Life Coach and Papa Life handle visitor, lead, AI coach, and member information.",
     eyebrow: "Privacy",
     headline: "Privacy Policy",
     intro:
-      "Boss Mobile Life Coach and Papa Life collect information needed to provide coaching resources, assessments, AI coach interactions, membership features, and follow-up support.",
+      "Papa Life Coach and Papa Life collect information needed to provide coaching resources, assessments, AI coach interactions, membership features, and follow-up support.",
     sections: [
       { heading: "Information use", body: "Information may be used to respond to requests, personalize resources, operate the site, and improve services." },
-      { heading: "Your choices", body: "Visitors and members may contact Boss Mobile Life Coach about their information and communication preferences." },
+      { heading: "Your choices", body: "Visitors and members may contact Papa Life Coach about their information and communication preferences." },
     ],
   },
   "/terms": {
-    title: "Terms of Use | Boss Mobile Life Coach",
-    description: "Terms for using Boss Mobile Life Coach, Papa Life resources, AI coaching, assessments, and member features.",
+    title: "Terms of Use | Papa Life Coach",
+    description: "Terms for using Papa Life Coach, Papa Life resources, AI coaching, assessments, and member features.",
     eyebrow: "Terms",
     headline: "Terms of Use",
     intro:
-      "By using Boss Mobile Life Coach and Papa Life resources, visitors agree to use the site responsibly and understand that coaching resources do not replace professional medical, mental health, legal, or financial advice.",
+      "By using Papa Life Coach and Papa Life resources, visitors agree to use the site responsibly and understand that coaching resources do not replace professional medical, mental health, legal, or financial advice.",
     sections: [
       { heading: "Site use", body: "Resources, assessments, and AI coaching are provided for education, reflection, and coaching support." },
       { heading: "Membership", body: "Member features and paid access are governed by the purchase and access terms shown during signup." },
@@ -2580,17 +2580,17 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/login": {
-    title: "Admin Login | Boss Mobile Life Coach",
-    description: "Admin login for Boss Mobile Life Coach.",
+    title: "Admin Login | Papa Life Coach",
+    description: "Admin login for Papa Life Coach.",
     eyebrow: "Admin",
     headline: "Admin login",
-    intro: "This page is for authorized Boss Mobile Life Coach administrators.",
+    intro: "This page is for authorized Papa Life Coach administrators.",
     sections: [{ heading: "Restricted access", body: "Sign in with an authorized account to manage site content and operations." }],
     noindex: true,
   },
   "/crm": {
-    title: "CRM Intake | Boss Mobile Life Coach",
-    description: "CRM intake form for Boss Mobile Life Coach.",
+    title: "CRM Intake | Papa Life Coach",
+    description: "CRM intake form for Papa Life Coach.",
     eyebrow: "CRM",
     headline: "CRM intake",
     intro: "This intake page collects lead and relationship context for follow-up.",
@@ -2598,8 +2598,8 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/crm-console": {
-    title: "CRM Console | Boss Mobile Life Coach",
-    description: "Admin CRM console for Boss Mobile Life Coach.",
+    title: "CRM Console | Papa Life Coach",
+    description: "Admin CRM console for Papa Life Coach.",
     eyebrow: "Admin",
     headline: "CRM console",
     intro: "Authorized administrators can manage leads, courses, media, and site operations.",
@@ -2607,8 +2607,8 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/dashboard": {
-    title: "CRM Console | Boss Mobile Life Coach",
-    description: "Dashboard route for Boss Mobile Life Coach administrators.",
+    title: "CRM Console | Papa Life Coach",
+    description: "Dashboard route for Papa Life Coach administrators.",
     eyebrow: "Admin",
     headline: "Dashboard",
     intro: "This route redirects administrators to the CRM console in the browser app.",
@@ -2617,7 +2617,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/papa-journey": {
-    title: "Papa Journey | Boss Mobile Life Coach",
+    title: "Papa Journey | Papa Life Coach",
     description: "A guided Papa Life journey for fathers rebuilding connection with adult children.",
     eyebrow: "Papa Journey",
     headline: "Move from awareness into a guided fatherhood path.",
@@ -2657,17 +2657,17 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/strategist": {
-    title: "Strategist | Boss Mobile Life Coach",
-    description: "Strategic planning tools for Boss Mobile Life Coach.",
+    title: "Strategist | Papa Life Coach",
+    description: "Strategic planning tools for Papa Life Coach.",
     eyebrow: "Strategist",
     headline: "Strategy tools for focused action.",
-    intro: "This page supports strategy work and planning for Boss Mobile Life Coach operations.",
+    intro: "This page supports strategy work and planning for Papa Life Coach operations.",
     sections: [{ heading: "Planning", body: "Use the strategist tools to clarify priorities and next moves." }],
     noindex: true,
   },
   "/theme-matrix": {
-    title: "Theme Matrix | Boss Mobile Life Coach",
-    description: "Theme matrix planning page for Boss Mobile Life Coach.",
+    title: "Theme Matrix | Papa Life Coach",
+    description: "Theme matrix planning page for Papa Life Coach.",
     eyebrow: "Theme Matrix",
     headline: "Organize themes and messages.",
     intro: "This page supports internal planning and content structure.",
@@ -2675,8 +2675,8 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/operators": {
-    title: "Operators | Boss Mobile Life Coach",
-    description: "Operations page for Boss Mobile Life Coach.",
+    title: "Operators | Papa Life Coach",
+    description: "Operations page for Papa Life Coach.",
     eyebrow: "Operators",
     headline: "Operations workspace",
     intro: "This page supports operational planning and workflows.",
@@ -2684,8 +2684,8 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/governance": {
-    title: "Governance | Boss Mobile Life Coach",
-    description: "Governance page for Boss Mobile Life Coach.",
+    title: "Governance | Papa Life Coach",
+    description: "Governance page for Papa Life Coach.",
     eyebrow: "Governance",
     headline: "Governance workspace",
     intro: "This page supports internal governance and operating principles.",
@@ -2693,16 +2693,16 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/booking": {
-    title: "Booking | Boss Mobile Life Coach",
-    description: "Booking page for Boss Mobile Life Coach.",
+    title: "Booking | Papa Life Coach",
+    description: "Booking page for Papa Life Coach.",
     eyebrow: "Booking",
-    headline: "Book time with Boss Mobile Life Coach.",
+    headline: "Book time with Papa Life Coach.",
     intro: "Use this page to move from interest into a scheduled conversation or next step.",
     sections: [{ heading: "Next step", body: "Choose an available path for booking or follow-up." }],
   },
   "/research-lab": {
-    title: "Research Lab | Boss Mobile Life Coach",
-    description: "Research lab workspace for Boss Mobile Life Coach.",
+    title: "Research Lab | Papa Life Coach",
+    description: "Research lab workspace for Papa Life Coach.",
     eyebrow: "Research Lab",
     headline: "Research workspace",
     intro: "This page supports research collection, analysis, and content planning.",
@@ -2773,12 +2773,12 @@ function serverPageShell(page: StaticServerPage, extraHtml = "") {
 function notFoundServerPage(): ServerRenderedPage {
   return {
     status: 404,
-    title: "404 Page Not Found | Boss Mobile Life Coach",
-    description: "The requested Boss Mobile Life Coach page could not be found.",
+    title: "404 Page Not Found | Papa Life Coach",
+    description: "The requested Papa Life Coach page could not be found.",
     noindex: true,
     bodyHtml: serverPageShell({
-      title: "404 Page Not Found | Boss Mobile Life Coach",
-      description: "The requested Boss Mobile Life Coach page could not be found.",
+      title: "404 Page Not Found | Papa Life Coach",
+      description: "The requested Papa Life Coach page could not be found.",
       eyebrow: "404",
       headline: "Page not found.",
       intro: "Sorry, the page you are looking for does not exist. It may have been moved or deleted.",
@@ -2825,7 +2825,7 @@ function coursesServerPage(): ServerRenderedPage {
       : `<section><h2>Course catalog</h2><p>No courses are listed yet. Check back soon, or contact your coach.</p></section>`;
 
   const page: StaticServerPage = {
-    title: "Papa Life Courses | Boss Mobile Life Coach",
+    title: "Papa Life Courses | Papa Life Coach",
     description:
       "Programs built for fathers navigating relationships with adult children. Preview Papa Life courses and sign in to watch lessons.",
     eyebrow: "Courses",
@@ -2947,9 +2947,8 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       intro: "Explore Papa Life resources, membership, books, and relationship-building tools.",
       sections: [],
       cta: { label: "Explore Papa Life", href: "/membership" },
-      noindex: true,
     };
-    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page), noindex: true };
+    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
 
   // AI Boss routes are authenticated client views. Serve the SPA shell with a
@@ -2981,7 +2980,16 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   return staticServerPage(pathname) || notFoundServerPage();
 }
 
-function renderHtmlDocument(template: string, page: ServerRenderedPage) {
+function canonicalPublicPath(pathname: string) {
+  const aliases: Record<string, string> = {
+    "/privacy": "/privacy-policy",
+    "/terms": "/terms-of-service",
+    "/media-library": "/courses",
+  };
+  return aliases[pathname] || pathname;
+}
+
+function renderHtmlDocument(template: string, page: ServerRenderedPage, canonicalPath: string) {
   let html = template
     .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(page.title)}</title>`)
     .replace(
@@ -3000,14 +3008,29 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage) {
     }
   }
 
-  if (page.noindex) {
-    const robots = `<meta name="robots" content="noindex, follow" />`;
-    if (/<meta name="robots"/i.test(html)) {
-      html = html.replace(/<meta name="robots" content="[^"]*"\s*\/?>/i, robots);
-    } else {
-      html = html.replace("</head>", `    ${robots}\n  </head>`);
-    }
+  const canonicalUrl = `https://papalifecoach.com${canonicalPath === "/" ? "/" : canonicalPath}`;
+  const robots = page.noindex
+    ? `<meta name="robots" content="noindex, follow" />`
+    : `<meta name="robots" content="index, follow, max-image-preview:large" />`;
+  if (/<meta name="robots"/i.test(html)) {
+    html = html.replace(/<meta name="robots" content="[^"]*"\s*\/?>/i, robots);
+  } else {
+    html = html.replace("</head>", `    ${robots}\n  </head>`);
   }
+
+  html = html.replace(/<link rel="canonical"[^>]*>/i, "");
+  const socialMeta = `    <link rel="canonical" href="${canonicalUrl}" />\n` +
+    `    <meta property="og:title" content="${escapeHtml(page.title)}" />\n` +
+    `    <meta property="og:description" content="${escapeHtml(page.description)}" />\n` +
+    `    <meta property="og:type" content="website" />\n` +
+    `    <meta property="og:url" content="${canonicalUrl}" />\n` +
+    `    <meta property="og:site_name" content="Papa Life Coach" />\n` +
+    `    <meta property="og:image" content="https://papalifecoach.com/images/papa-life-logo.png" />\n` +
+    `    <meta name="twitter:card" content="summary_large_image" />\n` +
+    `    <meta name="twitter:title" content="${escapeHtml(page.title)}" />\n` +
+    `    <meta name="twitter:description" content="${escapeHtml(page.description)}" />\n` +
+    `    <meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`;
+  html = html.replace("</head>", `${socialMeta}\n  </head>`);
 
   // The SEO generator writes a prerendered homepage into dist/public/index.html.
   // Replace that complete root payload so every server-rendered route exposes
@@ -3029,7 +3052,9 @@ function sendServerRenderedApp(req: Request, res: Response, staticPath: string) 
     return;
   }
 
-  res.status(page.status).type("html").send(renderHtmlDocument(template, page));
+  const pathname = canonicalPublicPath(normalizeAppPath(req.originalUrl || req.url));
+  if (page.noindex) res.set("X-Robots-Tag", "noindex, follow");
+  res.status(page.status).type("html").send(renderHtmlDocument(template, page, pathname));
 }
 
 // ─── Server ───────────────────────────────────────────────────────────────────
@@ -3173,7 +3198,7 @@ async function startServer() {
       event_type: "admin_test",
       subject: "Papa Life notification test",
       summary: [
-        "This is a test notification from Boss Mobile Life Coach.",
+        "This is a test notification from Papa Life Coach.",
         "",
         `Requested by: ${user?.display_name || user?.username || "admin"}`,
         `Time: ${new Date().toISOString()}`,
@@ -3264,7 +3289,7 @@ async function startServer() {
           first_name: lead.first_name,
           email: lead.email,
           phone: lead.phone || null,
-          source: "bossmobilelifecoach.com Papa Life AI lead",
+          source: "papalifecoach.com Papa Life AI lead",
           tags: [
             "papa_ai_lead",
             "papa_life_ai",
@@ -5232,7 +5257,7 @@ async function startServer() {
               lastName: contactLastNameParts.join(" ") || undefined,
               email,
               phone,
-              source: "bossmobilelifecoach.com relationship assessment",
+              source: "papalifecoach.com relationship assessment",
               tags: [
                 "papa_lead_assessment",
                 "relationship_assessment",
@@ -5471,7 +5496,7 @@ async function startServer() {
             first_name: lead.first_name || "Papa Life Visitor",
             email: lead.email,
             phone: lead.phone || null,
-            source: "bossmobilelifecoach.com Papa Life AI assessment",
+            source: "papalifecoach.com Papa Life AI assessment",
             tags: [
               "papa_lead_assessment",
               "papa_ai_assessment",
@@ -5666,7 +5691,7 @@ async function startServer() {
         first_name: lead.first_name,
         email: lead.email,
         phone: lead.phone || null,
-        source: actionCoachLead ? "bossmobilelifecoach.com Papa Life Action Coach" : "bossmobilelifecoach.com Papa Life AI lead",
+        source: actionCoachLead ? "papalifecoach.com Papa Life Action Coach" : "papalifecoach.com Papa Life AI lead",
         tags: actionCoachLead
           ? [
               "Papa Life Action Coach Lead",
@@ -6819,6 +6844,22 @@ async function startServer() {
   const tuesdayHostControlRoomPage = path.join(staticPath, "tuesday-host-control-room", "index.html");
   app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
     res.sendFile(tuesdayHostControlRoomPage);
+  });
+
+  app.get("/sitemap.xml", (_req, res) => {
+    const base = "https://papalifecoach.com";
+    const staticPaths = [
+      "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
+      "/papa-framework", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
+      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/papa-first-lesson", "/papa-intro",
+      "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/membership", "/shop",
+      "/papa-journey", "/booking", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
+    ];
+    const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
+    const today = new Date().toISOString().slice(0, 10);
+    const urls = [...staticPaths, ...coursePaths];
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((pathname) => `  <url><loc>${base}${pathname === "/" ? "/" : pathname}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`;
+    res.type("application/xml").send(xml);
   });
 
   app.use(express.static(staticPath));

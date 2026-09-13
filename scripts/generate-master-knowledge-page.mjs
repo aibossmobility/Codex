@@ -4,7 +4,7 @@ import path from "node:path";
 const sourcePath = path.resolve("data/Papa_Life_Master_Skill.md");
 const outputDir = path.resolve("client/public/papa-life-master-knowledge-center");
 const outputPath = path.join(outputDir, "index.html");
-const canonicalUrl = "https://bossmobilelifecoach.com/papa-life-master-knowledge-center";
+const canonicalUrl = "https://papalifecoach.com/papa-life-master-knowledge-center";
 
 const markdown = fs.readFileSync(sourcePath, "utf8").trimEnd();
 

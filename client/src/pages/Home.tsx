@@ -511,6 +511,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-5 text-sm font-semibold text-white/75">
+            <a href="/site-directory" className="hover:text-[#f2c230]">Site Directory</a>
             <a href="/member-login" className="hover:text-[#f2c230]">Member Login</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>

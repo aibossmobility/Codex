@@ -31,6 +31,7 @@ import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
 import AllPages from "./pages/AllPages";
+import SiteDirectory from "./pages/SiteDirectory";
 import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
 import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
@@ -121,6 +122,7 @@ function Router() {
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
       <Route path={"/all-pages"} component={AllPages} />
+      <Route path={"/site-directory"} component={SiteDirectory} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

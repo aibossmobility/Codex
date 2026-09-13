@@ -28,7 +28,14 @@ export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }
     upsertMeta("og:title", title, "property");
     upsertMeta("og:description", description, "property");
     upsertMeta("og:type", "website", "property");
-    upsertMeta("og:url", window.location.href, "property");
+    const canonicalUrl = canonicalPath ? new URL(canonicalPath, "https://papalifecoach.com").toString() : window.location.href;
+    upsertMeta("og:url", canonicalUrl, "property");
+    upsertMeta("og:site_name", "Papa Life Coach", "property");
+    upsertMeta("og:image", "https://papalifecoach.com/images/papa-life-logo.png", "property");
+    upsertMeta("twitter:card", "summary_large_image");
+    upsertMeta("twitter:title", title);
+    upsertMeta("twitter:description", description);
+    upsertMeta("twitter:image", "https://papalifecoach.com/images/papa-life-logo.png");
 
     if (canonicalPath) {
       let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -37,7 +44,7 @@ export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }
         canonical.rel = "canonical";
         document.head.appendChild(canonical);
       }
-      canonical.href = new URL(canonicalPath, window.location.origin).toString();
+      canonical.href = new URL(canonicalPath, "https://papalifecoach.com").toString();
     }
 
     const existing = document.querySelectorAll('script[data-page-jsonld="true"]');

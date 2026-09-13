@@ -226,7 +226,7 @@ export default function AiBossMobile() {
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-brand-yellow/50" />
           <div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
-          <Button size="sm" variant="outline" className="ml-auto border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/all-pages")}>All Pages</Button>
+          <Button size="sm" variant="outline" className="ml-auto border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/ai-boss/all-pages")}>All Pages</Button>
           <Button size="icon" variant="ghost" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
         </div>
       </header>

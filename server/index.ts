@@ -2937,7 +2937,20 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     };
   }
   if (pathname === "/404") return notFoundServerPage();
-  if (pathname === "/courses") return coursesServerPage();
+  if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();
+  if (pathname === "/shop") {
+    const page: StaticServerPage = {
+      title: "Papa Life Shop | Papa Life Coach",
+      description: "Papa Life resources and offers for fathers of adult children.",
+      eyebrow: "Papa Life",
+      headline: "Papa Life Shop",
+      intro: "Explore Papa Life resources, membership, books, and relationship-building tools.",
+      sections: [],
+      cta: { label: "Explore Papa Life", href: "/membership" },
+      noindex: true,
+    };
+    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page), noindex: true };
+  }
 
   // AI Boss routes are authenticated client views. Serve the SPA shell with a
   // noindex placeholder so the client can redirect unauthenticated visitors to

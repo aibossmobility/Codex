@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { captureFirstTouchAttribution } from "./lib/attribution";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { GlobalBookingButton } from "./components/GlobalBookingButton";
@@ -30,6 +30,7 @@ import Booking from "./pages/Booking";
 import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
+import AllPages from "./pages/AllPages";
 import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
 import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
@@ -118,6 +119,7 @@ function Router() {
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
       <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
+      <Route path={"/all-pages"} component={AllPages} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -138,6 +140,27 @@ function GlobalPapaAiWidget() {
   return <PapaAiWidget />;
 }
 
+function GlobalAllPagesButton() {
+  const [location, navigate] = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => setIsAdmin(Boolean(data.ok)))
+      .catch(() => setIsAdmin(false));
+  }, [location]);
+  if (!isAdmin || location === "/all-pages" || location === "/login") return null;
+  return (
+    <button
+      type="button"
+      onClick={() => navigate("/all-pages")}
+      className="fixed bottom-4 left-4 z-50 rounded-full border border-brand-yellow/50 bg-black/90 px-4 py-2 text-sm font-bold text-brand-yellow shadow-lg backdrop-blur hover:bg-brand-yellow hover:text-black"
+    >
+      All Pages
+    </button>
+  );
+}
+
 function App() {
   useEffect(() => { captureFirstTouchAttribution(); }, []);
   return (
@@ -147,6 +170,7 @@ function App() {
           <Toaster />
           <Router />
           <GlobalBookingButton />
+          <GlobalAllPagesButton />
           <GlobalPapaAiWidget />
         </TooltipProvider>
       </ThemeProvider>

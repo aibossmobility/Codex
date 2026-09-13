@@ -25,8 +25,10 @@ const groups: PageGroup[] = [
       { label: "Tuesday Live", path: "/tuesday-live" },
       { label: "Membership", path: "/membership" },
       { label: "Contact", path: "/contact" },
+      { label: "Site Directory", path: "/site-directory" },
     ],
-  },  {
+  },
+  {
     title: "Fatherhood & Journey",
     links: [
       { label: "My Journey", path: "/my-journey" },
@@ -56,10 +58,12 @@ const groups: PageGroup[] = [
       { label: "Shop", path: "/shop" },
       { label: "Join Papa Life", path: "/join" },
     ],
-  },  {
+  },
+  {
     title: "AI Boss OS & Operations",
     links: [
       { label: "AI Boss OS", path: "/ai-boss" },
+      { label: "All Pages", path: "/ai-boss/all-pages" },
       { label: "Executive Memory", path: "/executive-memory" },
       { label: "Command Center", path: "/crm-console" },
       { label: "Dashboard (opens Command Center)", path: "/dashboard" },
@@ -88,6 +92,7 @@ const groups: PageGroup[] = [
     ],
   },
 ];
+
 export default function AllPages() {
   const [, navigate] = useLocation();
   const [authChecked, setAuthChecked] = useState(false);
@@ -121,7 +126,7 @@ export default function AllPages() {
             <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">{group.title}</h2>
             <div className="flex flex-col divide-y divide-white/10">
               {group.links.map((link) => (
-                <a key={link.path} href={link.path} className="flex items-center justify-between gap-4 py-3 text-left hover:text-brand-yellow">
+                <a key={`${group.title}-${link.path}-${link.label}`} href={link.path} className="flex items-center justify-between gap-4 py-3 text-left hover:text-brand-yellow">
                   <div><p className="font-medium">{link.label}</p><p className="text-xs text-gray-600">papalifecoach.com{link.path}</p></div>
                   <ExternalLink className="h-4 w-4 shrink-0 text-gray-600" />
                 </a>

@@ -376,8 +376,21 @@ function render(page) {
     )
     .replace('<div id="root"></div>', `<div id="root">${bodyHtml(page)}</div>`);
 
-  const canonical = `<link rel="canonical" href="https://papalifecoach.com${page.path === "/" ? "" : page.path}" />`;
-  html = html.replace("</head>", `    ${canonical}\n  </head>`);
+  const canonicalUrl = `https://papalifecoach.com${page.path === "/" ? "" : page.path}`;
+  const socialMeta = [
+    `<meta property="og:title" content="${escapeHtml(page.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(page.description)}" />`,
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:url" content="${canonicalUrl}" />`,
+    `<meta property="og:site_name" content="Papa Life Coach" />`,
+    `<meta property="og:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(page.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(page.description)}" />`,
+    `<meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`,
+  ].join("\\n    ");
+  const canonical = `<link rel="canonical" href="${canonicalUrl}" />`;
+  html = html.replace("</head>", `    ${socialMeta}\n    ${canonical}\n  </head>`);
   if (page.keywords) html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);
   if (page.jsonLd) {
     const scripts = page.jsonLd.map((schema) => `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`).join("\n    ");

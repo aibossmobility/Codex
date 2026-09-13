@@ -3,8 +3,8 @@ const SITE = "https://papalifecoach.com";
 export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Boss Mobile Life Coach",
-  alternateName: ["Boss Mobility", "Boss Mobile Life Coach", "Papa Life"],
+  name: "Papa Life Coach",
+  alternateName: ["Papa Life", "Papa Life Coach", "Boss Mobility Life Coach Services", "Boss Mobility"],
   url: SITE,
   logo: `${SITE}/images/papa-life-logo.png`,
   description:
@@ -36,7 +36,7 @@ export const BRIAN_PERSON_SCHEMA = {
   worksFor: {
     "@type": "Organization",
     name: "Boss Mobility",
-    alternateName: "Boss Mobile Life Coach",
+    alternateName: "Papa Life Coach",
   },
   url: `${SITE}/about-brian-keith-hill`,
   image: `${SITE}/images/brian-keith-hill.png`,
@@ -54,10 +54,10 @@ export const HOMEPAGE_FAQ_SCHEMA = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "What is Boss Mobile Life Coach?",
+      name: "What is Papa Life Coach?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Boss Mobile Life Coach (PAPA Life) provides coaching and resources for fathers navigating relationships with adult children — with clarity, presence, and care for mental health.",
+        text: "Papa Life Coach (Papa Life) provides coaching and resources for fathers navigating relationships with adult children — with clarity, presence, and care for mental health.",
       },
     },
     {
@@ -103,7 +103,7 @@ export function webApplicationSchema(path: string, name: string, description: st
     },
     provider: {
       "@type": "Organization",
-      name: "Boss Mobile Life Coach",
+      name: "Papa Life Coach",
     },
   };
 }
@@ -121,7 +121,7 @@ export function articleSchema(slug: string, headline: string, description: strin
     },
     publisher: {
       "@type": "Organization",
-      name: "Boss Mobile Life Coach",
+      name: "Papa Life Coach",
       logo: {
         "@type": "ImageObject",
         url: `${SITE}/images/papa-life-logo.png`,
@@ -145,6 +145,6 @@ export const HOMEPAGE_WEB_APP_SCHEMA = webApplicationSchema(
 
 export const HOMEPAGE_ARTICLE_SCHEMA = articleSchema(
   "/",
-  "Boss Mobile Life Coach — Fatherhood & Life Coaching",
+  "Papa Life Coach — Fatherhood & Adult-Child Relationship Coaching",
   "Supportive coaching for fathers ready for a clearer mental-health journey with adult children."
 );

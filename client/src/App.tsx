@@ -115,12 +115,23 @@ function Router() {
       <Route path={"/booking"} component={Booking} />
       <Route path={"/research-lab"} component={ResearchLab} />
       <Route path={"/executive-memory"} component={ExecutiveMemory} />
+
+      {/* Papa Life OS is the canonical operating interface. */}
+      <Route path={"/papa-life-os/youtube-growth"} component={YouTubeGrowth} />
+      <Route path={"/papa-life-os/approvals"} component={AiBossApprovals} />
+      <Route path={"/papa-life-os/takeover"} component={AiBossTakeover} />
+      <Route path={"/papa-life-os/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/papa-life-os/all-pages"} component={AllPages} />
+      <Route path={"/papa-life-os"} component={AiBossMobile} />
+
+      {/* Legacy AI Boss routes remain valid so existing phone/tablet installs and saved links do not break. */}
       <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
       <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
+
       <Route path={"/all-pages"} component={AllPages} />
       <Route path={"/site-directory"} component={SiteDirectory} />
       <Route path={"/404"} component={NotFound} />
@@ -135,7 +146,7 @@ function GlobalPapaAiWidget() {
   const hiddenPrefixes = [
     "/ai-coach", "/crm", "/crm-console", "/dashboard", "/login", "/member-login",
     "/member-register", "/member-activate", "/member-billing", "/portal", "/my-journey",
-    "/join", "/research-lab", "/executive-memory", "/ai-boss", "/admin", "/strategist",
+    "/join", "/research-lab", "/executive-memory", "/papa-life-os", "/ai-boss", "/admin", "/strategist",
     "/theme-matrix", "/operators", "/governance",
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
@@ -152,11 +163,11 @@ function GlobalAllPagesButton() {
       .then((data) => setIsAdmin(Boolean(data.ok)))
       .catch(() => setIsAdmin(false));
   }, [location]);
-  if (!isAdmin || location === "/all-pages" || location === "/ai-boss/all-pages" || location === "/login") return null;
+  if (!isAdmin || location === "/all-pages" || location === "/papa-life-os/all-pages" || location === "/ai-boss/all-pages" || location === "/login") return null;
   return (
     <button
       type="button"
-      onClick={() => navigate("/ai-boss/all-pages")}
+      onClick={() => navigate("/papa-life-os/all-pages")}
       className="fixed bottom-4 left-4 z-50 rounded-full border border-brand-yellow/50 bg-black/90 px-4 py-2 text-sm font-bold text-brand-yellow shadow-lg backdrop-blur hover:bg-brand-yellow hover:text-black"
     >
       All Pages

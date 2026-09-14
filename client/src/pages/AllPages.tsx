@@ -62,8 +62,8 @@ const groups: PageGroup[] = [
   {
     title: "Papa Life OS & Operations",
     links: [
-      { label: "Papa Life OS", path: "/ai-boss" },
-      { label: "All Pages", path: "/ai-boss/all-pages" },
+      { label: "Papa Life OS", path: "/papa-life-os" },
+      { label: "All Pages", path: "/papa-life-os/all-pages" },
       { label: "Executive Memory", path: "/executive-memory" },
       { label: "Command Center", path: "/crm-console" },
       { label: "Dashboard (opens Command Center)", path: "/dashboard" },
@@ -75,10 +75,10 @@ const groups: PageGroup[] = [
       { label: "Governance", path: "/governance" },
       { label: "Booking", path: "/booking" },
       { label: "Research Lab", path: "/research-lab" },
-      { label: "YouTube Growth", path: "/ai-boss/youtube-growth" },
-      { label: "Approvals & Queue", path: "/ai-boss/approvals" },
-      { label: "Takeover", path: "/ai-boss/takeover" },
-      { label: "Tuesday Live Fallback", path: "/ai-boss/tuesday-live" },
+      { label: "YouTube Growth", path: "/papa-life-os/youtube-growth" },
+      { label: "Approvals & Queue", path: "/papa-life-os/approvals" },
+      { label: "Takeover", path: "/papa-life-os/takeover" },
+      { label: "Tuesday Live Fallback", path: "/papa-life-os/tuesday-live" },
     ],
   },
   {
@@ -117,7 +117,7 @@ export default function AllPages() {
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-10 w-10 rounded-lg object-contain bg-white" />
           <div><h1 className="font-bold">All Papa Life Pages</h1><p className="text-xs text-gray-500">One-tap access to the full site</p></div>
-          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => navigate("/ai-boss")}><ArrowLeft className="mr-2 h-4 w-4" />Papa Life OS</Button>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => navigate("/papa-life-os")}><ArrowLeft className="mr-2 h-4 w-4" />Papa Life OS</Button>
         </div>
       </header>
       <main className="mx-auto max-w-3xl space-y-6 p-4 pb-20">

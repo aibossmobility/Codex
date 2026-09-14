@@ -60,9 +60,9 @@ const groups: PageGroup[] = [
     ],
   },
   {
-    title: "AI Boss OS & Operations",
+    title: "Papa Life OS & Operations",
     links: [
-      { label: "AI Boss OS", path: "/ai-boss" },
+      { label: "Papa Life OS", path: "/ai-boss" },
       { label: "All Pages", path: "/ai-boss/all-pages" },
       { label: "Executive Memory", path: "/executive-memory" },
       { label: "Command Center", path: "/crm-console" },
@@ -117,7 +117,7 @@ export default function AllPages() {
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-10 w-10 rounded-lg object-contain bg-white" />
           <div><h1 className="font-bold">All Papa Life Pages</h1><p className="text-xs text-gray-500">One-tap access to the full site</p></div>
-          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => navigate("/ai-boss")}><ArrowLeft className="mr-2 h-4 w-4" />AI Boss</Button>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => navigate("/ai-boss")}><ArrowLeft className="mr-2 h-4 w-4" />Papa Life OS</Button>
         </div>
       </header>
       <main className="mx-auto max-w-3xl space-y-6 p-4 pb-20">

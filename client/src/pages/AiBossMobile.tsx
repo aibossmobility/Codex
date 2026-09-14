@@ -89,7 +89,7 @@ export default function AiBossMobile() {
     const onAppInstalled = () => {
       setIsInstalled(true);
       setInstallPrompt(null);
-      toast.success("AI Boss OS is installed on this device.");
+      toast.success("Papa Life OS is installed on this device.");
     };
     const standalone = window.matchMedia?.("(display-mode: standalone)")?.matches || (window.navigator as any).standalone === true;
     setIsInstalled(Boolean(standalone));
@@ -116,7 +116,7 @@ export default function AiBossMobile() {
                 .map((registration) => registration.unregister())
             );
             await navigator.serviceWorker.register(aiBossScriptPath, { scope: "/ai-boss" });
-          }).catch((error) => console.warn("AI Boss OS service worker registration failed", error));
+          }).catch((error) => console.warn("Papa Life OS service worker registration failed", error));
         }
         void load();
         if (/Android/i.test(window.navigator.userAgent)) {
@@ -184,14 +184,14 @@ export default function AiBossMobile() {
       setCaptureMode(null);
       toast.success(
         mode === "father"
-          ? "Father encounter remembered by AI Boss OS."
+          ? "Father encounter remembered by Papa Life OS."
           : result.routing === "workspace_completed"
             ? "Google Workspace request completed with no model credits."
             : result.routing === "deterministic_workspace"
               ? result.execution_error
                 ? "Request saved. Google Workspace needs its hosted connection before it can run with the Mac off."
                 : "Google Workspace request routed with no model credits."
-            : "Instruction captured by AI Boss OS for review."
+            : "Instruction captured by Papa Life OS for review."
       );
       await load();
     } catch (error) {
@@ -209,7 +209,7 @@ export default function AiBossMobile() {
     saveVoiceOnEndRef.current = false;
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      toast.message("Voice capture is not available here. Type below and send it to AI Boss.");
+      toast.message("Voice capture is not available here. Type below and send it to Papa Life OS.");
       return;
     }
     const recognition = new SpeechRecognition();
@@ -261,7 +261,7 @@ export default function AiBossMobile() {
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-brand-yellow/50" />
-          <div><h1 className="font-bold leading-tight">AI Boss OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
+          <div><h1 className="font-bold leading-tight">Papa Life OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
           <div className="ml-auto flex items-center gap-2">
             {!isInstalled && (
               <Button size="sm" className="bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => void installAiBoss()}>
@@ -278,8 +278,8 @@ export default function AiBossMobile() {
         <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
           <img src="/images/papa-life-logo.png" alt="Papa Life logo" className="h-44 w-full bg-white object-contain p-4 opacity-95 sm:h-56" />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">Boss Mobility</p>
-            <h2 className="mt-1 text-2xl font-black sm:text-3xl">AI Boss OS</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">Powered by AI Boss Mobility</p>
+            <h2 className="mt-1 text-2xl font-black sm:text-3xl">Papa Life OS</h2>
             <p className="mt-1 max-w-xl text-sm text-white/75">Your secure mobile command center for Papa Life, Google Workspace, approvals, and Android messaging.</p>
           </div>
         </section>
@@ -314,17 +314,17 @@ export default function AiBossMobile() {
 
         <Card className="bg-[#111] border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">Talk to AI Boss</CardTitle>
-            <p className="text-sm text-gray-500">Tell AI Boss what you want done from your Android phone. It can store the instruction immediately and route it through the operating system.</p>
+            <CardTitle className="text-white">Talk to Papa Life OS</CardTitle>
+            <p className="text-sm text-gray-500">Tell Papa Life OS what you want done from your Android phone. It can store the instruction immediately and route it through the operating system.</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={captureInstruction} className="space-y-3">
               <Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="Check my Gmail, review my calendar, prepare a follow-up, remember something, or queue work for my Mac…" className="min-h-28 bg-black/50 border-white/10 text-base" />
               <div className="grid sm:grid-cols-2 gap-3">
                 <Button type="button" variant="outline" disabled={saving} onClick={() => (listening && captureMode === "boss" ? stopVoice() : startVoice("boss"))} className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10">
-                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "boss" ? "Finish speaking" : "Speak to AI Boss"}
+                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "boss" ? "Finish speaking" : "Speak to Papa Life OS"}
                 </Button>
-                <Button type="submit" disabled={saving || !instruction.trim()}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to AI Boss</Button>
+                <Button type="submit" disabled={saving || !instruction.trim()}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to Papa Life OS</Button>
               </div>
             </form>
           </CardContent>
@@ -333,7 +333,7 @@ export default function AiBossMobile() {
         <Card className="bg-[#111] border-white/10">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
-              <div><p className="text-xs uppercase tracking-widest text-primary">Campaigns & Analytics</p><CardTitle className="mt-1 text-white">Managed by AI Boss OS</CardTitle></div>
+              <div><p className="text-xs uppercase tracking-widest text-primary">Campaigns & Analytics</p><CardTitle className="mt-1 text-white">Managed by Papa Life OS</CardTitle></div>
               <BarChart3 className="w-8 h-8 text-primary" />
             </div>
           </CardHeader>

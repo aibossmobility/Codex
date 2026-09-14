@@ -1,0 +1,18 @@
+{
+  "name": "Papa Life OS",
+  "short_name": "Papa Life OS",
+  "start_url": "/papa-life-os",
+  "scope": "/papa-life-os",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f5c518",
+  "description": "Brian Keith Hill's private Papa Life executive command center",
+  "icons": [
+    {
+      "src": "/images/papa-life-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

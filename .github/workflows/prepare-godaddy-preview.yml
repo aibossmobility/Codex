@@ -65,7 +65,7 @@ jobs:
           set -euo pipefail
           pnpm start > /tmp/papalife-preview.log 2>&1 &
           echo $! > /tmp/papalife-preview.pid
-      - name: Verify health and AI Boss direct routes
+      - name: Verify Papa Life OS canonical and legacy direct routes
         shell: bash
         run: |
           set -euo pipefail
@@ -85,7 +85,20 @@ jobs:
             fi
             sleep 1
           done
-          for route in /ai-boss /ai-boss/approvals /ai-boss/takeover /ai-boss/tuesday-live; do
+          for route in \
+            /papa-life-os \
+            /papa-life-os/all-pages \
+            /papa-life-os/approvals \
+            /papa-life-os/takeover \
+            /papa-life-os/tuesday-live \
+            /papa-life-os/youtube-growth \
+            /papa-life-os-manifest.webmanifest \
+            /papa-life-os-sw.js \
+            /ai-boss \
+            /ai-boss/all-pages \
+            /ai-boss/approvals \
+            /ai-boss/takeover \
+            /ai-boss/tuesday-live; do
             code="$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:4173$route")"
             if [[ "$code" != "200" ]]; then
               echo "Preview validation failed: $route returned $code"

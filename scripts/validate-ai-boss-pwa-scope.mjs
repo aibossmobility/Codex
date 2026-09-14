@@ -20,8 +20,8 @@ const manifest = JSON.parse(manifestText);
 assert.equal(manifest.start_url, "/ai-boss");
 assert.equal(manifest.scope, "/ai-boss");
 assert.equal(manifest.display, "standalone");
-assert.equal(manifest.name, "AI Boss OS");
-assert.equal(manifest.short_name, "AI Boss OS");
+assert.equal(manifest.name, "Papa Life OS");
+assert.equal(manifest.short_name, "Papa Life OS");
 assert.ok(Array.isArray(manifest.icons) && manifest.icons.length > 0, "The AI Boss manifest must include an icon");
 assert.equal(manifest.icons[0].src, "/images/papa-life-logo.png");
 

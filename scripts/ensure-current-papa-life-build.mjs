@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 
@@ -7,6 +7,7 @@ const sourceMarker = path.join(root, "client", "public", "papa-life-os-build.jso
 const builtMarker = path.join(root, "dist", "public", "papa-life-os-build.json");
 const compiledServer = path.join(root, "dist", "index.js");
 const compiledWebsite = path.join(root, "dist", "public", "index.html");
+const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
 function read(pathname) {
   try {
@@ -15,6 +16,54 @@ function read(pathname) {
     return "";
   }
 }
+
+function hasBetterSqlite3Binding() {
+  const probe = spawnSync(
+    process.execPath,
+    ["-e", "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.close();"],
+    { cwd: root, env: process.env, stdio: "ignore" },
+  );
+  return probe.status === 0;
+}
+
+function ensureBetterSqlite3Binding() {
+  if (hasBetterSqlite3Binding()) {
+    console.log("[sqlite-native] better-sqlite3 binding is available.");
+    return;
+  }
+
+  const pnpmStore = path.join(root, "node_modules", ".pnpm");
+  let packageDir = "";
+  try {
+    const entry = readdirSync(pnpmStore).find((name) => name.startsWith("better-sqlite3@"));
+    if (entry) {
+      packageDir = path.join(pnpmStore, entry, "node_modules", "better-sqlite3");
+    }
+  } catch {
+    packageDir = "";
+  }
+
+  if (!packageDir || !existsSync(packageDir)) {
+    console.error("[sqlite-native] better-sqlite3 package directory was not found.");
+    process.exit(1);
+  }
+
+  console.warn("[sqlite-native] Native binding is missing; running better-sqlite3 installer.");
+  const install = spawnSync(pnpmCommand, ["--dir", packageDir, "run", "install"], {
+    cwd: root,
+    env: process.env,
+    stdio: "inherit",
+  });
+
+  if (install.status !== 0 || !hasBetterSqlite3Binding()) {
+    console.error("[sqlite-native] better-sqlite3 native binding could not be prepared.");
+    process.exit(install.status ?? 1);
+  }
+
+  console.log("[sqlite-native] better-sqlite3 binding verified.");
+}
+
+ensureBetterSqlite3Binding();
 
 const expected = read(sourceMarker);
 const current = read(builtMarker);
@@ -37,8 +86,7 @@ if (existsSync(compiledServer) && existsSync(compiledWebsite)) {
 }
 
 console.log("[papa-life-build] Compiled output is missing; rebuilding from current source.");
-const command = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-const result = spawnSync(command, ["run", "build"], {
+const result = spawnSync(pnpmCommand, ["run", "build"], {
   cwd: root,
   env: process.env,
   stdio: "inherit",

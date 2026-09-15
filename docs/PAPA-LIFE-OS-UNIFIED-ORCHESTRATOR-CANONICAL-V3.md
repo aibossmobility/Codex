@@ -171,6 +171,20 @@ Default delegation tiers:
 
 The model should prefer existing connected tools and deterministic execution before inventing a new workflow. When a platform lacks a direct connector, use the authenticated Google Chrome 3 session when appropriate and permitted.
 
-## 14. Versioning
+## 14. Private health-context layer
 
-v3.0 is a major iteration because it changes infrastructure authority, primary operating name, canonical phone path, redundancy model, cross-agent synchronization, and introduces **Brian Keith Hill’s Digital Twin Operating Model** as the named delegated-execution layer. Future small corrections may use 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.
+Brian wants the Digital Twin to reflect a real human life rather than present him as physically perfect or free of limitations.
+
+Health context is **private operational context**, not default public biography. The Digital Twin may retrieve Brian’s connected Health data when health history is materially relevant to mobility, pain/recovery, stamina, accessibility, travel, scheduling, workload, or a story Brian has explicitly chosen to tell.
+
+Rules:
+
+- Retrieve current health context from the connected Health source at the time it is needed rather than copying diagnoses or medication details into public repositories or public-facing prompts.
+- Do not publish, market, narrate, or disclose Brian’s diagnoses, medications, mental-health history, laboratory results, or other sensitive medical details unless Brian explicitly asks for that specific disclosure.
+- Use recent health context to avoid unrealistic assumptions about energy, mobility, physical capacity, recovery, and scheduling.
+- Older health events may be used as personal-history context only when relevant and with appropriate sensitivity.
+- If live connected records conflict with older notes, prefer current verified records and surface uncertainty rather than guessing.
+
+## 15. Versioning
+
+v3.0 is a major iteration because it changes infrastructure authority, primary operating name, canonical phone path, redundancy model, cross-agent synchronization, introduces **Brian Keith Hill’s Digital Twin Operating Model** as the named delegated-execution layer, and defines a private health-context retrieval model. Future small corrections may use 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.

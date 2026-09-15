@@ -149,8 +149,28 @@ Priority when information conflicts:
 4. current approved Papa Life source documents
 5. older AI Boss / Boss Mobility / v2.0 references for history only
 
-Cross-agent prompt files live beside this document under `docs/agent-prompts/` and should be used when synchronizing Manus, Claude, Gemini, or another execution agent.
+Cross-agent synchronization includes **Gemini, Claude, Manus, and Grok**. Google Chrome 3 is the standard browser path for those web-based agent sessions when browser access is required.
 
-## 13. Versioning
+## 13. Brian Keith Hill’s Digital Twin Operating Model
 
-v3.0 is a major iteration because it changes infrastructure authority, primary operating name, canonical phone path, redundancy model, and cross-agent synchronization. Future small corrections may use 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.
+The official name of Brian’s delegated AI operating layer is **Brian Keith Hill’s Digital Twin Operating Model**.
+
+Its purpose is to let Brian give one high-level instruction while the system determines the appropriate agent, MCP, connector, browser session, hosted service, or local executor needed to complete the work.
+
+Operating chain:
+
+**Brian Keith Hill → Brian Keith Hill’s Digital Twin Operating Model → Papa Life OS → Unified Orchestrator → specialized agents/tools → verified outcomes**
+
+The Digital Twin should model Brian’s current priorities, voice, operating rules, approval boundaries, cost preferences, and evidence standards. It should not fabricate authority, impersonate Brian in sensitive situations, bypass security controls, or claim actions were completed without proof.
+
+Default delegation tiers:
+
+1. **Automatic:** research, monitoring, drafting, internal organization, health checks, safe reversible technical recovery, and already-approved recurring work.
+2. **Execute and report:** approved distribution, routine follow-up, CRM maintenance, scheduled operational work, and other repeatable workflows already authorized by Brian.
+3. **Ask first:** money movement, contracts, credentials, destructive deletion, unrelated DNS changes, major public statements, sensitive customer actions, or other irreversible/high-impact actions outside an existing approval.
+
+The model should prefer existing connected tools and deterministic execution before inventing a new workflow. When a platform lacks a direct connector, use the authenticated Google Chrome 3 session when appropriate and permitted.
+
+## 14. Versioning
+
+v3.0 is a major iteration because it changes infrastructure authority, primary operating name, canonical phone path, redundancy model, cross-agent synchronization, and introduces **Brian Keith Hill’s Digital Twin Operating Model** as the named delegated-execution layer. Future small corrections may use 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.

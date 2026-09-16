@@ -178,7 +178,13 @@ const relatedLinks: Array<{ title: string; copy: string; Icon: LucideIcon; href:
     title: "Podcast",
     copy: "Show notes, questions, and follow-up resources connect here.",
     Icon: MessageCircle,
-    href: "/podcast",
+    href: "/podcast.html",
+  },
+  {
+    title: "Audio",
+    copy: "Play Papa Life teaching and prayer audio without leaving the site.",
+    Icon: Mic,
+    href: "/audio.html",
   },
   {
     title: "Tuesday Live",
@@ -907,9 +913,24 @@ export default function PapaAiExperience() {
               <ChatMode mode="membership" lead={lead} setLead={setLead} />
             </TabsContent>
             <TabsContent value="prayer">
+              <div className="mb-4 rounded-2xl border border-brand-yellow/25 bg-brand-yellow/5 p-5">
+                <h3 className="text-xl font-bold text-brand-yellow">Prayer Room</h3>
+                <p className="mt-2 text-sm text-white/65">Start a guided fatherhood prayer here, or play the Papa Life prayer reflection audio.</p>
+                <a href="/media/Papa_Life_Prayer_Reflection_Transition.mp3" className="mt-4 inline-flex items-center gap-2 font-bold text-primary hover:text-brand-yellow">
+                  <Mic className="h-4 w-4" /> Play Prayer Reflection Audio
+                </a>
+              </div>
               <ChatMode mode="prayer" lead={lead} setLead={setLead} />
             </TabsContent>
             <TabsContent value="bible-study">
+              <div className="mb-4 rounded-2xl border border-brand-yellow/25 bg-brand-yellow/5 p-5">
+                <h3 className="text-xl font-bold text-brand-yellow">Bible Study</h3>
+                <p className="mt-2 text-sm text-white/65">Begin with James 1:19, then ask the AI Coach to apply the passage to your relationship with your adult child.</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <a href="/papa-framework" className="font-bold text-primary hover:text-brand-yellow">Open PAPA Framework</a>
+                  <a href="/papa-first-lesson" className="font-bold text-primary hover:text-brand-yellow">Open First Lesson</a>
+                </div>
+              </div>
               <ChatMode mode="bible-study" lead={lead} setLead={setLead} />
             </TabsContent>
           </Tabs>
@@ -920,7 +941,7 @@ export default function PapaAiExperience() {
         </section>
 
         <section className="border-t border-white/10 py-12">
-          <div className="container grid gap-4 md:grid-cols-4">
+          <div className="container grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             {relatedLinks.map(({ title, copy, Icon, href }) => {
               return (
                 <a key={title} href={href} className="rounded-xl border border-white/10 bg-card/60 p-5 hover:border-brand-yellow/50">

@@ -346,16 +346,14 @@
           <p class="hint">Tap the single voice control below to speak with the Papa Life AI agent in Brian Keith Hill's AI voice.</p>
           <div id="voiceWidgetSlot" class="voice-widget-slot" aria-live="polite"></div>
           <p id="voiceStatus" class="voice-status">Preparing the private voice session...</p>
-          <a
+          <button
             class="voice-start"
             id="voiceFallbackLink"
-            href="https://elevenlabs.io/app/talk-to?agent_id=agent_7601kt209ptbe0qrd9b3e4gezyv6"
-            target="_blank"
-            rel="noopener noreferrer"
+            type="button"
             hidden
           >
-            Open Backup Voice Page
-          </a>
+            Retry Voice Here
+          </button>
           <div class="contact-actions" aria-label="Contact Brian Keith Hill">
             <a class="contact-button contact-button-call" href="tel:+15104152098">Call Brian Live</a>
             <a class="contact-button contact-button-text" href="sms:+15104152098">Text Brian</a>
@@ -380,7 +378,6 @@
   </div>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    var voiceCoachFallbackUrl = "https://elevenlabs.io/app/talk-to?agent_id=agent_7601kt209ptbe0qrd9b3e4gezyv6";
     var voiceCoachReady = false;
     var voiceCoachFailed = false;
 
@@ -389,10 +386,6 @@
       var status = document.getElementById("voiceStatus");
       if (slot) slot.textContent = message;
       if (status) status.textContent = message;
-    }
-
-    function openBackupVoiceCoach() {
-      window.open(voiceCoachFallbackUrl, "_blank", "noopener,noreferrer");
     }
 
     function clickWidgetCallButton(widget) {
@@ -426,7 +419,10 @@
       var fallback = document.getElementById("voiceFallbackLink");
       var widget = slot ? slot.querySelector("elevenlabs-convai") : null;
       if (voiceCoachFailed || (fallback && !fallback.hidden && !widget)) {
-        openBackupVoiceCoach();
+        if (status) status.textContent = "Retrying the Papa Life voice coach here...";
+        voiceCoachFailed = false;
+        if (fallback) fallback.hidden = true;
+        loadVoiceCoach();
         return;
       }
       if (slot) {
@@ -469,7 +465,7 @@
       voiceCoachFailed = true;
       if (fallback) fallback.hidden = false;
       if (status) {
-        status.textContent = message || "The embedded voice coach is not available here. Use the backup button to open Brian Keith Hill's voice agent.";
+        status.textContent = message || "The embedded voice coach is not available here. Tap Retry Voice Here to try the embedded Papa Life voice again.";
       }
     }
 
@@ -497,7 +493,7 @@
         }
         widget.setAttribute("variant", "expandable");
         widget.addEventListener("error", function () {
-          showVoiceFallback("The embedded voice coach hit a browser error. Use the backup button to open the voice agent.");
+          showVoiceFallback("The embedded voice coach hit a browser error. Tap Retry Voice Here to try the embedded voice again.");
         });
         slot.replaceChildren(widget);
         voiceCoachReady = true;
@@ -507,21 +503,23 @@
 
         if (window.customElements && typeof window.customElements.whenDefined === "function") {
           window.customElements.whenDefined("elevenlabs-convai").catch(function () {
-            showVoiceFallback("The voice widget did not finish loading. Use the backup button to open the voice agent.");
+            showVoiceFallback("The voice widget did not finish loading. Tap Retry Voice Here to try the embedded voice again.");
           });
         }
 
         window.setTimeout(function () {
           if (!customElements.get("elevenlabs-convai")) {
-            showVoiceFallback("The voice widget did not load. Use the backup button to open the voice agent.");
+            showVoiceFallback("The voice widget did not load. Tap Retry Voice Here to try the embedded voice again.");
           }
         }, 8000);
       } catch (error) {
         console.warn("Voice coach fallback:", error);
-        showVoiceFallback("The private voice session could not start here. Use the backup button to open Brian Keith Hill's voice agent.");
+        showVoiceFallback("The private voice session could not start here. Tap Retry Voice Here to try the embedded Papa Life voice again.");
       }
     }
 
+    var retryButton = document.getElementById("voiceFallbackLink");
+    if (retryButton) retryButton.addEventListener("click", openEmbeddedVoiceCoach);
     loadVoiceCoach();
   </script>
 </body>

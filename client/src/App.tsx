@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { captureFirstTouchAttribution } from "./lib/attribution";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { GlobalBookingButton } from "./components/GlobalBookingButton";
-import { PapaAiWidget } from "./components/PapaAiWidget";
+import { BrianDigitalTwin } from "./components/BrianDigitalTwin";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -151,7 +151,7 @@ function GlobalPapaAiWidget() {
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
   if (shouldHide) return null;
-  return <PapaAiWidget autoOpen={path === "/"} />;
+  return <BrianDigitalTwin autoOpen={path === "/"} />;
 }
 
 function GlobalAllPagesButton() {

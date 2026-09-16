@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { ArrowRight, CalendarCheck, HeartHandshake, MessageCircle, Send, ShieldCheck, Sparkles, X } from "lucide-react";
+import { CalendarCheck, HeartHandshake, MessageCircle, Send, ShieldCheck, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };

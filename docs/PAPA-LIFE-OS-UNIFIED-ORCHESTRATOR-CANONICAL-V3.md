@@ -1,6 +1,6 @@
-# Papa Life OS + Unified Orchestrator — Canonical v3.0
+# Papa Life OS + Unified Orchestrator — Canonical v3.0.1
 
-**Effective date:** 2026-09-15  
+**Effective date:** 2026-09-17  
 **Owner:** Brian Keith Hill  
 **Status:** Current operational source of truth
 
@@ -8,8 +8,10 @@ This document supersedes conflicting AI Boss-era, bossmobilelifecoach.com-era, a
 
 ## 1. Canonical identity
 
-- Primary brand: **Papa Life**
-- Primary public domain: **PapaLifeCoach.com**
+- Primary fatherhood brand: **Papa Life**
+- Primary public fatherhood domain: **PapaLifeCoach.com**
+- **AI Boss Mobility** remains Brian Keith Hill’s broader AI strategy, organizational consulting, and technology-enablement brand; Papa Life does not replace AI Boss Mobility outside the fatherhood operating context.
+- **Brian Keith Hill’s Digital Twin Operating Model** is a cross-business delegated operating layer representing Brian’s approved priorities, voice, boundaries, and workflows; it is not merely a Papa Life marketing avatar.
 - Canonical operating interface: **Papa Life OS**
 - Canonical phone route: **/papa-life-os**
 - Legacy compatibility route: **/ai-boss**
@@ -74,7 +76,7 @@ Papa Life OS must remain usable from Brian’s Android phone and tablet, not onl
 
 Canonical phone address: `https://papalifecoach.com/papa-life-os`
 
-Expected mobile functions include Mobile Mission Control, approvals, instruction capture, voice capture where supported, Android companion heartbeat, Google Workspace routing, Google Messages surface/relay when connected, All Pages navigation, and Tuesday Live support.
+Expected mobile functions include Mobile Mission Control, approvals, instruction capture, voice capture where supported, Android companion heartbeat, Google Workspace routing, All Pages navigation, and Tuesday Live support. Google Messages may remain available as an inbound/personal communication surface or explicitly approved reply relay, but it is **not** a default Papa Life prospecting, campaign, or mass-outreach channel.
 
 The legacy `/ai-boss` route remains valid so old installs and bookmarks do not break.
 
@@ -118,7 +120,10 @@ Unified Orchestrator should route to these surfaces when connected and relevant:
 - Gmail — approved relationship follow-up
 - Google Calendar — events and Tuesday Live
 - Google Contacts — contact resolution
-- HighLevel / GoHighLevel — CRM, opportunities, conversations, workflows, authorized SMS fallback
+- Airtable — prospecting, outreach, contact-development tracking, response history, relationship-development status, and the structured pre-customer engagement record
+- HighLevel / GoHighLevel — established relationships, qualified opportunities, customers/members, purchases, conversations, workflows, and explicitly authorized SMS fallback
+
+**Data-system boundary:** avoid maintaining the same lifecycle record independently in both systems. Airtable is the primary engagement/prospecting tracker before a relationship becomes qualified/customer-operational; GoHighLevel becomes primary for established relationship/customer/opportunity operations. Synchronization should pass only the fields needed for handoff and de-duplication.
 - Calendly — booking
 - ZIPShare / HeyCatch — authenticated distribution
 - Threads, LinkedIn, Facebook, Google Business Profile, Alignable — authenticated distribution
@@ -134,7 +139,7 @@ Current priority is **distribution, follow-up, conversion, and delivery**, not e
 
 ## 11. Tuesday Live truth
 
-Primary start page: `https://papalifecoach.com/Tuesday`  
+Primary start page: `https://papalifecoach.com/tuesday`  
 Direct Meetn room: `https://meetn.com/briankeithhill`
 
 Meetn recording must be started or visibly confirmed unless the room itself shows recording active. The 12:45 PM Tuesday automation prepares links/checklists/materials; it does not physically open Meetn or press Record.
@@ -149,7 +154,7 @@ Priority when information conflicts:
 4. current approved Papa Life source documents
 5. older AI Boss / Boss Mobility / v2.0 references for history only
 
-Cross-agent synchronization includes **Gemini, Claude, Manus, and Grok**. Google Chrome 3 is the standard browser path for those web-based agent sessions when browser access is required.
+Cross-agent synchronization includes **Gemini, Claude, Manus, and Grok**. Their shared synchronization instructions live in `docs/agent-prompts/BRIAN-KEITH-HILL-DIGITAL-TWIN-V3-SYNC.md`; provider-specific sessions should load that source rather than depend on chat history alone. Google Chrome 3 is the standard browser path for those web-based agent sessions when browser access is required.
 
 ## 13. Brian Keith Hill’s Digital Twin Operating Model
 
@@ -187,4 +192,4 @@ Rules:
 
 ## 15. Versioning
 
-v3.0 is a major iteration because it changes infrastructure authority, primary operating name, canonical phone path, redundancy model, cross-agent synchronization, introduces **Brian Keith Hill’s Digital Twin Operating Model** as the named delegated-execution layer, and defines a private health-context retrieval model. Future small corrections may use 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.
+v3.0 established the major architecture. **v3.0.1** synchronizes the September 16–17 operating decisions: current Digital Twin visual identity, Papa Life vs. AI Boss Mobility brand boundaries, Airtable/GoHighLevel lifecycle ownership, the non-prospecting role of Google Messages, lowercase `/tuesday`, and repository-backed cross-agent synchronization. Future small corrections may continue as 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.

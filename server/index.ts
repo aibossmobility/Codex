@@ -2446,18 +2446,18 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Join Papa Life — Immediate Access", href: "/go/join?src=welcome-to-papa-life" },
   },
   "/papa-framework": {
-    title: "The PAPA Framework for Fathers | Presence, Purpose, Authority, Alignment",
+    title: "The PAPA Framework for Fathers | Presence, Authority, Purpose, Alignment",
     description:
       "Learn the PAPA framework, four pillars that help fathers lead with clarity, character, presence, and integrity with adult children.",
-    keywords: "PAPA framework, fatherhood framework, Presence Purpose Authority Alignment",
+    keywords: "PAPA framework, fatherhood framework, Presence Authority Purpose Alignment",
     eyebrow: "PAPA Framework",
     headline: "Four pillars. One mission: become the father your adult child can trust again.",
     intro:
-      "Presence, Purpose, Authority, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
+      "Presence, Authority, Purpose, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
     sections: [
       { heading: "Presence", body: "Show up without fixing everything and let your child feel seen, not managed." },
-      { heading: "Purpose", body: "Know why you were built for this role beyond paychecks and provider identity." },
       { heading: "Authority", body: "Lead without control and trade force for grounded character." },
+      { heading: "Purpose", body: "Know why you were built for this role beyond paychecks and provider identity." },
       { heading: "Alignment", body: "Close the gap between who you say you are and how you live." },
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },

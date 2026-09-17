@@ -2446,28 +2446,28 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Join Papa Life — Immediate Access", href: "/go/join?src=welcome-to-papa-life" },
   },
   "/papa-framework": {
-    title: "The PAPA Framework for Fathers | Purpose, Authority, Presence, Alignment",
+    title: "The PAPA Framework for Fathers | Presence, Purpose, Authority, Alignment",
     description:
       "Learn the PAPA framework, four pillars that help fathers lead with clarity, character, presence, and integrity with adult children.",
-    keywords: "PAPA framework, fatherhood framework, Purpose Authority Presence Alignment",
+    keywords: "PAPA framework, fatherhood framework, Presence Purpose Authority Alignment",
     eyebrow: "PAPA Framework",
     headline: "Four pillars. One mission: become the father your adult child can trust again.",
     intro:
-      "Purpose, Authority, Presence, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
+      "Presence, Purpose, Authority, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
     sections: [
+      { heading: "Presence", body: "Show up without fixing everything and let your child feel seen, not managed." },
       { heading: "Purpose", body: "Know why you were built for this role beyond paychecks and provider identity." },
       { heading: "Authority", body: "Lead without control and trade force for grounded character." },
-      { heading: "Presence", body: "Show up without fixing everything and let your child feel seen, not managed." },
       { heading: "Alignment", body: "Close the gap between who you say you are and how you live." },
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
   "/about-brian-keith-hill": {
-    title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
+    title: "Brian Keith Hill | Founder of AI Boss Mobility and Papa Life",
     description:
       "Meet Brian Keith Hill, founder of Boss Mobility and Papa Life, a Scripture-centered coaching movement serving fathers of adult children.",
     keywords: "Brian Keith Hill, Boss Mobility, Papa Life Coach, Papa Life founder, fatherhood coach",
-    eyebrow: "Founder of Boss Mobility and Papa Life",
+    eyebrow: "Founder of AI Boss Mobility and Papa Life",
     headline: "Brian Keith Hill",
     intro:
       "Brian Keith Hill is the founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",

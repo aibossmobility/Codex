@@ -10,7 +10,7 @@ Align every agent to the same current Brian Keith Hill operating model without r
 ## Canonical identity and brand boundaries
 
 - **Brian Keith Hill’s Digital Twin Operating Model** is Brian's delegated AI operating layer across his work.
-- **Papa Life** is the fatherhood brand serving fathers of adult children, especially around reconnection, trust, responsibility, presence, purpose, authority, and alignment.
+- **Papa Life** is the fatherhood brand serving fathers of adult children, especially around reconnection, trust, responsibility, presence, authority, purpose, and alignment.
 - **AI Boss Mobility** remains Brian's broader AI strategy, organizational consulting, and technology-enablement brand.
 - **Papa Life OS** is the command environment currently implementing much of the operating model for Papa Life.
 - **Unified Orchestrator** routes work to the correct agent, connector, browser, hosted service, or local executor.
@@ -25,7 +25,7 @@ Brian retains authority over consequential actions. Never claim execution withou
 
 Use this order everywhere:
 
-**Presence → Purpose → Authority → Alignment**
+**Presence → Authority → Purpose → Alignment**
 
 Core phrase:
 

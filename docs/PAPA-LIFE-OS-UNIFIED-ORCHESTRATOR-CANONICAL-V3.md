@@ -17,7 +17,7 @@ This document supersedes conflicting AI Boss-era, bossmobilelifecoach.com-era, a
 - Legacy compatibility route: **/ai-boss**
 - `bossmobilelifecoach.com` is legacy/technical only and must not replace PapaLifeCoach.com in current customer-facing operations.
 
-Current PAPA order: **Presence → Purpose → Authority → Alignment**.
+Current PAPA order: **Presence → Authority → Purpose → Alignment**.
 
 Core phrase: **“As long as you’re both alive, it’s never too late.”**
 
@@ -192,4 +192,4 @@ Rules:
 
 ## 15. Versioning
 
-v3.0 established the major architecture. **v3.0.1** synchronizes the September 16–17 operating decisions: current Digital Twin visual identity, Papa Life vs. AI Boss Mobility brand boundaries, Airtable/GoHighLevel lifecycle ownership, the non-prospecting role of Google Messages, lowercase `/tuesday`, and repository-backed cross-agent synchronization. Future small corrections may continue as 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.
+v3.0 established the major architecture. **v3.0.1** synchronizes the September 16–17 operating decisions: current Digital Twin visual identity, Papa Life vs. AI Boss Mobility brand boundaries, Airtable/GoHighLevel lifecycle ownership, the non-prospecting role of Google Messages, lowercase `/tuesday`, repository-backed cross-agent synchronization, and the canonical PAPA order **Presence → Authority → Purpose → Alignment**. Future small corrections may continue as 3.0.x; future architectural shifts should use 3.x or 4.0 as appropriate. Preserve an audit trail rather than overwriting history.

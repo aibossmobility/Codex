@@ -4,7 +4,7 @@
 
 ## Appearance authority
 
-Use Brian’s **current 2026 appearance** as the visual authority: current beard, current face shape, current hair, current build, and current overall presence. Older photos and videos may be used to learn motion, posture, gestures, speaking cadence, singing presence, and personality, but must not visually age Brian backward.
+Use Brian’s **current September 16, 2026 clean-shaven appearance** as the visual authority: current face shape, hair, build, skin tone, smile, and overall presence. The primary facial reference is the September 16 current-photo set, led by the 1:54 PM big-smile image; supporting references include the relaxed neutral, speaking/laughing, listening/coach hand-at-temple, and gentle-smile images from the same session. Older photos and videos may be used to learn motion, posture, gestures, speaking cadence, singing presence, and personality, but must not visually age Brian backward or override the current clean-shaven facial identity.
 
 ## Signature wardrobe cues
 

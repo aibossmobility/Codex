@@ -371,7 +371,7 @@ const html = `<!doctype html>
       <section class="status" aria-label="Knowledge center status">
         <div><strong>Version</strong><span>v1.0.1</span></div>
         <div><strong>Status</strong><span>Production-ready</span></div>
-        <div><strong>Framework</strong><span>Purpose, Authority, Presence, Alignment</span></div>
+        <div><strong>Framework</strong><span>Presence, Authority, Purpose, Alignment</span></div>
         <div><strong>Source</strong><span>Papa_Life_Master_Skill.md</span></div>
       </section>
 

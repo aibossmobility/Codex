@@ -200,7 +200,15 @@ export default function FatherJourney() {
             </div>
 
             <div className="relative mx-auto aspect-square w-full max-w-[720px]">
-              <img src="/images/papa-life-journey-wheel.webp" alt="Papa Life five-destination fatherhood journey steering wheel" className="h-full w-full object-contain" />
+              <img
+                src="/images/papa-life-journey-wheel.webp"
+                alt="Papa Life five-destination fatherhood journey steering wheel"
+                width={1254}
+                height={1254}
+                loading="eager"
+                fetchPriority="high"
+                className="h-full w-full object-contain"
+              />
               {steps.map((step, index) => {
                 const unlocked = isUnlocked(index);
                 const complete = saved[step.key]?.status === "completed";

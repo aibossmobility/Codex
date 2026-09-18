@@ -212,9 +212,13 @@ export default function Home() {
 
       <header className="relative overflow-hidden bg-[#f8f0db] text-[#17231c]">
         <img
-          src="/images/papa-life-reconnection-path-hero.png"
+          src="/images/papa-life-reconnection-path-hero.jpg"
           alt=""
           aria-hidden="true"
+          width={1672}
+          height={941}
+          loading="eager"
+          fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(235,218,179,0.94)_0%,rgba(235,218,179,0.82)_40%,rgba(235,218,179,0.28)_58%,rgba(235,218,179,0.04)_72%)]" />

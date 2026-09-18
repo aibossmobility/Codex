@@ -2917,7 +2917,7 @@ function aiBossServerPage(): ServerRenderedPage {
 
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
-  if (pathname.startsWith("/papa-life-os") || pathname.startsWith("/ai-boss")) return aiBossServerPage();
+  if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
   if (pathname === "/executive-memory") {
     const page: StaticServerPage = {
       title: "Executive Memory | AI Boss OS",
@@ -2955,7 +2955,7 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   // noindex placeholder so the client can redirect unauthenticated visitors to
   // /login. Returning the public 404 page here prevents the Android companion
   // and Tuesday Live fallback from ever reaching the client router.
-  if (/^\/(?:papa-life-os|ai-boss)(?:\/|$)/.test(pathname)) {
+  if (/^\/ai-boss(?:\/|$)/.test(pathname)) {
     return {
       status: 200,
       title: "AI Boss OS | Papa Life",

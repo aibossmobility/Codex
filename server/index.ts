@@ -2070,11 +2070,11 @@ const allowedAiOrigins = new Set([
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com https://in.heycatch.ai",
+  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com https://in.heycatch.ai https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
   "media-src 'self' blob: data:",
   "frame-src 'self' https://meetn.com",
   "object-src 'none'",
@@ -2917,7 +2917,7 @@ function aiBossServerPage(): ServerRenderedPage {
 
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
-  if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
+  if (pathname.startsWith("/papa-life-os") || pathname.startsWith("/ai-boss")) return aiBossServerPage();
   if (pathname === "/executive-memory") {
     const page: StaticServerPage = {
       title: "Executive Memory | AI Boss OS",
@@ -2955,7 +2955,7 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   // noindex placeholder so the client can redirect unauthenticated visitors to
   // /login. Returning the public 404 page here prevents the Android companion
   // and Tuesday Live fallback from ever reaching the client router.
-  if (/^\/ai-boss(?:\/|$)/.test(pathname)) {
+  if (/^\/(?:papa-life-os|ai-boss)(?:\/|$)/.test(pathname)) {
     return {
       status: 200,
       title: "AI Boss OS | Papa Life",

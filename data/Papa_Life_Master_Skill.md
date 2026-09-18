@@ -5,7 +5,7 @@
   "version": "1.0.1",
   "author": "Brian Keith Hill, Founder of Papa Life",
   "format": "skill-package",
-  "primary_framework": "Purpose, Authority, Presence, Alignment",
+  "primary_framework": "Presence, Authority, Purpose, Alignment",
   "audience": [
     "Fathers of adult children ages 50-70",
     "faith-based fathers",
@@ -30,7 +30,7 @@ Use this skill to produce Papa Life content and coaching assets with one consist
 
 ## Core Rule
 
-Every output must help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment.
+Every output must help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
 ## Workflow
 
@@ -53,9 +53,9 @@ Every output must help fathers of adult children rebuild connection, restore tru
 
 Connect naturally to at least one PAPA pillar when relevant:
 
-- Purpose: who the father is becoming under God.
-- Authority: leading wisely without controlling.
 - Presence: showing up consistently and safely.
+- Authority: leading wisely without controlling.
+- Purpose: who the father is becoming under God.
 - Alignment: living what he says matters.
 
 ## Website and Access Guardrails
@@ -85,7 +85,7 @@ Papa Life public website work must protect search visibility and member trust:
 # Papa Life Brand Voice and Guardrails
 
 ## Mission
-Help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment.
+Help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
 ## Audience
 Primary: fathers of adult children, ages 50-70, in the United States.
@@ -124,9 +124,9 @@ Avoid phrases like:
 - Your child owes you.
 
 ## PAPA Framework
-Purpose: Who am I becoming as a father under God?
-Authority: How do I lead wisely without controlling?
 Presence: How do I show up consistently and safely?
+Authority: How do I lead wisely without controlling?
+Purpose: Who am I becoming as a father under God?
 Alignment: Does my life match what I say matters?
 
 
@@ -1016,7 +1016,7 @@ Interpretation: lower scores identify the next coaching focus. Choose one practi
 Headline: It is not too late to become a wiser father.
 Subheadline: A faith-based path for fathers of adult children who want to rebuild connection with humility, presence, and practical action.
 Problem: Distance, silence, regret, and confusion.
-Framework: Purpose, Authority, Presence, Alignment.
+Framework: Presence, Authority, Purpose, Alignment.
 Offer: Join Papa Life for guided teaching, reflection, and next steps.
 CTA: Begin the Papa Life journey today.
 
@@ -1024,7 +1024,7 @@ CTA: Begin the Papa Life journey today.
 Headline: It is not too late to become a wiser father.
 Subheadline: A faith-based path for fathers of adult children who want to rebuild connection with humility, presence, and practical action.
 Problem: Distance, silence, regret, and confusion.
-Framework: Purpose, Authority, Presence, Alignment.
+Framework: Presence, Authority, Purpose, Alignment.
 Offer: Join Papa Life for guided teaching, reflection, and next steps.
 CTA: Begin the Papa Life journey today.
 
@@ -1032,7 +1032,7 @@ CTA: Begin the Papa Life journey today.
 Headline: It is not too late to become a wiser father.
 Subheadline: A faith-based path for fathers of adult children who want to rebuild connection with humility, presence, and practical action.
 Problem: Distance, silence, regret, and confusion.
-Framework: Purpose, Authority, Presence, Alignment.
+Framework: Presence, Authority, Purpose, Alignment.
 Offer: Join Papa Life for guided teaching, reflection, and next steps.
 CTA: Begin the Papa Life journey today.
 
@@ -1040,7 +1040,7 @@ CTA: Begin the Papa Life journey today.
 Headline: It is not too late to become a wiser father.
 Subheadline: A faith-based path for fathers of adult children who want to rebuild connection with humility, presence, and practical action.
 Problem: Distance, silence, regret, and confusion.
-Framework: Purpose, Authority, Presence, Alignment.
+Framework: Presence, Authority, Purpose, Alignment.
 Offer: Join Papa Life for guided teaching, reflection, and next steps.
 CTA: Begin the Papa Life journey today.
 
@@ -1048,7 +1048,7 @@ CTA: Begin the Papa Life journey today.
 Headline: It is not too late to become a wiser father.
 Subheadline: A faith-based path for fathers of adult children who want to rebuild connection with humility, presence, and practical action.
 Problem: Distance, silence, regret, and confusion.
-Framework: Purpose, Authority, Presence, Alignment.
+Framework: Presence, Authority, Purpose, Alignment.
 Offer: Join Papa Life for guided teaching, reflection, and next steps.
 CTA: Begin the Papa Life journey today.
 

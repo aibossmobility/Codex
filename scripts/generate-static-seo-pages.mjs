@@ -14,12 +14,12 @@ const pages = [
     eyebrow: "Papa Life Coach",
     headline: "Papa Life gives fathers a practical path back to connection.",
     intro:
-      "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers assessment, guided lessons, AI coaching, and the PAPA Framework: Purpose, Authority, Presence, and Alignment.",
+      "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers the 2-Minute Fatherhood Check-In, guided lessons, AI coaching, and the PAPA Framework: Presence, Purpose, Authority, and Alignment.",
     sections: [
-      ["Start with clarity", "Take the free relationship assessment to name where things stand and identify the first honest step toward closing the gap."],
+      ["Start with clarity", "Take the 2-Minute Fatherhood Check-In to notice where things stand today and choose an honest, practical next step."],
       ["Learn the new role", "Use the free workshop and course library to move from pressure and control into listening, humility, consistency, and trust."],
       ["Practice the path", "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships."],
-      ["Founded by Brian Keith Hill", "Brian Keith Hill is the founder of Boss Mobility and Papa Life, its specialized Scripture-centered fatherhood movement for fathers of adult children."],
+      ["Founded by Brian Keith Hill", "Brian Keith Hill is the founder of Papa Life, a Scripture-centered fatherhood movement for fathers of adult children."],
     ],
   },
   {

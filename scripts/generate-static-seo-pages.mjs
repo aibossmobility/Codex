@@ -1,3 +1,4 @@
+// Deployment sync: ensure Railway production builds current canonical homepage copy.
 import fs from "node:fs";
 import path from "node:path";
 

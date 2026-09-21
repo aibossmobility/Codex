@@ -2,7 +2,7 @@
   "name": "Papa Life OS",
   "short_name": "Papa Life OS",
   "start_url": "/papa-life-os",
-  "scope": "/papa-life-os",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#f5c518",

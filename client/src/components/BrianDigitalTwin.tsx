@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Send, ShieldCheck, Sparkles, Square, Volume2, VolumeX, X } from "lucide-react";
+import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Send, ShieldCheck, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -69,7 +69,16 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [spokenReplies, setSpokenReplies] = useState(true);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [conversationActive, setConversationActive] = useState(false);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const conversationActiveRef = useRef(false);
+  const loadingRef = useRef(false);
+  const spokenTextRef = useRef("");
+  const committedTranscriptRef = useRef("");
+  const interimTranscriptRef = useRef("");
+  const silenceTimerRef = useRef<number | null>(null);
+  const sendTextRef = useRef<(text: string) => void>(() => undefined);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -91,6 +100,27 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     setVoiceSupported(Boolean(browser.SpeechRecognition || browser.webkitSpeechRecognition));
   }, []);
 
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
+  function normalizeVoiceWords(value: string) {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((word) => word.length > 1);
+  }
+
+  function soundsLikeBrianPlayback(value: string) {
+    if (!spokenTextRef.current) return false;
+    const heard = normalizeVoiceWords(value);
+    if (heard.length < 2) return false;
+    const spoken = new Set(normalizeVoiceWords(spokenTextRef.current));
+    const overlap = heard.filter((word) => spoken.has(word)).length / heard.length;
+    return overlap >= 0.8;
+  }
+
   function stopSpeaking() {
     window.speechSynthesis?.cancel();
     const current = activeAudioRef.current;
@@ -99,18 +129,21 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       current.currentTime = 0;
       activeAudioRef.current = null;
     }
+    spokenTextRef.current = "";
     setIsSpeaking(false);
   }
 
-  function speak(_text: string, voiceUrl?: string) {
+  function speak(text: string, voiceUrl?: string) {
     if (!spokenReplies || !voiceUrl) return;
     stopSpeaking();
+    spokenTextRef.current = text;
     const audio = new Audio(voiceUrl);
     audio.preload = "auto";
     activeAudioRef.current = audio;
     setIsSpeaking(true);
     const finish = () => {
       if (activeAudioRef.current === audio) activeAudioRef.current = null;
+      if (spokenTextRef.current === text) spokenTextRef.current = "";
       setIsSpeaking(false);
     };
     audio.onended = finish;
@@ -214,27 +247,124 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     await sendText(clean);
   }
 
-  function startListening() {
-    if (!identified || loading) return;
-    stopSpeaking();
+  sendTextRef.current = (text: string) => {
+    void sendText(text);
+  };
+
+  function clearSilenceTimer() {
+    if (silenceTimerRef.current !== null) {
+      window.clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  }
+
+  function finishNaturalTurn() {
+    clearSilenceTimer();
+    const transcript = `${committedTranscriptRef.current} ${interimTranscriptRef.current}`.replace(/\s+/g, " ").trim();
+    if (transcript.length < 2) return;
+    if (loadingRef.current) {
+      silenceTimerRef.current = window.setTimeout(finishNaturalTurn, 350);
+      return;
+    }
+    committedTranscriptRef.current = "";
+    interimTranscriptRef.current = "";
+    setMessage("");
+    sendTextRef.current(transcript);
+  }
+
+  function scheduleNaturalTurn(isFinal: boolean) {
+    clearSilenceTimer();
+    silenceTimerRef.current = window.setTimeout(finishNaturalTurn, isFinal ? 700 : 1050);
+  }
+
+  function startRecognitionSession() {
+    if (!conversationActiveRef.current) return;
     const browser = window as any;
     const Recognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
-    if (!Recognition) return;
+    if (!Recognition || recognitionRef.current) return;
 
     const recognition = new Recognition();
     recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    setListening(true);
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognitionRef.current = recognition;
 
+    recognition.onstart = () => setListening(true);
     recognition.onresult = (event: any) => {
-      const transcript = String(event.results?.[0]?.[0]?.transcript || "").trim();
-      setListening(false);
-      if (transcript) void sendText(transcript);
+      let finalChunk = "";
+      let interimChunk = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const transcript = String(result?.[0]?.transcript || "").trim();
+        if (!transcript) continue;
+        if (result.isFinal) finalChunk += ` ${transcript}`;
+        else interimChunk += ` ${transcript}`;
+      }
+
+      const heard = `${finalChunk} ${interimChunk}`.replace(/\s+/g, " ").trim();
+      if (!heard || soundsLikeBrianPlayback(heard)) return;
+
+      if (activeAudioRef.current) stopSpeaking();
+
+      if (finalChunk.trim()) {
+        committedTranscriptRef.current = `${committedTranscriptRef.current} ${finalChunk}`.replace(/\s+/g, " ").trim();
+        interimTranscriptRef.current = "";
+      } else {
+        interimTranscriptRef.current = interimChunk.trim();
+      }
+
+      const liveTranscript = `${committedTranscriptRef.current} ${interimTranscriptRef.current}`.replace(/\s+/g, " ").trim();
+      if (liveTranscript) setMessage(liveTranscript);
+      scheduleNaturalTurn(Boolean(finalChunk.trim()));
     };
-    recognition.onerror = () => setListening(false);
-    recognition.onend = () => setListening(false);
-    recognition.start();
+
+    recognition.onerror = (event: any) => {
+      if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+        conversationActiveRef.current = false;
+        setConversationActive(false);
+      }
+      setListening(false);
+    };
+
+    recognition.onend = () => {
+      recognitionRef.current = null;
+      setListening(false);
+      if (conversationActiveRef.current) window.setTimeout(startRecognitionSession, 250);
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      recognitionRef.current = null;
+      setListening(false);
+    }
+  }
+
+  function stopConversation() {
+    conversationActiveRef.current = false;
+    setConversationActive(false);
+    clearSilenceTimer();
+    committedTranscriptRef.current = "";
+    interimTranscriptRef.current = "";
+    const recognition = recognitionRef.current;
+    recognitionRef.current = null;
+    try {
+      recognition?.abort();
+    } catch {
+      // Browser speech recognition may already be ending.
+    }
+    setListening(false);
+  }
+
+  function startListening() {
+    if (!identified) return;
+    if (conversationActiveRef.current) {
+      stopConversation();
+      return;
+    }
+    conversationActiveRef.current = true;
+    setConversationActive(true);
+    startRecognitionSession();
   }
 
   async function saveRelationship() {
@@ -321,21 +451,15 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 <div className="mb-3 flex items-end gap-2">
                   <Textarea value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void send(); } }} placeholder="What's on your heart?" aria-label="Message Brian's digital twin" className="max-h-28 min-h-12 resize-none border-white/15 bg-white/[0.04]" />
                   {voiceSupported && (
-                    <Button type="button" onClick={startListening} disabled={loading || listening} variant="outline" className="h-12 w-12 shrink-0 rounded-full border-brand-yellow/55 bg-transparent p-0 text-brand-yellow hover:bg-brand-yellow hover:text-black" aria-label="Speak to Brian's digital twin">
+                    <Button type="button" onClick={startListening} variant="outline" className={cn("h-12 w-12 shrink-0 rounded-full border-brand-yellow/55 p-0 text-brand-yellow hover:bg-brand-yellow hover:text-black", conversationActive ? "bg-brand-yellow/15" : "bg-transparent")} aria-label={conversationActive ? "Turn off hands-free conversation" : "Start hands-free conversation"}>
                       <Mic className="h-5 w-5" />
                     </Button>
                   )}
                   <Button type="button" onClick={() => void send()} disabled={!canSend} className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white" aria-label="Send message"><Send className="h-5 w-5" /></Button>
                 </div>
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/55">
-                  <span>{listening ? "Listening… speak naturally." : voiceSupported ? "Mic mode uses your browser; replies use Brian Keith Hill’s approved cloned voice." : "Text conversation is ready on this browser."}</span>
+                  <span>{conversationActive ? (isSpeaking ? "Brian is speaking — just start talking to interrupt naturally." : listening ? "Listening — speak naturally; a short pause completes your turn." : "Conversation is on.") : voiceSupported ? "Tap the mic once for hands-free conversation. Brian will yield when you speak." : "Text conversation is ready on this browser."}</span>
                   <div className="flex items-center gap-3">
-                    {isSpeaking && (
-                      <button type="button" onClick={stopSpeaking} className="inline-flex items-center gap-1 font-bold text-white hover:text-brand-yellow" aria-label="Stop Brian's voice">
-                        <Square className="h-3.5 w-3.5" />
-                        Stop
-                      </button>
-                    )}
                     <button type="button" onClick={() => { setSpokenReplies((value) => !value); stopSpeaking(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
                       {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
                       {spokenReplies ? "Brian voice on" : "Brian voice off"}

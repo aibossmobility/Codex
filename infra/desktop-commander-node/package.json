@@ -1,0 +1,11 @@
+{
+  "name": "papa-life-cloud-executor",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "npx -y @wonderwhy-er/desktop-commander@latest remote"
+  }
+}

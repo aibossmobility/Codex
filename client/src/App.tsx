@@ -31,6 +31,7 @@ import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
 import AllPages from "./pages/AllPages";
+import DigitalTwinPortal from "./pages/DigitalTwinPortal";
 import SiteDirectory from "./pages/SiteDirectory";
 import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
@@ -122,6 +123,7 @@ function Router() {
       <Route path={"/papa-life-os/takeover"} component={AiBossTakeover} />
       <Route path={"/papa-life-os/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/papa-life-os/all-pages"} component={AllPages} />
+      <Route path={"/papa-life-os/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/papa-life-os"} component={AiBossMobile} />
 
       {/* Legacy AI Boss routes remain valid so existing phone/tablet installs and saved links do not break. */}
@@ -130,6 +132,7 @@ function Router() {
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
       <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
+      <Route path={"/ai-boss/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
 
       <Route path={"/all-pages"} component={AllPages} />

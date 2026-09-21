@@ -54,11 +54,13 @@ export default function DigitalTwinDemo() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild className="min-h-12 rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white">
-                  <a href="/papa-agent.html" target="_blank" rel="noopener noreferrer">
-                    <Mic className="mr-2 h-5 w-5" />
-                    Start Voice Conversation
-                  </a>
+                <Button
+                  type="button"
+                  onClick={openTwin}
+                  className="min-h-12 rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white"
+                >
+                  <Mic className="mr-2 h-5 w-5" />
+                  Talk with Brian's Twin
                 </Button>
                 <Button
                   type="button"
@@ -67,9 +69,12 @@ export default function DigitalTwinDemo() {
                   className="min-h-12 rounded-full border-white/25 bg-transparent px-6 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Open Live Text Twin
+                  Type Instead
                 </Button>
               </div>
+              <p className="mt-3 text-sm text-white/55">
+                Voice input and spoken replies use the browser, so the live conversation does not require another paid service.
+              </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {pillars.map(([name, copy]) => (

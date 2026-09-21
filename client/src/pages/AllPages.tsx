@@ -64,6 +64,7 @@ const groups: PageGroup[] = [
     links: [
       { label: "Papa Life OS", path: "/papa-life-os" },
       { label: "All Pages", path: "/papa-life-os/all-pages" },
+      { label: "Digital Twin", path: "/papa-life-os/digital-twin" },
       { label: "Executive Memory", path: "/executive-memory" },
       { label: "Command Center", path: "/crm-console" },
       { label: "Dashboard (opens Command Center)", path: "/dashboard" },

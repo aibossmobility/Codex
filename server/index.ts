@@ -2181,6 +2181,35 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
+  "/digital-twin": {
+    title: "Meet Brian's Digital Twin | Papa Life",
+    description:
+      "Meet Brian Keith Hill's Papa Life digital twin, a relationship-aware AI guide for fathers of adult children grounded in the Presence, Authority, Purpose, and Alignment framework.",
+    keywords: "Brian Keith Hill digital twin, Papa Life, fathers of adult children, PAPA Framework, fatherhood AI",
+    eyebrow: "Papa Life Digital Twin",
+    headline: "Meet Brian's Papa Life Digital Twin.",
+    intro:
+      "This presentation experience combines Brian Keith Hill's approved Papa Life knowledge, completed HeyGen visual twin, and a relationship-aware conversation layer designed to keep human connection at the center.",
+    sections: [
+      {
+        heading: "Presence first",
+        body:
+          "The PAPA Framework begins with Presence, then Authority, Purpose, and Alignment. The twin listens before trying to teach, fix, direct, or persuade.",
+      },
+      {
+        heading: "Talk or type",
+        body:
+          "Visitors can use the live conversation by text and, on supported browsers, microphone input with spoken browser replies without another paid voice service.",
+      },
+      {
+        heading: "Human relationship stays central",
+        body:
+          "The twin can guide fathers toward the 2-Minute Fatherhood Check-In, Papa Life resources, or direct connection with Brian when a human conversation matters most.",
+      },
+    ],
+    cta: { label: "Meet Brian's Digital Twin", href: "/digital-twin" },
+    noindex: true,
+  },
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
     description:

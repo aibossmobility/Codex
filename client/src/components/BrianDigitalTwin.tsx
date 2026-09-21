@@ -107,7 +107,6 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     stopSpeaking();
     const audio = new Audio(voiceUrl);
     audio.preload = "auto";
-    audio.playsInline = true;
     activeAudioRef.current = audio;
     setIsSpeaking(true);
     const finish = () => {

@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarCheck, HeartHandshake, MessageCircle, Mic, ShieldCheck, Sparkles } from "lucide-react";
 import { useState } from "react";
 
-const HEYGEN_TWIN_PREVIEW =
-  "https://resource2.heygen.ai/avatar/v3/58763d9858c94dacb0d0bee6c258c316/half/2.2/preview_video_target.mp4";
+const HEYGEN_TWIN_PREVIEW = "/videos/papa-life-gold-master.mp4";
 
 const pillars = [
   ["Presence", "Show up consistently and safely."],

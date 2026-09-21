@@ -69,7 +69,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hi. I'm Brian's Papa Life digital twin. I can listen, help you think through a next step, and connect you with Brian when the human relationship matters most. Before we begin, how do you know Brian?",
+      content: "Hi. I'm Brian Keith Hill's Papa Life digital twin. I can listen, help you think through a next step using Presence, Authority, Purpose, and Alignment, and connect you with Brian when the human relationship matters most. Before we begin, how do you know Brian?",
     },
   ]);
 
@@ -141,6 +141,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       relationship.label,
       relationship.guidance,
       `Visitor first name: ${firstName.trim() || "not supplied"}.`,
+      "Papa Life framework order: Presence → Authority → Purpose → Alignment. Presence leads: listen and show up safely before trying to teach, fix, direct, or persuade.",
       "Integrity rules: Do not claim Brian personally saw this conversation. Do not invent memories. Do not reveal private information about Brian or anyone else. If the visitor is family, a friend, or a church/community relationship, do not turn the conversation into marketing. If a consequential personal matter needs Brian, encourage direct human connection.",
       `VISITOR MESSAGE: ${clean}`,
     ].join("\n");

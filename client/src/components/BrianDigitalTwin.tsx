@@ -70,6 +70,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [conversationActive, setConversationActive] = useState(false);
+  const [voiceIssue, setVoiceIssue] = useState("");
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const recognitionRef = useRef<any>(null);
   const conversationActiveRef = useRef(false);
@@ -78,6 +79,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const committedTranscriptRef = useRef("");
   const interimTranscriptRef = useRef("");
   const silenceTimerRef = useRef<number | null>(null);
+  const recognitionRestartTimerRef = useRef<number | null>(null);
+  const recognitionRestartAttemptsRef = useRef(0);
+  const recognizedSpeechThisSessionRef = useRef(false);
   const sendTextRef = useRef<(text: string) => void>(() => undefined);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -299,8 +303,12 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     recognition.continuous = true;
     recognition.interimResults = true;
     recognitionRef.current = recognition;
+    recognizedSpeechThisSessionRef.current = false;
 
-    recognition.onstart = () => setListening(true);
+    recognition.onstart = () => {
+      setListening(true);
+      setVoiceIssue("");
+    };
     recognition.onresult = (event: any) => {
       let finalChunk = "";
       let interimChunk = "";
@@ -314,6 +322,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
       const heard = `${finalChunk} ${interimChunk}`.replace(/\s+/g, " ").trim();
       if (!heard || soundsLikeBrianPlayback(heard)) return;
+      recognizedSpeechThisSessionRef.current = true;
+      recognitionRestartAttemptsRef.current = 0;
 
       if (activeAudioRef.current) stopSpeaking();
 
@@ -330,9 +340,15 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     };
 
     recognition.onerror = (event: any) => {
-      if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+      const error = String(event?.error || "");
+      if (error === "not-allowed" || error === "service-not-allowed" || error === "audio-capture") {
         conversationActiveRef.current = false;
         setConversationActive(false);
+        setVoiceIssue(
+          error === "audio-capture"
+            ? "The microphone is busy. Pause Voice Access or other voice typing, then tap the Papa Life mic once to resume."
+            : "Chrome does not currently have microphone access for this page. Allow the microphone, then tap the Papa Life mic once."
+        );
       }
       setListening(false);
     };
@@ -340,7 +356,32 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     recognition.onend = () => {
       recognitionRef.current = null;
       setListening(false);
-      if (conversationActiveRef.current) window.setTimeout(startRecognitionSession, 250);
+      if (!conversationActiveRef.current) return;
+
+      if (recognizedSpeechThisSessionRef.current) {
+        recognitionRestartAttemptsRef.current = 0;
+      } else {
+        recognitionRestartAttemptsRef.current += 1;
+      }
+
+      if (recognitionRestartAttemptsRef.current >= 3) {
+        conversationActiveRef.current = false;
+        setConversationActive(false);
+        setVoiceIssue("Voice paused because the microphone kept disconnecting. Pause Voice Access or other voice typing, then tap the Papa Life mic once to resume.");
+        return;
+      }
+
+      const restartWhenReady = () => {
+        recognitionRestartTimerRef.current = null;
+        if (!conversationActiveRef.current) return;
+        if (document.hidden || loadingRef.current || activeAudioRef.current) {
+          recognitionRestartTimerRef.current = window.setTimeout(restartWhenReady, 500);
+          return;
+        }
+        startRecognitionSession();
+      };
+
+      recognitionRestartTimerRef.current = window.setTimeout(restartWhenReady, 900);
     };
 
     try {
@@ -355,6 +396,12 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     conversationActiveRef.current = false;
     setConversationActive(false);
     clearSilenceTimer();
+    if (recognitionRestartTimerRef.current !== null) {
+      window.clearTimeout(recognitionRestartTimerRef.current);
+      recognitionRestartTimerRef.current = null;
+    }
+    recognitionRestartAttemptsRef.current = 0;
+    recognizedSpeechThisSessionRef.current = false;
     committedTranscriptRef.current = "";
     interimTranscriptRef.current = "";
     const recognition = recognitionRef.current;
@@ -375,6 +422,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }
     conversationActiveRef.current = true;
     setConversationActive(true);
+    setVoiceIssue("");
+    recognitionRestartAttemptsRef.current = 0;
     startRecognitionSession();
   }
 
@@ -469,7 +518,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                   <Button type="button" onClick={() => void send()} disabled={!canSend} className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white" aria-label="Send message"><Send className="h-5 w-5" /></Button>
                 </div>
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/55">
-                  <span>{conversationActive ? (isSpeaking ? "Brian is speaking — just start talking to interrupt naturally." : listening ? "Listening — speak naturally; a short pause completes your turn." : "Conversation is on.") : voiceSupported ? "Tap the mic once for hands-free conversation. Brian will yield when you speak." : "Text conversation is ready on this browser."}</span>
+                  <span>{voiceIssue || (conversationActive ? (isSpeaking ? "Brian is speaking — just start talking to interrupt naturally." : listening ? "Listening — speak naturally; a short pause completes your turn." : "Conversation is on.") : voiceSupported ? "Tap the mic once for hands-free conversation. Brian will yield when you speak." : "Text conversation is ready on this browser.")}</span>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => { setSpokenReplies((value) => !value); stopSpeaking(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
                       {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}

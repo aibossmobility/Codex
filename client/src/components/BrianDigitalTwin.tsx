@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Send, ShieldCheck, Sparkles, Volume2, VolumeX, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Send, ShieldCheck, Sparkles, Square, Volume2, VolumeX, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type RelationshipKey = "new" | "papa" | "friend" | "family" | "child" | "church" | "professional";
@@ -68,6 +68,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [listening, setListening] = useState(false);
   const [spokenReplies, setSpokenReplies] = useState(true);
   const [voiceSupported, setVoiceSupported] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -89,14 +91,32 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     setVoiceSupported(Boolean(browser.SpeechRecognition || browser.webkitSpeechRecognition));
   }, []);
 
-  function speak(text: string) {
-    if (!spokenReplies || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.96;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-    window.speechSynthesis.speak(utterance);
+  function stopSpeaking() {
+    window.speechSynthesis?.cancel();
+    const current = activeAudioRef.current;
+    if (current) {
+      current.pause();
+      current.currentTime = 0;
+      activeAudioRef.current = null;
+    }
+    setIsSpeaking(false);
+  }
+
+  function speak(_text: string, voiceUrl?: string) {
+    if (!spokenReplies || !voiceUrl) return;
+    stopSpeaking();
+    const audio = new Audio(voiceUrl);
+    audio.preload = "auto";
+    audio.playsInline = true;
+    activeAudioRef.current = audio;
+    setIsSpeaking(true);
+    const finish = () => {
+      if (activeAudioRef.current === audio) activeAudioRef.current = null;
+      setIsSpeaking(false);
+    };
+    audio.onended = finish;
+    audio.onerror = finish;
+    void audio.play().catch(finish);
   }
 
   useEffect(() => {
@@ -179,11 +199,11 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Twin unavailable");
       setMessages((current) => [...current, { role: "assistant", content: json.reply }]);
-      speak(json.reply);
+      speak(json.reply, json.voice_url);
     } catch {
       const reply = safeLocalReply(clean, relationship);
       setMessages((current) => [...current, { role: "assistant", content: reply }]);
-      speak(reply);
+      stopSpeaking();
     } finally {
       setLoading(false);
     }
@@ -197,6 +217,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
   function startListening() {
     if (!identified || loading) return;
+    stopSpeaking();
     const browser = window as any;
     const Recognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
     if (!Recognition) return;
@@ -265,7 +286,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                   <p className="text-xs font-semibold text-white/60">Relationship-aware Papa Life guidance — Brian stays human.</p>
                 </div>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/75 hover:border-brand-yellow hover:text-brand-yellow" aria-label="Close Brian's digital twin">
+              <button type="button" onClick={() => { stopSpeaking(); setOpen(false); }} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/75 hover:border-brand-yellow hover:text-brand-yellow" aria-label="Close Brian's digital twin">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -308,11 +329,19 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                   <Button type="button" onClick={() => void send()} disabled={!canSend} className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white" aria-label="Send message"><Send className="h-5 w-5" /></Button>
                 </div>
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/55">
-                  <span>{listening ? "Listening… speak naturally." : voiceSupported ? "Mic mode uses your browser — no extra subscription." : "Text conversation is ready on this browser."}</span>
-                  <button type="button" onClick={() => { setSpokenReplies((value) => !value); window.speechSynthesis?.cancel(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
-                    {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
-                    {spokenReplies ? "Voice on" : "Voice off"}
-                  </button>
+                  <span>{listening ? "Listening… speak naturally." : voiceSupported ? "Mic mode uses your browser; replies use Brian Keith Hill’s approved cloned voice." : "Text conversation is ready on this browser."}</span>
+                  <div className="flex items-center gap-3">
+                    {isSpeaking && (
+                      <button type="button" onClick={stopSpeaking} className="inline-flex items-center gap-1 font-bold text-white hover:text-brand-yellow" aria-label="Stop Brian's voice">
+                        <Square className="h-3.5 w-3.5" />
+                        Stop
+                      </button>
+                    )}
+                    <button type="button" onClick={() => { setSpokenReplies((value) => !value); stopSpeaking(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
+                      {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                      {spokenReplies ? "Brian voice on" : "Brian voice off"}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">

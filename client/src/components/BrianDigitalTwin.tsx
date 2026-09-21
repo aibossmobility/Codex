@@ -82,6 +82,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const recognitionRestartTimerRef = useRef<number | null>(null);
   const recognitionRestartAttemptsRef = useRef(0);
   const recognizedSpeechThisSessionRef = useRef(false);
+  const recognitionPausedForPlaybackRef = useRef(false);
   const sendTextRef = useRef<(text: string) => void>(() => undefined);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -131,6 +132,61 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }, 1400);
   }
 
+  function isMobileVoiceDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 1100);
+  }
+
+  function pauseRecognitionForPlayback() {
+    if (!conversationActiveRef.current || !isMobileVoiceDevice()) return;
+    recognitionPausedForPlaybackRef.current = true;
+    clearSilenceTimer();
+    const recognition = recognitionRef.current;
+    recognitionRef.current = null;
+    try {
+      recognition?.abort();
+    } catch {
+      // Recognition may already be ending.
+    }
+    setListening(false);
+  }
+
+  function resumeRecognitionAfterPlayback() {
+    if (!recognitionPausedForPlaybackRef.current) return;
+    recognitionPausedForPlaybackRef.current = false;
+    if (!conversationActiveRef.current) return;
+    window.setTimeout(() => {
+      if (conversationActiveRef.current && !recognitionRef.current && !loadingRef.current && !activeAudioRef.current) {
+        startRecognitionSession();
+      }
+    }, 500);
+  }
+
+  function speakWithBrowserVoice(text: string) {
+    if (!window.speechSynthesis) {
+      resumeRecognitionAfterPlayback();
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.96;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    setIsSpeaking(true);
+    const finish = () => {
+      setIsSpeaking(false);
+      releasePlaybackEchoGuard(text);
+      resumeRecognitionAfterPlayback();
+    };
+    utterance.onend = finish;
+    utterance.onerror = finish;
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      finish();
+    }
+  }
+
   function stopSpeaking() {
     window.speechSynthesis?.cancel();
     const current = activeAudioRef.current;
@@ -145,21 +201,42 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   }
 
   function speak(text: string, voiceUrl?: string) {
-    if (!spokenReplies || !voiceUrl) return;
+    if (!spokenReplies) return;
     stopSpeaking();
+    pauseRecognitionForPlayback();
     spokenTextRef.current = text;
+
+    if (!voiceUrl) {
+      speakWithBrowserVoice(text);
+      return;
+    }
+
     const audio = new Audio(voiceUrl);
     audio.preload = "auto";
+    audio.volume = 1;
     activeAudioRef.current = audio;
     setIsSpeaking(true);
+
+    let completed = false;
     const finish = () => {
+      if (completed) return;
+      completed = true;
       if (activeAudioRef.current === audio) activeAudioRef.current = null;
       releasePlaybackEchoGuard(text);
       setIsSpeaking(false);
+      resumeRecognitionAfterPlayback();
     };
+    const fallback = () => {
+      if (completed) return;
+      completed = true;
+      if (activeAudioRef.current === audio) activeAudioRef.current = null;
+      setIsSpeaking(false);
+      speakWithBrowserVoice(text);
+    };
+
     audio.onended = finish;
-    audio.onerror = finish;
-    void audio.play().catch(finish);
+    audio.onerror = fallback;
+    void audio.play().catch(fallback);
   }
 
   useEffect(() => {
@@ -356,6 +433,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     recognition.onend = () => {
       recognitionRef.current = null;
       setListening(false);
+      if (recognitionPausedForPlaybackRef.current) return;
       if (!conversationActiveRef.current) return;
 
       if (recognizedSpeechThisSessionRef.current) {
@@ -402,6 +480,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }
     recognitionRestartAttemptsRef.current = 0;
     recognizedSpeechThisSessionRef.current = false;
+    recognitionPausedForPlaybackRef.current = false;
     committedTranscriptRef.current = "";
     interimTranscriptRef.current = "";
     const recognition = recognitionRef.current;

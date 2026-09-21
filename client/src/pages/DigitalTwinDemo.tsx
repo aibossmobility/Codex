@@ -2,7 +2,7 @@ import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Button } from "@/components/ui/button";
 import { CalendarCheck, HeartHandshake, MessageCircle, Mic, ShieldCheck, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const HEYGEN_TWIN_PREVIEW = "/videos/papa-life-gold-master.mp4";
 
@@ -15,9 +15,31 @@ const pillars = [
 
 export default function DigitalTwinDemo() {
   const [videoFailed, setVideoFailed] = useState(false);
+  const [welcomeSoundOn, setWelcomeSoundOn] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   function openTwin() {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.muted = true;
+      setWelcomeSoundOn(false);
+    }
     window.dispatchEvent(new Event("papa-ai:open"));
+  }
+
+  async function playWelcomeWithSound() {
+    const video = videoRef.current;
+    if (!video) return;
+    try {
+      video.muted = false;
+      video.loop = false;
+      video.currentTime = 0;
+      await video.play();
+      setWelcomeSoundOn(true);
+    } catch {
+      setWelcomeSoundOn(false);
+    }
   }
 
   return (
@@ -86,9 +108,10 @@ export default function DigitalTwinDemo() {
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
-              <div className="aspect-video bg-black">
+              <div className="relative aspect-video bg-black">
                 {!videoFailed ? (
                   <video
+                    ref={videoRef}
                     src={HEYGEN_TWIN_PREVIEW}
                     poster="/images/brian-keith-hill.png"
                     className="h-full w-full object-cover"
@@ -97,6 +120,7 @@ export default function DigitalTwinDemo() {
                     loop
                     playsInline
                     onError={() => setVideoFailed(true)}
+                    onEnded={() => setWelcomeSoundOn(false)}
                   />
                 ) : (
                   <img
@@ -104,6 +128,20 @@ export default function DigitalTwinDemo() {
                     alt="Brian Keith Hill"
                     className="h-full w-full object-cover object-top"
                   />
+                )}
+                {!videoFailed && (
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-xl bg-black/75 px-3 py-2 backdrop-blur-sm">
+                    <span className="text-xs font-semibold text-white/75">
+                      {welcomeSoundOn ? "Brian's welcome is playing with sound." : "Visual preview is muted."}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void playWelcomeWithSound()}
+                      className="rounded-full border border-[#f2c230]/60 px-3 py-1.5 text-xs font-extrabold text-[#f2c230] hover:bg-[#f2c230] hover:text-black"
+                    >
+                      Hear Welcome
+                    </button>
+                  </div>
                 )}
               </div>
               <div className="border-t border-white/10 p-5">

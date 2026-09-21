@@ -83,6 +83,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const recognitionRestartAttemptsRef = useRef(0);
   const recognizedSpeechThisSessionRef = useRef(false);
   const recognitionPausedForPlaybackRef = useRef(false);
+  const unlockedAudioRef = useRef<HTMLAudioElement | null>(null);
   const sendTextRef = useRef<(text: string) => void>(() => undefined);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -134,6 +135,29 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
   function isMobileVoiceDevice() {
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 1100);
+  }
+
+  function unlockMobileAudio() {
+    if (!isMobileVoiceDevice()) return;
+    try {
+      let audio = unlockedAudioRef.current;
+      if (!audio) {
+        audio = new Audio();
+        audio.preload = "auto";
+        audio.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+        unlockedAudioRef.current = audio;
+      }
+      audio.volume = 0.01;
+      void audio.play().then(() => {
+        audio?.pause();
+        if (audio) {
+          audio.currentTime = 0;
+          audio.volume = 1;
+        }
+      }).catch(() => undefined);
+    } catch {
+      // Audio unlocking is best-effort; browser voice remains the fallback.
+    }
   }
 
   function pauseRecognitionForPlayback() {
@@ -211,9 +235,12 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       return;
     }
 
-    const audio = new Audio(voiceUrl);
+    const audio = isMobileVoiceDevice() && unlockedAudioRef.current ? unlockedAudioRef.current : new Audio();
+    audio.pause();
+    audio.src = voiceUrl;
     audio.preload = "auto";
     audio.volume = 1;
+    audio.load();
     activeAudioRef.current = audio;
     setIsSpeaking(true);
 
@@ -377,7 +404,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
     const recognition = new Recognition();
     recognition.lang = "en-US";
-    recognition.continuous = true;
+    const mobilePushToTalk = isMobileVoiceDevice();
+    recognition.continuous = !mobilePushToTalk;
     recognition.interimResults = true;
     recognitionRef.current = recognition;
     recognizedSpeechThisSessionRef.current = false;
@@ -434,6 +462,13 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       recognitionRef.current = null;
       setListening(false);
       if (recognitionPausedForPlaybackRef.current) return;
+
+      if (isMobileVoiceDevice()) {
+        conversationActiveRef.current = false;
+        setConversationActive(false);
+        return;
+      }
+
       if (!conversationActiveRef.current) return;
 
       if (recognizedSpeechThisSessionRef.current) {
@@ -499,6 +534,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       stopConversation();
       return;
     }
+    unlockMobileAudio();
     conversationActiveRef.current = true;
     setConversationActive(true);
     setVoiceIssue("");
@@ -590,14 +626,16 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 <div className="mb-3 flex items-end gap-2">
                   <Textarea value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void send(); } }} placeholder="What's on your heart?" aria-label="Message Brian's digital twin" className="max-h-28 min-h-12 resize-none border-white/15 bg-white/[0.04]" />
                   {voiceSupported && (
-                    <Button type="button" onClick={startListening} variant="outline" className={cn("h-12 w-12 shrink-0 rounded-full border-brand-yellow/55 p-0 text-brand-yellow hover:bg-brand-yellow hover:text-black", conversationActive ? "bg-brand-yellow/15" : "bg-transparent")} aria-label={conversationActive ? "Turn off hands-free conversation" : "Start hands-free conversation"}>
+                    <Button type="button" onClick={startListening} variant="outline" className={cn("h-12 w-12 shrink-0 rounded-full border-brand-yellow/55 p-0 text-brand-yellow hover:bg-brand-yellow hover:text-black", conversationActive ? "bg-brand-yellow/15" : "bg-transparent")} aria-label={isMobileVoiceDevice() ? (conversationActive ? "Stop listening" : "Tap to speak") : (conversationActive ? "Turn off hands-free conversation" : "Start hands-free conversation")}>
                       <Mic className="h-5 w-5" />
                     </Button>
                   )}
                   <Button type="button" onClick={() => void send()} disabled={!canSend} className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white" aria-label="Send message"><Send className="h-5 w-5" /></Button>
                 </div>
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/55">
-                  <span>{voiceIssue || (conversationActive ? (isSpeaking ? "Brian is speaking — just start talking to interrupt naturally." : listening ? "Listening — speak naturally; a short pause completes your turn." : "Conversation is on.") : voiceSupported ? "Tap the mic once for hands-free conversation. Brian will yield when you speak." : "Text conversation is ready on this browser.")}</span>
+                  <span>{voiceIssue || (isMobileVoiceDevice()
+                    ? (isSpeaking ? "Brian is speaking." : listening ? "Listening — speak your turn, then wait for Brian's reply." : "On phones and tablets, tap the mic for each turn.")
+                    : (conversationActive ? (isSpeaking ? "Brian is speaking — just start talking to interrupt naturally." : listening ? "Listening — speak naturally; a short pause completes your turn." : "Conversation is on.") : voiceSupported ? "Tap the mic once for hands-free conversation. Brian will yield when you speak." : "Text conversation is ready on this browser."))}</span>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => { setSpokenReplies((value) => !value); stopSpeaking(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
                       {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}

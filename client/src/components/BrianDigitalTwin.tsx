@@ -121,6 +121,12 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     return overlap >= 0.8;
   }
 
+  function releasePlaybackEchoGuard(text: string) {
+    window.setTimeout(() => {
+      if (spokenTextRef.current === text) spokenTextRef.current = "";
+    }, 1400);
+  }
+
   function stopSpeaking() {
     window.speechSynthesis?.cancel();
     const current = activeAudioRef.current;
@@ -129,7 +135,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       current.currentTime = 0;
       activeAudioRef.current = null;
     }
-    spokenTextRef.current = "";
+    const previousSpokenText = spokenTextRef.current;
+    if (previousSpokenText) releasePlaybackEchoGuard(previousSpokenText);
     setIsSpeaking(false);
   }
 
@@ -143,7 +150,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     setIsSpeaking(true);
     const finish = () => {
       if (activeAudioRef.current === audio) activeAudioRef.current = null;
-      if (spokenTextRef.current === text) spokenTextRef.current = "";
+      releasePlaybackEchoGuard(text);
       setIsSpeaking(false);
     };
     audio.onended = finish;
@@ -178,6 +185,10 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     window.addEventListener("papa-ai:open", openTwin);
     return () => window.removeEventListener("papa-ai:open", openTwin);
   }, []);
+
+  useEffect(() => {
+    if (!open && conversationActiveRef.current) stopConversation();
+  }, [open]);
 
   function beginRelationship() {
     const current = relationshipByKey(relationshipKey);

@@ -229,17 +229,25 @@ function buildRuntimeSystemPrompt(message: string) {
   return `${loadPapaLifeSystemPrompt()}\n\n---\n\n${kbContext}`;
 }
 
+function extractVisitorMessage(message: string) {
+  const marker = "VISITOR MESSAGE:";
+  const index = message.lastIndexOf(marker);
+  if (index === -1) return message.trim();
+  return message.slice(index + marker.length).trim() || message.trim();
+}
+
 export function buildPapaAiLocalReply(input: {
   message: string;
   mode?: PapaAiMode;
   history?: ChatMessage[];
 }) {
   const message = input.message.trim();
+  const visitorMessage = extractVisitorMessage(message);
   const mode = input.mode || "coach";
-  const lower = message.toLowerCase();
+  const lower = visitorMessage.toLowerCase();
   const pillar = detectPillar(lower);
   const need = detectNeed(lower);
-  const resources = findPapaResources(message, 3);
+  const resources = findPapaResources(visitorMessage, 3);
 
   if (isCrisisLike(lower)) {
     return {
@@ -253,7 +261,7 @@ export function buildPapaAiLocalReply(input: {
   if (mode === "prayer") {
     return {
       provider: "local" as PapaAiProvider,
-      reply: buildPrayer(message, pillar),
+      reply: buildPrayer(visitorMessage, pillar),
       resources,
     };
   }
@@ -261,7 +269,7 @@ export function buildPapaAiLocalReply(input: {
   if (mode === "bible-study") {
     return {
       provider: "local" as PapaAiProvider,
-      reply: buildBibleStudy(message, pillar),
+      reply: buildBibleStudy(visitorMessage, pillar),
       resources,
     };
   }
@@ -279,7 +287,7 @@ export function buildPapaAiLocalReply(input: {
       provider: "local" as PapaAiProvider,
       reply:
         "That is a strong Tuesday Live question. I would frame it this way for the show: what does a father do when he wants repair, but his adult child is not ready for the conversation?\n\nStart with humility, then move to one practical action. Ask the question before Tuesday, bring one real example, and the follow-up resource should point back to Presence and Alignment.",
-      resources: findPapaResources(`${message} Tuesday live`, 3),
+      resources: findPapaResources(`${visitorMessage} Tuesday live`, 3),
     };
   }
 
@@ -294,7 +302,7 @@ export function buildPapaAiLocalReply(input: {
 
   return {
     provider: "local" as PapaAiProvider,
-    reply: buildCoachingReply(message, pillar, need),
+    reply: buildCoachingReply(visitorMessage, pillar, need),
     resources,
   };
 }

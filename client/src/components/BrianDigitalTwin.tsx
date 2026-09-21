@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { CalendarCheck, HeartHandshake, MessageCircle, Send, ShieldCheck, Sparkles, X } from "lucide-react";
+import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Send, ShieldCheck, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -65,6 +65,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [identified, setIdentified] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [spokenReplies, setSpokenReplies] = useState(true);
+  const [voiceSupported, setVoiceSupported] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -80,6 +83,21 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   useEffect(() => {
     if (autoOpen) setOpen(true);
   }, [autoOpen]);
+
+  useEffect(() => {
+    const browser = window as any;
+    setVoiceSupported(Boolean(browser.SpeechRecognition || browser.webkitSpeechRecognition));
+  }, []);
+
+  function speak(text: string) {
+    if (!spokenReplies || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.96;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+  }
 
   useEffect(() => {
     try {
@@ -128,9 +146,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     ]);
   }
 
-  async function send() {
-    const clean = message.trim();
-    if (!canSend || !clean) return;
+  async function sendText(clean: string) {
+    if (!identified || loading || clean.length < 2) return;
     setLoading(true);
     setMessage("");
     const visibleHistory = [...messages, { role: "user" as const, content: clean }];
@@ -162,11 +179,42 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Twin unavailable");
       setMessages((current) => [...current, { role: "assistant", content: json.reply }]);
+      speak(json.reply);
     } catch {
-      setMessages((current) => [...current, { role: "assistant", content: safeLocalReply(clean, relationship) }]);
+      const reply = safeLocalReply(clean, relationship);
+      setMessages((current) => [...current, { role: "assistant", content: reply }]);
+      speak(reply);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function send() {
+    const clean = message.trim();
+    if (!canSend || !clean) return;
+    await sendText(clean);
+  }
+
+  function startListening() {
+    if (!identified || loading) return;
+    const browser = window as any;
+    const Recognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
+    if (!Recognition) return;
+
+    const recognition = new Recognition();
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    setListening(true);
+
+    recognition.onresult = (event: any) => {
+      const transcript = String(event.results?.[0]?.[0]?.transcript || "").trim();
+      setListening(false);
+      if (transcript) void sendText(transcript);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognition.start();
   }
 
   async function saveRelationship() {
@@ -252,7 +300,19 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
               <div className="border-t border-white/10 p-4">
                 <div className="mb-3 flex items-end gap-2">
                   <Textarea value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void send(); } }} placeholder="What's on your heart?" aria-label="Message Brian's digital twin" className="max-h-28 min-h-12 resize-none border-white/15 bg-white/[0.04]" />
+                  {voiceSupported && (
+                    <Button type="button" onClick={startListening} disabled={loading || listening} variant="outline" className="h-12 w-12 shrink-0 rounded-full border-brand-yellow/55 bg-transparent p-0 text-brand-yellow hover:bg-brand-yellow hover:text-black" aria-label="Speak to Brian's digital twin">
+                      <Mic className="h-5 w-5" />
+                    </Button>
+                  )}
                   <Button type="button" onClick={() => void send()} disabled={!canSend} className="h-12 w-12 shrink-0 rounded-full bg-brand-yellow p-0 text-black hover:bg-white" aria-label="Send message"><Send className="h-5 w-5" /></Button>
+                </div>
+                <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/55">
+                  <span>{listening ? "Listening… speak naturally." : voiceSupported ? "Mic mode uses your browser — no extra subscription." : "Text conversation is ready on this browser."}</span>
+                  <button type="button" onClick={() => { setSpokenReplies((value) => !value); window.speechSynthesis?.cancel(); }} className="inline-flex items-center gap-1 font-bold text-brand-yellow hover:text-white">
+                    {spokenReplies ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                    {spokenReplies ? "Voice on" : "Voice off"}
+                  </button>
                 </div>
 
                 <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">

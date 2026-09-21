@@ -300,10 +300,14 @@ export function buildPapaAiLocalReply(input: {
     };
   }
 
+  const voiceKey = coachingVoiceKey(pillar, need);
   return {
     provider: "local" as PapaAiProvider,
     reply: buildCoachingReply(visitorMessage, pillar, need),
     resources,
+    voice_key: voiceKey,
+    voice_url: BRIAN_COACHING_VOICE_URLS[voiceKey],
+    voice_name: "Brian Keith Hill",
   };
 }
 
@@ -506,6 +510,30 @@ function detectNeed(text: string) {
   if (/(silent|won't talk|not talking|estranged|distance)/.test(text)) return "distance";
   if (/(membership|price|join|subscription)/.test(text)) return "membership";
   return "repair";
+}
+
+const BRIAN_COACHING_VOICE_URLS: Record<string, string> = {
+  "presence-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=ab2cef38-95de-4737-a284-52d1eccbae76.wav",
+  "presence-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5c00dad8-49d2-4e52-a5a3-6de575227b94.wav",
+  "presence-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=471cf96f-715f-4094-af68-dd21127ae1a3.wav",
+  "presence-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=755f1eb6-f092-479c-aad2-1d5db6f7fab2.wav",
+  "authority-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=1f2c21d3-98ac-4874-ac47-3c53fa183bad.wav",
+  "authority-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=994098bd-f9b1-441d-91bb-55d644827637.wav",
+  "authority-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=028ced03-35a3-42ec-a9ea-36f88c7e253c.wav",
+  "authority-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5b58f413-1e17-4d18-aa0f-58336dff5170.wav",
+  "purpose-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=f8df9a0d-30bd-4122-9c0a-99e805119c99.wav",
+  "purpose-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=27e6d351-7861-4200-ae05-8b5a81297260.wav",
+  "purpose-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5e5756ee-bd88-4788-a0a1-067870e317ec.wav",
+  "purpose-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=d33fa4d2-f3b9-4e0a-a32b-22214bcd3927.wav",
+  "alignment-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=0d1cc038-bcc3-4283-8fe0-1862994c4d61.wav",
+  "alignment-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=0ffcc0c5-f470-4dca-83ae-316443ee1ea3.wav",
+  "alignment-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=f1c18467-6ed5-4f56-9349-9e14ec8ba945.wav",
+  "alignment-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=6223cb8b-b1ac-41cc-bc4e-053f84074ba3.wav",
+};
+
+function coachingVoiceKey(pillar: string, need: string) {
+  const voiceNeed = need === "daughter" || need === "son" || need === "apology" ? need : "general";
+  return `${pillar.toLowerCase()}-${voiceNeed}`;
 }
 
 function isCrisisLike(text: string) {

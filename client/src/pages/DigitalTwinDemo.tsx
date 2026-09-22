@@ -59,13 +59,13 @@ export default function DigitalTwinDemo() {
       </header>
 
       <main>
-        <section className="py-12 md:py-16">
-          <div className="container grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
+        <section className="py-8 md:py-10 lg:py-14">
+          <div className="container grid items-start gap-6 md:grid-cols-[minmax(0,1.05fr)_minmax(320px,.95fr)] lg:gap-10">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
                 October 3 presentation experience
               </p>
-              <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">
+              <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
                 Meet Brian's Papa Life Digital Twin
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
@@ -107,7 +107,7 @@ export default function DigitalTwinDemo() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
+            <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl md:sticky md:top-4">
               <div className="relative aspect-video bg-black">
                 {!videoFailed ? (
                   <video

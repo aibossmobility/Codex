@@ -250,8 +250,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     audio.pause();
     audio.src = voiceUrl;
     audio.preload = "auto";
-    audio.volume = 0.68;
-    audio.playbackRate = 0.84;
+    audio.volume = 0.9;
+    audio.playbackRate = 1;
     audio.load();
     activeAudioRef.current = audio;
     setIsSpeaking(true);
@@ -383,6 +383,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   async function send() {
     const clean = message.trim();
     if (!canSend || !clean) return;
+    unlockMobileAudio();
     await sendText(clean);
   }
 
@@ -641,10 +642,30 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 <button type="button" className="ml-2 underline hover:text-white" onClick={() => setIdentified(false)}>change</button>
               </div>
               <div className="max-h-[300px] space-y-3 overflow-y-auto p-4">
-                {messages.map((item, index) => (
-                  <div key={`${item.role}-${index}`} className={cn("rounded-xl px-4 py-3 text-sm leading-relaxed", item.role === "assistant" ? "border border-white/10 bg-white/[0.06] text-white/82" : "ml-auto max-w-[86%] bg-primary text-black")}>{item.content}</div>
-                ))}
-                {loading && <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white/65"><Sparkles className="h-4 w-4 text-brand-yellow" />Listening with Brian's relationship context...</div>}
+                {voiceBridgeReady && spokenReplies ? (
+                  <div className="rounded-2xl border border-brand-yellow/25 bg-brand-yellow/[0.06] px-5 py-5 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-brand-yellow/50 text-brand-yellow">
+                      {isSpeaking ? <Volume2 className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                    </div>
+                    <p className="font-extrabold text-white">
+                      {isSpeaking ? "Brian is speaking" : loading ? "Brian is thinking" : listening ? "Brian is listening" : "Voice conversation ready"}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-white/55">
+                      {isSpeaking
+                        ? "Tap the microphone whenever you want to interrupt and speak."
+                        : isMobileVoiceDevice()
+                          ? "Tap the microphone, speak naturally, then wait for Brian to answer."
+                          : "Speak naturally. Brian will answer in his voice."}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {messages.map((item, index) => (
+                      <div key={`${item.role}-${index}`} className={cn("rounded-xl px-4 py-3 text-sm leading-relaxed", item.role === "assistant" ? "border border-white/10 bg-white/[0.06] text-white/82" : "ml-auto max-w-[86%] bg-primary text-black")}>{item.content}</div>
+                    ))}
+                    {loading && <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white/65"><Sparkles className="h-4 w-4 text-brand-yellow" />Listening with Brian's relationship context...</div>}
+                  </>
+                )}
               </div>
 
               <div className="border-t border-white/10 p-4">

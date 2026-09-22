@@ -185,33 +185,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }, 500);
   }
 
-  function speakWithBrowserVoice(text: string) {
-    if (!window.speechSynthesis) {
-      resumeRecognitionAfterPlayback();
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 0.96;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-    setIsSpeaking(true);
-    const finish = () => {
-      setIsSpeaking(false);
-      releasePlaybackEchoGuard(text);
-      resumeRecognitionAfterPlayback();
-    };
-    utterance.onend = finish;
-    utterance.onerror = finish;
-    try {
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      finish();
-    }
-  }
-
   function stopSpeaking() {
+    recognitionPausedForPlaybackRef.current = false;
     window.speechSynthesis?.cancel();
     const current = activeAudioRef.current;
     if (current) {
@@ -231,7 +206,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     spokenTextRef.current = text;
 
     if (!voiceUrl) {
-      speakWithBrowserVoice(text);
+      setVoiceIssue("Brian's cloned voice is not available for this reply yet. The written reply is still available.");
+      resumeRecognitionAfterPlayback();
       return;
     }
 
@@ -258,7 +234,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       completed = true;
       if (activeAudioRef.current === audio) activeAudioRef.current = null;
       setIsSpeaking(false);
-      speakWithBrowserVoice(text);
+      setVoiceIssue("Brian's cloned voice could not play on this device. Tap the mic again to continue by voice, or use the written reply.");
+      releasePlaybackEchoGuard(text);
+      resumeRecognitionAfterPlayback();
     };
 
     audio.onended = finish;
@@ -433,7 +411,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       if (activeAudioRef.current) stopSpeaking();
 
       if (finalChunk.trim()) {
-        committedTranscriptRef.current = `${committedTranscriptRef.current} ${finalChunk}`.replace(/\s+/g, " ").trim();
+        committedTranscriptRef.current = isMobileVoiceDevice()
+          ? finalChunk.trim()
+          : `${committedTranscriptRef.current} ${finalChunk}`.replace(/\s+/g, " ").trim();
         interimTranscriptRef.current = "";
       } else {
         interimTranscriptRef.current = interimChunk.trim();
@@ -530,6 +510,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
   function startListening() {
     if (!identified) return;
+    if (isSpeaking || activeAudioRef.current || window.speechSynthesis?.speaking) {
+      stopSpeaking();
+    }
     if (conversationActiveRef.current) {
       stopConversation();
       return;
@@ -575,9 +558,9 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   }
 
   return (
-    <div className={cn("fixed bottom-4 right-4 z-[75] w-[calc(100vw-2rem)] max-w-[460px]", className)}>
+    <div className={cn("fixed bottom-4 right-4 z-[75] w-[calc(100vw-2rem)] max-w-[460px] md:max-w-[360px] xl:max-w-[460px]", className)}>
       {open ? (
-        <section className="overflow-hidden rounded-2xl border border-brand-yellow/40 bg-black shadow-[0_18px_80px_rgba(0,0,0,0.58)]" aria-label="Brian Keith Hill digital twin">
+        <section className="max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-brand-yellow/40 bg-black shadow-[0_18px_80px_rgba(0,0,0,0.58)]" aria-label="Brian Keith Hill digital twin">
           <div className="border-b border-white/10 bg-gradient-to-r from-brand-yellow/20 via-black to-primary/15 p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">

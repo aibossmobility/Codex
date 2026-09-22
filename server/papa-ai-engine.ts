@@ -306,8 +306,8 @@ export function buildPapaAiLocalReply(input: {
     reply: buildCoachingReply(visitorMessage, pillar, need),
     resources,
     voice_key: voiceKey,
-    voice_url: `/api/ai/voice/clip/${encodeURIComponent(voiceKey)}`,
     voice_name: "Brian Keith Hill",
+    voice_provider: String(process.env.PAPA_VOICE_PROVIDER || "off").trim().toLowerCase(),
   };
 }
 
@@ -537,6 +537,10 @@ function coachingVoiceKey(pillar: string, need: string) {
 }
 
 export function getBrianCoachingVoiceSourceUrl(voiceKey: string) {
+  // Legacy HeyGen clips are deliberately disabled by default. They do not use
+  // Brian Keith Hill's authoritative ElevenLabs voice and must never be used
+  // as a silent fallback.
+  if (String(process.env.PAPA_ENABLE_LEGACY_HEYGEN_VOICE || "").trim() !== "1") return "";
   return BRIAN_COACHING_VOICE_URLS[voiceKey] || "";
 }
 

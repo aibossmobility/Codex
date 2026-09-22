@@ -41,9 +41,9 @@ function safeLocalReply(text: string, relationship: RelationshipOption) {
     return "Your immediate safety and the safety of everyone involved come first. If someone may be in immediate danger, call 911 or your local emergency number now. In the U.S. or Canada, call or text 988 for immediate crisis support. Papa Life can support a wise next step, but it is not an emergency or clinical service.";
   }
   if (!relationship.commercial) {
-    return "I'm here to listen in a way that reflects Brian's care without pretending to replace him. Tell me a little more about what matters most right now. If this needs Brian personally, I'll help point you toward direct connection rather than turning it into a sales conversation.";
+    return "I'm listening. Take your time and tell me what feels most important right now. We don't have to rush to solve anything.";
   }
-  return "You do not have to solve everything in one move. Tell me what is happening, what you hope will be different, and what feels hardest right now. From there, I can help you choose one practical next step and, when useful, connect you with Brian or the right Papa Life resource.";
+  return "I'm listening. Take your time and tell me what feels most important right now. We don't have to rush to solve anything.";
 }
 
 function summarize(messages: ChatMessage[], relationship: RelationshipOption, firstName: string) {
@@ -215,7 +215,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     audio.pause();
     audio.src = voiceUrl;
     audio.preload = "auto";
-    audio.volume = 1;
+    audio.volume = 0.82;
+    audio.playbackRate = 0.92;
     audio.load();
     activeAudioRef.current = audio;
     setIsSpeaking(true);

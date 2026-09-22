@@ -219,39 +219,52 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   function startMouthAnimation(audio: HTMLAudioElement, text: string) {
     stopMouthAnimation();
     const analyser = analyserRef.current;
-    if (!analyser) return;
-    const samples = new Uint8Array(analyser.fftSize);
+    const samples = analyser ? new Uint8Array(analyser.fftSize) : null;
     let frame = 0;
+    let analyzerHasSignal = false;
     const estimatedDuration = Math.max(1.6, text.trim().split(/\s+/).length * 0.43);
     const tick = () => {
       if (audio.paused || audio.ended || activeAudioRef.current !== audio) {
         stopMouthAnimation();
         return;
       }
-      analyser.getByteTimeDomainData(samples);
-      let sum = 0;
-      for (let i = 0; i < samples.length; i += 1) {
-        const value = (samples[i] - 128) / 128;
-        sum += value * value;
+
+      let rms = 0;
+      if (analyser && samples) {
+        analyser.getByteTimeDomainData(samples);
+        let sum = 0;
+        for (let i = 0; i < samples.length; i += 1) {
+          const value = (samples[i] - 128) / 128;
+          sum += value * value;
+        }
+        rms = Math.sqrt(sum / samples.length);
+        if (rms > 0.018) analyzerHasSignal = true;
       }
-      const rms = Math.sqrt(sum / samples.length);
+
       const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : estimatedDuration;
       const progress = Math.max(0, Math.min(0.999, audio.currentTime / duration));
       const shape = mouthShapeForText(text, progress);
-      const audible = Math.max(0, Math.min(1, (rms - 0.012) * 11));
+
+      const analyzerLevel = Math.max(0, Math.min(1, (rms - 0.012) * 11));
+      // Chrome can allow HTMLAudio playback while keeping Web Audio suspended.
+      // When that happens, keep the face alive using a restrained cadence tied
+      // to playback time and the actual response text instead of freezing.
+      const cadence = 0.34 + 0.66 * Math.abs(Math.sin(audio.currentTime * 10.5));
+      const audible = analyzerHasSignal ? analyzerLevel : cadence;
+
       const shapeOpen =
-        shape === "closed" ? 0.04 :
-        shape === "teeth" ? 0.18 :
-        shape === "wide" ? 0.38 :
-        shape === "round" ? 0.64 :
-        shape === "open" ? 0.82 :
+        shape === "closed" ? 0.08 :
+        shape === "teeth" ? 0.30 :
+        shape === "wide" ? 0.52 :
+        shape === "round" ? 0.72 :
+        shape === "open" ? 0.90 :
         0;
       const target = audible * shapeOpen;
-      mouthSmoothRef.current += (target - mouthSmoothRef.current) * 0.42;
+      mouthSmoothRef.current += (target - mouthSmoothRef.current) * 0.36;
       frame += 1;
       if (frame % 2 === 0) {
         setMouthOpen(mouthSmoothRef.current);
-        setMouthShape(audible < 0.08 ? "rest" : shape);
+        setMouthShape(shape);
       }
       mouthAnimationFrameRef.current = window.requestAnimationFrame(tick);
     };
@@ -259,7 +272,6 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   }
 
   function unlockMobileAudio() {
-    if (!isMobileVoiceDevice()) return;
     try {
       let audio = unlockedAudioRef.current;
       if (!audio) {

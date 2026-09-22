@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type RelationshipKey = "new" | "papa" | "friend" | "family" | "child" | "church" | "professional";
+type MouthShape = "rest" | "closed" | "wide" | "round" | "open" | "teeth";
 
 type RelationshipOption = {
   key: RelationshipKey;
@@ -74,6 +75,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [voiceBridgeReady, setVoiceBridgeReady] = useState(false);
   const [voiceBridgeProvider, setVoiceBridgeProvider] = useState("off");
   const [mouthOpen, setMouthOpen] = useState(0);
+  const [mouthShape, setMouthShape] = useState<MouthShape>("rest");
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeObjectUrlRef = useRef<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -163,6 +165,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }
     mouthSmoothRef.current = 0;
     setMouthOpen(0);
+    setMouthShape("rest");
   }
 
   function ensureLipSyncAudio(audio: HTMLAudioElement) {
@@ -191,12 +194,35 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     }
   }
 
-  function startMouthAnimation(audio: HTMLAudioElement) {
+  function mouthShapeForText(text: string, progress: number): MouthShape {
+    const spoken = text.toLowerCase().replace(/[^a-z0-9.,!?\s']/g, " ");
+    if (!spoken.trim()) return "rest";
+    const index = Math.max(0, Math.min(spoken.length - 1, Math.floor(progress * spoken.length)));
+    let char = spoken[index] || " ";
+    if (/\s/.test(char)) {
+      for (let offset = 1; offset < 5; offset += 1) {
+        const next = spoken[index + offset];
+        const prev = spoken[index - offset];
+        if (next && /[a-z]/.test(next)) { char = next; break; }
+        if (prev && /[a-z]/.test(prev)) { char = prev; break; }
+      }
+    }
+    if (/[bmp]/.test(char)) return "closed";
+    if (/[fv]/.test(char)) return "teeth";
+    if (/[ouqw]/.test(char)) return "round";
+    if (/[eiy]/.test(char)) return "wide";
+    if (/[a]/.test(char)) return "open";
+    if (/[.,!?]/.test(char)) return "closed";
+    return "open";
+  }
+
+  function startMouthAnimation(audio: HTMLAudioElement, text: string) {
     stopMouthAnimation();
     const analyser = analyserRef.current;
     if (!analyser) return;
     const samples = new Uint8Array(analyser.fftSize);
     let frame = 0;
+    const estimatedDuration = Math.max(1.6, text.trim().split(/\s+/).length * 0.43);
     const tick = () => {
       if (audio.paused || audio.ended || activeAudioRef.current !== audio) {
         stopMouthAnimation();
@@ -209,10 +235,24 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
         sum += value * value;
       }
       const rms = Math.sqrt(sum / samples.length);
-      const target = Math.max(0, Math.min(1, (rms - 0.015) * 10));
-      mouthSmoothRef.current += (target - mouthSmoothRef.current) * 0.38;
+      const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : estimatedDuration;
+      const progress = Math.max(0, Math.min(0.999, audio.currentTime / duration));
+      const shape = mouthShapeForText(text, progress);
+      const audible = Math.max(0, Math.min(1, (rms - 0.012) * 11));
+      const shapeOpen =
+        shape === "closed" ? 0.04 :
+        shape === "teeth" ? 0.18 :
+        shape === "wide" ? 0.38 :
+        shape === "round" ? 0.64 :
+        shape === "open" ? 0.82 :
+        0;
+      const target = audible * shapeOpen;
+      mouthSmoothRef.current += (target - mouthSmoothRef.current) * 0.42;
       frame += 1;
-      if (frame % 2 === 0) setMouthOpen(mouthSmoothRef.current);
+      if (frame % 2 === 0) {
+        setMouthOpen(mouthSmoothRef.current);
+        setMouthShape(audible < 0.08 ? "rest" : shape);
+      }
       mouthAnimationFrameRef.current = window.requestAnimationFrame(tick);
     };
     mouthAnimationFrameRef.current = window.requestAnimationFrame(tick);
@@ -356,7 +396,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
     audio.onended = finish;
     audio.onerror = fallback;
-    void audio.play().then(() => startMouthAnimation(audio)).catch(fallback);
+    void audio.play().then(() => startMouthAnimation(audio, text)).catch(fallback);
   }
 
   useEffect(() => {
@@ -727,31 +767,47 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                       <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
                       <div
                         aria-hidden="true"
-                        className="absolute left-[31%] top-[56%] h-[20%] w-[38%] overflow-hidden"
+                        className="absolute left-[33%] top-[58%] h-[10%] w-[34%] overflow-visible"
                         style={{
-                          transform: `translateY(${mouthOpen * 1.8}px) scaleY(${1 + mouthOpen * 0.24})`,
-                          transformOrigin: "50% 18%",
+                          transform: `scaleX(${mouthShape === "round" ? 0.84 : mouthShape === "wide" ? 1.06 : 1})`,
+                          transformOrigin: "50% 50%",
                         }}
                       >
+                        <div
+                          className="absolute left-[15%] right-[15%] top-[42%] rounded-[999px] bg-[#16090a]"
+                          style={{
+                            height: `${Math.max(1, mouthOpen * 34)}%`,
+                            opacity: mouthOpen > 0.05 ? Math.min(0.88, mouthOpen * 1.25) : 0,
+                          }}
+                        />
                         <img
                           src="/images/brian-keith-hill.png"
                           alt=""
-                          className="absolute max-w-none"
+                          className="absolute inset-0 h-full w-full object-cover"
                           style={{
-                            width: "263.16%",
-                            height: "500%",
-                            left: "-81.58%",
-                            top: "-280%",
+                            width: "294.12%",
+                            height: "1000%",
+                            left: "-97.06%",
+                            top: "-580%",
+                            clipPath: "inset(0 0 50% 0)",
+                          }}
+                        />
+                        <img
+                          src="/images/brian-keith-hill.png"
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                          style={{
+                            width: "294.12%",
+                            height: "1000%",
+                            left: "-97.06%",
+                            top: "-580%",
+                            clipPath: "inset(50% 0 0 0)",
+                            transform: `translateY(${mouthOpen * 3.1}px)`,
+                            transformOrigin: "50% 50%",
                           }}
                         />
                       </div>
-                      {isSpeaking && (
-                        <div
-                          aria-hidden="true"
-                          className="absolute inset-x-[17%] bottom-[4%] h-1 rounded-full bg-brand-yellow/70 transition-transform"
-                          style={{ transform: `scaleX(${0.25 + mouthOpen * 0.75})` }}
-                        />
-                      )}
+
                     </div>
                     <p className="font-extrabold text-white">
                       {isSpeaking ? "Brian is speaking" : loading ? "Brian is thinking" : listening ? "Brian is listening" : "Voice conversation ready"}

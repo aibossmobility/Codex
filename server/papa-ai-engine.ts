@@ -507,7 +507,7 @@ function detectNeed(text: string) {
   if (/(daughter)/.test(text)) return "daughter";
   if (/(son)/.test(text)) return "son";
   if (/(sorry|apolog|forgive)/.test(text)) return "apology";
-  if (/(silent|won't talk|not talking|estranged|distance)/.test(text)) return "distance";
+  if (/(silent|won't talk|not talking|estranged|distance|stops? calling|stopped calling|not returning|won't return|pulls? away|pulled away)/.test(text)) return "distance";
   if (/(membership|price|join|subscription)/.test(text)) return "membership";
   return "repair";
 }
@@ -549,22 +549,30 @@ function isCrisisLike(text: string) {
 }
 
 function buildCoachingReply(message: string, pillar: string, need: string) {
-  const firstQuestion =
-    need === "daughter"
-      ? "What has the distance with your daughter been like for you lately?"
-      : need === "son"
-        ? "What has been hardest for you in the relationship with your son?"
-        : need === "apology"
-          ? "What part of the situation keeps coming back to you?"
-          : "What feels most important for me to understand before we go any further?";
+  if (need === "distance" || need === "son" || need === "daughter") {
+    const child = need === "son" ? "son" : need === "daughter" ? "daughter" : "adult child";
+    return `Start by lowering the pressure. If your ${child} has pulled back, repeated calls or a long explanation can feel like more pressure, even when your intention is love.
 
-  return `Take your time. I'm listening.
+Send one short message that asks for nothing: “I’m thinking about you. I love you. I’m here when you’re ready.” Then give them room and let your consistency do some of the talking.
 
-I may hear some ${pillar} in what you're describing, but I don't want to rush to fix it before I understand you.
+If you want, tell me what happened just before the distance started, and I’ll help you think through the next step.`;
+  }
 
-${firstQuestion}
+  if (need === "apology") {
+    return `Start with ownership, not explanation. Say what you did, name the impact you can see, and apologize without adding “but.”
 
-You don't have to solve anything in this message. Tell me a little more, and we'll stay with what matters most to you.`;
+A simple repair sentence is: “I was wrong for ____. I can see how that hurt you. I’m sorry.”
+
+Then stop and listen. The next question is not how to defend yourself; it’s whether they feel safe enough to tell you more.`;
+  }
+
+  if (need === "membership") {
+    return `Papa Life membership is built for fathers who want steady practice, not one emotional conversation. The work centers on Presence, Authority, Purpose, and Alignment, with practical steps for rebuilding connection over time.`;
+  }
+
+  return `Start with the part you can own. Before trying to fix the whole relationship, name one thing you can do differently this week that would make you safer, clearer, or more consistent.
+
+For ${pillar}, that usually means one small action before a big speech. Tell me the specific situation, and I’ll help you choose that action.`;
 }
 
 function buildPrayer(message: string, pillar: string) {

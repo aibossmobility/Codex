@@ -306,7 +306,7 @@ export function buildPapaAiLocalReply(input: {
     reply: buildCoachingReply(visitorMessage, pillar, need),
     resources,
     voice_key: voiceKey,
-    voice_url: BRIAN_COACHING_VOICE_URLS[voiceKey],
+    voice_url: `/api/ai/voice/clip/${encodeURIComponent(voiceKey)}`,
     voice_name: "Brian Keith Hill",
   };
 }
@@ -512,7 +512,7 @@ function detectNeed(text: string) {
   return "repair";
 }
 
-const BRIAN_COACHING_VOICE_URLS: Record<string, string> = {
+export const BRIAN_COACHING_VOICE_URLS: Record<string, string> = {
   "presence-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=ab2cef38-95de-4737-a284-52d1eccbae76.wav",
   "presence-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5c00dad8-49d2-4e52-a5a3-6de575227b94.wav",
   "presence-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=471cf96f-715f-4094-af68-dd21127ae1a3.wav",
@@ -534,6 +534,10 @@ const BRIAN_COACHING_VOICE_URLS: Record<string, string> = {
 function coachingVoiceKey(pillar: string, need: string) {
   const voiceNeed = need === "daughter" || need === "son" || need === "apology" ? need : "general";
   return `${pillar.toLowerCase()}-${voiceNeed}`;
+}
+
+export function getBrianCoachingVoiceSourceUrl(voiceKey: string) {
+  return BRIAN_COACHING_VOICE_URLS[voiceKey] || "";
 }
 
 function isCrisisLike(text: string) {

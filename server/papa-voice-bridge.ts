@@ -159,11 +159,19 @@ async function synthesizeHeyGen(text: string) {
   });
 
   const json = await response.json().catch(() => ({})) as any;
-  if (!response.ok || !json?.audio_url) {
-    throw new Error(json?.error?.message || json?.message || `HeyGen synthesis failed (${response.status}).`);
+  const audioUrl =
+    json?.audio_url ||
+    json?.data?.audio_url ||
+    json?.data?.url ||
+    json?.result?.audio_url ||
+    json?.result?.url ||
+    json?.url;
+  if (!response.ok || !audioUrl) {
+    const shape = json && typeof json === "object" ? Object.keys(json).slice(0, 8).join(",") : "non-object";
+    throw new Error(json?.error?.message || json?.message || `HeyGen synthesis failed (${response.status}; response keys: ${shape}).`);
   }
 
-  const audioResponse = await fetch(String(json.audio_url));
+  const audioResponse = await fetch(String(audioUrl));
   if (!audioResponse.ok) {
     throw new Error(`HeyGen audio download failed (${audioResponse.status}).`);
   }

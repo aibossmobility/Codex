@@ -18,11 +18,21 @@ const replacements = [
 ];
 
 for (const replacement of replacements) {
-  const count = source.split(replacement.from).length - 1;
-  if (count !== 1) {
-    throw new Error(`[papa-life-os-server] Expected exactly one ${replacement.label} match, found ${count}`);
+  const fromCount = source.split(replacement.from).length - 1;
+  const toCount = source.split(replacement.to).length - 1;
+
+  if (fromCount === 1 && toCount === 0) {
+    source = source.replace(replacement.from, replacement.to);
+    continue;
   }
-  source = source.replace(replacement.from, replacement.to);
+
+  if (fromCount === 0 && toCount === 1) {
+    continue;
+  }
+
+  throw new Error(
+    `[papa-life-os-server] Expected one unpatched or already-patched ${replacement.label} match, found from=${fromCount}, to=${toCount}`
+  );
 }
 
 fs.writeFileSync(serverPath, source);

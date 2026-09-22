@@ -226,9 +226,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       });
       if (!response.ok) return "";
       const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      activeObjectUrlRef.current = objectUrl;
-      return objectUrl;
+      return URL.createObjectURL(blob);
     } catch {
       return "";
     }
@@ -241,10 +239,15 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     spokenTextRef.current = text;
 
     if (!voiceUrl) {
-      setVoiceIssue("Brian's cloned voice is not available for this reply yet. The written reply is still available.");
+      setVoiceIssue("Brian's cloned voice is not available for this reply yet.");
       resumeRecognitionAfterPlayback();
       return;
     }
+
+    // The voice URL belongs to this reply. Store it only after stopSpeaking()
+    // has cleaned up the previous reply, otherwise stopSpeaking() would revoke
+    // the brand-new URL before the browser can play it.
+    activeObjectUrlRef.current = voiceUrl;
 
     const audio = isMobileVoiceDevice() && unlockedAudioRef.current ? unlockedAudioRef.current : new Audio();
     audio.pause();
@@ -270,7 +273,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       completed = true;
       if (activeAudioRef.current === audio) activeAudioRef.current = null;
       setIsSpeaking(false);
-      setVoiceIssue("Brian's cloned voice could not play on this device. Tap the mic again to continue by voice, or use the written reply.");
+      setVoiceIssue("Brian's voice was generated, but this device blocked playback. Tap the mic once more and try again.");
       releasePlaybackEchoGuard(text);
       resumeRecognitionAfterPlayback();
     };

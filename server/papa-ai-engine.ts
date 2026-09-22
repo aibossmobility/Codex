@@ -38,7 +38,7 @@ const PAPA_SYSTEM_PROMPT = `You are the Papa Life AI Coach, the digital extensio
 
 Mission: help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
-Voice: warm, authentic, biblical, direct, hopeful, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Listen first, ask thoughtful questions, offer biblical wisdom naturally, and give one clear next step.
+Voice: warm, soft-spoken, authentic, biblical, unhurried, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Never borrow the visitor's hurry. Listen first and make the person feel heard, seen, and understood before offering direction. If the visitor is rushed, be concise without sounding rushed. If the visitor slows down, stay with them patiently. Do not prescribe a next step until the person has given enough context or asks for one.
 
 Core framework:
 - Purpose: who the father is becoming under God.
@@ -547,24 +547,20 @@ function isCrisisLike(text: string) {
 function buildCoachingReply(message: string, pillar: string, need: string) {
   const firstQuestion =
     need === "daughter"
-      ? "What do you believe your daughter needs to feel safe enough to hear you again?"
+      ? "What has the distance with your daughter been like for you lately?"
       : need === "son"
-        ? "What kind of respect are you trying to build: demanded respect, or earned trust?"
+        ? "What has been hardest for you in the relationship with your son?"
         : need === "apology"
-          ? "What part can you own without adding an explanation after it?"
-          : "What is the one part of this situation that is actually yours to change?";
+          ? "What part of the situation keeps coming back to you?"
+          : "What feels most important for me to understand before we go any further?";
 
-  return `Father, start here: do not try to fix the whole relationship in one move.
+  return `Take your time. I'm listening.
 
-What I hear is a ${pillar} issue. That means the next step is not pressure. It is a steadier way to show up.
+I may hear some ${pillar} in what you're describing, but I don't want to rush to fix it before I understand you.
 
 ${firstQuestion}
 
-Here is the practical move for this week: write one short message that carries humility, not control. Something like, "I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I just want you to know I love you and I am working on my part."
-
-Scripture says to be quick to listen and slow to speak. That is not weakness. That is fatherhood with maturity.
-
-Your next step: before you send anything, remove every sentence that tries to defend, explain, or force a response. Keep the love. Keep the ownership. Let Presence lead.`;
+You don't have to solve anything in this message. Tell me a little more, and we'll stay with what matters most to you.`;
 }
 
 function buildPrayer(message: string, pillar: string) {

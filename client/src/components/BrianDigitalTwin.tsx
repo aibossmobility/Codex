@@ -42,9 +42,9 @@ function safeLocalReply(text: string, relationship: RelationshipOption) {
     return "Your immediate safety and the safety of everyone involved come first. If someone may be in immediate danger, call 911 or your local emergency number now. In the U.S. or Canada, call or text 988 for immediate crisis support. Papa Life can support a wise next step, but it is not an emergency or clinical service.";
   }
   if (!relationship.commercial) {
-    return "I'm listening. Take your time and tell me what feels most important right now. We don't have to rush to solve anything.";
+    return "I'm listening. Tell me what happened, and I'll respond to that.";
   }
-  return "I'm listening. Take your time and tell me what feels most important right now. We don't have to rush to solve anything.";
+  return "I'm listening. Tell me what happened, and I'll respond to that.";
 }
 
 function summarize(messages: ChatMessage[], relationship: RelationshipOption, firstName: string) {
@@ -100,7 +100,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Take your time. Whenever you're ready, tell me what's on your mind.",
+      content: "I'm here. What's on your mind?",
     },
   ]);
 
@@ -295,7 +295,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   }
 
   function pauseRecognitionForPlayback() {
-    if (!conversationActiveRef.current || !isMobileVoiceDevice()) return;
+    if (!conversationActiveRef.current) return;
     recognitionPausedForPlaybackRef.current = true;
     clearSilenceTimer();
     const recognition = recognitionRef.current;
@@ -424,7 +424,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
         setMessages([
           {
             role: "assistant",
-            content: `Take your time${parsed.firstName ? `, ${parsed.firstName}` : ""}. I remember the context you chose to share before. Whenever you're ready, tell me what's on your mind.`,
+            content: `${parsed.firstName ? `${parsed.firstName}, ` : ""}I remember the context you chose to share before. What's on your mind today?`,
           },
         ]);
       }
@@ -456,8 +456,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       {
         role: "assistant",
         content: firstName.trim()
-          ? `Take your time, ${firstName.trim()}. Whenever you're ready, tell me what's on your mind.`
-          : "Take your time. Whenever you're ready, tell me what's on your mind.",
+          ? `${firstName.trim()}, what's on your mind?`
+          : "What's on your mind?",
       },
     ]);
   }

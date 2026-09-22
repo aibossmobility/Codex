@@ -133,6 +133,7 @@ import {
   buildAssessmentReport,
   buildPapaAiReply,
   findPapaResources,
+  getBrianCoachingVoiceSourceUrl,
   getPapaAiStatus,
   papaAssessmentQuestions,
 } from "./papa-ai-engine";
@@ -5384,6 +5385,35 @@ async function startServer() {
         ok: false,
         error: error instanceof Error ? error.message : "Voice coach could not start right now.",
       });
+    }
+  });
+
+  app.get(["/api/papa-ai/voice/clip/:voiceKey", "/api/ai/voice/clip/:voiceKey"], async (req, res) => {
+    const voiceKey = cleanPublicText(req.params.voiceKey, 80);
+    const sourceUrl = getBrianCoachingVoiceSourceUrl(voiceKey);
+    if (!sourceUrl) {
+      return res.status(404).json({ ok: false, error: "Brian voice clip not found" });
+    }
+
+    try {
+      const upstream = await fetch(sourceUrl, {
+        headers: {
+          "User-Agent": "PapaLifeDigitalTwin/1.0",
+          Accept: "audio/wav,audio/*;q=0.9,*/*;q=0.1",
+        },
+      });
+      if (!upstream.ok) {
+        console.error("[papa-ai] Brian voice upstream failed", { voiceKey, status: upstream.status });
+        return res.status(502).json({ ok: false, error: "Brian voice clip unavailable" });
+      }
+      const audio = Buffer.from(await upstream.arrayBuffer());
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || "audio/wav");
+      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+      res.setHeader("Content-Length", String(audio.length));
+      return res.send(audio);
+    } catch (error) {
+      console.error("[papa-ai] Brian voice proxy failed", { voiceKey, error });
+      return res.status(502).json({ ok: false, error: "Brian voice clip unavailable" });
     }
   });
 

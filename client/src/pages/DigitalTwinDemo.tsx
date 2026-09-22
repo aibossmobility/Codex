@@ -1,7 +1,7 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, HeartHandshake, MessageCircle, Mic, ShieldCheck, Sparkles } from "lucide-react";
+import { CalendarCheck, HeartHandshake, MessageCircle, Mic, Play, ShieldCheck, Sparkles, Square } from "lucide-react";
 import { useRef, useState } from "react";
 
 const HEYGEN_TWIN_PREVIEW = "/videos/papa-life-gold-master.mp4";
@@ -35,6 +35,7 @@ export default function DigitalTwinDemo() {
       video.muted = false;
       video.loop = false;
       video.currentTime = 0;
+      video.playbackRate = 0.92;
       await video.play();
       setWelcomeSoundOn(true);
     } catch {
@@ -115,11 +116,11 @@ export default function DigitalTwinDemo() {
                     src={HEYGEN_TWIN_PREVIEW}
                     poster="/images/brian-keith-hill.png"
                     className="h-full w-full object-cover"
-                    autoPlay
-                    muted
-                    loop
                     playsInline
+                    preload="metadata"
                     onError={() => setVideoFailed(true)}
+                    onPlay={() => setWelcomeSoundOn(true)}
+                    onPause={() => setWelcomeSoundOn(false)}
                     onEnded={() => setWelcomeSoundOn(false)}
                   />
                 ) : (
@@ -129,17 +130,36 @@ export default function DigitalTwinDemo() {
                     className="h-full w-full object-cover object-top"
                   />
                 )}
-                {!videoFailed && (
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-xl bg-black/75 px-3 py-2 backdrop-blur-sm">
-                    <span className="text-xs font-semibold text-white/75">
-                      {welcomeSoundOn ? "Brian's welcome is playing with sound." : "Visual preview is muted."}
-                    </span>
+                {!videoFailed && !welcomeSoundOn && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/45">
                     <button
                       type="button"
                       onClick={() => void playWelcomeWithSound()}
-                      className="rounded-full border border-[#f2c230]/60 px-3 py-1.5 text-xs font-extrabold text-[#f2c230] hover:bg-[#f2c230] hover:text-black"
+                      className="flex min-h-16 items-center gap-3 rounded-full border border-[#f2c230]/70 bg-black/85 px-6 py-4 text-base font-extrabold text-[#f2c230] shadow-xl backdrop-blur-sm hover:bg-[#f2c230] hover:text-black"
+                      aria-label="Play Brian's welcome"
                     >
-                      Hear Welcome
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2c230] text-black">
+                        <Play className="h-5 w-5 fill-current" />
+                      </span>
+                      Play Brian's Welcome
+                    </button>
+                  </div>
+                )}
+                {!videoFailed && welcomeSoundOn && (
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-xl bg-black/75 px-3 py-2 backdrop-blur-sm">
+                    <span className="text-xs font-semibold text-white/75">
+                      Brian's welcome is playing at a calmer pace.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const video = videoRef.current;
+                        if (video) video.pause();
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#f2c230]/60 px-3 py-1.5 text-xs font-extrabold text-[#f2c230] hover:bg-[#f2c230] hover:text-black"
+                    >
+                      <Square className="h-3.5 w-3.5" />
+                      Stop
                     </button>
                   </div>
                 )}

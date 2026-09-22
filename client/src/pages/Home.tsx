@@ -319,6 +319,33 @@ export default function Home() {
           </div>
         </section>
 
+        <section aria-labelledby="featured-dear-fathers-heading" className="bg-[#f8f0db] py-8 md:py-10">
+          <div className="container">
+            <a
+              href="https://dearfathers.com/2026/09/brian-keith-hill-opens-up-about-fatherhood-papa-life-and-more/"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex flex-col gap-4 rounded-xl border-2 border-[#f2c230] bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:flex-row md:items-center md:justify-between md:p-8"
+            >
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
+                  Featured in Dear Fathers
+                </p>
+                <h2 id="featured-dear-fathers-heading" className="mt-2 text-2xl font-extrabold md:text-3xl">
+                  Brian Keith Hill Opens Up About Fatherhood, Papa Life, and More
+                </h2>
+                <p className="mt-3 max-w-4xl leading-relaxed text-[#314239]">
+                  Dear Fathers invited Brian to share the story behind Papa Life, what he has learned as a father, and why fathers of adult children still have room to grow, repair, and reconnect.
+                </p>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-2 font-extrabold text-[#145b35] group-hover:text-[#b33a32]">
+                Read the feature
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
+            </a>
+          </div>
+        </section>
+
         <section id="is-this-you" aria-labelledby="is-this-you-heading" className="scroll-mt-6 bg-[#f8f0db] py-16 md:py-20">
           <div className="container">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">

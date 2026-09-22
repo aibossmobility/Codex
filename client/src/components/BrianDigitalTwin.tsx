@@ -16,7 +16,7 @@ type RelationshipOption = {
 };
 
 const RELATIONSHIPS: RelationshipOption[] = [
-  { key: "new", label: "I am new to Brian / Papa Life", guidance: "Warmly welcome the visitor. Learn what brought them here. Do not imply prior knowledge. Guide toward the Fatherhood Check-In or a conversation only when useful.", commercial: true },
+  { key: "new", label: "I am new to Brian / Papa Life", guidance: "Meet the visitor at their pace. Do not perform a welcome, pitch, explain Papa Life, or move them toward an outcome before they ask. Listen first. If they are rushed, be concise without sounding rushed. If they slow down, stay with them patiently so they feel heard, seen, and understood.", commercial: true },
   { key: "papa", label: "I am a Papa Life father / participant", guidance: "Treat this as an ongoing Papa Life relationship. Ask what has changed since their last step and help them continue rather than restarting the whole journey.", commercial: true },
   { key: "friend", label: "I am Brian's friend", guidance: "Speak warmly and personally without sales pressure. Do not treat the visitor as a lead first. Listen, preserve dignity, and invite Brian into the conversation when appropriate.", commercial: false },
   { key: "family", label: "I am family / extended family", guidance: "Use a close-family tone without assuming private facts. No marketing language. Never expose information about other family members. Encourage direct human connection with Brian when the subject is personal or consequential.", commercial: false },
@@ -89,7 +89,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hi. I'm Brian Keith Hill's Papa Life digital twin. I can listen, help you think through a next step using Presence, Authority, Purpose, and Alignment, and connect you with Brian when the human relationship matters most. Before we begin, how do you know Brian?",
+      content: "Take your time. Whenever you're ready, tell me what's on your mind.",
     },
   ]);
 
@@ -257,7 +257,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
         setMessages([
           {
             role: "assistant",
-            content: `Welcome back${parsed.firstName ? `, ${parsed.firstName}` : ""}. I remember that you identified yourself as: ${rememberedRelationship.label}. I won't assume anything beyond what you choose to share. What's on your mind today?`,
+            content: `Take your time${parsed.firstName ? `, ${parsed.firstName}` : ""}. I remember the context you chose to share before. Whenever you're ready, tell me what's on your mind.`,
           },
         ]);
       }
@@ -289,8 +289,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       {
         role: "assistant",
         content: firstName.trim()
-          ? `Thank you, ${firstName.trim()}. I understand that you know Brian as: ${current.label}. I'll use that only to make this conversation more appropriate and personal. What would you like to talk about?`
-          : `Thank you. I understand that you know Brian as: ${current.label}. I'll use that only to make this conversation more appropriate. What would you like to talk about?`,
+          ? `Take your time, ${firstName.trim()}. Whenever you're ready, tell me what's on your mind.`
+          : "Take your time. Whenever you're ready, tell me what's on your mind.",
       },
     ]);
   }
@@ -307,7 +307,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       relationship.label,
       relationship.guidance,
       `Visitor first name: ${firstName.trim() || "not supplied"}.`,
-      "Papa Life framework order: Presence → Authority → Purpose → Alignment. Presence leads: listen and show up safely before trying to teach, fix, direct, or persuade.",
+      "Papa Life framework order: Presence → Authority → Purpose → Alignment. Presence leads: listen and show up safely before trying to teach, fix, direct, persuade, sell, or hurry the person.",
+      "Pace rule: Never borrow the visitor's hurry. If they are rushed, answer briefly and clearly without sounding rushed. If they slow down, slow down with them. Leave room for silence and questions. The goal is for the person to feel heard, seen, and understood, not moved through a funnel.",
       "Integrity rules: Do not claim Brian personally saw this conversation. Do not invent memories. Do not reveal private information about Brian or anyone else. If the visitor is family, a friend, or a church/community relationship, do not turn the conversation into marketing. If a consequential personal matter needs Brian, encourage direct human connection.",
       `VISITOR MESSAGE: ${clean}`,
     ].join("\n");
@@ -582,14 +583,14 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
           {!identified ? (
             <div className="space-y-3 p-4">
               <div className="rounded-xl border border-brand-yellow/20 bg-brand-yellow/[0.05] p-3 text-sm leading-relaxed text-white/80">
-                I don't want to guess who you are to Brian. Tell me how you know him so I can respond in the right way.
+                No rush. If you'd like, share your first name and how you know Brian. It just helps me respond with care.
               </div>
               <Input value={firstName} onChange={(event) => setFirstName(event.target.value)} placeholder="Your first name (optional)" aria-label="Your first name" className="border-white/15 bg-white/[0.04]" />
               <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-yellow" htmlFor="brian-relationship">How do you know Brian?</label>
               <select id="brian-relationship" value={relationshipKey} onChange={(event) => setRelationshipKey(event.target.value as RelationshipKey)} className="min-h-11 w-full rounded-md border border-white/15 bg-[#111] px-3 text-sm text-white">
                 {RELATIONSHIPS.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
               </select>
-              <Button type="button" onClick={beginRelationship} className="w-full bg-brand-yellow font-extrabold text-black hover:bg-white">Start our conversation</Button>
+              <Button type="button" onClick={beginRelationship} className="w-full bg-brand-yellow font-extrabold text-black hover:bg-white">Continue when you're ready</Button>
               <p className="flex items-start gap-2 text-[11px] leading-relaxed text-white/45"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />The twin never guesses a family or personal relationship and never treats family/church relationships as marketing inventory.</p>
             </div>
           ) : (
@@ -659,7 +660,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       ) : (
         <button type="button" onClick={() => setOpen(true)} className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
           <img src="/images/brian-keith-hill.png" alt="" className="h-10 w-10 rounded-full border border-brand-yellow/45 object-cover" />
-          <span><span className="block text-sm font-extrabold text-white">Talk with Brian's Twin</span><span className="block text-xs font-semibold text-white/55">I'll meet you where you know Brian</span></span>
+          <span><span className="block text-sm font-extrabold text-white">Talk with Brian's Twin</span><span className="block text-xs font-semibold text-white/55">No rush. Speak when you're ready.</span></span>
           <MessageCircle className="h-4 w-4 text-brand-yellow" />
         </button>
       )}

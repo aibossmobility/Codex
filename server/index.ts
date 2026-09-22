@@ -137,6 +137,7 @@ import {
   getPapaAiStatus,
   papaAssessmentQuestions,
 } from "./papa-ai-engine";
+import { getPapaVoiceBridgeStatus, synthesizePapaVoice } from "./papa-voice-bridge";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -5331,6 +5332,36 @@ async function startServer() {
     const query = cleanPublicText(req.query.q, 240);
     const resources = findPapaResources(query || "papa life fatherhood", 8);
     res.json({ ok: true, resources });
+  });
+
+  app.get(["/api/papa-ai/voice/bridge-status", "/api/ai/voice/bridge-status"], (_req, res) => {
+    try {
+      res.json(getPapaVoiceBridgeStatus());
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        error: error instanceof Error ? error.message : "Voice bridge status unavailable.",
+      });
+    }
+  });
+
+  app.post(["/api/papa-ai/voice/synthesize", "/api/ai/voice/synthesize"], async (req, res) => {
+    const text = cleanPublicText(req.body?.text, 4000);
+    if (!text) return res.status(400).json({ ok: false, error: "Text is required" });
+
+    try {
+      const result = await synthesizePapaVoice(text);
+      res.setHeader("Content-Type", result.contentType);
+      res.setHeader("Cache-Control", "private, max-age=3600");
+      res.setHeader("X-Papa-Voice-Provider", result.provider);
+      res.setHeader("X-Papa-Voice-Name", "Brian Keith Hill");
+      return res.send(result.audio);
+    } catch (error) {
+      return res.status(503).json({
+        ok: false,
+        error: error instanceof Error ? error.message : "Brian Keith Hill voice is unavailable.",
+      });
+    }
   });
 
   app.get(["/api/papa-ai/voice/signed-url", "/api/ai/voice/signed-url"], async (req, res) => {

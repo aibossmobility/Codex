@@ -777,19 +777,6 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                   <div className="rounded-2xl border border-brand-yellow/25 bg-brand-yellow/[0.06] px-5 py-5 text-center">
                     <div className="relative mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full border-2 border-brand-yellow/55 bg-black shadow-[0_0_24px_rgba(250,204,21,0.16)]">
                       <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
-                      {isSpeaking && mouthOpen > 0.03 && (
-                        <img
-                          aria-hidden="true"
-                          src={`/images/digital-twin-mouth/${mouthShape === "rest" ? "closed" : mouthShape}.png`}
-                          alt=""
-                          className="pointer-events-none absolute left-[28%] top-[56%] w-[44%] select-none object-contain"
-                          style={{
-                            transform: `scaleX(${mouthShape === "round" ? 0.9 : mouthShape === "wide" ? 1.05 : 1}) scaleY(${0.98 + mouthOpen * 0.06})`,
-                            transformOrigin: "50% 50%",
-                            opacity: Math.min(1, 0.72 + mouthOpen * 0.28),
-                          }}
-                        />
-                      )}
 
                     </div>
                     <p className="font-extrabold text-white">
@@ -797,7 +784,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                     </p>
                     <p className="mt-1 text-xs leading-relaxed text-white/55">
                       {isSpeaking
-                        ? "Tap the microphone whenever you want to interrupt and speak."
+                        ? "Brian is answering in his voice. Tap the microphone whenever you want to interrupt and speak."
                         : isMobileVoiceDevice()
                           ? "Tap the microphone, speak naturally, then wait for Brian to answer."
                           : "Speak naturally. Brian will answer in his voice."}

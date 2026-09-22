@@ -150,7 +150,7 @@ Checklist:
 - Connect pain to responsibility without shame.
 - Use biblical language naturally.
 - Give one clear next step.
-- Return to Purpose, Authority, Presence, or Alignment.
+- Return to Presence, Authority, Purpose, or Alignment.
 
 Default close:
 As long as you are both alive, it is not too late to become the father God is shaping you to be.

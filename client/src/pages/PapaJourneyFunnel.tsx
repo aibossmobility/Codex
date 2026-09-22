@@ -1230,17 +1230,17 @@ function FreeResourcesSection() {
     {
       title: "The PAPA Workbook",
       desc: "Work the framework on paper, at your pace.",
-      href: "https://afcdmbri.gensparkspace.com/resources/papa-workbook.html",
+      href: "/papa-framework",
     },
     {
       title: "The Letter Template",
       desc: "The words, when you can't find your own.",
-      href: "https://afcdmbri.gensparkspace.com/resources/letter-template.html",
+      href: "https://docs.google.com/document/d/1du2XWa3f09adowSF2jgqGTot9FKFif6dynLAkmMH2Bg/edit",
     },
     {
       title: "Weekly Reset Journal",
       desc: "Small, consistent presence — one week at a time.",
-      href: "https://afcdmbri.gensparkspace.com/resources/weekly-reset-journal.html",
+      href: "https://docs.google.com/document/d/1PSqpYSwWTs16yx6f05h2QMX7-B8oK-ffMwgAk4r8Ju8/edit",
     },
   ];
 

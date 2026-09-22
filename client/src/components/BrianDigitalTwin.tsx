@@ -765,48 +765,18 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                   <div className="rounded-2xl border border-brand-yellow/25 bg-brand-yellow/[0.06] px-5 py-5 text-center">
                     <div className="relative mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full border-2 border-brand-yellow/55 bg-black shadow-[0_0_24px_rgba(250,204,21,0.16)]">
                       <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
-                      <div
-                        aria-hidden="true"
-                        className="absolute left-[33%] top-[58%] h-[10%] w-[34%] overflow-visible"
-                        style={{
-                          transform: `scaleX(${mouthShape === "round" ? 0.84 : mouthShape === "wide" ? 1.06 : 1})`,
-                          transformOrigin: "50% 50%",
-                        }}
-                      >
+                      {isSpeaking && mouthOpen > 0.03 && (
                         <div
-                          className="absolute left-[15%] right-[15%] top-[42%] rounded-[999px] bg-[#16090a]"
+                          aria-hidden="true"
+                          className="absolute left-[38%] top-[63%] w-[24%] rounded-[999px] bg-[#14090a]/90"
                           style={{
-                            height: `${Math.max(1, mouthOpen * 34)}%`,
-                            opacity: mouthOpen > 0.05 ? Math.min(0.88, mouthOpen * 1.25) : 0,
-                          }}
-                        />
-                        <img
-                          src="/images/brian-keith-hill.png"
-                          alt=""
-                          className="absolute inset-0 h-full w-full object-cover"
-                          style={{
-                            width: "294.12%",
-                            height: "1000%",
-                            left: "-97.06%",
-                            top: "-580%",
-                            clipPath: "inset(0 0 50% 0)",
-                          }}
-                        />
-                        <img
-                          src="/images/brian-keith-hill.png"
-                          alt=""
-                          className="absolute inset-0 h-full w-full object-cover"
-                          style={{
-                            width: "294.12%",
-                            height: "1000%",
-                            left: "-97.06%",
-                            top: "-580%",
-                            clipPath: "inset(50% 0 0 0)",
-                            transform: `translateY(${mouthOpen * 3.1}px)`,
+                            height: `${Math.max(1.5, mouthOpen * 7)}%`,
+                            transform: `scaleX(${mouthShape === "round" ? 0.78 : mouthShape === "wide" ? 1.12 : 1})`,
                             transformOrigin: "50% 50%",
+                            opacity: Math.min(0.92, 0.35 + mouthOpen * 0.75),
                           }}
                         />
-                      </div>
+                      )}
 
                     </div>
                     <p className="font-extrabold text-white">

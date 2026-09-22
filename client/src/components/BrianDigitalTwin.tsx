@@ -71,7 +71,10 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [conversationActive, setConversationActive] = useState(false);
   const [voiceIssue, setVoiceIssue] = useState("");
+  const [voiceBridgeReady, setVoiceBridgeReady] = useState(false);
+  const [voiceBridgeProvider, setVoiceBridgeProvider] = useState("off");
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const activeObjectUrlRef = useRef<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const conversationActiveRef = useRef(false);
   const loadingRef = useRef(false);
@@ -104,6 +107,16 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   useEffect(() => {
     const browser = window as any;
     setVoiceSupported(Boolean(browser.SpeechRecognition || browser.webkitSpeechRecognition));
+    fetch("/api/ai/voice/bridge-status")
+      .then((response) => response.json())
+      .then((status) => {
+        setVoiceBridgeReady(Boolean(status?.enabled && status?.voice_name === "Brian Keith Hill"));
+        setVoiceBridgeProvider(String(status?.provider || "off"));
+      })
+      .catch(() => {
+        setVoiceBridgeReady(false);
+        setVoiceBridgeProvider("off");
+      });
   }, []);
 
   useEffect(() => {
@@ -194,9 +207,31 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       current.currentTime = 0;
       activeAudioRef.current = null;
     }
+    if (activeObjectUrlRef.current) {
+      URL.revokeObjectURL(activeObjectUrlRef.current);
+      activeObjectUrlRef.current = null;
+    }
     const previousSpokenText = spokenTextRef.current;
     if (previousSpokenText) releasePlaybackEchoGuard(previousSpokenText);
     setIsSpeaking(false);
+  }
+
+  async function bridgedVoiceUrl(text: string) {
+    if (!spokenReplies || !voiceBridgeReady || voiceBridgeProvider === "off") return "";
+    try {
+      const response = await fetch("/api/ai/voice/synthesize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!response.ok) return "";
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      activeObjectUrlRef.current = objectUrl;
+      return objectUrl;
+    } catch {
+      return "";
+    }
   }
 
   function speak(text: string, voiceUrl?: string) {
@@ -330,7 +365,12 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Twin unavailable");
       setMessages((current) => [...current, { role: "assistant", content: json.reply }]);
-      speak(json.reply, json.voice_url);
+      const voiceUrl = json.voice_url || await bridgedVoiceUrl(json.reply);
+      if (voiceUrl) speak(json.reply, voiceUrl);
+      else {
+        stopSpeaking();
+        setVoiceIssue("");
+      }
     } catch {
       const reply = safeLocalReply(clean, relationship);
       setMessages((current) => [...current, { role: "assistant", content: reply }]);

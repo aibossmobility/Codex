@@ -656,6 +656,70 @@ try {
 } catch {}
 
 try {
+  const canonicalCourseId = PAPA_LIFE_MEMBERSHIP_COURSE_ID;
+  const canonicalCourseTitle = "From Distance to Reconnection";
+  const canonicalCourseDescription =
+    "A 12-lesson Papa Life course for fathers of adult children moving from distance, silence, tension, or regret toward reconnection.";
+  const canonicalLessons = [
+    ["Listening Without Defending", 36],
+    ["Owning Impact Without Shame", 37],
+    ["The First Repair Sentence", 27],
+    ["Presence Over Pressure", 27],
+    ["When Your Adult Child Pulls Away", 27],
+    ["Authority Without Control", 26],
+    ["Apology Without Explanation", 27],
+    ["Consistency After the Conversation", 27],
+    ["Rebuilding Trust in Small Deposits", 28],
+    ["When Silence Feels Personal", 27],
+    ["Leading With Purpose, Not Panic", 27],
+    ["Becoming Safe to Talk To", 26],
+  ] as const;
+
+  const ensureCanonicalCourse = db.transaction(() => {
+    const existingCourse = db.prepare("SELECT id FROM courses WHERE id = ?").get(canonicalCourseId);
+    if (!existingCourse) {
+      db.prepare(
+        "INSERT INTO courses (id, title, description, pillar, sort_order, show_in_catalog) VALUES (?, ?, ?, 'General', 1, 1)"
+      ).run(canonicalCourseId, canonicalCourseTitle, canonicalCourseDescription);
+    } else {
+      db.prepare(
+        "UPDATE courses SET title = ?, description = ?, pillar = 'General', sort_order = 1, show_in_catalog = 1 WHERE id = ?"
+      ).run(canonicalCourseTitle, canonicalCourseDescription, canonicalCourseId);
+    }
+
+    const byOrder = db.prepare(
+      "SELECT id FROM lessons WHERE course_id = ? AND sort_order = ? ORDER BY id ASC LIMIT 1"
+    );
+    const byTitle = db.prepare(
+      "SELECT id FROM lessons WHERE course_id = ? AND title = ? ORDER BY id ASC LIMIT 1"
+    );
+    const updateLesson = db.prepare(
+      "UPDATE lessons SET title = ?, content_type = 'audio', sort_order = ?, duration_minutes = COALESCE(duration_minutes, ?) WHERE id = ?"
+    );
+    const insertLesson = db.prepare(
+      "INSERT INTO lessons (course_id, title, description, content_url, content_type, sort_order, duration_minutes) VALUES (?, ?, NULL, NULL, 'audio', ?, ?)"
+    );
+
+    canonicalLessons.forEach(([title, duration], index) => {
+      const sortOrder = index + 1;
+      const existing =
+        (byTitle.get(canonicalCourseId, title) as { id: number } | undefined) ||
+        (byOrder.get(canonicalCourseId, sortOrder) as { id: number } | undefined);
+      if (existing) {
+        updateLesson.run(title, sortOrder, duration, existing.id);
+      } else {
+        insertLesson.run(canonicalCourseId, title, sortOrder, duration);
+      }
+    });
+  });
+
+  ensureCanonicalCourse();
+  console.log("[courses] ensured canonical Papa Life course " + canonicalCourseId + " with 12 lessons");
+} catch (e) {
+  console.error("[courses] unable to ensure canonical Papa Life curriculum:", e);
+}
+
+try {
   db.exec("CREATE INDEX IF NOT EXISTS idx_papa_ai_interactions_session ON papa_ai_interactions(session_id, created_at)");
 } catch {}
 try {
@@ -2917,7 +2981,7 @@ function aiBossServerPage(): ServerRenderedPage {
 
 function renderServerPage(rawUrl: string): ServerRenderedPage {
   const pathname = normalizeAppPath(rawUrl);
-  if (pathname.startsWith("/ai-boss")) return aiBossServerPage();
+  if (pathname.startsWith("/papa-life-os") || pathname.startsWith("/ai-boss")) return aiBossServerPage();
   if (pathname === "/executive-memory") {
     const page: StaticServerPage = {
       title: "Executive Memory | AI Boss OS",
@@ -2955,7 +3019,7 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   // noindex placeholder so the client can redirect unauthenticated visitors to
   // /login. Returning the public 404 page here prevents the Android companion
   // and Tuesday Live fallback from ever reaching the client router.
-  if (/^\/ai-boss(?:\/|$)/.test(pathname)) {
+  if (/^\/(?:papa-life-os|ai-boss)(?:\/|$)/.test(pathname)) {
     return {
       status: 200,
       title: "AI Boss OS | Papa Life",

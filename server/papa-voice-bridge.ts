@@ -1,4 +1,4 @@
-type PapaVoiceProvider = "off" | "google_custom" | "elevenlabs";
+type PapaVoiceProvider = "off" | "google_custom" | "elevenlabs" | "heygen";
 
 const REQUIRED_VOICE_NAME = "Brian Keith Hill";
 const REQUIRED_ELEVENLABS_VOICE_ID = "Eo4ci7V2rQPrk0GndhOG";
@@ -9,7 +9,7 @@ function env(name: string) {
 
 function provider(): PapaVoiceProvider {
   const raw = env("PAPA_VOICE_PROVIDER").toLowerCase();
-  if (raw === "google_custom" || raw === "elevenlabs") return raw;
+  if (raw === "google_custom" || raw === "elevenlabs" || raw === "heygen") return raw;
   return "off";
 }
 
@@ -135,6 +135,46 @@ async function synthesizeElevenLabs(text: string) {
   };
 }
 
+
+async function synthesizeHeyGen(text: string) {
+  const apiKey = env("HEYGEN_API_KEY");
+  const voiceId = env("PAPA_HEYGEN_VOICE_ID");
+  if (!apiKey) throw new Error("HeyGen API key is not configured.");
+  if (!voiceId) throw new Error("Papa Life HeyGen voice ID is not configured.");
+
+  const response = await fetch("https://api.heygen.com/v3/voices/speech", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify({
+      text,
+      voice_id: voiceId,
+      input_type: "text",
+      speed: Number(env("PAPA_HEYGEN_VOICE_SPEED") || "0.95"),
+      language: "en",
+    }),
+  });
+
+  const json = await response.json().catch(() => ({})) as any;
+  if (!response.ok || !json?.audio_url) {
+    throw new Error(json?.error?.message || json?.message || `HeyGen synthesis failed (${response.status}).`);
+  }
+
+  const audioResponse = await fetch(String(json.audio_url));
+  if (!audioResponse.ok) {
+    throw new Error(`HeyGen audio download failed (${audioResponse.status}).`);
+  }
+
+  return {
+    audio: Buffer.from(await audioResponse.arrayBuffer()),
+    contentType: audioResponse.headers.get("content-type") || "audio/wav",
+    provider: "heygen" as const,
+  };
+}
+
 export function getPapaVoiceBridgeStatus() {
   assertVoiceIdentity();
   const current = provider();
@@ -150,6 +190,7 @@ export function getPapaVoiceBridgeStatus() {
     (env("ELEVENLABS_VOICE_ID") || REQUIRED_ELEVENLABS_VOICE_ID) === REQUIRED_ELEVENLABS_VOICE_ID &&
     env("PAPA_ALLOW_ELEVENLABS_CREDITS") === "1",
   );
+  const heygenReady = Boolean(env("HEYGEN_API_KEY") && env("PAPA_HEYGEN_VOICE_ID"));
 
   return {
     ok: true,
@@ -158,9 +199,11 @@ export function getPapaVoiceBridgeStatus() {
     enabled:
       current === "google_custom" ? googleReady :
       current === "elevenlabs" ? elevenLabsReady :
+      current === "heygen" ? heygenReady :
       false,
     google_custom_ready: googleReady,
     elevenlabs_ready: elevenLabsReady,
+    heygen_ready: heygenReady,
     elevenlabs_credit_use_allowed: env("PAPA_ALLOW_ELEVENLABS_CREDITS") === "1",
     legacy_heygen_fallback_allowed: env("PAPA_ENABLE_LEGACY_HEYGEN_VOICE") === "1",
   };
@@ -175,5 +218,6 @@ export async function synthesizePapaVoice(text: string) {
   const current = provider();
   if (current === "google_custom") return synthesizeGoogleCustomVoice(clean);
   if (current === "elevenlabs") return synthesizeElevenLabs(clean);
+  if (current === "heygen") return synthesizeHeyGen(clean);
   throw new Error("Papa voice synthesis is disabled until the Brian Keith Hill voice bridge is configured.");
 }

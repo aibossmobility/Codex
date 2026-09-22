@@ -135,20 +135,17 @@ export default function DigitalTwinDemo() {
                     <button
                       type="button"
                       onClick={() => void playWelcomeWithSound()}
-                      className="flex min-h-16 items-center gap-3 rounded-full border border-[#f2c230]/70 bg-black/85 px-6 py-4 text-base font-extrabold text-[#f2c230] shadow-xl backdrop-blur-sm hover:bg-[#f2c230] hover:text-black"
-                      aria-label="Hear Brian say hello"
+                      className="flex h-16 w-16 items-center justify-center rounded-full border border-[#f2c230]/70 bg-black/80 text-[#f2c230] shadow-xl backdrop-blur-sm hover:bg-[#f2c230] hover:text-black"
+                      aria-label="Play video"
                     >
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2c230] text-black">
-                        <Play className="h-5 w-5 fill-current" />
-                      </span>
-                      Hear Brian Say Hello
+                      <Play className="h-7 w-7 fill-current" />
                     </button>
                   </div>
                 )}
                 {!videoFailed && welcomeSoundOn && (
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-xl bg-black/75 px-3 py-2 backdrop-blur-sm">
                     <span className="text-xs font-semibold text-white/75">
-                      Brian is speaking softly.
+                      Take your time.
                     </span>
                     <button
                       type="button"

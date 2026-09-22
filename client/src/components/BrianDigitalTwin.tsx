@@ -738,7 +738,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
           <div className="border-b border-white/10 bg-gradient-to-r from-brand-yellow/20 via-black to-primary/15 p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="h-12 w-12 rounded-full border border-brand-yellow/50 object-cover" />
+                <img src="/images/brian-digital-twin-real.png" alt="Brian Keith Hill" className="h-12 w-12 rounded-full border border-brand-yellow/50 object-cover" />
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-base font-extrabold text-white">Talk with Brian's Digital Twin</h2>
@@ -776,7 +776,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 {voiceBridgeReady && spokenReplies ? (
                   <div className="rounded-2xl border border-brand-yellow/25 bg-brand-yellow/[0.06] px-5 py-5 text-center">
                     <div className="relative mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full border-2 border-brand-yellow/55 bg-black shadow-[0_0_24px_rgba(250,204,21,0.16)]">
-                      <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
+                      <img src="/images/brian-digital-twin-real.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
 
                     </div>
                     <p className="font-extrabold text-white">
@@ -862,7 +862,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
         </section>
       ) : (
         <button type="button" onClick={() => setOpen(true)} className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
-          <img src="/images/brian-keith-hill.png" alt="" className="h-10 w-10 rounded-full border border-brand-yellow/45 object-cover" />
+          <img src="/images/brian-digital-twin-real.png" alt="" className="h-10 w-10 rounded-full border border-brand-yellow/45 object-cover" />
           <span><span className="block text-sm font-extrabold text-white">Talk with Brian's Twin</span><span className="block text-xs font-semibold text-white/55">No rush. Speak when you're ready.</span></span>
           <MessageCircle className="h-4 w-4 text-brand-yellow" />
         </button>

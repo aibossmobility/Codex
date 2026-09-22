@@ -114,7 +114,7 @@ export default function DigitalTwinDemo() {
                   <video
                     ref={videoRef}
                     src={HEYGEN_TWIN_PREVIEW}
-                    poster="/images/brian-keith-hill.png"
+                    poster="/images/brian-digital-twin-real.png"
                     className="h-full w-full object-cover"
                     playsInline
                     preload="metadata"
@@ -125,7 +125,7 @@ export default function DigitalTwinDemo() {
                   />
                 ) : (
                   <img
-                    src="/images/brian-keith-hill.png"
+                    src="/images/brian-digital-twin-real.png"
                     alt="Brian Keith Hill"
                     className="h-full w-full object-cover object-top"
                   />

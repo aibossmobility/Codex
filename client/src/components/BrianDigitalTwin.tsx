@@ -215,8 +215,8 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     audio.pause();
     audio.src = voiceUrl;
     audio.preload = "auto";
-    audio.volume = 0.82;
-    audio.playbackRate = 0.92;
+    audio.volume = 0.68;
+    audio.playbackRate = 0.84;
     audio.load();
     activeAudioRef.current = audio;
     setIsSpeaking(true);

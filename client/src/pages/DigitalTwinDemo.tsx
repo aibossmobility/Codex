@@ -35,7 +35,7 @@ export default function DigitalTwinDemo() {
       video.muted = false;
       video.loop = false;
       video.currentTime = 0;
-      video.playbackRate = 0.92;
+      video.playbackRate = 1;
       await video.play();
       setWelcomeSoundOn(true);
     } catch {
@@ -143,10 +143,7 @@ export default function DigitalTwinDemo() {
                   </div>
                 )}
                 {!videoFailed && welcomeSoundOn && (
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-xl bg-black/75 px-3 py-2 backdrop-blur-sm">
-                    <span className="text-xs font-semibold text-white/75">
-                      Take your time.
-                    </span>
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-end rounded-xl bg-black/55 px-3 py-2 backdrop-blur-sm">
                     <button
                       type="button"
                       onClick={() => {

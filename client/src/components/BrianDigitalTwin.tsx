@@ -73,8 +73,14 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
   const [voiceIssue, setVoiceIssue] = useState("");
   const [voiceBridgeReady, setVoiceBridgeReady] = useState(false);
   const [voiceBridgeProvider, setVoiceBridgeProvider] = useState("off");
+  const [mouthOpen, setMouthOpen] = useState(0);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeObjectUrlRef = useRef<string | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const analyserSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const mouthAnimationFrameRef = useRef<number | null>(null);
+  const mouthSmoothRef = useRef(0);
   const recognitionRef = useRef<any>(null);
   const conversationActiveRef = useRef(false);
   const loadingRef = useRef(false);
@@ -150,6 +156,68 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && window.innerWidth < 1100);
   }
 
+  function stopMouthAnimation() {
+    if (mouthAnimationFrameRef.current !== null) {
+      window.cancelAnimationFrame(mouthAnimationFrameRef.current);
+      mouthAnimationFrameRef.current = null;
+    }
+    mouthSmoothRef.current = 0;
+    setMouthOpen(0);
+  }
+
+  function ensureLipSyncAudio(audio: HTMLAudioElement) {
+    try {
+      const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextCtor) return;
+      let context = audioContextRef.current;
+      if (!context) {
+        context = new AudioContextCtor();
+        audioContextRef.current = context;
+      }
+      if (!analyserSourceRef.current) {
+        const analyser = context.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.7;
+        const source = context.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(context.destination);
+        analyserSourceRef.current = source;
+        analyserRef.current = analyser;
+      }
+      if (context.state === "suspended") void context.resume();
+    } catch {
+      // The portrait animation is optional; audio playback must continue even
+      // when a browser does not permit Web Audio analysis.
+    }
+  }
+
+  function startMouthAnimation(audio: HTMLAudioElement) {
+    stopMouthAnimation();
+    const analyser = analyserRef.current;
+    if (!analyser) return;
+    const samples = new Uint8Array(analyser.fftSize);
+    let frame = 0;
+    const tick = () => {
+      if (audio.paused || audio.ended || activeAudioRef.current !== audio) {
+        stopMouthAnimation();
+        return;
+      }
+      analyser.getByteTimeDomainData(samples);
+      let sum = 0;
+      for (let i = 0; i < samples.length; i += 1) {
+        const value = (samples[i] - 128) / 128;
+        sum += value * value;
+      }
+      const rms = Math.sqrt(sum / samples.length);
+      const target = Math.max(0, Math.min(1, (rms - 0.015) * 10));
+      mouthSmoothRef.current += (target - mouthSmoothRef.current) * 0.38;
+      frame += 1;
+      if (frame % 2 === 0) setMouthOpen(mouthSmoothRef.current);
+      mouthAnimationFrameRef.current = window.requestAnimationFrame(tick);
+    };
+    mouthAnimationFrameRef.current = window.requestAnimationFrame(tick);
+  }
+
   function unlockMobileAudio() {
     if (!isMobileVoiceDevice()) return;
     try {
@@ -160,6 +228,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
         audio.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
         unlockedAudioRef.current = audio;
       }
+      ensureLipSyncAudio(audio);
       audio.volume = 0.01;
       void audio.play().then(() => {
         audio?.pause();
@@ -200,6 +269,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
   function stopSpeaking() {
     recognitionPausedForPlaybackRef.current = false;
+    stopMouthAnimation();
     window.speechSynthesis?.cancel();
     const current = activeAudioRef.current;
     if (current) {
@@ -249,7 +319,13 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
     // the brand-new URL before the browser can play it.
     activeObjectUrlRef.current = voiceUrl;
 
-    const audio = isMobileVoiceDevice() && unlockedAudioRef.current ? unlockedAudioRef.current : new Audio();
+    let audio = unlockedAudioRef.current;
+    if (!audio) {
+      audio = new Audio();
+      audio.preload = "auto";
+      unlockedAudioRef.current = audio;
+    }
+    ensureLipSyncAudio(audio);
     audio.pause();
     audio.src = voiceUrl;
     audio.preload = "auto";
@@ -280,7 +356,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
     audio.onended = finish;
     audio.onerror = fallback;
-    void audio.play().catch(fallback);
+    void audio.play().then(() => startMouthAnimation(audio)).catch(fallback);
   }
 
   useEffect(() => {
@@ -647,8 +723,35 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
               <div className="max-h-[300px] space-y-3 overflow-y-auto p-4">
                 {voiceBridgeReady && spokenReplies ? (
                   <div className="rounded-2xl border border-brand-yellow/25 bg-brand-yellow/[0.06] px-5 py-5 text-center">
-                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-brand-yellow/50 text-brand-yellow">
-                      {isSpeaking ? <Volume2 className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                    <div className="relative mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full border-2 border-brand-yellow/55 bg-black shadow-[0_0_24px_rgba(250,204,21,0.16)]">
+                      <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="absolute inset-0 h-full w-full object-cover" />
+                      <div
+                        aria-hidden="true"
+                        className="absolute left-[31%] top-[56%] h-[20%] w-[38%] overflow-hidden"
+                        style={{
+                          transform: `translateY(${mouthOpen * 1.8}px) scaleY(${1 + mouthOpen * 0.24})`,
+                          transformOrigin: "50% 18%",
+                        }}
+                      >
+                        <img
+                          src="/images/brian-keith-hill.png"
+                          alt=""
+                          className="absolute max-w-none"
+                          style={{
+                            width: "263.16%",
+                            height: "500%",
+                            left: "-81.58%",
+                            top: "-280%",
+                          }}
+                        />
+                      </div>
+                      {isSpeaking && (
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-x-[17%] bottom-[4%] h-1 rounded-full bg-brand-yellow/70 transition-transform"
+                          style={{ transform: `scaleX(${0.25 + mouthOpen * 0.75})` }}
+                        />
+                      )}
                     </div>
                     <p className="font-extrabold text-white">
                       {isSpeaking ? "Brian is speaking" : loading ? "Brian is thinking" : listening ? "Brian is listening" : "Voice conversation ready"}

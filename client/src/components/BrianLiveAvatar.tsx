@@ -4,9 +4,11 @@ import {
   SessionEvent,
   SessionState,
 } from "@heygen/liveavatar-web-sdk";
-import { Mic, Send, Square, Video } from "lucide-react";
+import { Mic, Send, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+
+const GREEN_SWEATER_PREVIEW = "/videos/papa-life-gold-master.mp4";
 
 type LiveState = "idle" | "connecting" | "live" | "ended" | "error";
 
@@ -22,6 +24,13 @@ export function BrianLiveAvatar() {
   const [sandbox, setSandbox] = useState(false);
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.src = GREEN_SWEATER_PREVIEW;
+      video.muted = true;
+      video.loop = true;
+      void video.play().catch(() => undefined);
+    }
     return () => {
       void sessionRef.current?.stop().catch(() => undefined);
       sessionRef.current = null;
@@ -54,7 +63,11 @@ export function BrianLiveAvatar() {
       sessionRef.current = session;
 
       session.on(SessionEvent.SESSION_STREAM_READY, () => {
-        if (videoRef.current) session.attach(videoRef.current);
+        if (videoRef.current) {
+          videoRef.current.muted = false;
+          videoRef.current.loop = false;
+          session.attach(videoRef.current);
+        }
         setState("live");
         setStatusText("Live — speak naturally with Brian");
       });
@@ -79,7 +92,14 @@ export function BrianLiveAvatar() {
       });
       session.on(SessionEvent.SESSION_DISCONNECTED, () => {
         sessionRef.current = null;
-        if (videoRef.current) videoRef.current.srcObject = null;
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = null;
+          video.src = GREEN_SWEATER_PREVIEW;
+          video.muted = true;
+          video.loop = true;
+          void video.play().catch(() => undefined);
+        }
         setState("ended");
         setStatusText("Conversation ended");
       });
@@ -102,7 +122,14 @@ export function BrianLiveAvatar() {
       } catch {
       }
     }
-    if (videoRef.current) videoRef.current.srcObject = null;
+    const video = videoRef.current;
+    if (video) {
+      video.srcObject = null;
+      video.src = GREEN_SWEATER_PREVIEW;
+      video.muted = true;
+      video.loop = true;
+      void video.play().catch(() => undefined);
+    }
     setState("ended");
     setStatusText("Conversation ended");
   }
@@ -124,29 +151,29 @@ export function BrianLiveAvatar() {
       <div className="relative aspect-video bg-black">
         <video
           ref={videoRef}
+          src={GREEN_SWEATER_PREVIEW}
           autoPlay
+          muted={!isLive}
+          loop={!isLive}
           playsInline
           className="h-full w-full bg-black object-cover"
           aria-label="Live video of Brian Keith Hill's Papa Life Digital Twin"
         />
         {!isLive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#07100b] px-6 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#f2c230]/55 bg-black/60">
-              <Video className="h-7 w-7 text-[#f2c230]" />
-            </div>
-            <div>
-              <p className="font-extrabold text-white">Brian appears here as live video</p>
-              <p className="mt-1 max-w-md text-sm leading-relaxed text-white/60">
-                Start the conversation to connect the real-time avatar, microphone, and Brian Keith Hill voice.
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black via-black/70 to-transparent px-4 pb-4 pt-14">
+            <div className="min-w-0">
+              <p className="font-extrabold text-white">Brian Keith Hill — ready to talk</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/65">
+                Green-sweater Brian stays moving while the live conversation connects.
               </p>
             </div>
             <button
               type="button"
               onClick={() => void startConversation()}
               disabled={isBusy}
-              className="inline-flex min-h-12 items-center rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white disabled:opacity-60"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#f2c230] px-5 font-extrabold text-black hover:bg-white disabled:opacity-60"
             >
-              <Mic className="mr-2 h-5 w-5" />
+              <Mic className="mr-2 h-4 w-4" />
               {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
             </button>
           </div>

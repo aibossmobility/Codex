@@ -138,6 +138,7 @@ import {
   papaAssessmentQuestions,
 } from "./papa-ai-engine";
 import { getPapaVoiceBridgeStatus, synthesizePapaVoice } from "./papa-voice-bridge";
+import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -3098,6 +3099,7 @@ async function startServer() {
 
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
+  registerPapaLiveAvatarRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);
 

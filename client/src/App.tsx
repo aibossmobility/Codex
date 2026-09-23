@@ -154,14 +154,7 @@ function GlobalPapaAiWidget() {
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
   if (shouldHide) return null;
 
-  if (path === "/digital-twin") {
-    return (
-      <BrianDigitalTwin
-        autoOpen={false}
-        className="md:left-4 md:right-auto md:max-w-[340px] xl:left-auto xl:right-4 xl:max-w-[460px]"
-      />
-    );
-  }
+  if (path === "/digital-twin") return null;
 
   return <BrianDigitalTwin autoOpen={path === "/"} />;
 }

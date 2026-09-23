@@ -57,7 +57,7 @@ type LeadContact = {
 };
 
 const PAPA_LIFE_VOICE_AGENT_URL = "/papa-agent.html";
-const papaPillars: PapaPillar[] = ["Purpose", "Authority", "Presence", "Alignment"];
+const papaPillars: PapaPillar[] = ["Presence", "Authority", "Purpose", "Alignment"];
 const SMS_CONSENT_TEXT =
   "By submitting this form, you agree to receive text messages from Papa Life regarding coaching appointments, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";
 
@@ -97,7 +97,7 @@ const localResources: ResourceItem[] = [
     title: "The PAPA Framework Guide",
     type: "Worksheet",
     pillar: "General",
-    description: "Start with Purpose, Authority, Presence, and Alignment.",
+    description: "Start with Presence, Authority, Purpose, and Alignment.",
     path: "/papa-framework",
   },
   {
@@ -393,7 +393,7 @@ function ChatMode({
       content:
         mode === "resource"
           ? "Tell me what you are facing, and I will point you to the best Papa Life resources."
-          : "Welcome to the Papa Life AI Coach. I help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment. What's weighing on your heart today?",
+          : "Welcome to the Papa Life AI Coach. I help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment. What's weighing on your heart today?",
     },
   ]);
   const [resources, setResources] = useState<ResourceItem[]>([]);

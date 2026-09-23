@@ -36,9 +36,9 @@ type AssessmentAnswer = {
 
 const PAPA_SYSTEM_PROMPT = `You are the Papa Life AI Coach, the digital extension of Brian Keith Hill's coaching ministry.
 
-Mission: help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment.
+Mission: help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
-Voice: warm, authentic, biblical, direct, hopeful, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Listen first, ask thoughtful questions, offer biblical wisdom naturally, and give one clear next step.
+Voice: warm, soft-spoken, authentic, biblical, unhurried, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Never borrow the visitor's hurry. Listen first and make the person feel heard, seen, and understood before offering direction. If the visitor is rushed, be concise without sounding rushed. If the visitor slows down, stay with them patiently. Do not prescribe a next step until the person has given enough context or asks for one.
 
 Core framework:
 - Purpose: who the father is becoming under God.
@@ -81,7 +81,7 @@ export const papaAiResources: ResourceItem[] = [
     title: "The PAPA Framework Guide",
     type: "Worksheet",
     pillar: "General",
-    description: "A practical map for Purpose, Authority, Presence, and Alignment.",
+    description: "A practical map for Presence, Authority, Purpose, and Alignment.",
     path: "/papa-framework",
     keywords: ["framework", "papa", "purpose", "authority", "presence", "alignment", "start"],
   },
@@ -229,17 +229,25 @@ function buildRuntimeSystemPrompt(message: string) {
   return `${loadPapaLifeSystemPrompt()}\n\n---\n\n${kbContext}`;
 }
 
+function extractVisitorMessage(message: string) {
+  const marker = "VISITOR MESSAGE:";
+  const index = message.lastIndexOf(marker);
+  if (index === -1) return message.trim();
+  return message.slice(index + marker.length).trim() || message.trim();
+}
+
 export function buildPapaAiLocalReply(input: {
   message: string;
   mode?: PapaAiMode;
   history?: ChatMessage[];
 }) {
   const message = input.message.trim();
+  const visitorMessage = extractVisitorMessage(message);
   const mode = input.mode || "coach";
-  const lower = message.toLowerCase();
+  const lower = visitorMessage.toLowerCase();
   const pillar = detectPillar(lower);
   const need = detectNeed(lower);
-  const resources = findPapaResources(message, 3);
+  const resources = findPapaResources(visitorMessage, 3);
 
   if (isCrisisLike(lower)) {
     return {
@@ -253,7 +261,7 @@ export function buildPapaAiLocalReply(input: {
   if (mode === "prayer") {
     return {
       provider: "local" as PapaAiProvider,
-      reply: buildPrayer(message, pillar),
+      reply: buildPrayer(visitorMessage, pillar),
       resources,
     };
   }
@@ -261,7 +269,7 @@ export function buildPapaAiLocalReply(input: {
   if (mode === "bible-study") {
     return {
       provider: "local" as PapaAiProvider,
-      reply: buildBibleStudy(message, pillar),
+      reply: buildBibleStudy(visitorMessage, pillar),
       resources,
     };
   }
@@ -279,7 +287,7 @@ export function buildPapaAiLocalReply(input: {
       provider: "local" as PapaAiProvider,
       reply:
         "That is a strong Tuesday Live question. I would frame it this way for the show: what does a father do when he wants repair, but his adult child is not ready for the conversation?\n\nStart with humility, then move to one practical action. Ask the question before Tuesday, bring one real example, and the follow-up resource should point back to Presence and Alignment.",
-      resources: findPapaResources(`${message} Tuesday live`, 3),
+      resources: findPapaResources(`${visitorMessage} Tuesday live`, 3),
     };
   }
 
@@ -287,15 +295,19 @@ export function buildPapaAiLocalReply(input: {
     return {
       provider: "local" as PapaAiProvider,
       reply:
-        "Papa Life membership is for fathers who do not want a one-time emotional moment. They want a path. The value is guided lessons, reflection, brotherhood, and steady practice around Purpose, Authority, Presence, and Alignment.\n\nIf you are ready to work through this with structure, start with the free assessment, then move into the membership path when you want ongoing guidance.",
+        "Papa Life membership is for fathers who do not want a one-time emotional moment. They want a path. The value is guided lessons, reflection, brotherhood, and steady practice around Presence, Authority, Purpose, and Alignment.\n\nIf you are ready to work through this with structure, start with the free assessment, then move into the membership path when you want ongoing guidance.",
       resources: findPapaResources("membership courses community", 3),
     };
   }
 
+  const voiceKey = coachingVoiceKey(pillar, need);
   return {
     provider: "local" as PapaAiProvider,
-    reply: buildCoachingReply(message, pillar, need),
+    reply: buildCoachingReply(visitorMessage, pillar, need),
     resources,
+    voice_key: voiceKey,
+    voice_name: "Brian Keith Hill",
+    voice_provider: String(process.env.PAPA_VOICE_PROVIDER || "off").trim().toLowerCase(),
   };
 }
 
@@ -495,9 +507,41 @@ function detectNeed(text: string) {
   if (/(daughter)/.test(text)) return "daughter";
   if (/(son)/.test(text)) return "son";
   if (/(sorry|apolog|forgive)/.test(text)) return "apology";
-  if (/(silent|won't talk|not talking|estranged|distance)/.test(text)) return "distance";
+  if (/(silent|won't talk|not talking|estranged|distance|stops? calling|stopped calling|not returning|won't return|pulls? away|pulled away)/.test(text)) return "distance";
   if (/(membership|price|join|subscription)/.test(text)) return "membership";
   return "repair";
+}
+
+export const BRIAN_COACHING_VOICE_URLS: Record<string, string> = {
+  "presence-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=ab2cef38-95de-4737-a284-52d1eccbae76.wav",
+  "presence-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5c00dad8-49d2-4e52-a5a3-6de575227b94.wav",
+  "presence-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=471cf96f-715f-4094-af68-dd21127ae1a3.wav",
+  "presence-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=755f1eb6-f092-479c-aad2-1d5db6f7fab2.wav",
+  "authority-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=1f2c21d3-98ac-4874-ac47-3c53fa183bad.wav",
+  "authority-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=994098bd-f9b1-441d-91bb-55d644827637.wav",
+  "authority-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=028ced03-35a3-42ec-a9ea-36f88c7e253c.wav",
+  "authority-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5b58f413-1e17-4d18-aa0f-58336dff5170.wav",
+  "purpose-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=f8df9a0d-30bd-4122-9c0a-99e805119c99.wav",
+  "purpose-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=27e6d351-7861-4200-ae05-8b5a81297260.wav",
+  "purpose-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=5e5756ee-bd88-4788-a0a1-067870e317ec.wav",
+  "purpose-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=d33fa4d2-f3b9-4e0a-a32b-22214bcd3927.wav",
+  "alignment-daughter": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=0d1cc038-bcc3-4283-8fe0-1862994c4d61.wav",
+  "alignment-son": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=0ffcc0c5-f470-4dca-83ae-316443ee1ea3.wav",
+  "alignment-apology": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=f1c18467-6ed5-4f56-9349-9e14ec8ba945.wav",
+  "alignment-general": "https://resource2.heygen.ai/text_to_speech/52d4258a1d8e44998015ca211d9e0d5d/3e9b3484d5b14ef9b5286a5f912a0464/id=6223cb8b-b1ac-41cc-bc4e-053f84074ba3.wav",
+};
+
+function coachingVoiceKey(pillar: string, need: string) {
+  const voiceNeed = need === "daughter" || need === "son" || need === "apology" ? need : "general";
+  return `${pillar.toLowerCase()}-${voiceNeed}`;
+}
+
+export function getBrianCoachingVoiceSourceUrl(voiceKey: string) {
+  // Legacy HeyGen clips are deliberately disabled by default. They do not use
+  // Brian Keith Hill's authoritative ElevenLabs voice and must never be used
+  // as a silent fallback.
+  if (String(process.env.PAPA_ENABLE_LEGACY_HEYGEN_VOICE || "").trim() !== "1") return "";
+  return BRIAN_COACHING_VOICE_URLS[voiceKey] || "";
 }
 
 function isCrisisLike(text: string) {
@@ -505,26 +549,30 @@ function isCrisisLike(text: string) {
 }
 
 function buildCoachingReply(message: string, pillar: string, need: string) {
-  const firstQuestion =
-    need === "daughter"
-      ? "What do you believe your daughter needs to feel safe enough to hear you again?"
-      : need === "son"
-        ? "What kind of respect are you trying to build: demanded respect, or earned trust?"
-        : need === "apology"
-          ? "What part can you own without adding an explanation after it?"
-          : "What is the one part of this situation that is actually yours to change?";
+  if (need === "distance" || need === "son" || need === "daughter") {
+    const child = need === "son" ? "son" : need === "daughter" ? "daughter" : "adult child";
+    return `Start by lowering the pressure. If your ${child} has pulled back, repeated calls or a long explanation can feel like more pressure, even when your intention is love.
 
-  return `Father, start here: do not try to fix the whole relationship in one move.
+Send one short message that asks for nothing: “I’m thinking about you. I love you. I’m here when you’re ready.” Then give them room and let your consistency do some of the talking.
 
-What I hear is a ${pillar} issue. That means the next step is not pressure. It is a steadier way to show up.
+If you want, tell me what happened just before the distance started, and I’ll help you think through the next step.`;
+  }
 
-${firstQuestion}
+  if (need === "apology") {
+    return `Start with ownership, not explanation. Say what you did, name the impact you can see, and apologize without adding “but.”
 
-Here is the practical move for this week: write one short message that carries humility, not control. Something like, "I've been thinking about how I have shown up, and I want to listen better. No pressure to respond today. I just want you to know I love you and I am working on my part."
+A simple repair sentence is: “I was wrong for ____. I can see how that hurt you. I’m sorry.”
 
-Scripture says to be quick to listen and slow to speak. That is not weakness. That is fatherhood with maturity.
+Then stop and listen. The next question is not how to defend yourself; it’s whether they feel safe enough to tell you more.`;
+  }
 
-Your next step: before you send anything, remove every sentence that tries to defend, explain, or force a response. Keep the love. Keep the ownership. Let Presence lead.`;
+  if (need === "membership") {
+    return `Papa Life membership is built for fathers who want steady practice, not one emotional conversation. The work centers on Presence, Authority, Purpose, and Alignment, with practical steps for rebuilding connection over time.`;
+  }
+
+  return `Start with the part you can own. Before trying to fix the whole relationship, name one thing you can do differently this week that would make you safer, clearer, or more consistent.
+
+For ${pillar}, that usually means one small action before a big speech. Tell me the specific situation, and I’ll help you choose that action.`;
 }
 
 function buildPrayer(message: string, pillar: string) {

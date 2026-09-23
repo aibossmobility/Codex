@@ -1,0 +1,35 @@
+name: Import quiet invitation video
+
+on:
+  push:
+    branches:
+      - feature/oct3-digital-twin
+    paths:
+      - .github/workflows/import-quiet-invitation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download quiet invitation
+        env:
+          VIDEO_URL: "https://files2.heygen.ai/aws_pacific/avatar_tmp/52d4258a1d8e44998015ca211d9e0d5d/288e3b3ca7ab611c049dd6b3c008b1ff.mp4?Expires=1790642836&Signature=ljmM84Go61yS-Z~pt9D0HiDwXDCCXqsPKiQj60VqdrkNtiospzHgEKTdE4~h7Q6NmIOXaJDuTeJbwNxlf5MO~BcmXwYjHwiFKDs8SNcVRiFzahCOiX30BjydVOh1W6URuB9Lk31y56Dy63dxsBUc4NGif1aVy3wY9acdBzrlWFDw1dKAPETc0vDmPUsGJY~YHGOWsfENJ6Lb2asccjfX~6FF4vG97PsvD7UA2EsMtgZzINVLA~ORopx1YR9~qfrAQIh5Rqcs0GsWYfYrZMrQVQ2KqzunkAZ60rU8Gw5~297aEI-A6s7qGuEtz4ByzncRov9-BXteG-7a5Iw3Gf9d9Q__&Key-Pair-Id=K38HBHX5LX3X2H"
+        run: |
+          curl --fail --location "$VIDEO_URL" --output client/public/videos/papa-life-gold-master.mp4
+          test -s client/public/videos/papa-life-gold-master.mp4
+
+      - name: Commit short quiet invitation
+        run: |
+          git config user.name "Papa Life Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add client/public/videos/papa-life-gold-master.mp4
+          git commit -m "Replace long intro with quiet visitor-paced invitation" || exit 0
+          git push

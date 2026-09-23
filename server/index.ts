@@ -133,9 +133,12 @@ import {
   buildAssessmentReport,
   buildPapaAiReply,
   findPapaResources,
+  getBrianCoachingVoiceSourceUrl,
   getPapaAiStatus,
   papaAssessmentQuestions,
 } from "./papa-ai-engine";
+import { getPapaVoiceBridgeStatus, synthesizePapaVoice } from "./papa-voice-bridge";
+import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -2138,7 +2141,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
   "media-src 'self' blob: data:",
   "frame-src 'self' https://meetn.com",
   "object-src 'none'",
@@ -2244,6 +2247,35 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       },
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
+  },
+  "/digital-twin": {
+    title: "Meet Brian's Digital Twin | Papa Life",
+    description:
+      "Meet Brian Keith Hill's Papa Life digital twin, a relationship-aware AI guide for fathers of adult children grounded in the Presence, Authority, Purpose, and Alignment framework.",
+    keywords: "Brian Keith Hill digital twin, Papa Life, fathers of adult children, PAPA Framework, fatherhood AI",
+    eyebrow: "Papa Life Digital Twin",
+    headline: "Meet Brian's Papa Life Digital Twin.",
+    intro:
+      "This presentation experience combines Brian Keith Hill's approved Papa Life knowledge, completed HeyGen visual twin, and a relationship-aware conversation layer designed to keep human connection at the center.",
+    sections: [
+      {
+        heading: "Presence first",
+        body:
+          "The PAPA Framework begins with Presence, then Authority, Purpose, and Alignment. The twin listens before trying to teach, fix, direct, or persuade.",
+      },
+      {
+        heading: "Talk or type",
+        body:
+          "Visitors can use the live conversation by text and, on supported browsers, microphone input with spoken browser replies without another paid voice service.",
+      },
+      {
+        heading: "Human relationship stays central",
+        body:
+          "The twin can guide fathers toward the 2-Minute Fatherhood Check-In, Papa Life resources, or direct connection with Brian when a human conversation matters most.",
+      },
+    ],
+    cta: { label: "Meet Brian's Digital Twin", href: "/digital-twin" },
+    noindex: true,
   },
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
@@ -3131,6 +3163,7 @@ async function startServer() {
 
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
+  registerPapaLiveAvatarRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);
 
@@ -5367,6 +5400,36 @@ async function startServer() {
     res.json({ ok: true, resources });
   });
 
+  app.get(["/api/papa-ai/voice/bridge-status", "/api/ai/voice/bridge-status"], (_req, res) => {
+    try {
+      res.json(getPapaVoiceBridgeStatus());
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        error: error instanceof Error ? error.message : "Voice bridge status unavailable.",
+      });
+    }
+  });
+
+  app.post(["/api/papa-ai/voice/synthesize", "/api/ai/voice/synthesize"], async (req, res) => {
+    const text = cleanPublicText(req.body?.text, 4000);
+    if (!text) return res.status(400).json({ ok: false, error: "Text is required" });
+
+    try {
+      const result = await synthesizePapaVoice(text);
+      res.setHeader("Content-Type", result.contentType);
+      res.setHeader("Cache-Control", "private, max-age=3600");
+      res.setHeader("X-Papa-Voice-Provider", result.provider);
+      res.setHeader("X-Papa-Voice-Name", "Brian Keith Hill");
+      return res.send(result.audio);
+    } catch (error) {
+      return res.status(503).json({
+        ok: false,
+        error: error instanceof Error ? error.message : "Brian Keith Hill voice is unavailable.",
+      });
+    }
+  });
+
   app.get(["/api/papa-ai/voice/signed-url", "/api/ai/voice/signed-url"], async (req, res) => {
     if (!ELEVENLABS_API_KEY) {
       return res.status(503).json({
@@ -5419,6 +5482,35 @@ async function startServer() {
         ok: false,
         error: error instanceof Error ? error.message : "Voice coach could not start right now.",
       });
+    }
+  });
+
+  app.get(["/api/papa-ai/voice/clip/:voiceKey", "/api/ai/voice/clip/:voiceKey"], async (req, res) => {
+    const voiceKey = cleanPublicText(req.params.voiceKey, 80);
+    const sourceUrl = getBrianCoachingVoiceSourceUrl(voiceKey);
+    if (!sourceUrl) {
+      return res.status(404).json({ ok: false, error: "Brian voice clip not found" });
+    }
+
+    try {
+      const upstream = await fetch(sourceUrl, {
+        headers: {
+          "User-Agent": "PapaLifeDigitalTwin/1.0",
+          Accept: "audio/wav,audio/*;q=0.9,*/*;q=0.1",
+        },
+      });
+      if (!upstream.ok) {
+        console.error("[papa-ai] Brian voice upstream failed", { voiceKey, status: upstream.status });
+        return res.status(502).json({ ok: false, error: "Brian voice clip unavailable" });
+      }
+      const audio = Buffer.from(await upstream.arrayBuffer());
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || "audio/wav");
+      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+      res.setHeader("Content-Length", String(audio.length));
+      return res.send(audio);
+    } catch (error) {
+      console.error("[papa-ai] Brian voice proxy failed", { voiceKey, error });
+      return res.status(502).json({ ok: false, error: "Brian voice clip unavailable" });
     }
   });
 

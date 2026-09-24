@@ -20,16 +20,39 @@ export function BrianLiveAvatar() {
   const [brianText, setBrianText] = useState("");
   const [typedMessage, setTypedMessage] = useState("");
   const [sandbox, setSandbox] = useState(false);
+  const [avatarReady, setAvatarReady] = useState(false);
+  const [availabilityChecked, setAvailabilityChecked] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/liveavatar/status")
+      .then(async (response) => {
+        const data = await response.json();
+        if (cancelled) return;
+        const isSandbox = Boolean(data?.sandbox);
+        setSandbox(isSandbox);
+        setAvatarReady(Boolean(response.ok && data?.configured && !isSandbox));
+        setAvailabilityChecked(true);
+        if (isSandbox) {
+          setStatusText("Brian's custom green-sweater live video is being activated");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAvatarReady(false);
+          setAvailabilityChecked(true);
+          setStatusText("Brian's custom live video is not available yet");
+        }
+      });
     return () => {
+      cancelled = true;
       void sessionRef.current?.stop().catch(() => undefined);
       sessionRef.current = null;
     };
   }, []);
 
   async function startConversation() {
-    if (state === "connecting" || state === "live") return;
+    if (!avatarReady || sandbox || state === "connecting" || state === "live") return;
     setState("connecting");
     setStatusText("Connecting Brian's live video…");
     setError("");
@@ -135,20 +158,28 @@ export function BrianLiveAvatar() {
               <Video className="h-7 w-7 text-[#f2c230]" />
             </div>
             <div>
-              <p className="font-extrabold text-white">Brian appears here as live video</p>
+              <p className="font-extrabold text-white">
+                {avatarReady ? "Brian appears here as live video" : "Brian's green-sweater live twin"}
+              </p>
               <p className="mt-1 max-w-md text-sm leading-relaxed text-white/60">
-                Start the conversation to connect the real-time avatar, microphone, and Brian Keith Hill voice.
+                {!availabilityChecked
+                  ? "Checking the live Brian avatar…"
+                  : avatarReady
+                    ? "Start the conversation to connect Brian's real-time avatar, microphone, and Brian Keith Hill voice."
+                    : "The stock test avatar is disabled. This space will only activate when Brian's custom green-sweater LiveAvatar is connected."}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => void startConversation()}
-              disabled={isBusy}
-              className="inline-flex min-h-12 items-center rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white disabled:opacity-60"
-            >
-              <Mic className="mr-2 h-5 w-5" />
-              {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
-            </button>
+            {avatarReady && (
+              <button
+                type="button"
+                onClick={() => void startConversation()}
+                disabled={isBusy}
+                className="inline-flex min-h-12 items-center rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white disabled:opacity-60"
+              >
+                <Mic className="mr-2 h-5 w-5" />
+                {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
+              </button>
+            )}
           </div>
         )}
         {isLive && (
@@ -173,7 +204,7 @@ export function BrianLiveAvatar() {
 
         {sandbox && (
           <p className="mt-2 text-xs text-[#f2c230]/85">
-            LiveAvatar sandbox test — the conversation/voice pipeline is live; the custom green-sweater Brian avatar replaces this test avatar after activation.
+            The stock LiveAvatar test character is disabled. Only Brian's custom green-sweater live twin will be shown publicly.
           </p>
         )}
 

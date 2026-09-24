@@ -118,7 +118,7 @@ export default function DigitalTwinDemo() {
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   The conversation can guide a father toward a practical next step without pressure.
                 </p>
-                <a href="/assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                <a href="https://papalifecoach.com/assessment" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Start the Check-In
                 </a>
               </div>
@@ -129,7 +129,7 @@ export default function DigitalTwinDemo() {
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   When a conversation needs Brian personally, the twin routes back to the human relationship.
                 </p>
-                <a href="/booking" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                <a href="https://papalifecoach.com/booking" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Talk with Brian
                 </a>
               </div>
@@ -147,15 +147,15 @@ export default function DigitalTwinDemo() {
               <h2 className="text-xl font-extrabold">Explore Papa Life together</h2>
               <p className="mt-2 text-sm text-white/65">Ask the AI to help you choose a next step, then open the resource that fits. Members sign in for course materials.</p>
               <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
-                <a href="/my-journey" className="text-[#f2c230] underline">Fatherhood Check-In</a>
-                <a href="/papa-framework" className="text-[#f2c230] underline">PAPA Framework</a>
-                <a href="/courses" className="text-[#f2c230] underline">Courses and lessons</a>
-                <a href="/tuesday-live" className="text-[#f2c230] underline">Tuesday Live</a>
-                <a href="/resources" className="text-[#f2c230] underline">Resources</a>
-                <a href="/books" className="text-[#f2c230] underline">Books</a>
-                <a href="/podcast" className="text-[#f2c230] underline">Audio and podcast</a>
-                <a href="/membership" className="text-[#f2c230] underline">Membership</a>
-                <a href="/booking" className="text-[#f2c230] underline">Talk with Brian</a>
+                <a href="https://papalifecoach.com/my-journey" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Fatherhood Check-In</a>
+                <a href="https://papalifecoach.com/papa-framework" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">PAPA Framework</a>
+                <a href="https://papalifecoach.com/courses" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Courses and lessons</a>
+                <a href="https://papalifecoach.com/tuesday-live" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Tuesday Live</a>
+                <a href="https://papalifecoach.com/resources" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Resources</a>
+                <a href="https://papalifecoach.com/books" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Books</a>
+                <a href="https://papalifecoach.com/podcast" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Audio and podcast</a>
+                <a href="https://papalifecoach.com/membership" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Membership</a>
+                <a href="https://papalifecoach.com/booking" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Talk with Brian</a>
               </div>
             </div>
 

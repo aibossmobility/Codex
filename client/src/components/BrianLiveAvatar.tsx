@@ -13,11 +13,13 @@ type LiveState = "idle" | "connecting" | "live" | "ended" | "error";
 type BrianLiveAvatarProps = {
   posterSrc?: string;
   posterAlt?: string;
+  fallbackVideoSrc?: string;
 };
 
 export function BrianLiveAvatar({
   posterSrc = "/images/brian-green-sweater-live.jpg",
   posterAlt = "Brian Keith Hill",
+  fallbackVideoSrc = "/media/brian-green-sweater-web.m4v",
 }: BrianLiveAvatarProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sessionRef = useRef<ElevenLabsAgentSession | null>(null);
@@ -140,9 +142,15 @@ export function BrianLiveAvatar({
 
         {(!isLive || sandbox) && (
           <div className="absolute inset-0">
-            <img
-              src={posterSrc}
-              alt={posterAlt}
+            <video
+              src={fallbackVideoSrc}
+              poster={posterSrc}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={posterAlt}
               className="h-full w-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-black/10" />

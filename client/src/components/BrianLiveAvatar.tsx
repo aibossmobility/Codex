@@ -153,11 +153,16 @@ export function BrianLiveAvatar() {
           aria-label="Live video of Brian Keith Hill's Papa Life Digital Twin"
         />
         {!isLive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#07100b] px-6 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#f2c230]/55 bg-black/60">
-              <Video className="h-7 w-7 text-[#f2c230]" />
-            </div>
-            <div>
+          <div className="absolute inset-0 bg-[#07100b]">
+            <img
+              data-nonlive-poster="brian-green-sweater"
+              src="/images/brian-digital-twin-real.png"
+              alt="Brian Keith Hill wearing his green Papa Life sweater"
+              className="h-full w-full object-cover object-top opacity-95"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-6 pb-6 text-center">
+              <div>
               <p className="font-extrabold text-white">
                 {avatarReady ? "Brian appears here as live video" : "Brian's green-sweater live twin"}
               </p>
@@ -168,7 +173,7 @@ export function BrianLiveAvatar() {
                     ? "Start the conversation to connect Brian's real-time avatar, microphone, and Brian Keith Hill voice."
                     : "The stock test avatar is disabled. This space will only activate when Brian's custom green-sweater LiveAvatar is connected."}
               </p>
-            </div>
+              </div>
             {avatarReady && (
               <button
                 type="button"
@@ -180,6 +185,7 @@ export function BrianLiveAvatar() {
                 {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
               </button>
             )}
+            </div>
           </div>
         )}
         {isLive && (

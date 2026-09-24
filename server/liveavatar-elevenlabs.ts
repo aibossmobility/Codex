@@ -1,8 +1,9 @@
 import type { Express } from "express";
 
 const LIVEAVATAR_BASE_URL = "https://api.liveavatar.com";
-const DEFAULT_SANDBOX_AVATAR_ID = "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a";
-const DEFAULT_PAPA_AGENT_ID = "F1Xz9oYC1pQFzumJSRHg";
+const DEFAULT_PAPA_AVATAR_ID = "86644f89aefc498b87f413307497f3e0";
+const SANDBOX_AVATAR_ID = "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a";
+const DEFAULT_PAPA_AGENT_ID = "agent_7601kt209ptbe0qrd9b3e4gezyv6";
 const DEFAULT_SECRET_NAME = "Papa Life ElevenLabs Agent Key";
 
 function env(name: string, fallback = "") {
@@ -10,7 +11,7 @@ function env(name: string, fallback = "") {
 }
 
 function isSandbox() {
-  return env("LIVEAVATAR_SANDBOX", "1") !== "0";
+  return env("LIVEAVATAR_SANDBOX", "0") !== "0";
 }
 
 function liveAvatarApiKey() {
@@ -18,7 +19,7 @@ function liveAvatarApiKey() {
 }
 
 function avatarId() {
-  return env("LIVEAVATAR_AVATAR_ID", DEFAULT_SANDBOX_AVATAR_ID);
+  return env("LIVEAVATAR_AVATAR_ID", DEFAULT_PAPA_AVATAR_ID);
 }
 
 function papaAgentId() {
@@ -117,11 +118,31 @@ async function createPapaLiveAvatarSession() {
   };
 }
 
+let avatarAvailability: { id: string; expires: number; ready: boolean } | null = null;
+
+async function hasCustomAvatar() {
+  const id = avatarId();
+  if (!liveAvatarApiKey() || isSandbox() || !id || id === SANDBOX_AVATAR_ID) return false;
+  if (avatarAvailability?.id === id && avatarAvailability.expires > Date.now()) return avatarAvailability.ready;
+  try {
+    const result = await liveAvatarJson(`/v1/avatars/${encodeURIComponent(id)}`);
+    const ready = Boolean(result?.data?.id === id);
+    avatarAvailability = { id, ready, expires: Date.now() + 60_000 };
+    return ready;
+  } catch (error) {
+    console.warn("[liveavatar] custom avatar unavailable:", error);
+    avatarAvailability = { id, ready: false, expires: Date.now() + 60_000 };
+    return false;
+  }
+}
+
 export function registerPapaLiveAvatarRoutes(app: Express) {
-  app.get("/api/liveavatar/status", (_req, res) => {
+  app.get("/api/liveavatar/status", async (_req, res) => {
+    const configured = Boolean(env("ELEVENLABS_API_KEY") && papaAgentId() === DEFAULT_PAPA_AGENT_ID && await hasCustomAvatar());
     res.json({
       ok: true,
-      configured: Boolean(liveAvatarApiKey() && env("ELEVENLABS_API_KEY")),
+      configured,
+      avatar_id: avatarId(),
       sandbox: isSandbox(),
       avatar_mode: isSandbox() ? "sandbox" : "custom",
       agent_id: papaAgentId(),
@@ -136,6 +157,12 @@ export function registerPapaLiveAvatarRoutes(app: Express) {
         error: "LiveAvatar API key is not connected to the preview yet.",
         code: "LIVEAVATAR_NOT_CONFIGURED",
       });
+    }
+    if (isSandbox() || avatarId() === SANDBOX_AVATAR_ID || papaAgentId() !== DEFAULT_PAPA_AGENT_ID) {
+      return res.status(503).json({ ok: false, error: "Brian's custom live avatar is not configured.", code: "LIVEAVATAR_CUSTOM_AVATAR_REQUIRED" });
+    }
+    if (!await hasCustomAvatar()) {
+      return res.status(503).json({ ok: false, error: "Brian's LiveAvatar is not available in this LiveAvatar account.", code: "LIVEAVATAR_AVATAR_NOT_FOUND" });
     }
     try {
       const session = await createPapaLiveAvatarSession();

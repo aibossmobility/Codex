@@ -34,7 +34,7 @@ export function BrianLiveAvatar() {
         setAvatarReady(Boolean(response.ok && data?.configured && !isSandbox));
         setAvailabilityChecked(true);
         if (isSandbox) {
-          setStatusText("Brian's custom green-sweater live video is being activated");
+          setStatusText("Brian's custom live video is being activated");
         }
       })
       .catch(() => {
@@ -154,24 +154,18 @@ export function BrianLiveAvatar() {
         />
         {!isLive && (
           <div className="absolute inset-0 bg-[#07100b]">
-            <img
-              data-nonlive-poster="brian-green-sweater"
-              src="/images/brian-digital-twin-real.png"
-              alt="Brian Keith Hill wearing his green Papa Life sweater"
-              className="h-full w-full object-cover object-top opacity-95"
-            />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-6 pb-6 text-center">
               <div>
               <p className="font-extrabold text-white">
-                {avatarReady ? "Brian appears here as live video" : "Brian's green-sweater live twin"}
+                {avatarReady ? "Brian appears here as live video" : "Brian's live video twin"}
               </p>
               <p className="mt-1 max-w-md text-sm leading-relaxed text-white/60">
                 {!availabilityChecked
                   ? "Checking the live Brian avatar…"
                   : avatarReady
                     ? "Start the conversation to connect Brian's real-time avatar, microphone, and Brian Keith Hill voice."
-                    : "The stock test avatar is disabled. This space will only activate when Brian's custom green-sweater LiveAvatar is connected."}
+                    : "Brian's live video will be available once his LiveAvatar is connected to this account."}
               </p>
               </div>
             {avatarReady && (
@@ -210,7 +204,7 @@ export function BrianLiveAvatar() {
 
         {sandbox && (
           <p className="mt-2 text-xs text-[#f2c230]/85">
-            The stock LiveAvatar test character is disabled. Only Brian's custom green-sweater live twin will be shown publicly.
+            The stock LiveAvatar test character is disabled. Only Brian's custom live twin will be shown publicly.
           </p>
         )}
 

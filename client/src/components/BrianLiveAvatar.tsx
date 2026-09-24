@@ -22,9 +22,23 @@ export function BrianLiveAvatar() {
   const [sandbox, setSandbox] = useState(false);
   const [avatarReady, setAvatarReady] = useState(false);
   const [availabilityChecked, setAvailabilityChecked] = useState(false);
+  const [renderReady, setRenderReady] = useState(false);
+  const [renderState, setRenderState] = useState<"idle" | "submitting" | "rendering" | "ready" | "error">("idle");
+  const [renderedVideoUrl, setRenderedVideoUrl] = useState("");
+  const [renderedReply, setRenderedReply] = useState("");
+  const [renderError, setRenderError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
+    void fetch("/api/papa-twin/render-status")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!cancelled) setRenderReady(Boolean(response.ok && data?.enabled && data?.heygen_configured));
+      })
+      .catch(() => {
+        if (!cancelled) setRenderReady(false);
+      });
+
     void fetch("/api/liveavatar/status")
       .then(async (response) => {
         const data = await response.json();
@@ -116,6 +130,60 @@ export function BrianLiveAvatar() {
     }
   }
 
+
+  async function renderBrianTurn() {
+    const message = typedMessage.trim();
+    if (!message || !renderReady || renderState === "submitting" || renderState === "rendering") return;
+    setRenderState("submitting");
+    setRenderError("");
+    setRenderedVideoUrl("");
+    setRenderedReply("");
+    setUserText(message);
+    setTypedMessage("");
+
+    try {
+      const response = await fetch("/api/papa-twin/render", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.video_id) {
+        throw new Error(data?.error || "Brian's video response could not start.");
+      }
+
+      setRenderedReply(String(data.reply || ""));
+      setBrianText(String(data.reply || ""));
+      setRenderState("rendering");
+      setStatusText("Brian is preparing a lip-synced response…");
+
+      const started = Date.now();
+      while (Date.now() - started < 150_000) {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        const statusResponse = await fetch("/api/papa-twin/render/" + encodeURIComponent(String(data.video_id)));
+        const status = await statusResponse.json();
+        if (!statusResponse.ok) {
+          throw new Error(status?.error || "Could not check Brian's video response.");
+        }
+        if (status.status === "completed" && status.video_url) {
+          setRenderedVideoUrl(String(status.video_url));
+          setRenderState("ready");
+          setStatusText("Brian's video response is ready");
+          return;
+        }
+        if (status.status === "failed" || status.status === "error") {
+          throw new Error(status?.error || "Brian's video response failed to render.");
+        }
+      }
+      throw new Error("Brian's video response is taking longer than expected. Please try again.");
+    } catch (err) {
+      setRenderState("error");
+      const messageText = err instanceof Error ? err.message : "Brian's video response could not be created.";
+      setRenderError(messageText);
+      setStatusText("Brian's rendered response is unavailable");
+    }
+  }
+
   async function stopConversation() {
     const session = sessionRef.current;
     sessionRef.current = null;
@@ -145,14 +213,25 @@ export function BrianLiveAvatar() {
   return (
     <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
       <div className="relative aspect-video bg-black">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          className="h-full w-full bg-black object-cover"
-          aria-label="Live video of Brian Keith Hill's Papa Life Digital Twin"
-        />
-        {!isLive && (
+        {renderedVideoUrl && !isLive ? (
+          <video
+            src={renderedVideoUrl}
+            autoPlay
+            playsInline
+            controls
+            className="h-full w-full bg-black object-cover"
+            aria-label="Rendered video response from Brian Keith Hill's Papa Life Digital Twin"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className="h-full w-full bg-black object-cover"
+            aria-label="Live video of Brian Keith Hill's Papa Life Digital Twin"
+          />
+        )}
+        {!isLive && !renderedVideoUrl && (
           <div className="absolute inset-0 bg-[#07100b]">
             <img
               data-nonlive-poster="brian-green-sweater"
@@ -171,7 +250,9 @@ export function BrianLiveAvatar() {
                   ? "Checking the live Brian avatar…"
                   : avatarReady
                     ? "Start the conversation to connect Brian's real-time avatar, microphone, and Brian Keith Hill voice."
-                    : "The stock test avatar is disabled. This space will only activate when Brian's custom green-sweater LiveAvatar is connected."}
+                    : renderReady
+                      ? "Ask Brian a question below. His Papa Life answer will be rendered with the Brian Keith Hill voice and green-sweater Digital Twin."
+                      : "The stock test avatar is disabled. Brian's correct visual remains here while the video-response renderer is being activated."}
               </p>
               </div>
             {avatarReady && (
@@ -214,9 +295,9 @@ export function BrianLiveAvatar() {
           </p>
         )}
 
-        {error && (
+        {(error || renderError) && (
           <p className="mt-3 rounded-xl border border-red-400/30 bg-red-950/30 px-3 py-2 text-sm text-red-100">
-            {error}
+            {error || renderError}
           </p>
         )}
 
@@ -227,22 +308,29 @@ export function BrianLiveAvatar() {
           </div>
         )}
 
-        {isLive && (
+        {(isLive || renderReady) && (
           <div className="mt-4 flex gap-2">
             <input
               value={typedMessage}
               onChange={(event) => setTypedMessage(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") sendTypedMessage();
+                if (event.key === "Enter") {
+                  if (isLive) sendTypedMessage();
+                  else void renderBrianTurn();
+                }
               }}
-              placeholder="Or type a message to Brian"
+              placeholder={isLive ? "Or type a message to Brian" : "Ask Brian a question"}
               className="min-w-0 flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#f2c230]"
             />
             <button
               type="button"
-              onClick={sendTypedMessage}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2c230] text-black hover:bg-white"
-              aria-label="Send typed message"
+              onClick={() => {
+                if (isLive) sendTypedMessage();
+                else void renderBrianTurn();
+              }}
+              disabled={!isLive && (renderState === "submitting" || renderState === "rendering")}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2c230] text-black hover:bg-white disabled:opacity-50"
+              aria-label={isLive ? "Send typed message" : "Ask Brian for a video response"}
             >
               <Send className="h-4 w-4" />
             </button>

@@ -111,6 +111,7 @@ import {
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
+import { registerPapaHeyGenTurnRoutes } from "./papa-heygen-turn";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import {
   ensureGhlIntegrationTable,
@@ -3133,6 +3134,7 @@ async function startServer() {
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
   registerPapaLiveAvatarRoutes(app);
+  registerPapaHeyGenTurnRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);
 

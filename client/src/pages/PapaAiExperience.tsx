@@ -889,7 +889,7 @@ export default function PapaAiExperience() {
                 PAPA is always Presence → Authority → Purpose → Alignment.
               </p>
             </div>
-            <BrianLiveAvatar posterSrc="/images/brian-keith-hill.png" posterAlt="Brian Keith Hill" />
+            <BrianLiveAvatar posterSrc="/images/brian-green-sweater-live.jpg" posterAlt="Brian Keith Hill in his green sweater" />
           </div>
         </section>
 

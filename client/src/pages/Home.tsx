@@ -272,7 +272,12 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="border-y border-[#17231c]/15 bg-[#17231c] py-10 text-white md:py-14" aria-label="Talk with Brian's Digital Twin">
+      <section className="border-y border-black bg-black py-10 text-white md:py-14" aria-label="Talk with Brian's Digital Twin">
+        <div className="mb-8 grid h-2 grid-cols-3" aria-hidden="true">
+          <div className="bg-[#f2c230]" />
+          <div className="bg-[#b33a32]" />
+          <div className="bg-[#145b35]" />
+        </div>
         <div className="container grid items-start gap-7 lg:grid-cols-[minmax(0,.8fr)_minmax(420px,1.2fr)] lg:gap-10">
           <div className="pt-2">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Live Papa Life conversation</p>

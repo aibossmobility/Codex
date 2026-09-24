@@ -130,7 +130,12 @@ export function BrianLiveAvatar({
   const isBusy = state === "connecting";
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
+    <div className="overflow-hidden rounded-3xl border border-[#f2c230]/45 bg-black shadow-2xl">
+      <div className="grid h-1.5 grid-cols-3">
+        <div className="bg-[#f2c230]" />
+        <div className="bg-[#c62828]" />
+        <div className="bg-[#16853b]" />
+      </div>
       <div className="relative aspect-video overflow-hidden bg-black">
         <video
           ref={videoRef}
@@ -201,8 +206,8 @@ export function BrianLiveAvatar({
         </div>
 
         {sandbox && isLive && (
-          <p className="mt-2 text-xs text-white/50">
-            Live voice is active. Brian’s custom live-motion video is being finalized.
+          <p className="mt-2 text-xs text-white/55">
+            Live voice conversation is active.
           </p>
         )}
 

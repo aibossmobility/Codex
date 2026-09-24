@@ -5366,6 +5366,30 @@ async function startServer() {
     }
   });
 
+  app.get("/api/papa-ai/voice/knowledge-status", async (_req, res) => {
+    try {
+      const agent = await fetchElevenLabsJson(
+        `/v1/convai/agents/${encodeURIComponent(ELEVENLABS_AGENT_ID)}?branch_id=agtbrch_6301kt209qgde8vv2pdev2caj6bd`,
+      );
+      const prompt = agent?.conversation_config?.agent?.prompt || {};
+      const documents = Array.isArray(prompt.knowledge_base) ? prompt.knowledge_base : [];
+      const names = documents.map((item: any) => String(item?.name || "").toLowerCase());
+      return res.json({
+        ok: true,
+        agent_id_match: String(agent?.agent_id || "") === ELEVENLABS_AGENT_ID,
+        branch_id: String(agent?.branch_id || ""),
+        knowledge_document_count: documents.length,
+        google_drive_document_count: documents.filter((item: any) => item?.type === "google_drive").length,
+        canonical_v31_present: names.some((name: string) => name.includes("v3.1") && name.includes("master")),
+        master_skill_present: names.some((name: string) => name.includes("master skill")),
+        runtime_instructions_present: names.some((name: string) => name.includes("runtime instruction")),
+        has_prompt: Boolean(String(prompt.prompt || "").trim()),
+      });
+    } catch (error) {
+      return res.status(502).json({ ok: false, error: "Agent knowledge could not be verified." });
+    }
+  });
+
   app.get(["/api/papa-ai/voice/signed-url", "/api/ai/voice/signed-url"], async (req, res) => {
     if (!ELEVENLABS_API_KEY) {
       return res.status(503).json({

@@ -100,6 +100,7 @@ function Router() {
       <Route path="/my-journey" component={FatherJourney} />
       <Route path="/assessment"><Redirect to="/my-journey" /></Route>
       <Route path="/relationship-assessment" component={RelationshipAssessment} />
+      <Route path="/relationship-check-in" component={RelationshipAssessment} />
       <Route path="/marlee-assessment" component={MarleeAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />
       <Route path="/adult-daughter-relationship" component={AdultDaughterRelationshipPage} />

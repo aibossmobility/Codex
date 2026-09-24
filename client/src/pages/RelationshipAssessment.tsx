@@ -6,7 +6,7 @@ import { FatherEngagementFollowUpForm } from "@/components/FatherEngagementFollo
 import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type Pillar = "Presence" | "Purpose" | "Authority" | "Alignment";
+type Pillar = "Presence" | "Authority" | "Purpose" | "Alignment";
 
 type Question = {
   id: string;
@@ -42,7 +42,7 @@ export default function RelationshipAssessment() {
   const answeredCount = Object.keys(answers).length;
 
   const scores = useMemo(() => {
-    const totals: Record<Pillar, number> = { Presence: 0, Purpose: 0, Authority: 0, Alignment: 0 };
+    const totals: Record<Pillar, number> = { Presence: 0, Authority: 0, Purpose: 0, Alignment: 0 };
     questions.forEach((question) => {
       totals[question.pillar] += answers[question.id] || 0;
     });
@@ -70,7 +70,7 @@ export default function RelationshipAssessment() {
       <PageMeta
         title="2-Minute Fatherhood Check-In | Papa Life"
         description="A short fatherhood check-in to help you see where things stand with your adult child and choose a practical next step."
-        keywords="fatherhood check-in, fathers of adult children, PAPA framework, Presence Purpose Authority Alignment"
+        keywords="fatherhood check-in, fathers of adult children, PAPA framework, Presence Authority Purpose Alignment"
       />
 
       <header className="border-b border-white/10 bg-black/90">
@@ -112,7 +112,7 @@ export default function RelationshipAssessment() {
               <p className="mt-2 text-sm text-white/60">Be honest. This is for clarity, not judgment.</p>
             </div>
 
-            {(["Presence", "Purpose", "Authority", "Alignment"] as Pillar[]).map((pillar) => (
+            {(["Presence", "Authority", "Purpose", "Alignment"] as Pillar[]).map((pillar) => (
               <section key={pillar} aria-labelledby={`${pillar.toLowerCase()}-heading`}>
                 <div className="mb-4 flex items-baseline gap-3">
                   <span className="text-3xl font-black text-brand-yellow">{pillar[0]}</span>

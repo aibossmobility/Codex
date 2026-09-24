@@ -55,7 +55,7 @@ export default function DigitalTwinDemo() {
                 Talk with Brian's Papa Life AI
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                See Brian's image, tap the phone button at the lower right, and talk naturally with his ElevenLabs AI agent. Ask about fatherhood, the PAPA framework, or where to find a Papa Life resource.
+                See Brian's image, tap the phone button at the lower right, and talk naturally with his ElevenLabs AI agent. Ask about fatherhood, the PAPA framework, any public page, courses, podcast, or how to join Papa Life.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -155,6 +155,8 @@ export default function DigitalTwinDemo() {
                 <a href="https://papalifecoach.com/books" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Books</a>
                 <a href="https://papalifecoach.com/podcast" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Audio and podcast</a>
                 <a href="https://papalifecoach.com/membership" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Membership</a>
+                <a href="https://papalifecoach.com/join" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Join Papa Life</a>
+                <a href="https://papalifecoach.com/site-directory" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">All public pages</a>
                 <a href="https://papalifecoach.com/booking" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Talk with Brian</a>
               </div>
             </div>

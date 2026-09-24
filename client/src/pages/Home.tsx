@@ -237,22 +237,6 @@ export default function Home() {
             <p className="mt-5 text-lg font-bold text-[#145b35] md:text-xl">
               As long as you’re both alive, it’s never too late.
             </p>
-            <div className="mt-8 max-w-2xl rounded-xl border border-[#145b35]/30 bg-white/75 p-4 shadow-lg backdrop-blur-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
-              <div>
-                <p className="font-extrabold text-[#17231c]">Experience AI in your fatherhood.</p>
-                <p className="mt-1 text-sm leading-relaxed text-[#314239]">
-                  Take one minute to share what you are facing and experience how AI can help you understand where you are, explore the app, and choose one practical next step.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={openPapaAiCoach}
-                className="mt-4 inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white sm:mt-0"
-              >
-                <MessageCircle className="h-5 w-5" aria-hidden="true" />
-                Try the 1-Minute AI Experience
-              </button>
-            </div>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
               <ActionLink href={joinHref} light>
                 Enroll Now — Immediate Access

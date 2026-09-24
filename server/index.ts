@@ -110,6 +110,7 @@ import {
 } from "./sync-intake-to-crm";
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
+import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import {
   ensureGhlIntegrationTable,
@@ -2138,7 +2139,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
   "media-src 'self' blob: data:",
   "frame-src 'self' https://meetn.com",
   "object-src 'none'",
@@ -3131,6 +3132,7 @@ async function startServer() {
 
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
+  registerPapaLiveAvatarRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);
 

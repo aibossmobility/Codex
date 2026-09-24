@@ -36,7 +36,7 @@ type AssessmentAnswer = {
 
 const PAPA_SYSTEM_PROMPT = `You are the Papa Life AI Coach, the digital extension of Brian Keith Hill's coaching ministry.
 
-Mission: help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment.
+Mission: help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
 Voice: warm, authentic, biblical, direct, hopeful, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Listen first, ask thoughtful questions, offer biblical wisdom naturally, and give one clear next step.
 
@@ -81,7 +81,7 @@ export const papaAiResources: ResourceItem[] = [
     title: "The PAPA Framework Guide",
     type: "Worksheet",
     pillar: "General",
-    description: "A practical map for Purpose, Authority, Presence, and Alignment.",
+    description: "A practical map for Presence, Authority, Purpose, and Alignment.",
     path: "/papa-framework",
     keywords: ["framework", "papa", "purpose", "authority", "presence", "alignment", "start"],
   },
@@ -287,7 +287,7 @@ export function buildPapaAiLocalReply(input: {
     return {
       provider: "local" as PapaAiProvider,
       reply:
-        "Papa Life membership is for fathers who do not want a one-time emotional moment. They want a path. The value is guided lessons, reflection, brotherhood, and steady practice around Purpose, Authority, Presence, and Alignment.\n\nIf you are ready to work through this with structure, start with the free assessment, then move into the membership path when you want ongoing guidance.",
+        "Papa Life membership is for fathers who do not want a one-time emotional moment. They want a path. The value is guided lessons, reflection, brotherhood, and steady practice around Presence, Authority, Purpose, and Alignment.\n\nIf you are ready to work through this with structure, start with the free assessment, then move into the membership path when you want ongoing guidance.",
       resources: findPapaResources("membership courses community", 3),
     };
   }

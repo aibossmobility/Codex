@@ -792,7 +792,7 @@ try {
 }
 
 try {
-  const pillarOpts = JSON.stringify(["Purpose", "Authority", "Presence", "Alignment"]);
+  const pillarOpts = JSON.stringify(["Presence", "Authority", "Purpose", "Alignment"]);
   db.prepare(
     `UPDATE form_questions SET options_json = ?, updated_at = datetime('now')
      WHERE form_key = 'intake_submission' AND question_key IN ('routed_pillar','disconnected_pillar')
@@ -2225,7 +2225,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Papa Life Coach",
     headline: "Papa Life gives fathers a practical path back to connection.",
     intro:
-      "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers assessment, guided lessons, AI coaching, and the PAPA Framework: Purpose, Authority, Presence, and Alignment.",
+      "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers assessment, guided lessons, AI coaching, and the PAPA Framework: Presence, Authority, Purpose, and Alignment.",
     sections: [
       {
         heading: "Start with clarity",
@@ -2254,7 +2254,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     intro:
       "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
-      { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Purpose, Authority, Presence, and Alignment." },
+      { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment." },
       { heading: "Resource guidance", body: "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
@@ -2340,7 +2340,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Membership",
     headline: "Build consistency instead of relying on one emotional moment.",
     intro:
-      "Membership helps fathers keep practicing Purpose, Authority, Presence, and Alignment through guided lessons and reflection tools.",
+      "Membership helps fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
     sections: [
       { heading: "Course structure", body: "Work through practical lessons built for fathers navigating relationships with adult children." },
       { heading: "Ongoing support", body: "Use AI coaching, resources, and community-oriented support to stay steady." },
@@ -2510,14 +2510,14 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     cta: { label: "Join Papa Life — Immediate Access", href: "/go/join?src=welcome-to-papa-life" },
   },
   "/papa-framework": {
-    title: "The PAPA Framework for Fathers | Purpose, Authority, Presence, Alignment",
+    title: "The PAPA Framework for Fathers | Presence, Authority, Purpose, Alignment",
     description:
       "Learn the PAPA framework, four pillars that help fathers lead with clarity, character, presence, and integrity with adult children.",
-    keywords: "PAPA framework, fatherhood framework, Purpose Authority Presence Alignment",
+    keywords: "PAPA framework, fatherhood framework, Presence Authority Purpose Alignment",
     eyebrow: "PAPA Framework",
     headline: "Four pillars. One mission: become the father your adult child can trust again.",
     intro:
-      "Purpose, Authority, Presence, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
+      "Presence, Authority, Purpose, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
     sections: [
       { heading: "Purpose", body: "Know why you were built for this role beyond paychecks and provider identity." },
       { heading: "Authority", body: "Lead without control and trade force for grounded character." },
@@ -2688,7 +2688,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     intro:
       "The Papa Journey helps fathers work through relationship distance with structure, reflection, coaching, and next steps.",
     sections: [
-      { heading: "PAPA pillars", body: "Purpose, Authority, Presence, and Alignment organize the path." },
+      { heading: "PAPA pillars", body: "Presence, Authority, Purpose, and Alignment organize the path." },
       { heading: "Continue steadily", body: "Use the journey to build consistency and repair-oriented habits over time." },
     ],
     cta: { label: "Join Papa Life", href: "/go/join" },

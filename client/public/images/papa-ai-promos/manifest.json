@@ -49,7 +49,7 @@
     "message": "faith-based fatherhood",
     "logoPlacement": "bottom"
   },
-  "rotation": ["Purpose", "Authority", "Presence", "Alignment"],
+  "rotation": ["Presence", "Authority", "Purpose", "Alignment"],
   "rotationStartsOn": "2026-06-30",
   "filenamePattern": "YYYY-W##_pillar_topic-slug_platform_WIDTHxHEIGHT.ext",
   "exampleFilename": "2026-W27_purpose_ai-launch_website-hero_1600x900.png",

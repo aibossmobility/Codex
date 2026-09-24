@@ -162,7 +162,7 @@ const TESTIMONIALS = [
 const FAQ = [
   {
     q: "What exactly is the PAPA Journey Journal?",
-    a: "It's an AI-powered daily reflection and coaching journal built on the PAPA framework — Purpose, Authority, Presence, and Alignment. Each day you receive guided prompts crafted to help you grow in one of the four pillars. Your responses are private, but the insights are lasting.",
+    a: "It's an AI-powered daily reflection and coaching journal built on the PAPA framework — Presence, Authority, Purpose, and Alignment. Each day you receive guided prompts crafted to help you grow in one of the four pillars. Your responses are private, but the insights are lasting.",
   },
   {
     q: "Who is this for?",
@@ -524,7 +524,7 @@ function SolutionBridge() {
               </div>
               <ul className="space-y-3">
                 {[
-                  "PAPA framework: Purpose · Authority · Presence · Alignment",
+                  "PAPA framework: Presence · Authority · Purpose · Alignment",
                   "Built specifically for fathers of adult children",
                   "30-Day Dad Dojo immersive coaching program",
                   "Structured curriculum with courses per PAPA pillar",
@@ -1071,7 +1071,7 @@ function ProgramSection() {
     { label: "PAPA Journey Journal", desc: "AI-guided daily prompts for all 4 pillars", color: "text-primary" },
     { label: "Cosmic Insights", desc: "Daily lunar-cycle spiritual guidance tied to your PAPA pillar walk", color: "text-accent" },
     { label: "30-Day Dad Dojo", desc: "Immersive coaching — one week per PAPA pillar", color: "text-green-400" },
-    { label: "Full Course Library", desc: "Structured lessons: Purpose, Authority, Presence, Alignment", color: "text-brand-yellow" },
+    { label: "Full Course Library", desc: "Structured lessons: Presence, Authority, Purpose, Alignment", color: "text-brand-yellow" },
     { label: "Weekly Live Sessions", desc: "Direct coaching and community accountability calls", color: "text-indigo-300" },
     { label: "iShareHow Rise Dashboard", desc: "Track your consciousness-to-mastery journey", color: "text-accent" },
     { label: "Private Community", desc: "A collective of fathers rising together — no judgment", color: "text-primary" },
@@ -1359,7 +1359,7 @@ function FinalCTA() {
           <p className="text-gray-600 text-sm">No free trial · Cancel anytime</p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-gray-600 text-xs">
-            {["Purpose", "Authority", "Presence", "Alignment"].map((p, i) => (
+            {["Presence", "Authority", "Purpose", "Alignment"].map((p, i) => (
               <span key={p} className={`${PILLARS[i].text} font-bold`}>{p}</span>
             ))}
           </div>

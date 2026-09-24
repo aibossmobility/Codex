@@ -4,7 +4,7 @@
 
 The Papa Life AI Experience turns the website into an AI-powered coaching ministry for fathers of adult children. It gives visitors one clear place to receive guided coaching, take a fatherhood assessment, find resources, ask Tuesday Live questions, request prayer, create Bible studies, understand membership, and submit contact information.
 
-The experience is grounded in Brian Keith Hill's Papa Life voice and the PAPA Framework: Purpose, Authority, Presence, and Alignment.
+The experience is grounded in Brian Keith Hill's Papa Life voice and the PAPA Framework: Presence, Authority, Purpose, and Alignment.
 
 ## Website Pages
 
@@ -108,7 +108,7 @@ It instructs the AI to:
 
 - Speak as the Papa Life AI Coach, the digital extension of Brian Keith Hill's coaching ministry
 - Help fathers rebuild connection and restore trust
-- Use Purpose, Authority, Presence, and Alignment
+- Use Presence, Authority, Purpose, and Alignment
 - Stay warm, biblical, direct, hopeful, masculine, practical, and non-shaming
 - Listen first and avoid lectures
 - Give clear next steps

@@ -23,7 +23,7 @@ const VOICE_ALWAYS = [
   "Use clear, grounded, emotionally honest language",
   "9th-grade reading level — always",
   "Prioritize specificity over inspiration",
-  "Reference the framework by name (PAPA: Purpose, Authority, Presence, Alignment)",
+  "Reference the framework by name (PAPA: Presence, Authority, Purpose, Alignment)",
   "End every content piece with ONE question or ONE action — never both",
   "Reflect the weight of fatherhood without wallowing in it",
   "Honor the man's experience — even when challenging him",

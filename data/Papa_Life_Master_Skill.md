@@ -51,6 +51,8 @@ Every output must help fathers of adult children rebuild connection, restore tru
 
 ## Core Framework
 
+**Locked order:** Presence → Authority → Purpose → Alignment. Never reorder the four pillars in definitions, lists, examples, prompts, or generated content.
+
 Connect naturally to at least one PAPA pillar when relevant:
 
 - Presence: showing up consistently and safely.
@@ -465,9 +467,9 @@ Use $papa-life-master to create a landing page, lead magnet, 5-email sequence, a
 ### LinkedIn Post 1
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -477,9 +479,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 2
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -489,9 +491,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 3
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -501,9 +503,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 4
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -513,9 +515,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 5
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -525,9 +527,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 6
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -537,9 +539,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 7
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -549,9 +551,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 8
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -561,9 +563,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 9
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."
@@ -573,9 +575,9 @@ Reflection: What would change if you prepared your heart before preparing your a
 ### LinkedIn Post 10
 A father does not rebuild trust by demanding a conversation. He begins by becoming safer to talk to.
 
-Purpose asks: Who am I becoming now?
-Authority asks: Am I leading or controlling?
 Presence asks: Can my child experience me as steady?
+Authority asks: Am I leading or controlling?
+Purpose asks: Who am I becoming now?
 Alignment asks: Does my life match my words?
 
 This week, do not start with a speech. Start with one honest sentence: "I have been thinking about how I showed up, and I want to listen better."

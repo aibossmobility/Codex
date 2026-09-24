@@ -73,7 +73,7 @@ export const HOMEPAGE_FAQ_SCHEMA = {
       name: "What is the PAPA framework?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "PAPA stands for Purpose, Authority, Presence, and Alignment — four pillars that help fathers move from confusion to intentional leadership with adult children.",
+        text: "PAPA stands for Presence, Authority, Purpose, and Alignment — four pillars that help fathers move from confusion to intentional leadership with adult children.",
       },
     },
     {

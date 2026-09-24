@@ -97,7 +97,7 @@ const localResources: ResourceItem[] = [
     title: "The PAPA Framework Guide",
     type: "Worksheet",
     pillar: "General",
-    description: "Start with Purpose, Authority, Presence, and Alignment.",
+    description: "Start with Presence, Authority, Purpose, and Alignment.",
     path: "/papa-framework",
   },
   {
@@ -255,7 +255,7 @@ function localReply(mode: Mode, text: string) {
     return "Bible Study: Read James 1:19. Observation: listening comes before speaking. Interpretation: mature fatherhood does not lose authority when it slows down. Application: before your next conversation, write what you heard, what you can own, and what you will do differently. Reflection: where have I been trying to be understood before helping my child feel heard? Prayer: Lord, make me quick to listen and slow to speak.";
   }
   if (mode === "membership") {
-    return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Purpose, Authority, Presence, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
+    return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
   }
   if (mode === "tuesday") {
     return "That is a strong Tuesday Live question. Bring it as one clear sentence: what should a father do when he wants repair, but his adult child is not ready? The teaching should start with humility, move through Presence, and end with one practical step.";
@@ -393,7 +393,7 @@ function ChatMode({
       content:
         mode === "resource"
           ? "Tell me what you are facing, and I will point you to the best Papa Life resources."
-          : "Welcome to the Papa Life AI Coach. I help fathers of adult children rebuild connection, restore trust, and lead with Purpose, Authority, Presence, and Alignment. What's weighing on your heart today?",
+          : "Welcome to the Papa Life AI Coach. I help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment. What's weighing on your heart today?",
     },
   ]);
   const [resources, setResources] = useState<ResourceItem[]>([]);

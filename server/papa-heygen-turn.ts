@@ -241,6 +241,34 @@ export function registerPapaHeyGenTurnRoutes(app: Express) {
     }
   });
 
+
+  app.get("/api/papa-twin/video/:videoId", async (req, res) => {
+    if (!enabled()) {
+      return res.status(503).json({ ok: false, error: "Brian video responses are not enabled yet." });
+    }
+    try {
+      const result = await getHeyGenVideo(String(req.params.videoId || ""));
+      if (result.status !== "completed" || !result.video_url) {
+        return res.status(409).json({ ok: false, error: "Brian's video is not ready yet." });
+      }
+      const upstream = await fetch(result.video_url);
+      if (!upstream.ok) {
+        throw new Error("Completed Brian video could not be downloaded.");
+      }
+      const body = Buffer.from(await upstream.arrayBuffer());
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || "video/mp4");
+      res.setHeader("Content-Disposition", 'attachment; filename="Brian-Digital-Twin-Test.mp4"');
+      res.setHeader("Cache-Control", "private, max-age=300");
+      res.setHeader("Content-Length", String(body.length));
+      return res.status(200).send(body);
+    } catch (error) {
+      return res.status(502).json({
+        ok: false,
+        error: error instanceof Error ? error.message : "Brian video download is unavailable.",
+      });
+    }
+  });
+
   app.get("/api/papa-twin/render/:videoId", async (req, res) => {
     if (!enabled()) {
       return res.status(503).json({ ok: false, error: "Brian video responses are not enabled yet." });

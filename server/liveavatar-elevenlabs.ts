@@ -1,4 +1,6 @@
 import type { Express } from "express";
+import fs from "fs";
+import path from "path";
 
 const LIVEAVATAR_BASE_URL = "https://api.liveavatar.com";
 const DEFAULT_SANDBOX_AVATAR_ID = "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a";
@@ -117,7 +119,49 @@ async function createPapaLiveAvatarSession() {
   };
 }
 
+const PUBLIC_GUIDE_NAME = "CURRENT - Papa Life Public Site Guide 2026-09-24";
+const PAPA_AGENT_BRANCH_ID = "agtbrch_6301kt209qgde8vv2pdev2caj6bd";
+
+async function syncPublicGuideToElevenLabs() {
+  if (env("PAPA_SYNC_ELEVENLABS_KB_REVISION") !== "2026-09-24") return;
+  const key = env("ELEVENLABS_API_KEY");
+  if (!key) throw new Error("ElevenLabs API key is missing.");
+  const file = path.resolve(process.cwd(), "data", "papa-life-public-guide-2026-09-24.txt");
+  const text = fs.readFileSync(file, "utf8");
+  const agentId = papaAgentId();
+  const endpoint = `https://api.elevenlabs.io/v1/convai/agents/${encodeURIComponent(agentId)}?branch_id=${encodeURIComponent(PAPA_AGENT_BRANCH_ID)}`;
+  const headers = { "xi-api-key": key, "Content-Type": "application/json" };
+  const currentResponse = await fetch(endpoint, { headers });
+  if (!currentResponse.ok) throw new Error(`ElevenLabs agent read failed: ${currentResponse.status}`);
+  const current: any = await currentResponse.json();
+  const existing = Array.isArray(current?.conversation_config?.agent?.prompt?.knowledge_base)
+    ? current.conversation_config.agent.prompt.knowledge_base : [];
+  if (existing.some((item: any) => item?.name === PUBLIC_GUIDE_NAME)) {
+    console.info("[elevenlabs] Papa Life public guide already attached");
+    return;
+  }
+  const createResponse = await fetch("https://api.elevenlabs.io/v1/convai/knowledge-base/text", {
+    method: "POST", headers, body: JSON.stringify({ name: PUBLIC_GUIDE_NAME, text }),
+  });
+  if (!createResponse.ok) throw new Error(`ElevenLabs guide creation failed: ${createResponse.status}`);
+  const created: any = await createResponse.json();
+  if (!created?.id) throw new Error("ElevenLabs guide creation returned no id.");
+  const knowledge_base = [...existing, {
+    type: "text", id: created.id, name: PUBLIC_GUIDE_NAME, usage_mode: "prompt",
+  }];
+  const updateResponse = await fetch(endpoint, {
+    method: "PATCH", headers,
+    body: JSON.stringify({ conversation_config: { agent: { prompt: { knowledge_base } } } }),
+  });
+  if (!updateResponse.ok) {
+    const detail = (await updateResponse.text()).slice(0, 400);
+    throw new Error(`ElevenLabs guide attach failed: ${updateResponse.status} ${detail}`);
+  }
+  console.info("[elevenlabs] Papa Life public guide attached", { agentId, documentCount: knowledge_base.length });
+}
+
 export function registerPapaLiveAvatarRoutes(app: Express) {
+  void syncPublicGuideToElevenLabs().catch((error) => console.error("[elevenlabs] public guide sync:", error));
   app.get("/api/liveavatar/status", (_req, res) => {
     res.json({
       ok: true,

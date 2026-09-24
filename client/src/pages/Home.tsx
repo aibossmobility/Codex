@@ -1,3 +1,4 @@
+import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { brianKeithHillHeadshot } from "@/lib/site-assets";
@@ -270,6 +271,22 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <section className="border-y border-[#17231c]/15 bg-[#17231c] py-10 text-white md:py-14" aria-label="Talk with Brian's Digital Twin">
+        <div className="container grid items-start gap-7 lg:grid-cols-[minmax(0,.8fr)_minmax(420px,1.2fr)] lg:gap-10">
+          <div className="pt-2">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Live Papa Life conversation</p>
+            <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Talk with Brian’s Digital Twin.</h2>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/72">
+              The same Papa Life brain used by the AI Coach powers this live conversation: Presence, Authority, Purpose, and Alignment.
+            </p>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/58">
+              Voice, knowledge, and coaching posture stay consistent across the homepage, AI Coach, and Digital Twin experience.
+            </p>
+          </div>
+          <BrianLiveAvatar />
+        </div>
+      </section>
 
       <div className="bg-[#b33a32] py-5 text-center text-white">
         <p className="container text-sm font-black uppercase tracking-[0.16em] md:text-base">

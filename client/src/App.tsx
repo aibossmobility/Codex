@@ -154,9 +154,9 @@ function GlobalPapaAiWidget() {
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
   if (shouldHide) return null;
 
-  if (path === "/digital-twin") return null;
+  if (path === "/" || path === "/digital-twin") return null;
 
-  return <BrianDigitalTwin autoOpen={path === "/"} />;
+  return <BrianDigitalTwin />;
 }
 
 function GlobalAllPagesButton() {

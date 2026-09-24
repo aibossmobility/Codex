@@ -702,7 +702,7 @@ function ConsentRow({ label, granted }: { label: string; granted: boolean }) {
 
 // ─── Resources View ───────────────────────────────────────────────────────────
 
-const CATEGORIES = ["General", "Purpose", "Authority", "Presence", "Alignment", "Faith", "Business", "Family"];
+const CATEGORIES = ["General", "Presence", "Authority", "Purpose", "Alignment", "Faith", "Business", "Family"];
 
 function Resources() {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -1065,7 +1065,7 @@ function CommandCenter({ stats }: { stats: Stats | null }) {
               father and entrepreneur.
             </p>
             <div className="flex gap-2 mt-4 flex-wrap">
-              {["Purpose", "Authority", "Presence", "Alignment"].map((tag) => (
+              {["Presence", "Authority", "Purpose", "Alignment"].map((tag) => (
                 <span key={tag} className="text-xs px-2.5 py-1 rounded-full border border-white/20 text-gray-300">
                   {tag}
                 </span>
@@ -1689,7 +1689,7 @@ function Members() {
 
 // ─── Curriculum View ──────────────────────────────────────────────────────────
 
-const PILLARS = ["General", "Purpose", "Authority", "Presence", "Alignment"];
+const PILLARS = ["General", "Presence", "Authority", "Purpose", "Alignment"];
 const pillarColors: Record<string, string> = {
   Purpose: "text-primary bg-primary/10 border-primary/30",
   Authority: "text-green-400 bg-green-400/10 border-green-400/30",
@@ -2011,7 +2011,7 @@ function JournalPrompts() {
         <div className="bg-[#111] border border-white/10 rounded-xl p-5 space-y-3">
           <h3 className="text-white font-semibold text-sm">New Journal Prompt</h3>
           <select value={form.pillar} onChange={(e) => setForm({ ...form, pillar: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50">
-            {["Purpose", "Authority", "Presence", "Alignment"].map((p) => <option key={p} value={p} className="bg-[#1a1a1a]">{p}</option>)}
+            {["Presence", "Authority", "Purpose", "Alignment"].map((p) => <option key={p} value={p} className="bg-[#1a1a1a]">{p}</option>)}
           </select>
           <textarea value={form.prompt_text} onChange={(e) => setForm({ ...form, prompt_text: e.target.value })} placeholder="Write the journal prompt question..." rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 resize-none" />
           <div className="flex gap-2">
@@ -2022,7 +2022,7 @@ function JournalPrompts() {
       )}
 
       <div className="flex gap-1.5 flex-wrap">
-        {["All", "Purpose", "Authority", "Presence", "Alignment"].map((p) => (
+        {["All", "Presence", "Authority", "Purpose", "Alignment"].map((p) => (
           <button key={p} onClick={() => setFilterPillar(p)} className={`text-xs px-2.5 py-1 rounded-full transition-colors ${filterPillar === p ? "bg-primary text-primary-foreground font-bold" : "bg-white/5 text-gray-400 hover:text-white"}`}>{p}</button>
         ))}
       </div>

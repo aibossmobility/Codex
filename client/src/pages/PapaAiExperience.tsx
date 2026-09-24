@@ -1,3 +1,4 @@
+import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,7 +57,6 @@ type LeadContact = {
   sms_consent: boolean;
 };
 
-const PAPA_LIFE_VOICE_AGENT_URL = "/papa-agent.html";
 const papaPillars: PapaPillar[] = ["Presence", "Authority", "Purpose", "Alignment"];
 const SMS_CONSENT_TEXT =
   "By submitting this form, you agree to receive text messages from Papa Life regarding coaching appointments, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";
@@ -255,7 +255,7 @@ function localReply(mode: Mode, text: string) {
     return "Bible Study: Read James 1:19. Observation: listening comes before speaking. Interpretation: mature fatherhood does not lose authority when it slows down. Application: before your next conversation, write what you heard, what you can own, and what you will do differently. Reflection: where have I been trying to be understood before helping my child feel heard? Prayer: Lord, make me quick to listen and slow to speak.";
   }
   if (mode === "membership") {
-    return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Purpose, Authority, Presence, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
+    return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
   }
   if (mode === "tuesday") {
     return "That is a strong Tuesday Live question. Bring it as one clear sentence: what should a father do when he wants repair, but his adult child is not ready? The teaching should start with humility, move through Presence, and end with one practical step.";
@@ -857,9 +857,7 @@ export default function PapaAiExperience() {
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a
-                    href={PAPA_LIFE_VOICE_AGENT_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#live-brian-twin"
                     className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-yellow px-6 text-sm font-extrabold text-black transition-colors hover:bg-white"
                   >
                     <Mic className="mr-2 h-5 w-5" aria-hidden="true" />
@@ -876,6 +874,22 @@ export default function PapaAiExperience() {
               </div>
               <HeroPromoPanel statusLabel={statusLabel} />
             </div>
+          </div>
+        </section>
+
+        <section id="live-brian-twin" className="container scroll-mt-24 py-8 md:py-12">
+          <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,.72fr)_minmax(420px,1.28fr)]">
+            <div className="pt-2">
+              <Badge className="bg-brand-yellow text-black">Same Brain · Live Video</Badge>
+              <h2 className="mt-4 text-3xl font-extrabold md:text-4xl">Talk face-to-face with Brian’s Digital Twin.</h2>
+              <p className="mt-4 text-base leading-relaxed text-white/68">
+                This live Twin uses the same Papa Life framework and approved knowledge posture as the text AI Coach below.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-white/55">
+                PAPA is always Presence → Authority → Purpose → Alignment.
+              </p>
+            </div>
+            <BrianLiveAvatar />
           </div>
         </section>
 

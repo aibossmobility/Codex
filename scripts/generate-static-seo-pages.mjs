@@ -27,7 +27,7 @@ const pages = [
     path: "/assessment",
     title: "Free PAPA Fatherhood Assessment | Papa Life",
     description:
-      "Score yourself across Purpose, Authority, Presence, and Alignment. A free five-minute assessment for fathers of adult children.",
+      "Score yourself across Presence, Authority, Purpose, and Alignment. A free five-minute assessment for fathers of adult children.",
     eyebrow: "Free Assessment",
     headline: "Your grown child stopped talking to you. It does not have to stay that way.",
     intro:
@@ -74,18 +74,18 @@ const pages = [
     headline: "Ask for guidance when you need words, next steps, or perspective.",
     intro: "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
-      ["Assessment help", "Use the coach to understand your PAPA scores and what they suggest about Purpose, Authority, Presence, and Alignment."],
+      ["Assessment help", "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment."],
       ["Resource guidance", "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises."],
     ],
   },
   {
     path: "/papa-framework",
-    title: "The PAPA Framework for Fathers | Purpose, Authority, Presence, Alignment",
+    title: "The PAPA Framework for Fathers | Presence, Authority, Purpose, Alignment",
     description:
       "Learn the PAPA framework, four pillars that help fathers lead with clarity, character, presence, and integrity with adult children.",
     eyebrow: "PAPA Framework",
     headline: "Four pillars. One mission: become the father your adult child can trust again.",
-    intro: "Purpose, Authority, Presence, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
+    intro: "Presence, Authority, Purpose, and Alignment give fathers a map when adult-child relationships feel harder than they should.",
     sections: [
       ["Purpose", "Know why you were built for this role beyond paychecks and provider identity."],
       ["Authority", "Lead without control and trade force for grounded character."],
@@ -197,7 +197,7 @@ const pages = [
     description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
     eyebrow: "Membership",
     headline: "Build consistency instead of relying on one emotional moment.",
-    intro: "Membership helps fathers keep practicing Purpose, Authority, Presence, and Alignment through guided lessons and reflection tools.",
+    intro: "Membership helps fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
     sections: [
       ["Course structure", "Work through practical lessons built for fathers navigating relationships with adult children."],
       ["Ongoing support", "Use AI coaching, resources, and community-oriented support to stay steady."],
@@ -260,7 +260,7 @@ const pages = [
     headline: "Move from awareness into a guided fatherhood path.",
     intro: "The Papa Journey helps fathers work through relationship distance with structure, reflection, coaching, and next steps.",
     sections: [
-      ["PAPA pillars", "Purpose, Authority, Presence, and Alignment organize the path."],
+      ["PAPA pillars", "Presence, Authority, Purpose, and Alignment organize the path."],
       ["Continue steadily", "Use the journey to build consistency and repair-oriented habits over time."],
     ],
   },

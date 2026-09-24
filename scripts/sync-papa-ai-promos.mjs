@@ -253,7 +253,7 @@ function buildManifest(existing, assets) {
       message: "faith-based fatherhood",
       logoPlacement: "bottom",
     },
-    rotation: ["Purpose", "Authority", "Presence", "Alignment"],
+    rotation: ["Presence", "Authority", "Purpose", "Alignment"],
     rotationStartsOn: launchStartsOn,
     filenamePattern: "YYYY-W##_pillar_topic-slug_platform_WIDTHxHEIGHT.ext",
     exampleFilename: "2026-W27_purpose_ai-launch_website-hero_1600x900.png",

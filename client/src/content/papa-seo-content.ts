@@ -66,7 +66,7 @@ export const SEO_PAGES: SeoArticle[] = [
       {
         heading: "A better path forward",
         paragraphs: [
-          "The PAPA framework — Purpose, Authority, Presence, Alignment — gives you language and steps when emotions run high and words fail.",
+          "The PAPA framework — Presence, Authority, Purpose, Alignment — gives you language and steps when emotions run high and words fail.",
           "Start with clarity, not a grand gesture. Take the free assessment to see where your relationship stands today and what one honest next step could look like.",
         ],
       },
@@ -187,12 +187,12 @@ export const SEO_PAGES: SeoArticle[] = [
   },
   {
     slug: "/papa-framework",
-    title: "The PAPA Framework for Fathers | Purpose, Authority, Presence, Alignment",
+    title: "The PAPA Framework for Fathers | Presence, Authority, Purpose, Alignment",
     description:
       "Learn the PAPA framework — four pillars that help fathers lead with clarity, character, presence, and integrity with adult children.",
-    keywords: "PAPA framework, fatherhood framework, Purpose Authority Presence Alignment",
+    keywords: "PAPA framework, fatherhood framework, Presence Authority Purpose Alignment",
     headline: "Four pillars. One mission: become the father your adult child can trust again.",
-    subheadline: "Purpose · Authority · Presence · Alignment — a map when fatherhood feels harder than it should.",
+    subheadline: "Presence · Authority · Purpose · Alignment — a map when fatherhood feels harder than it should.",
     sections: [
       {
         paragraphs: [
@@ -227,7 +227,7 @@ export const SEO_PAGES: SeoArticle[] = [
     jsonLd: articleSchema(
       "/papa-framework",
       "The PAPA Framework for Fathers",
-      "Purpose, Authority, Presence, and Alignment — a fatherhood framework for adult children."
+      "Presence, Authority, Purpose, and Alignment — a fatherhood framework for adult children."
     ),
   },
   {

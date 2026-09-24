@@ -79,7 +79,7 @@ export const papaAiPromoSizes: PapaAiPromoSize[] = [
   { id: "youtube-community", label: "YouTube community", width: 1280, height: 720, folder: "YouTube" },
 ];
 
-export const papaAiPromoRotation: PapaPillar[] = ["Purpose", "Authority", "Presence", "Alignment"];
+export const papaAiPromoRotation: PapaPillar[] = ["Presence", "Authority", "Purpose", "Alignment"];
 
 export const papaAiCurrentPromo: PapaAiPromoWeek = {
   weekNumber: 1,

@@ -21,7 +21,7 @@ type ChatMessage = {
 type ResourceItem = {
   title: string;
   type: "Video" | "Article" | "Podcast" | "Bible Study" | "Worksheet" | "Course" | "Book Chapter";
-  pillar: "Purpose" | "Authority" | "Presence" | "Alignment" | "General";
+  pillar: "Presence" | "Authority" | "Purpose" | "Alignment" | "General";
   description: string;
   path: string;
   keywords: string[];
@@ -31,7 +31,7 @@ type AssessmentAnswer = {
   id: string;
   label: string;
   score: number;
-  pillar: "Purpose" | "Authority" | "Presence" | "Alignment" | "Communication" | "Forgiveness" | "Trust" | "Humility" | "Listening" | "Connection";
+  pillar: "Presence" | "Authority" | "Purpose" | "Alignment" | "Communication" | "Forgiveness" | "Trust" | "Humility" | "Listening" | "Connection";
 };
 
 const PAPA_SYSTEM_PROMPT = `You are the Papa Life AI Coach, the digital extension of Brian Keith Hill's coaching ministry.
@@ -40,7 +40,7 @@ Mission: help fathers of adult children rebuild connection, restore trust, and l
 
 Voice: warm, soft-spoken, authentic, biblical, unhurried, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Never borrow the visitor's hurry. Listen first and make the person feel heard, seen, and understood before offering direction. If the visitor is rushed, be concise without sounding rushed. If the visitor slows down, stay with them patiently. Do not prescribe a next step until the person has given enough context or asks for one.
 
-Core framework:
+Core framework, always in this exact order:
 - Presence: showing up consistently and safely.
 - Authority: leading wisely without controlling.
 - Purpose: who the father is becoming under God.
@@ -182,12 +182,12 @@ export const papaAiResources: ResourceItem[] = [
 ];
 
 export const papaAssessmentQuestions = [
-  ["purpose_1", "I know what kind of father I am becoming in this season.", "Purpose"],
-  ["purpose_2", "I can name a clear hope for my relationship with my adult child.", "Purpose"],
-  ["authority_1", "I lead through humility and consistency instead of pressure.", "Authority"],
-  ["authority_2", "I can take responsibility for my part without becoming defensive.", "Authority"],
   ["presence_1", "I listen before correcting, teaching, or fixing.", "Presence"],
   ["presence_2", "I initiate connection without demanding a response.", "Presence"],
+  ["authority_1", "I lead through humility and consistency instead of pressure.", "Authority"],
+  ["authority_2", "I can take responsibility for my part without becoming defensive.", "Authority"],
+  ["purpose_1", "I know what kind of father I am becoming in this season.", "Purpose"],
+  ["purpose_2", "I can name a clear hope for my relationship with my adult child.", "Purpose"],
   ["alignment_1", "My actions match the faith and values I say matter.", "Alignment"],
   ["alignment_2", "I have made, or am willing to make, needed apologies.", "Alignment"],
   ["communication_1", "My adult child would likely experience my tone as safe.", "Communication"],
@@ -255,6 +255,15 @@ export function buildPapaAiLocalReply(input: {
       reply:
         "Father, I want to answer with care. If there is immediate danger, abuse, violence, or thoughts of self-harm, pause the coaching path and contact local emergency help or a trusted crisis resource right now. Papa Life can walk with fatherhood repair, but safety comes first.\n\nWhen things are stable, start with one grounded step: write down what happened, who may be at risk, and who can help you make the next wise call today.",
       resources: findPapaResources("safety trust support", 3),
+    };
+  }
+
+  if (isPapaFrameworkQuestion(lower)) {
+    return {
+      provider: "local" as PapaAiProvider,
+      reply:
+        "PAPA stands for, in this exact approved order:\n\n1. Presence — show up consistently and safely.\n2. Authority — lead wisely without controlling.\n3. Purpose — become the father God is shaping now.\n4. Alignment — live what you say matters.",
+      resources: findPapaResources("PAPA framework Presence Authority Purpose Alignment", 3),
     };
   }
 
@@ -493,6 +502,10 @@ async function completeWithGemini(input: { message: string; mode?: PapaAiMode; h
     reply: String(json?.candidates?.[0]?.content?.parts?.[0]?.text || "").trim(),
     resources: findPapaResources(input.message, 3),
   };
+}
+
+function isPapaFrameworkQuestion(text: string) {
+  return /(what\s+does\s+papa\s+stand\s+for|what\s+is\s+(?:the\s+)?papa\s+framework|papa\s+(?:framework|pillars?)|(?:four|4)\s+papa\s+pillars?|what\s+are\s+the\s+(?:four|4)\s+pillars)/.test(text);
 }
 
 function detectPillar(text: string) {

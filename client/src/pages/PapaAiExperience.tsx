@@ -145,12 +145,12 @@ const localResources: ResourceItem[] = [
 ];
 
 const fallbackQuestions: AssessmentQuestion[] = [
-  { id: "purpose_1", label: "I know what kind of father I am becoming in this season.", pillar: "Purpose" },
-  { id: "purpose_2", label: "I can name a clear hope for my relationship with my adult child.", pillar: "Purpose" },
-  { id: "authority_1", label: "I lead through humility and consistency instead of pressure.", pillar: "Authority" },
-  { id: "authority_2", label: "I can take responsibility for my part without becoming defensive.", pillar: "Authority" },
   { id: "presence_1", label: "I listen before correcting, teaching, or fixing.", pillar: "Presence" },
   { id: "presence_2", label: "I initiate connection without demanding a response.", pillar: "Presence" },
+  { id: "authority_1", label: "I lead through humility and consistency instead of pressure.", pillar: "Authority" },
+  { id: "authority_2", label: "I can take responsibility for my part without becoming defensive.", pillar: "Authority" },
+  { id: "purpose_1", label: "I know what kind of father I am becoming in this season.", pillar: "Purpose" },
+  { id: "purpose_2", label: "I can name a clear hope for my relationship with my adult child.", pillar: "Purpose" },
   { id: "alignment_1", label: "My actions match the faith and values I say matter.", pillar: "Alignment" },
   { id: "alignment_2", label: "I have made, or am willing to make, needed apologies.", pillar: "Alignment" },
   { id: "communication_1", label: "My adult child would likely experience my tone as safe.", pillar: "Communication" },

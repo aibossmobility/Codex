@@ -1,8 +1,10 @@
-import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
+import { createElement, useEffect } from "react";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { CalendarCheck, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
 
+const AGENT_ID = "agent_7601kt209ptbe0qrd9b3e4gezyv6";
+const AGENT_LINK = "https://elevenlabs.io/app/talk-to?agent_id=agent_7601kt209ptbe0qrd9b3e4gezyv6&branch_id=agtbrch_6301kt209qgde8vv2pdev2caj6bd";
 const pillarColors = ["#f2c230", "#16853b", "#c62828", "#f2c230"] as const;
 
 const pillars = [
@@ -13,11 +15,19 @@ const pillars = [
 ] as const;
 
 export default function DigitalTwinDemo() {
+  useEffect(() => {
+    if (document.querySelector("script[data-papa-elevenlabs-widget]")) return;
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+    script.async = true;
+    script.dataset.papaElevenlabsWidget = "true";
+    document.body.appendChild(script);
+  }, []);
   return (
     <div className="min-h-screen bg-[#050806] text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
-        description="Have a live video conversation with Brian Keith Hill's Papa Life digital twin for fathers of adult children."
+        description="Talk by voice with Brian Keith Hill's Papa Life AI agent and explore the fatherhood resources."
       />
 
       <header className="border-b border-[#f2c230]/35 bg-black">
@@ -42,11 +52,10 @@ export default function DigitalTwinDemo() {
                 Live Papa Life conversation
               </p>
               <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-                Talk face-to-face with Brian's Digital Twin
+                Talk with Brian's Papa Life AI
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                Speak naturally. Brian's Papa Life agent listens and responds live in the Brian Keith Hill voice,
-                while a clean Papa Life visual keeps human relationship at the center.
+                See Brian's image, press Start Call, and talk naturally with his ElevenLabs AI agent. Ask about fatherhood, the PAPA framework, or where to find a Papa Life resource.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -66,10 +75,9 @@ export default function DigitalTwinDemo() {
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#f2c230]" />
                   <div>
-                    <p className="font-extrabold">The conversation is live, not a prerecorded answer.</p>
+                    <p className="font-extrabold">Your conversation uses Brian's ElevenLabs AI agent.</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/65">
-                      Your microphone feeds the Papa Life conversation agent. Responses are generated live
-                      in Brian's voice while the clean green-sweater visual keeps the experience calm and personal.
+                      The agent responds to your questions by voice. Brian's portrait identifies the guide; it is not a moving video avatar.
                     </p>
                   </div>
                 </div>
@@ -77,7 +85,26 @@ export default function DigitalTwinDemo() {
             </div>
 
             <div className="md:sticky md:top-4">
-              <BrianLiveAvatar posterSrc="/images/brian-green-sweater-live.jpg" posterAlt="Brian Keith Hill in his green sweater" />
+              <div className="overflow-hidden rounded-3xl border border-[#f2c230]/45 bg-black shadow-2xl">
+                <div className="grid h-1.5 grid-cols-3" aria-hidden="true"><div className="bg-[#f2c230]" /><div className="bg-[#c62828]" /><div className="bg-[#16853b]" /></div>
+                <img src="/images/brian-green-sweater-live.jpg" alt="Brian Keith Hill" className="aspect-video w-full object-cover object-center" />
+                <div className="space-y-4 border-t border-white/10 p-5">
+                  <p className="font-extrabold">Speak with Brian's Papa Life AI</p>
+                  <p className="text-sm text-white/70">Press Start Call below and allow microphone access when your browser asks.</p>
+                  {createElement("elevenlabs-convai", {
+                    "agent-id": AGENT_ID,
+                    variant: "expanded",
+                    "avatar-image-url": "https://papa-life-digital-twin-preview-production.up.railway.app/images/brian-green-sweater-live.jpg",
+                    "avatar-orb-color-1": "#f2c230",
+                    "avatar-orb-color-2": "#16853b",
+                    "start-call-text": "Talk with Brian's AI",
+                    "markdown-link-allowed-hosts": "papalifecoach.com papa-life-digital-twin-preview-production.up.railway.app",
+                  })}
+                  <a href={AGENT_LINK} target="_blank" rel="noopener noreferrer" className="inline-block text-sm font-bold text-[#f2c230] underline hover:text-white">
+                    Open Brian's AI conversation directly
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -113,6 +140,22 @@ export default function DigitalTwinDemo() {
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   The twin does not invent memories, expose private information, or pretend to replace Brian.
                 </p>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-white/10 bg-black/25 p-6">
+              <h2 className="text-xl font-extrabold">Explore Papa Life together</h2>
+              <p className="mt-2 text-sm text-white/65">Ask the AI to help you choose a next step, then open the resource that fits. Members sign in for course materials.</p>
+              <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
+                <a href="/my-journey" className="text-[#f2c230] underline">Fatherhood Check-In</a>
+                <a href="/papa-framework" className="text-[#f2c230] underline">PAPA Framework</a>
+                <a href="/courses" className="text-[#f2c230] underline">Courses and lessons</a>
+                <a href="/tuesday-live" className="text-[#f2c230] underline">Tuesday Live</a>
+                <a href="/resources" className="text-[#f2c230] underline">Resources</a>
+                <a href="/books" className="text-[#f2c230] underline">Books</a>
+                <a href="/podcast" className="text-[#f2c230] underline">Audio and podcast</a>
+                <a href="/membership" className="text-[#f2c230] underline">Membership</a>
+                <a href="/booking" className="text-[#f2c230] underline">Talk with Brian</a>
               </div>
             </div>
 

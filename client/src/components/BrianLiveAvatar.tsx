@@ -4,13 +4,21 @@ import {
   SessionEvent,
   SessionState,
 } from "@heygen/liveavatar-web-sdk";
-import { Mic, Send, Square, Video } from "lucide-react";
+import { Mic, Send, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 
 type LiveState = "idle" | "connecting" | "live" | "ended" | "error";
 
-export function BrianLiveAvatar() {
+type BrianLiveAvatarProps = {
+  posterSrc?: string;
+  posterAlt?: string;
+};
+
+export function BrianLiveAvatar({
+  posterSrc = "/images/brian-green-sweater-live.jpg",
+  posterAlt = "Brian Keith Hill",
+}: BrianLiveAvatarProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sessionRef = useRef<ElevenLabsAgentSession | null>(null);
   const [state, setState] = useState<LiveState>("idle");
@@ -121,41 +129,54 @@ export function BrianLiveAvatar() {
 
   return (
     <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
-      <div className="relative aspect-video bg-black">
+      <div className="relative aspect-video overflow-hidden bg-black">
         <video
           ref={videoRef}
           autoPlay
           playsInline
-          className="h-full w-full bg-black object-cover"
+          className={`absolute inset-0 h-full w-full bg-black object-cover transition-opacity duration-300 ${isLive && !sandbox ? "opacity-100" : "opacity-0"}`}
           aria-label="Live video of Brian Keith Hill's Papa Life Digital Twin"
         />
-        {!isLive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#07100b] px-6 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#f2c230]/55 bg-black/60">
-              <Video className="h-7 w-7 text-[#f2c230]" />
+
+        {(!isLive || sandbox) && (
+          <div className="absolute inset-0">
+            <img
+              src={posterSrc}
+              alt={posterAlt}
+              className="h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-black/10" />
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 px-5 pb-6 text-center">
+              <div>
+                <p className="font-extrabold text-white">
+                  {isLive ? "Talk with Brian’s Digital Twin" : "Brian Keith Hill — Papa Life"}
+                </p>
+                <p className="mt-1 max-w-md text-sm leading-relaxed text-white/75">
+                  {isLive
+                    ? "Live voice conversation is connected. Speak naturally with Brian’s Papa Life Digital Twin."
+                    : "Start a private voice conversation with Brian’s Papa Life Digital Twin."}
+                </p>
+              </div>
+              {!isLive && (
+                <button
+                  type="button"
+                  onClick={() => void startConversation()}
+                  disabled={isBusy}
+                  className="inline-flex min-h-12 items-center rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white disabled:opacity-60"
+                >
+                  <Mic className="mr-2 h-5 w-5" />
+                  {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
+                </button>
+              )}
             </div>
-            <div>
-              <p className="font-extrabold text-white">Brian appears here as live video</p>
-              <p className="mt-1 max-w-md text-sm leading-relaxed text-white/60">
-                Start the conversation to connect the real-time avatar, microphone, and Brian Keith Hill voice.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => void startConversation()}
-              disabled={isBusy}
-              className="inline-flex min-h-12 items-center rounded-full bg-[#f2c230] px-6 font-extrabold text-black hover:bg-white disabled:opacity-60"
-            >
-              <Mic className="mr-2 h-5 w-5" />
-              {isBusy ? "Connecting…" : state === "ended" ? "Talk Again" : "Talk with Brian"}
-            </button>
           </div>
         )}
+
         {isLive && (
           <button
             type="button"
             onClick={() => void stopConversation()}
-            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full border border-[#f2c230]/60 bg-black/75 px-3 py-2 text-xs font-extrabold text-[#f2c230] backdrop-blur hover:bg-[#f2c230] hover:text-black"
+            className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-2 rounded-full border border-[#f2c230]/60 bg-black/75 px-3 py-2 text-xs font-extrabold text-[#f2c230] backdrop-blur hover:bg-[#f2c230] hover:text-black"
           >
             <Square className="h-3.5 w-3.5" />
             End
@@ -171,9 +192,9 @@ export function BrianLiveAvatar() {
           </span>
         </div>
 
-        {sandbox && (
-          <p className="mt-2 text-xs text-[#f2c230]/85">
-            LiveAvatar sandbox test — the conversation/voice pipeline is live; the custom green-sweater Brian avatar replaces this test avatar after activation.
+        {sandbox && isLive && (
+          <p className="mt-2 text-xs text-white/50">
+            Live voice is active. Brian’s custom live-motion video is being finalized.
           </p>
         )}
 

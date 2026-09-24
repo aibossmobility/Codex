@@ -66,7 +66,7 @@ export default function DigitalTwinDemo() {
             </div>
 
             <div className="md:sticky md:top-4">
-              <BrianLiveAvatar />
+              <BrianLiveAvatar posterSrc="/images/brian-green-sweater-live.jpg" posterAlt="Brian Keith Hill in his green sweater" />
             </div>
           </div>
         </section>

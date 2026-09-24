@@ -284,7 +284,7 @@ export default function Home() {
               Voice, knowledge, and coaching posture stay consistent across the homepage, AI Coach, and Digital Twin experience.
             </p>
           </div>
-          <BrianLiveAvatar />
+          <BrianLiveAvatar posterSrc="/images/brian-green-sweater-live.jpg" posterAlt="Brian Keith Hill in his green sweater" />
         </div>
       </section>
 

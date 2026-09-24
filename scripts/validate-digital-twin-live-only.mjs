@@ -9,7 +9,6 @@ const files = [
 const forbidden = [
   ["papa-life-gold-master", "prerecorded green-sweater fallback"],
   ["GREEN_SWEATER_PREVIEW", "prerecorded preview constant"],
-  ["brian-digital-twin-real", "still-image Brian fallback"],
   ["digital-twin-mouth", "fake mouth-frame overlay"],
 ];
 

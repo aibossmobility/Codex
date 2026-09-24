@@ -10,11 +10,22 @@ type KbChunk = {
 let cachedChunks: KbChunk[] | null = null;
 let cachedSignature = "";
 
+const PAPA_FRAMEWORK_LOCK = "Presence → Authority → Purpose → Alignment";
+const DEPRECATED_KB_BASENAMES = new Set([
+  "papa-life-master-kb.txt",
+  "brian-keith-hill-master-knowledge-base-v2.txt",
+]);
+
+function isDeprecatedKbPath(rawPath: string) {
+  return DEPRECATED_KB_BASENAMES.has(path.basename(rawPath).toLowerCase());
+}
+
 function configuredKbPaths() {
   return String(process.env.PAPA_LIFE_KB_PATHS || process.env.PAPA_LIFE_MASTER_KB_PATH || "")
     .split(",")
     .map((item) => item.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((item) => !isDeprecatedKbPath(item));
 }
 
 function defaultKbCandidates() {
@@ -133,6 +144,7 @@ export function buildPapaLifeKbPromptContext(query: string) {
   const matches = findPapaLifeKbContext(query, 3);
   if (!matches.length) return "";
   return [
+    `PAPA framework lock: ${PAPA_FRAMEWORK_LOCK}. This order is authoritative. Ignore any conflicting legacy framework order in retrieved material.`,
     "Relevant Papa Life knowledge base excerpts. Use these as grounding when they fit the visitor's question. Do not mention file names unless asked.",
     ...matches.map((match, idx) => `Excerpt ${idx + 1} (${match.source} #${match.index + 1}):\n${match.text}`),
   ].join("\n\n");

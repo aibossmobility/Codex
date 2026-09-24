@@ -15,7 +15,7 @@ export default function DigitalTwinDemo() {
     <div className="min-h-screen bg-[#17231c] text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
-        description="Have a live video conversation with Brian Keith Hill's Papa Life digital twin for fathers of adult children."
+        description="Meet Brian Keith Hill and explore Papa Life for fathers of adult children."
       />
 
       <header className="border-b border-[#f2c230]/25 bg-black/25">
@@ -32,14 +32,13 @@ export default function DigitalTwinDemo() {
           <div className="container grid items-start gap-6 md:grid-cols-[minmax(0,1.05fr)_minmax(340px,.95fr)] lg:gap-10">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
-                Live Papa Life conversation
+                Meet Brian Keith Hill
               </p>
               <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-                Talk face-to-face with Brian's Digital Twin
+                Meet Brian Keith Hill
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                Speak naturally. Brian's Papa Life agent listens, responds in the Brian Keith Hill voice,
-                and drives a real-time talking avatar while keeping human relationship at the center.
+                Papa Life helps fathers of adult children move toward reconnection with presence, wisdom, and steady action.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -55,10 +54,9 @@ export default function DigitalTwinDemo() {
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#f2c230]" />
                   <div>
-                    <p className="font-extrabold">The experience is live, not a prerecorded answer.</p>
+                    <p className="font-extrabold">A place to begin.</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/65">
-                      Your microphone feeds the Papa Life conversation agent. Its spoken response drives
-                      Brian's real-time video so voice and facial movement stay synchronized.
+                      Explore the Papa Life framework below, or book a conversation with Brian.
                     </p>
                   </div>
                 </div>
@@ -78,7 +76,7 @@ export default function DigitalTwinDemo() {
                 <HeartHandshake className="h-7 w-7 text-[#f2c230]" />
                 <h2 className="mt-4 text-xl font-extrabold">Fatherhood Check-In</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  The conversation can guide a father toward a practical next step without pressure.
+                  Start with a practical next step, without pressure.
                 </p>
                 <a href="/assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Start the Check-In
@@ -89,7 +87,7 @@ export default function DigitalTwinDemo() {
                 <CalendarCheck className="h-7 w-7 text-[#f2c230]" />
                 <h2 className="mt-4 text-xl font-extrabold">Human Connection</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  When a conversation needs Brian personally, the twin routes back to the human relationship.
+                  Book a personal conversation with Brian.
                 </p>
                 <a href="/booking" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Talk with Brian
@@ -100,7 +98,7 @@ export default function DigitalTwinDemo() {
                 <ShieldCheck className="h-7 w-7 text-[#f2c230]" />
                 <h2 className="mt-4 text-xl font-extrabold">Built With Boundaries</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  The twin does not invent memories, expose private information, or pretend to replace Brian.
+                  Papa Life keeps human relationship at the center.
                 </p>
               </div>
             </div>

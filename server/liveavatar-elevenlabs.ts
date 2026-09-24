@@ -3,7 +3,6 @@ import type { Express } from "express";
 const LIVEAVATAR_BASE_URL = "https://api.liveavatar.com";
 const DEFAULT_SANDBOX_AVATAR_ID = "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a";
 const DEFAULT_PAPA_AGENT_ID = "F1Xz9oYC1pQFzumJSRHg";
-const DEFAULT_BRIAN_VOICE_ID = "Eo4ci7V2rQPrk0GndhOG";
 const DEFAULT_SECRET_NAME = "Papa Life ElevenLabs Agent Key";
 
 function env(name: string, fallback = "") {
@@ -24,10 +23,6 @@ function avatarId() {
 
 function papaAgentId() {
   return env("LIVEAVATAR_AGENT_ID", DEFAULT_PAPA_AGENT_ID);
-}
-
-function brianVoiceId() {
-  return env("LIVEAVATAR_VOICE_ID", DEFAULT_BRIAN_VOICE_ID);
 }
 
 function secretName() {
@@ -107,7 +102,6 @@ async function createPapaLiveAvatarSession() {
     elevenlabs_agent_config: {
       secret_id: secretId,
       agent_id: papaAgentId(),
-      voice_id: brianVoiceId(),
     },
   };
 

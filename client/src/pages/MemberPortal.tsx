@@ -200,7 +200,7 @@ function OnboardingWizard({ user, onComplete }: { user: MemberUser; onComplete: 
     "Ready to level up",
   ];
 
-  const pillars = ["Purpose", "Authority", "Presence", "Alignment"];
+  const pillars = ["Presence", "Authority", "Purpose", "Alignment"];
 
   const steps = [
     {
@@ -696,7 +696,7 @@ function JournalView() {
   const [selectedPrompt, setSelectedPrompt] = useState("");
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
-  const pillars = ["Purpose", "Authority", "Presence", "Alignment"];
+  const pillars = ["Presence", "Authority", "Purpose", "Alignment"];
 
   const fetchPrompts = async () => {
     const res = await fetch("/api/journal-prompts");
@@ -1211,7 +1211,7 @@ function ProfileView({ user }: { user: MemberUser | null }) {
         <div>
           <label className="text-xs text-gray-500 uppercase tracking-widest mb-2 block">Primary Growth Pillar</label>
           <div className="grid grid-cols-2 gap-2">
-            {["Purpose", "Authority", "Presence", "Alignment"].map((p) => (
+            {["Presence", "Authority", "Purpose", "Alignment"].map((p) => (
               <button key={p} onClick={() => setPrefs((f) => ({ ...f, primary_pillar: p }))}
                 className={`py-2 rounded-lg text-sm font-medium transition-colors ${prefs.primary_pillar === p ? `${pillarColors[p].badge} border` : "bg-white/5 text-gray-400 hover:text-white"}`}>
                 {p}

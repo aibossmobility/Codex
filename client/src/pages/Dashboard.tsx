@@ -1065,7 +1065,7 @@ function CommandCenter({ stats }: { stats: Stats | null }) {
               father and entrepreneur.
             </p>
             <div className="flex gap-2 mt-4 flex-wrap">
-              {["Purpose", "Authority", "Presence", "Alignment"].map((tag) => (
+              {["Presence", "Authority", "Purpose", "Alignment"].map((tag) => (
                 <span key={tag} className="text-xs px-2.5 py-1 rounded-full border border-white/20 text-gray-300">
                   {tag}
                 </span>
@@ -2011,7 +2011,7 @@ function JournalPrompts() {
         <div className="bg-[#111] border border-white/10 rounded-xl p-5 space-y-3">
           <h3 className="text-white font-semibold text-sm">New Journal Prompt</h3>
           <select value={form.pillar} onChange={(e) => setForm({ ...form, pillar: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50">
-            {["Purpose", "Authority", "Presence", "Alignment"].map((p) => <option key={p} value={p} className="bg-[#1a1a1a]">{p}</option>)}
+            {["Presence", "Authority", "Purpose", "Alignment"].map((p) => <option key={p} value={p} className="bg-[#1a1a1a]">{p}</option>)}
           </select>
           <textarea value={form.prompt_text} onChange={(e) => setForm({ ...form, prompt_text: e.target.value })} placeholder="Write the journal prompt question..." rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 resize-none" />
           <div className="flex gap-2">

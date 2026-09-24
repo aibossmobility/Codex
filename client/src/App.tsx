@@ -50,6 +50,7 @@ import TuesdayLive from "./pages/TuesdayLive";
 import MarleeAssessment from "./pages/MarleeAssessment";
 import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
+import DigitalTwinDemo from "./pages/DigitalTwinDemo";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import {
   AboutBrianKeithHillPage,
@@ -108,6 +109,7 @@ function Router() {
       <Route path="/papa-framework" component={PapaFrameworkPage} />
       <Route path="/about-brian-keith-hill" component={AboutBrianKeithHillPage} />
       <Route path="/welcome-to-papa-life" component={WelcomeToPapaLife} />
+      <Route path="/digital-twin" component={DigitalTwinDemo} />
       <Route path="/admin/papa-life-outreach" component={PapaLifeOutreach} />
       <Route path={"/strategist"} component={Strategist} />
       <Route path={"/theme-matrix"} component={ThemeMatrix} />
@@ -154,7 +156,8 @@ function GlobalPapaAiWidget() {
   ];
   const shouldHide = hiddenPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
   if (shouldHide) return null;
-  return <BrianDigitalTwin autoOpen={path === "/"} />;
+  if (path === "/" || path === "/digital-twin") return null;
+  return <BrianDigitalTwin />;
 }
 
 function GlobalAllPagesButton() {

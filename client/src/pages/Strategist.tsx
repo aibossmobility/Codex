@@ -74,7 +74,7 @@ const PILLARS: {
   },
 ];
 
-const PILLAR_SET = new Set<string>(["Purpose", "Authority", "Presence", "Alignment"]);
+const PILLAR_SET = new Set<string>(["Presence", "Authority", "Purpose", "Alignment"]);
 
 const SMS_CONSENT_TEXT =
   "By submitting this form, you agree to receive text messages from Papa Life regarding coaching appointments, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";

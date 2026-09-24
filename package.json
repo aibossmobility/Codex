@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --host",
-    "build": "node scripts/generate-master-knowledge-page.mjs && node scripts/generate-search-discovery.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && node scripts/patch-papa-life-os-server.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-local-bridge.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-gmail-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-google-workspace-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-node-heartbeat.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-youtube-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "node scripts/validate-digital-twin-live-only.mjs && node scripts/generate-master-knowledge-page.mjs && node scripts/generate-search-discovery.mjs && vite build && node scripts/generate-static-seo-pages.mjs && node scripts/copy-private-resources.mjs && node scripts/patch-papa-life-os-server.mjs && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild mcp-streamable.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-local-bridge.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-gmail-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-google-workspace-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-node-heartbeat.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/ai-boss-youtube-connector.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "prestart": "node scripts/ensure-current-papa-life-build.mjs && node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
@@ -95,7 +95,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "wouter": "^3.3.5",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "@heygen/liveavatar-web-sdk": "0.0.19"
   },
   "devDependencies": {
     "@builder.io/vite-plugin-jsx-loc": "^0.1.1",

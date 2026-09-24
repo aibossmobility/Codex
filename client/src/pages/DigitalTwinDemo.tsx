@@ -55,7 +55,7 @@ export default function DigitalTwinDemo() {
                 Talk with Brian's Papa Life AI
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                See Brian's image, press Start Call, and talk naturally with his ElevenLabs AI agent. Ask about fatherhood, the PAPA framework, or where to find a Papa Life resource.
+                See Brian's image, tap the phone button at the lower right, and talk naturally with his ElevenLabs AI agent. Ask about fatherhood, the PAPA framework, or where to find a Papa Life resource.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -90,7 +90,7 @@ export default function DigitalTwinDemo() {
                 <img src="/images/brian-green-sweater-live.jpg" alt="Brian Keith Hill" className="aspect-video w-full object-cover object-center" />
                 <div className="space-y-4 border-t border-white/10 p-5">
                   <p className="font-extrabold">Speak with Brian's Papa Life AI</p>
-                  <p className="text-sm text-white/70">Press Start Call below and allow microphone access when your browser asks.</p>
+                  <p className="text-sm text-white/70">Tap the phone button at the lower right and allow microphone access when your browser asks.</p>
                   {createElement("elevenlabs-convai", {
                     "agent-id": AGENT_ID,
                     variant: "expanded",

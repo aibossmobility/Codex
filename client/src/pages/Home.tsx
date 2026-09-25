@@ -262,7 +262,7 @@ export default function Home() {
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet Brian Keith Hill</p>
             <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Meet Brian Keith Hill.</h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/72">
-              Explore Papa Life through Presence, Authority, Purpose, and Alignment.
+              Speak with Brian’s Papa Life AI about Presence, Authority, Purpose, and Alignment.
             </p>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/58">
               As long as you’re both alive, it’s never too late.

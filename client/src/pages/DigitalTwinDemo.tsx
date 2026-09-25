@@ -15,7 +15,7 @@ export default function DigitalTwinDemo() {
     <div className="min-h-screen bg-[#17231c] text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
-        description="Meet Brian Keith Hill and explore Papa Life for fathers of adult children."
+        description="Talk with Brian Keith Hill’s Papa Life AI using your microphone."
       />
 
       <header className="border-b border-[#f2c230]/25 bg-black/25">
@@ -38,7 +38,7 @@ export default function DigitalTwinDemo() {
                 Meet Brian Keith Hill
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                Papa Life helps fathers of adult children move toward reconnection with presence, wisdom, and steady action.
+                Ask a question out loud. Brian’s Papa Life AI listens and responds in his voice while his image stays on screen.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -56,7 +56,7 @@ export default function DigitalTwinDemo() {
                   <div>
                     <p className="font-extrabold">A place to begin.</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/65">
-                      Explore the Papa Life framework below, or book a conversation with Brian.
+                      Use the microphone by Brian’s image to start a voice conversation.
                     </p>
                   </div>
                 </div>

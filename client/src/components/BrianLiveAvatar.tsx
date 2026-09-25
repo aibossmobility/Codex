@@ -29,7 +29,13 @@ export function BrianLiveAvatar() {
       <div className="border-t border-white/10 p-5 text-white">
         <p className="font-extrabold">Brian Keith Hill — Papa Life Digital Twin</p>
         <p className="mt-2 text-sm text-white/70">Use the microphone below to speak with Brian's Papa Life AI.</p>
-        <div className="mt-4">{createElement("elevenlabs-convai", { "agent-id": AGENT_ID })}</div>
+        <div className="mt-4">
+          {createElement("elevenlabs-convai", {
+            "agent-id": AGENT_ID,
+            "worklet-path-raw-audio-processor": "/vendor/elevenlabs-worklets/rawAudioProcessor.js",
+            "worklet-path-audio-concat-processor": "/vendor/elevenlabs-worklets/audioConcatProcessor.js",
+          })}
+        </div>
       </div>
     </div>
   );

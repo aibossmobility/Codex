@@ -8,7 +8,7 @@ export function BrianLiveAvatar() {
     if (document.getElementById(id)) return;
     const script = document.createElement("script");
     script.id = id;
-    script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+    script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed@0.16.4";
     script.async = true;
     document.body.appendChild(script);
   }, []);

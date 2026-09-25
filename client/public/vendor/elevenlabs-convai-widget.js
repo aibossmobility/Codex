@@ -45,7 +45,7 @@
   };
 
   var script = document.createElement("script");
-  script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+  script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed@0.16.4";
   script.async = true;
   script.type = "text/javascript";
   script.onerror = function () {

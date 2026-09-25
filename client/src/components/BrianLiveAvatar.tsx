@@ -15,7 +15,17 @@ export function BrianLiveAvatar() {
 
   return (
     <div className="overflow-hidden rounded-3xl border border-[#f2c230]/35 bg-black shadow-2xl">
-      <img src="/images/brian-green-sweater-live.jpg" alt="Brian Keith Hill in a green sweater" className="aspect-video w-full object-cover" />
+      <video
+        controls
+        playsInline
+        preload="metadata"
+        poster="/videos/brian-green-sweater-papa-life-clean.jpg"
+        className="aspect-video w-full bg-black object-cover"
+        aria-label="Brian Keith Hill — Papa Life welcome video"
+      >
+        <source src="/videos/brian-green-sweater-papa-life-clean.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       <div className="border-t border-white/10 p-5 text-white">
         <p className="font-extrabold">Brian Keith Hill — Papa Life Digital Twin</p>
         <p className="mt-2 text-sm text-white/70">Use the microphone below to speak with Brian's Papa Life AI.</p>

@@ -547,6 +547,7 @@ export default function Home() {
             <a href="/member-login" className="hover:text-[#f2c230]">Member Login</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>
+            <a href="/consent" className="hover:text-[#f2c230]">Media & AI Permission</a>
             <a href="tel:+15104152098" className="hover:text-[#f2c230]">510.415.2098</a>
           </div>
         </div>

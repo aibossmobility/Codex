@@ -15,7 +15,7 @@ import { useState } from "react";
 const navigation = [
   { label: "Start Here", href: "#is-this-you" },
   { label: "Brian’s Story", href: "#brian-story" },
-  { label: "Start My Journey", href: "/assessment" },
+  { label: "2-Minute Check-In", href: "/assessment?src=nav" },
   { label: "Member Login", href: "/member-login" },
 ];
 
@@ -160,10 +160,10 @@ export default function Home() {
               1-Minute AI Experience
             </button>
             <a
-              href={joinHref}
+              href={quietChildAssessmentHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
             >
-              Enroll Now — Immediate Access
+              2-Minute Check-In
             </a>
           </div>
           <button
@@ -201,11 +201,11 @@ export default function Home() {
                 1-Minute AI Experience
               </button>
               <a
-                href={joinHref}
+                href={quietChildAssessmentHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-md bg-[#b33a32] px-4 py-3 font-extrabold text-white"
               >
-                Enroll Now — Immediate Access
+                2-Minute Check-In
               </a>
             </div>
           </div>
@@ -547,9 +547,9 @@ export default function Home() {
               {[
                 ["LinkedIn", "https://www.linkedin.com/in/brian-hill-bossmobility/"],
                 ["X", "https://x.com/bossmobility"],
-                ["Instagram", "https://instagram.com/bossmobilitylifecoach"],
+                ["Instagram", "https://www.instagram.com/papalifecoach/"],
                 ["YouTube", "https://www.youtube.com/channel/UC_etyzPwAS0W8GWWwFT9sow"],
-                ["TikTok", "https://www.tiktok.com/@bossmobilitylifecoach"],
+                ["TikTok", "https://www.tiktok.com/@papalifecoach"],
                 ["Threads", "https://www.threads.net/@papalifecoach"],
                 ["Facebook", "https://www.facebook.com/BrianKeithHillPapaLife3"],
                 ["Twitch", "https://www.twitch.tv/papalifecoach"],

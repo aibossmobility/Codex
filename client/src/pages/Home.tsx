@@ -15,7 +15,7 @@ import { useState } from "react";
 const navigation = [
   { label: "Start Here", href: "#is-this-you" },
   { label: "Brian’s Story", href: "#brian-story" },
-  { label: "Start My Journey", href: "/assessment" },
+  { label: "2-Minute Check-In", href: "/assessment?utm_source=homepage&utm_medium=nav&utm_campaign=quiet_child" },
   { label: "Member Login", href: "/member-login" },
 ];
 
@@ -122,6 +122,7 @@ function ActionLink({
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const joinHref = "/go/join?src=homepage";
+  const checkInHref = "/assessment?utm_source=homepage&utm_medium=hero&utm_campaign=quiet_child";
 
   function openPapaAiCoach() {
     window.dispatchEvent(new Event("papa-ai:open"));
@@ -131,7 +132,7 @@ export default function Home() {
     <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
       <PageMeta
         title="Papa Life | Help for Fathers of Adult Children"
-        description="Papa Life helps fathers of adult children rebuild trust, restore communication, and move from distance to reconnection through Scripture-centered guidance and practical tools."
+        description="When your adult child gets quiet, Papa Life helps fathers respond with presence, humility, and consistency. Start with the 2-Minute Fatherhood Check-In."
         keywords="fathers of adult children, reconnect with adult child, Papa Life, fatherhood, relationship repair"
       />
 
@@ -229,28 +230,29 @@ export default function Home() {
               Papa Life · For Fathers of Adult Children
             </p>
             <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.04] sm:text-5xl md:text-7xl">
-              Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.
+              When Your Adult Child Gets Quiet, Don’t Chase the Silence.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#314239] md:text-xl">
-              If you are ready to be taught, humbled, and led forward, Papa Life will help you take the next faithful step. Some doors between fathers and adult children cannot be forced open. Only God can make a way—and your part is to be ready when He does.
+              Silence can tempt a father to call again, text again, explain again, or push for an answer. Papa Life helps you choose a better next step: presence, humility, and consistency—so you can rebuild trust without pressure, panic, or shame.
             </p>
             <p className="mt-5 text-lg font-bold text-[#145b35] md:text-xl">
               As long as you’re both alive, it’s never too late.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              <ActionLink href={joinHref} light>
-                Enroll Now — Immediate Access
+              <ActionLink href={checkInHref} light>
+                Take the 2-Minute Fatherhood Check-In
               </ActionLink>
-              <a
-                href="/assessment"
+              <button
+                type="button"
+                onClick={openPapaAiCoach}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/55 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
               >
-                Start My Journey
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Talk with Brian’s AI Coach
+              </button>
             </div>
             <p className="mt-5 text-sm font-semibold text-[#314239]">
-              We do not help fathers win arguments. We help fathers rebuild relationships.
+              Start with clarity. Then take one calm, practical next step toward safer connection.
             </p>
           </div>
         </div>

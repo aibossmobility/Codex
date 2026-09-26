@@ -122,6 +122,8 @@ function ActionLink({
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const joinHref = "/go/join?src=homepage";
+  const quietChildAssessmentHref =
+    "/assessment?utm_source=homepage&utm_medium=hero&utm_campaign=quiet_child";
 
   function openPapaAiCoach() {
     window.dispatchEvent(new Event("papa-ai:open"));
@@ -229,28 +231,32 @@ export default function Home() {
               Papa Life · For Fathers of Adult Children
             </p>
             <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.04] sm:text-5xl md:text-7xl">
-              Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.
+              When Your Adult Child Gets Quiet, Don’t Chase the Silence.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#314239] md:text-xl">
-              If you are ready to be taught, humbled, and led forward, Papa Life will help you take the next faithful step. Some doors between fathers and adult children cannot be forced open. Only God can make a way—and your part is to be ready when He does.
+              Silence can tempt a father to call again, text again, explain again, or push for an answer. But pressure rarely rebuilds trust. Papa Life helps you choose a better next step: calm presence, humility, and consistency.
             </p>
             <p className="mt-5 text-lg font-bold text-[#145b35] md:text-xl">
+              Presence. Humility. Consistency.
+            </p>
+            <p className="mt-2 text-base font-extrabold text-[#b33a32] md:text-lg">
               As long as you’re both alive, it’s never too late.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              <ActionLink href={joinHref} light>
-                Enroll Now — Immediate Access
+              <ActionLink href={quietChildAssessmentHref} light>
+                Take the 2-Minute Fatherhood Check-In
               </ActionLink>
-              <a
-                href="/assessment"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/55 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
+              <button
+                type="button"
+                onClick={openPapaAiCoach}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/65 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
               >
-                Start My Journey
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Talk With Brian’s Papa Life AI
+              </button>
             </div>
-            <p className="mt-5 text-sm font-semibold text-[#314239]">
-              We do not help fathers win arguments. We help fathers rebuild relationships.
+            <p className="mt-5 max-w-2xl text-sm font-semibold leading-relaxed text-[#314239]">
+              Start with clarity. Take the check-in first, then use Brian’s Papa Life AI to think through your next calm, practical step.
             </p>
           </div>
         </div>
@@ -262,8 +268,25 @@ export default function Home() {
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet Brian Keith Hill</p>
             <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Meet Brian Keith Hill.</h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/72">
-              Speak with Brian’s Papa Life AI about Presence, Authority, Purpose, and Alignment.
+              After your 2-Minute Fatherhood Check-In, talk with Brian’s Papa Life AI about what to do next when your adult child is distant, guarded, or silent.
             </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a
+                href={quietChildAssessmentHref}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-[#f7d75e]"
+              >
+                1. Take the Check-In
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <button
+                type="button"
+                onClick={openPapaAiCoach}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 py-3 text-sm font-extrabold text-white hover:bg-white/10"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                2. Talk With Brian’s AI
+              </button>
+            </div>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/58">
               As long as you’re both alive, it’s never too late.
             </p>
@@ -556,8 +579,8 @@ export default function Home() {
               You may not be able to rewrite yesterday, but you can decide what kind of father you will be from this day forward.
             </p>
             <div className="mt-8">
-              <ActionLink href={joinHref} light>
-                Enroll Now — Immediate Access
+              <ActionLink href={quietChildAssessmentHref} light>
+                Take the 2-Minute Fatherhood Check-In
               </ActionLink>
             </div>
             <p className="mt-5 text-white/75">

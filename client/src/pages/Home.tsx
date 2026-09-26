@@ -122,8 +122,7 @@ function ActionLink({
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const joinHref = "/go/join?src=homepage";
-  const quietChildAssessmentHref =
-    "/assessment?utm_source=homepage&utm_medium=hero&utm_campaign=quiet_child";
+  const quietChildAssessmentHref = "/assessment?src=homepage_quiet_child";
 
   function openPapaAiCoach() {
     window.dispatchEvent(new Event("papa-ai:open"));

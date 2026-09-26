@@ -39,7 +39,7 @@ export default function MediaAiConsent() {
     "allow_website_social","allow_education_training","allow_marketing","allow_ai_assisted_editing"
   ] as const, []);
 
-  const set = <K extends keyof ConsentState>(key: K, value: ConsentState[K]) =>
+  const set = <K extends keyof ConsentState,>(key: K, value: ConsentState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const toggleAll = (checked: boolean) => {

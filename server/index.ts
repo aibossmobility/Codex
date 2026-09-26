@@ -89,6 +89,10 @@ import {
   getPricingSettings,
 } from "./pricing-store";
 import {
+  ensureMediaAiConsentTable,
+  registerMediaAiConsentRoutes,
+} from "./media-ai-consent";
+import {
   completeCommerceEvent,
   ensureCommerceEntitlementTables,
   getCommerceProductByCode,
@@ -813,6 +817,7 @@ seedAiBossCampaigns(db);
 ensureSiteCtasTable(db);
 ensureSiteMediaTable(db);
 ensurePricingSettingsTable(db);
+ensureMediaAiConsentTable(db);
 ensureCommerceEntitlementTables(db);
 
 const intakeQuestionCount = (
@@ -3132,6 +3137,7 @@ async function startServer() {
 
   app.use(securityHeaders);
   app.use(express.json({ limit: "12mb" }));
+  registerMediaAiConsentRoutes(app, db);
   registerPapaLiveAvatarRoutes(app);
   app.use("/api/ai", papaAiCors, papaAiRateLimit());
   app.use("/api/health", papaAiCors);

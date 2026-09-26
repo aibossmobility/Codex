@@ -511,6 +511,42 @@ export default function Home() {
           </div>
         </section>
 
+
+        <section aria-labelledby="connect-brian-heading" className="bg-[#f8f0db] py-16 md:py-20">
+          <div className="container text-center">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#145b35]">Connect With Brian</p>
+            <h2 id="connect-brian-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
+              Stay Connected With Papa Life
+            </h2>
+            <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">
+              Follow Brian Keith Hill for fatherhood encouragement, practical teaching, live conversations, and updates across the platforms you already use.
+            </p>
+            <div className="mx-auto mt-8 flex max-w-5xl flex-wrap justify-center gap-3">
+              {[
+                ["LinkedIn", "https://www.linkedin.com/in/brian-hill-bossmobility/"],
+                ["X", "https://x.com/bossmobility"],
+                ["Instagram", "https://instagram.com/bossmobilitylifecoach"],
+                ["YouTube", "https://www.youtube.com/channel/UC_etyzPwAS0W8GWWwFT9sow"],
+                ["TikTok", "https://www.tiktok.com/@bossmobilitylifecoach"],
+                ["Threads", "https://www.threads.net/@papalifecoach"],
+                ["Facebook", "https://www.facebook.com/BrianKeithHillPapaLife3"],
+                ["Twitch", "https://www.twitch.tv/papalifecoach"],
+                ["Alignable", "https://www.alignable.com/san-leandro-ca/papa-life-fatherhood-life-coach-ambassador-of-the-east-bay-ca?preview=true&user=11616493"],
+              ].map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border-2 border-[#17231c] bg-white px-5 py-3 font-extrabold text-[#17231c] transition hover:border-[#b33a32] hover:bg-[#f2c230]"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section aria-labelledby="final-invitation-heading" className="bg-[#17231c] py-20 text-center text-white">
           <div className="container">
             <h2 id="final-invitation-heading" className="text-4xl font-extrabold md:text-5xl">

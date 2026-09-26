@@ -37,6 +37,7 @@ import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
 import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
 import YouTubeGrowth from "./pages/YouTubeGrowth";
+import AiBossPublic from "./pages/AiBossPublic";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
@@ -61,10 +62,17 @@ import {
   WhyAdultChildrenPullAwayPage,
 } from "./pages/papa-seo-routes";
 
+function RootRoute() {
+  if (typeof window !== "undefined" && /(^|\.)bossmobilelifecoach\.com$/i.test(window.location.hostname)) {
+    return <AiBossPublic />;
+  }
+  return <Home />;
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={RootRoute} />
       <Route path="/media-library"><Redirect to="/courses" /></Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />
@@ -136,6 +144,7 @@ function Router() {
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/ai-boss"} component={AiBossMobile} />
+      <Route path={"/ai-boss-public"} component={AiBossPublic} />
 
       <Route path={"/all-pages"} component={AllPages} />
       <Route path={"/site-directory"} component={SiteDirectory} />

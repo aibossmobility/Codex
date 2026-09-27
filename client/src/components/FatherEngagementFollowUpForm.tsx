@@ -76,7 +76,7 @@ export function FatherEngagementFollowUpForm() {
   };
 
   if (submitted) {
-    return <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-5"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-300" /><div><p className="font-bold text-white">Your request is with Brian for review.</p><p className="mt-1 text-sm leading-relaxed text-white/65">Papa Life will use only the follow-up information you chose to share here. Your private reflection scores were not submitted.</p></div></div></div>;
+    return <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-5"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-300" /><div><p className="font-bold text-white">You’re in Brian’s review queue.</p><p className="mt-1 text-sm leading-relaxed text-white/65">Papa Life will use only the follow-up information you chose to share here. Your private reflection scores were not submitted.</p></div></div></div>;
   }
 
   const selectClass = "w-full rounded-xl border border-white/15 bg-black/35 px-4 py-3 text-white focus:border-brand-yellow focus:outline-none";

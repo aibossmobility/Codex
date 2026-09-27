@@ -4672,19 +4672,34 @@ async function startServer() {
          END,
          updated_at = datetime('now')`
     ).run(memberId, stepKey, response, status, status);
+    db.prepare("UPDATE members SET last_active_date = date('now') WHERE id = ?").run(memberId);
     res.json({ ok: true, step_key: stepKey, status });
   });
 
   app.get("/api/admin/father-journeys", requireAuth, requireResearchLabAccess, (_req, res) => {
     const journeys = db.prepare(
-      `SELECT m.id AS member_id, m.first_name, m.last_name, m.email,
-              COUNT(js.id) AS started_steps,
-              SUM(CASE WHEN js.status = 'completed' THEN 1 ELSE 0 END) AS completed_steps,
-              MAX(js.updated_at) AS last_activity
+      `SELECT m.id AS member_id, m.first_name, m.last_name, m.email, m.status, m.enrolled_at,
+              COALESCE(j.started_steps, 0) AS started_steps,
+              COALESCE(j.completed_steps, 0) AS completed_steps,
+              COALESCE(p.completed_lessons, 0) AS completed_lessons,
+              CASE
+                WHEN COALESCE(j.last_journey_activity, '') >= COALESCE(p.last_lesson_activity, '') THEN j.last_journey_activity
+                ELSE p.last_lesson_activity
+              END AS last_activity
        FROM members m
-       LEFT JOIN member_journey_steps js ON js.member_id = m.id
-       WHERE js.id IS NOT NULL
-       GROUP BY m.id
+       LEFT JOIN (
+         SELECT member_id, COUNT(*) AS started_steps,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_steps,
+                MAX(updated_at) AS last_journey_activity
+         FROM member_journey_steps
+         GROUP BY member_id
+       ) j ON j.member_id = m.id
+       LEFT JOIN (
+         SELECT member_id, COUNT(*) AS completed_lessons, MAX(completed_at) AS last_lesson_activity
+         FROM member_progress
+         GROUP BY member_id
+       ) p ON p.member_id = m.id
+       WHERE COALESCE(j.started_steps, 0) > 0 OR COALESCE(p.completed_lessons, 0) > 0
        ORDER BY last_activity DESC`
     ).all();
     res.json({ ok: true, journeys });

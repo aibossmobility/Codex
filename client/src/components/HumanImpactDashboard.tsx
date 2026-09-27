@@ -43,6 +43,7 @@ type FatherJourney = {
   email: string;
   started_steps: number;
   completed_steps: number;
+  completed_lessons: number;
   last_activity: string;
 };
 
@@ -221,8 +222,8 @@ export function HumanImpactDashboard() {
               <div className="py-8 text-center text-sm text-gray-500">No father has started the interactive journey yet.</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[680px] text-left text-sm">
-                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-gray-500"><tr><th className="pb-3">Father</th><th className="pb-3">Progress</th><th className="pb-3">Current destination</th><th className="pb-3">Last activity</th><th className="pb-3 text-right">Human impact</th></tr></thead>
+                <table className="w-full min-w-[760px] text-left text-sm">
+                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-gray-500"><tr><th className="pb-3">Father</th><th className="pb-3">Journey</th><th className="pb-3">Lessons</th><th className="pb-3">Current destination</th><th className="pb-3">Last activity</th><th className="pb-3 text-right">Human impact</th></tr></thead>
                   <tbody className="divide-y divide-white/10">
                     {fatherJourneys.map((journey) => {
                       const completed = Number(journey.completed_steps || 0);
@@ -230,6 +231,7 @@ export function HumanImpactDashboard() {
                       return <tr key={journey.member_id}>
                         <td className="py-4"><p className="font-semibold text-white">{journey.first_name} {journey.last_name}</p><p className="text-xs text-gray-500">{journey.email}</p></td>
                         <td className="py-4"><span className="font-bold text-primary">{completed}/5</span><div className="mt-2 h-1.5 w-28 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-primary" style={{ width: `${completed * 20}%` }} /></div></td>
+                        <td className="py-4"><span className="font-bold text-white">{Number(journey.completed_lessons || 0)}</span><div className="text-xs text-gray-500">completed</div></td>
                         <td className="py-4 text-gray-300">{completed === 5 ? "Journey completed" : journeyLabel}</td>
                         <td className="py-4 text-gray-500">{journey.last_activity ? new Date(journey.last_activity).toLocaleString() : "—"}</td>
                         <td className="py-4 text-right"><Button size="sm" variant="outline" onClick={() => startJourneyObservation(journey)}>Record impact</Button></td>

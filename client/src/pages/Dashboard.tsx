@@ -9,11 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "wouter";
 import { SiteLogo } from "@/components/SiteLogo";
 import {
-  LayoutDashboard,
   Users,
   BarChart3,
   BookOpen,
-  Play,
   Pencil,
   TrendingUp,
   Heart,
@@ -248,41 +246,13 @@ interface NotificationEvent {
   created_at: string;
 }
 
-// ─── Agent Cards Data ────────────────────────────────────────────────────────
+// ─── PAPA Pillar Status Metadata ─────────────────────────────────────────────
 
-const agents = [
-  {
-    name: "The Purpose Voice",
-    pillar: "Purpose",
-    description: "Knowing why you lead, not just what you do",
-    icon: Pencil,
-    color: "#f59e0b",
-    border: "border-l-primary",
-  },
-  {
-    name: "The Alignment Guide",
-    pillar: "Alignment",
-    description: "Integrating faith, family, and business into one coherent life",
-    icon: MessageSquare,
-    color: "#3b82f6",
-    border: "border-l-blue-400",
-  },
-  {
-    name: "The Authority Architect",
-    pillar: "Authority",
-    description: "Leading with grace-based assertiveness, not aggression or passivity",
-    icon: TrendingUp,
-    color: "#22c55e",
-    border: "border-l-green-400",
-  },
-  {
-    name: "The Presence Designer",
-    pillar: "Presence",
-    description: "Being intentionally present, not just physically there",
-    icon: Heart,
-    color: "#f97316",
-    border: "border-l-accent",
-  },
+const papaPillars = [
+  { pillar: "Purpose", icon: Pencil, color: "#f59e0b" },
+  { pillar: "Alignment", icon: MessageSquare, color: "#3b82f6" },
+  { pillar: "Authority", icon: TrendingUp, color: "#22c55e" },
+  { pillar: "Presence", icon: Heart, color: "#f97316" },
 ];
 
 // ─── Client Detail Panel ─────────────────────────────────────────────────────
@@ -929,7 +899,6 @@ function Resources() {
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
 type View =
-  | "command"
   | "crm"
   | "papa-ai"
   | "alerts"
@@ -961,8 +930,7 @@ function Sidebar({
   user: AdminUser | null;
   onLogout: () => void;
 }) {
-  const items: { id: View; label: string; Icon: typeof LayoutDashboard }[] = [
-    { id: "command", label: "Command Center", Icon: LayoutDashboard },
+  const items: { id: View; label: string; Icon: typeof Users }[] = [
     { id: "crm", label: "CRM", Icon: Users },
     { id: "papa-ai", label: "Papa AI", Icon: MessageSquare },
     { id: "alerts", label: "Alerts", Icon: Mail },
@@ -1039,102 +1007,7 @@ function Sidebar({
   );
 }
 
-// ─── Command Center ───────────────────────────────────────────────────────────
-
-function CommandCenter({ stats }: { stats: Stats | null }) {
-  const [runningAgent, setRunningAgent] = useState<string | null>(null);
-
-  const handleActivate = (name: string) => {
-    setRunningAgent(name);
-    setTimeout(() => setRunningAgent(null), 3000);
-  };
-
-  return (
-    <div className="space-y-8">
-      <div className="relative rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#111] border border-white/10 p-8 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
-        <div className="flex items-start justify-between">
-          <div className="max-w-xl">
-            <h1 className="text-3xl font-extrabold text-white leading-tight">
-              Jamel, Stop Executing.{" "}
-              <span className="text-primary">Start Architecting.</span>
-            </h1>
-            <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-              Your four-pillar AI team handles content, strategy, experience, and
-              alignment — so you can focus on what matters: building your legacy as a
-              father and entrepreneur.
-            </p>
-            <div className="flex gap-2 mt-4 flex-wrap">
-              {["Presence", "Authority", "Purpose", "Alignment"].map((tag) => (
-                <span key={tag} className="text-xs px-2.5 py-1 rounded-full border border-white/20 text-gray-300">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-5 py-2.5 rounded-lg shrink-0 ml-4">
-            <Play className="w-4 h-4 mr-2" /> Run Daily Operations
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: "Operations Run", value: stats?.total ?? 0, color: "text-white" },
-          { label: "Delivery Rate", value: `${stats?.deliveryRate ?? 0}%`, color: "text-green-400" },
-          { label: "Avg Duration", value: "--", color: "text-white" },
-          { label: "Agent Insights", value: 1, color: "text-primary" },
-        ].map(({ label, value, color }) => (
-          <Card key={label} className="bg-[#111] border-white/10">
-            <CardContent className="p-5">
-              <p className="text-xs text-gray-500 mb-2">{label}</p>
-              <p className={`text-3xl font-bold ${color}`}>{value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {agents.map((agent) => {
-          const Icon = agent.icon;
-          const isRunning = runningAgent === agent.name;
-          return (
-            <Card key={agent.name} className={`bg-[#111] border-white/10 border-l-4 ${agent.border}`}>
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: agent.color + "22" }}>
-                      <Icon className="w-4 h-4" style={{ color: agent.color }} />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-bold text-sm">{agent.name}</h3>
-                      <p className="text-xs mt-0.5">
-                        <span style={{ color: agent.color }} className="font-semibold">{agent.pillar}</span>{" "}
-                        <span className="text-gray-500">— {agent.description}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className={`text-xs border-white/20 ${isRunning ? "text-primary border-primary/40" : "text-gray-400"}`}>
-                    {isRunning ? "Running..." : "Ready"}
-                  </Badge>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/10 text-gray-300 hover:text-white hover:bg-white/10 text-sm"
-                  onClick={() => handleActivate(agent.name)}
-                  disabled={isRunning}
-                >
-                  {isRunning ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
-                  Activate {agent.name}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+// Command Center prototype retired; CRM is now the default admin workspace.
 
 // ─── CRM ─────────────────────────────────────────────────────────────────────
 
@@ -1454,7 +1327,7 @@ function SystemMetrics({ stats }: { stats: Stats | null }) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-4">
-            {agents.map((agent) => (
+            {papaPillars.map((agent) => (
               <div key={agent.pillar} className="text-center">
                 <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-2" style={{ backgroundColor: agent.color + "22" }}>
                   <agent.icon className="w-5 h-5" style={{ color: agent.color }} />
@@ -2815,7 +2688,7 @@ function PapaAiAdmin() {
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
-  const [view, setView] = useState<View>("command");
+  const [view, setView] = useState<View>("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -2877,7 +2750,6 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-[#0a0a0a] text-white">
       <Sidebar view={view} setView={setView} user={user} onLogout={handleLogout} />
       <main className="flex-1 p-8 overflow-y-auto">
-        {view === "command" && <CommandCenter stats={stats} />}
         {view === "crm" && <CRM leads={leads} onDelete={handleDelete} onRefresh={fetchData} onLeadsUpdate={setLeads} />}
         {view === "papa-ai" && <PapaAiAdmin />}
         {view === "alerts" && <AdminAlerts />}

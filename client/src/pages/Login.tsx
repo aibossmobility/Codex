@@ -101,7 +101,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-gray-600 text-xs mt-6">
-          PAPA Life · Command Center
+          PAPA Life · Admin
         </p>
       </div>
     </div>

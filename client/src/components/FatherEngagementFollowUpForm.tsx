@@ -67,6 +67,15 @@ export function FatherEngagementFollowUpForm() {
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "Could not submit your request");
+      void fetch("/api/engagement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          event_type: "fatherhood_checkin_followup_requested",
+          event_detail: `Requested Brian review after 2-Minute Fatherhood Check-In · Next step: ${form.preferred_next_step}`,
+        }),
+      }).catch(() => undefined);
       setSubmitted(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not submit your request. Please try again.");

@@ -3,6 +3,8 @@ import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { CalendarCheck, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
 
+const pillarColors = ["#f2c230", "#16853b", "#c62828", "#f2c230"] as const;
+
 const pillars = [
   ["Presence", "Show up consistently and safely."],
   ["Authority", "Lead wisely without controlling."],
@@ -12,13 +14,13 @@ const pillars = [
 
 export default function DigitalTwinDemo() {
   return (
-    <div className="min-h-screen bg-[#17231c] text-white">
+    <div className="min-h-screen bg-black text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
         description="Talk with Brian Keith Hill’s Papa Life AI using your microphone."
       />
 
-      <header className="border-b border-[#f2c230]/25 bg-black/25">
+      <header className="border-b border-[#f2c230]/35 bg-black">
         <div className="container flex items-center justify-between gap-4 py-4">
           <SiteLogo size="md" />
           <a href="/" className="text-sm font-bold text-white/70 hover:text-[#f2c230]">
@@ -26,6 +28,11 @@ export default function DigitalTwinDemo() {
           </a>
         </div>
       </header>
+      <div className="grid h-2 grid-cols-3" aria-hidden="true">
+        <div className="bg-[#f2c230]" />
+        <div className="bg-[#c62828]" />
+        <div className="bg-[#16853b]" />
+      </div>
 
       <main>
         <section className="py-8 md:py-10 lg:py-14">
@@ -42,9 +49,13 @@ export default function DigitalTwinDemo() {
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {pillars.map(([name, copy]) => (
-                  <div key={name} className="rounded-xl border border-white/10 bg-white/[0.05] p-4">
-                    <p className="font-extrabold text-[#f2c230]">{name}</p>
+                {pillars.map(([name, copy], index) => (
+                  <div
+                    key={name}
+                    className="rounded-xl border bg-white/[0.04] p-4"
+                    style={{ borderColor: pillarColors[index] }}
+                  >
+                    <p className="font-extrabold" style={{ color: pillarColors[index] }}>{name}</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/68">{copy}</p>
                   </div>
                 ))}
@@ -69,7 +80,7 @@ export default function DigitalTwinDemo() {
           </div>
         </section>
 
-        <section className="border-y border-white/10 bg-black/25 py-12">
+        <section className="border-y border-white/10 bg-[#07100b] py-12">
           <div className="container">
             <div className="grid gap-5 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
@@ -84,7 +95,7 @@ export default function DigitalTwinDemo() {
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <CalendarCheck className="h-7 w-7 text-[#f2c230]" />
+                <CalendarCheck className="h-7 w-7 text-[#16853b]" />
                 <h2 className="mt-4 text-xl font-extrabold">Human Connection</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   Book a personal conversation with Brian.
@@ -95,7 +106,7 @@ export default function DigitalTwinDemo() {
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <ShieldCheck className="h-7 w-7 text-[#f2c230]" />
+                <ShieldCheck className="h-7 w-7 text-[#c62828]" />
                 <h2 className="mt-4 text-xl font-extrabold">Built With Boundaries</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   Papa Life keeps human relationship at the center.

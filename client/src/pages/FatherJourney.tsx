@@ -21,6 +21,9 @@ const alignmentKey = "papa-life-pies-foes-v1";
 const developmentKey = "papa-life-development-stage-v1";
 const fatherSeasonKey = "papa-life-father-season-v1";
 
+const nextJourneyStep = (saved: Record<string, SavedStep>): StepKey =>
+  steps.find((step) => saved[step.key]?.status !== "completed")?.key || "reconnection";
+
 const developmentStages = [
   { key: "connection", ages: "0–5", title: "Emotional Connection", focus: "Build safety and bonding through touch, eye contact, affection, play, and dependable presence.", questions: ["Am I emotionally and physically present?", "Does my child experience warmth and safety from me?", "Am I building connection instead of leaving it to someone else?"] },
   { key: "learning", ages: "5–10", title: "Intellectual Development", focus: "Encourage curiosity, education, confidence, and patient learning as your child enters the wider world.", questions: ["Do I show interest in how my child learns?", "Do I encourage questions without embarrassment?", "Am I building confidence instead of only correcting mistakes?"] },
@@ -76,6 +79,7 @@ export default function FatherJourney() {
   useEffect(() => {
     const local = JSON.parse(localStorage.getItem(localKey) || "{}");
     setSaved(local);
+    setActive(nextJourneyStep(local));
     setAlignment(JSON.parse(localStorage.getItem(alignmentKey) || "{}"));
     const development = JSON.parse(localStorage.getItem(developmentKey) || "{}");
     setDevelopmentStage(development.stage || null);
@@ -89,7 +93,11 @@ export default function FatherJourney() {
       if (!journeyRes.ok) return;
       const data = await journeyRes.json();
       const remote = Object.fromEntries((data.steps || []).map((step: SavedStep) => [step.step_key, step]));
-      setSaved((current) => ({ ...current, ...remote }));
+      setSaved((current) => {
+        const merged = { ...current, ...remote };
+        setActive(nextJourneyStep(merged));
+        return merged;
+      });
     }).catch(() => undefined);
   }, []);
 
@@ -125,6 +133,7 @@ export default function FatherJourney() {
   };
 
   const progress = useMemo(() => Math.round((completedCount / steps.length) * 100), [completedCount]);
+  const journeyComplete = completedCount === steps.length;
   const scoredAreas = lifeAreas.filter((area) => alignment[area.key]);
   const lowestArea = scoredAreas.length ? [...scoredAreas].sort((a, b) => (alignment[a.key] || 0) - (alignment[b.key] || 0))[0] : null;
 
@@ -302,6 +311,16 @@ export default function FatherJourney() {
               <Button type="submit" disabled={!response.trim() || saving} className="bg-[#d51f26] font-black text-white hover:bg-[#b71920]">Carry this reflection forward <ArrowRight className="ml-2 h-4 w-4" /></Button>
             </div>
           </form>
+          {journeyComplete && <div className="mt-6 rounded-2xl border-2 border-[#168c3c] bg-[#eef8f0] p-5">
+            <p className="text-xs font-black uppercase tracking-widest text-[#168c3c]">Journey checkpoint complete</p>
+            <h3 className="mt-1 text-2xl font-black">Do not stop at the wheel.</h3>
+            <p className="mt-2 text-sm text-[#425047]">You finished this reflection cycle. The next step is to keep learning, practice one change in real life, and come back to record what happened.</p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              {member ? <a href="/portal?view=courses" className="inline-flex items-center justify-center rounded-lg bg-[#d51f26] px-5 py-3 text-sm font-black text-white">Continue to my lessons <ArrowRight className="ml-2 h-4 w-4" /></a> : <a href={`/member-login?return=${encodeURIComponent("/portal?view=courses")}`} className="inline-flex items-center justify-center rounded-lg bg-[#d51f26] px-5 py-3 text-sm font-black text-white">Sign in and continue <ArrowRight className="ml-2 h-4 w-4" /></a>}
+              <a href="/portal" className="inline-flex items-center justify-center rounded-lg border border-[#17231c] px-5 py-3 text-sm font-black text-[#17231c]">Open my member home</a>
+            </div>
+            <p className="mt-3 text-xs font-bold text-[#5b655e]">When you return, Papa Life will reopen at your next unfinished destination. Completed member work is saved to your account.</p>
+          </div>}
           {!member && <p className="mt-5 text-sm text-[#5b655e]">Your work is saved on this device. Sign in to keep it available across devices and allow Papa Life to support you when you request help.</p>}
         </section>
       </main>

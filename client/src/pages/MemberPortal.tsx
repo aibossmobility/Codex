@@ -43,6 +43,8 @@ interface MemberUser {
   onboarding_completed: number;
   primary_pillar?: string;
   streak_days?: number;
+  daily_reminder?: number;
+  brotherhood_notifications?: number;
 }
 
 interface Course {
@@ -1169,7 +1171,7 @@ function ProfileView({ user }: { user: MemberUser | null }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    if (user) setPrefs({ daily_reminder: !!user.streak_days, brotherhood_notifications: true, primary_pillar: user.primary_pillar || "Purpose" });
+    if (user) setPrefs({ daily_reminder: !!user.daily_reminder, brotherhood_notifications: user.brotherhood_notifications !== 0, primary_pillar: user.primary_pillar || "Purpose" });
   }, [user]);
 
   const handleSave = async () => {
@@ -1247,7 +1249,9 @@ function ProfileView({ user }: { user: MemberUser | null }) {
 export default function MemberPortal() {
   const [, navigate] = useLocation();
   const requestedView = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("view") : null;
-  const [view, setView] = useState<PortalView>(requestedView === "library" ? "library" : "home");
+  const validViews: PortalView[] = ["home", "courses", "journal", "brotherhood", "events", "library", "profile"];
+  const initialView = validViews.includes(requestedView as PortalView) ? (requestedView as PortalView) : "home";
+  const [view, setView] = useState<PortalView>(initialView);
   const [user, setUser] = useState<MemberUser | null>(null);
   const [access, setAccess] = useState<PortalAccess>({ community: false, curriculum: false, portal: false });
   const [authChecked, setAuthChecked] = useState(false);

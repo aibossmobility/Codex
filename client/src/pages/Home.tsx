@@ -15,7 +15,7 @@ import { useState } from "react";
 const navigation = [
   { label: "Start Here", href: "#is-this-you" },
   { label: "Brian’s Story", href: "#brian-story" },
-  { label: "Start My Journey", href: "/assessment" },
+  { label: "2-Minute Check-In", href: "/assessment?src=homepage_nav" },
   { label: "Member Login", href: "/member-login" },
 ];
 

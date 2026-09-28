@@ -95,6 +95,30 @@ const papaLifeDifference = [
   "Leading through humility, presence, and consistency",
 ];
 
+const relationshipSignals = [
+  {
+    key: "red",
+    label: "Red",
+    title: "We’re distant, tense, or not talking.",
+    guidance: "Start by lowering pressure. Presence comes before persuasion.",
+    buttonClass: "border-[#b33a32] bg-[#b33a32] text-white",
+  },
+  {
+    key: "yellow",
+    label: "Yellow",
+    title: "I want to reconnect, but I’m not sure how.",
+    guidance: "Start with one safe question and listen without preparing a defense.",
+    buttonClass: "border-[#d8aa16] bg-[#f2c230] text-[#17231c]",
+  },
+  {
+    key: "green",
+    label: "Green",
+    title: "We’re connected, and I want to keep building trust.",
+    guidance: "Keep making small deposits of presence, humility, and consistency.",
+    buttonClass: "border-[#145b35] bg-[#145b35] text-white",
+  },
+] as const;
+
 function ActionLink({
   href,
   children,
@@ -121,6 +145,7 @@ function ActionLink({
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [relationshipSignal, setRelationshipSignal] = useState<"red" | "yellow" | "green">("yellow");
   const joinHref = "/go/join?src=homepage";
   const quietChildAssessmentHref = "/assessment?src=homepage_quiet_child";
 
@@ -260,6 +285,108 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <section id="fatherhood-wheel" className="border-y border-[#17231c]/15 bg-[#fffaf0] py-12 md:py-16" aria-labelledby="fatherhood-wheel-heading">
+        <div className="container">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Your Papa Life Starting Point</p>
+            <h2 id="fatherhood-wheel-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">
+              Where are you with your child right now?
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
+              Every father-child relationship has seasons. Use the steering wheel to name where things feel today, then take one calm next step.
+            </p>
+          </div>
+
+          <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-12">
+            <div className="rounded-2xl border border-[#17231c]/15 bg-white p-5 shadow-sm md:p-7">
+              <img
+                src="/images/papa-life-journey-wheel.webp"
+                alt="Papa Life fatherhood journey steering wheel"
+                className="mx-auto w-full max-w-[520px]"
+                loading="lazy"
+              />
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {relationshipSignals.map((signal) => {
+                  const active = relationshipSignal === signal.key;
+                  return (
+                    <button
+                      key={signal.key}
+                      type="button"
+                      onClick={() => setRelationshipSignal(signal.key)}
+                      aria-pressed={active}
+                      className={`rounded-xl border-2 px-4 py-4 text-left transition-all ${signal.buttonClass} ${
+                        active ? "scale-[1.02] shadow-lg ring-4 ring-black/10" : "opacity-80 hover:opacity-100"
+                      }`}
+                    >
+                      <span className="block text-xs font-black uppercase tracking-[0.16em]">{signal.label}</span>
+                      <span className="mt-1 block text-sm font-extrabold leading-snug">{signal.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-5 rounded-xl bg-[#17231c] p-4 text-white">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#f2c230]">
+                  Your next step
+                </p>
+                <p className="mt-2 text-base font-bold">
+                  {relationshipSignals.find((signal) => signal.key === relationshipSignal)?.guidance}
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-[#17231c]/15 bg-[#17231c] text-white shadow-xl">
+              <div className="p-5 md:p-7">
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
+                  Red. Yellow. Green.
+                </p>
+                <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">See how the Papa Life path works.</h3>
+                <p className="mt-3 leading-relaxed text-white/72">
+                  Brian explains the three relationship seasons and one safe question that can help a father begin again without pressure.
+                </p>
+              </div>
+              <video
+                className="aspect-[9/16] max-h-[680px] w-full bg-black object-contain"
+                controls
+                preload="metadata"
+                playsInline
+                poster="/images/brian-keith-hill.png"
+              >
+                <source src="/videos/papa-life-red-yellow-green.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <div className="border-t border-white/10 p-5 md:p-7">
+                <p className="text-sm leading-relaxed text-white/70">
+                  Connection doesn’t always start with a big conversation. Sometimes it starts with one safe question.
+                </p>
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <a
+                    href={`/assessment?src=homepage_wheel_${relationshipSignal}`}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white"
+                  >
+                    Take the 2-Minute Fatherhood Check-In
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={openPapaAiCoach}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
+                  >
+                    <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                    Talk With Digital Brian
+                  </button>
+                  <a
+                    href="/tuesday"
+                    className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/20 px-5 py-3 text-sm font-extrabold text-white/85 hover:bg-white/10"
+                  >
+                    Join Tuesday Live
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="border-y border-[#17231c]/15 bg-[#17231c] py-10 text-white md:py-14" aria-label="Meet Brian Keith Hill">
         <div className="container grid items-start gap-7 lg:grid-cols-[minmax(0,.8fr)_minmax(420px,1.2fr)] lg:gap-10">

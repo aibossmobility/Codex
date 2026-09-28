@@ -1,7 +1,6 @@
 import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
-import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import {
   ArrowRight,
   CheckCircle2,
@@ -350,7 +349,7 @@ export default function Home() {
                 controls
                 preload="metadata"
                 playsInline
-                poster="/images/brian-keith-hill.png"
+                poster="/images/papa-life-journey-wheel.webp"
               >
                 <source src="/videos/papa-life-red-yellow-green.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -637,13 +636,8 @@ export default function Home() {
         </section>
 
         <section id="brian-story" aria-labelledby="brian-story-heading" className="bg-white py-16 md:py-20">
-          <div className="container grid items-center gap-8 md:grid-cols-[260px_1fr]">
-            <img
-              src={brianKeithHillHeadshot}
-              alt="Brian Keith Hill, founder of Boss Mobility and Papa Life"
-              className="aspect-square w-full rounded-xl object-cover object-top shadow-lg"
-            />
-            <div>
+          <div className="container">
+            <div className="max-w-4xl">
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">A father-to-father word from Brian</p>
               <h2 id="brian-story-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">I Know What It Is to Carry the Silence.</h2>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">

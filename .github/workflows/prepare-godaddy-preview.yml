@@ -113,7 +113,14 @@ jobs:
           set -euo pipefail
           mkdir -p preview-package/scripts
           mkdir -p preview-package/dist
-          rsync -a --exclude 'private-resources/papa-life-audio/' dist/ preview-package/dist/
+          # Keep the preview archive under GoDaddy's upload limit while preserving
+          # heavyweight media separately. The homepage Red/Yellow/Green video stays
+          # in the package; only the two large unchanged media files are omitted.
+          rsync -a \
+            --exclude 'private-resources/papa-life-audio/' \
+            --exclude 'public/videos/brian-green-sweater-papa-life-clean.mp4' \
+            --exclude 'public/media/Papa_Life_From_Distance_to_Reconnection.mp3' \
+            dist/ preview-package/dist/
           cp package.json pnpm-lock.yaml preview-package/
           cp scripts/recover-sqlite-wal.mjs preview-package/scripts/
           tar -czf papalife-godaddy-preview.tgz -C preview-package .

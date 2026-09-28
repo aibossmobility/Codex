@@ -339,7 +339,7 @@ export default function Home() {
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
                   Red. Yellow. Green.
                 </p>
-                <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">See how the Papa Life path works.</h3>
+                <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">Brian explains how to begin reconnecting.</h3>
                 <p className="mt-3 leading-relaxed text-white/72">
                   Brian explains the three relationship seasons and one safe question that can help a father begin again without pressure.
                 </p>
@@ -349,7 +349,7 @@ export default function Home() {
                 controls
                 preload="metadata"
                 playsInline
-                poster="/images/papa-life-journey-wheel.webp"
+                poster="/images/papa-life-path-brian-poster.png"
               >
                 <source src="/videos/papa-life-red-yellow-green.mp4" type="video/mp4" />
                 Your browser does not support the video tag.

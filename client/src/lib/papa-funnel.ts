@@ -1,6 +1,6 @@
 /** Papa Life homepage funnel — mirrors server `PAPA_FUNNEL_ISSUE_*` */
 
-export const CALENDLY_BOOK_URL = "https://calendly.com/briankeithhill";
+export const CALENDLY_BOOK_URL = "https://calendly.com/briankeithhill/30";
 
 export const HEYGEN_EMBED_URL = "https://app.heygen.com/embeds/e0919c0ef5f54baead1bfe23bdc695a0";
 

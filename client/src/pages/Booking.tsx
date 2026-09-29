@@ -26,7 +26,7 @@ interface ConversionStatus {
   booked: boolean;
 }
 
-const CALENDLY_URL = "https://calendly.com/briankeithhill";
+const CALENDLY_URL = "https://calendly.com/briankeithhill/30";
 
 const CLOSER_STEPS = [
   {
@@ -270,7 +270,7 @@ export default function Booking() {
                       Book PAPA Clarity Session
                     </Button>
                     <p className="text-xs text-gray-600">
-                      60 minutes with Brian Keith Hill via Calendly
+                      30 minutes with Brian Keith Hill via Calendly
                     </p>
                   </CardContent>
                 </Card>

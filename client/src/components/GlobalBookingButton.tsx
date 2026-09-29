@@ -1,6 +1,6 @@
 import { CalendarDays, ClipboardCheck } from "lucide-react";
 
-const BOOKING_URL = "https://calendly.com/briankeithhill/30";
+const BOOKING_URL = "https://calendly.com/briankeithhill";
 
 export function GlobalBookingButton() {
   return (

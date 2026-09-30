@@ -2527,6 +2527,23 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
+  "/father-friendly-practice": {
+    title: "Our Father-Friendly Practice | Papa Life Coach",
+    description:
+      "How Papa Life applies the Alameda County Fathers Corps Father-Friendly Principles to serving fathers of adult children.",
+    keywords: "father-friendly principles, Alameda County Fathers Corps, fathers of adult children, fatherhood services, Papa Life",
+    eyebrow: "Father-Friendly Practice",
+    headline: "Fathers should be seen, welcomed, supported, and expected to participate.",
+    intro:
+      "Papa Life uses the Alameda County Fathers Corps Father-Friendly Principles as a practical local benchmark for father-centered service, especially for fathers whose children are adults.",
+    sections: [
+      { heading: "Father-centered design", body: "Papa Life is built around fathers of adult children and the realities of distance, silence, regret, role transition, and reconnection." },
+      { heading: "Father-specific support", body: "The 2-Minute Fatherhood Check-In, PAPA Framework, courses, AI coaching, membership resources, and live teaching are designed specifically for fathers." },
+      { heading: "Father participation", body: "Papa Life works with the father's responsibility and choices. The work begins with listening, self-examination, growth, and consistent action rather than controlling an adult child." },
+      { heading: "Partner development", body: "Papa Life is developing provider training, peer-father pathways, referral relationships, and father-feedback practices for stronger father-friendly service." },
+    ],
+    cta: { label: "Explore Papa Life", href: "/" },
+  },
   "/about-brian-keith-hill": {
     title: "Brian Keith Hill | Founder of Boss Mobility and Papa Life",
     description:

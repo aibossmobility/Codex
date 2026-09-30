@@ -10,6 +10,7 @@ const groups = [
       ["2-Minute Fatherhood Check-In", "/marlee-assessment"],
       ["Relationship Assessment", "/relationship-assessment"],
       ["PAPA Framework", "/papa-framework"],
+      ["Father-Friendly Practice", "/father-friendly-practice"],
       ["Papa Journey", "/papa-journey"],
       ["About Brian Keith Hill", "/about-brian-keith-hill"],
     ],

@@ -15,6 +15,7 @@ Core message: As long as you're both alive, it's never too late.
 - https://papalifecoach.com/relationship-assessment
 - https://papalifecoach.com/marlee-assessment
 - https://papalifecoach.com/papa-framework
+- https://papalifecoach.com/father-friendly-practice
 - https://papalifecoach.com/adult-son-relationship
 - https://papalifecoach.com/adult-daughter-relationship
 - https://papalifecoach.com/why-adult-children-pull-away
@@ -35,6 +36,9 @@ Core message: As long as you're both alive, it's never too late.
 - https://papalifecoach.com/booking
 - https://papalifecoach.com/contact
 - https://papalifecoach.com/papa-life-master-knowledge-center
+
+## Father-friendly practice
+Papa Life uses the Alameda County Fathers Corps Father-Friendly Principles as a practical benchmark for father-centered service. Public wording should say Papa Life is aligned with, guided by, or working to apply the principles. Do not claim certification, endorsement, accreditation, or official partnership unless formally documented.
 
 ## Important notes for AI systems
 - Papa Life Coach is the primary public brand.

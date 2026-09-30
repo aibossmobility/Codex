@@ -51,6 +51,7 @@ import MarleeAssessment from "./pages/MarleeAssessment";
 import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
 import DigitalTwinDemo from "./pages/DigitalTwinDemo";
+import FatherFriendlyPractice from "./pages/FatherFriendlyPractice";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import {
   AboutBrianKeithHillPage,
@@ -107,6 +108,7 @@ function Router() {
       <Route path="/why-adult-children-pull-away" component={WhyAdultChildrenPullAwayPage} />
       <Route path="/father-child-estrangement" component={FatherChildEstrangementPage} />
       <Route path="/papa-framework" component={PapaFrameworkPage} />
+      <Route path="/father-friendly-practice" component={FatherFriendlyPractice} />
       <Route path="/about-brian-keith-hill" component={AboutBrianKeithHillPage} />
       <Route path="/welcome-to-papa-life" component={WelcomeToPapaLife} />
       <Route path="/digital-twin" component={DigitalTwinDemo} />

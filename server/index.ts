@@ -6931,7 +6931,7 @@ async function startServer() {
     const base = "https://papalifecoach.com";
     const staticPaths = [
       "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
-      "/papa-framework", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
+      "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/membership", "/shop",
       "/papa-journey", "/booking", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",

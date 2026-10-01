@@ -345,7 +345,7 @@ export default function Home() {
                 </p>
               </div>
               <video
-                className="h-[220px] w-full bg-black object-cover object-[center_72%] sm:h-[260px] md:h-[300px]"
+                className="aspect-video w-full bg-black object-contain object-center"
                 controls
                 preload="metadata"
                 playsInline

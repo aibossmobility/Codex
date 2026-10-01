@@ -234,7 +234,7 @@ export async function ghlAddContactToWorkflow(
   if (!contactId) return { ok: false, error: "contact_id is required" };
   if (!workflowId) return { ok: false, error: "workflow_id is required" };
 
-  const eventStartTime = (args.event_start_time || new Date().toISOString()).replace(/Z$/, "+00:00");
+  const eventStartTime = new Date(args.event_start_time || Date.now()).toISOString().replace(/\.\d{3}Z$/, "+00:00");
   const payload = { eventStartTime };
   const r = await fetch(
     `${GHL_BASE}/contacts/${encodeURIComponent(contactId)}/workflow/${encodeURIComponent(workflowId)}`,

@@ -212,6 +212,55 @@ export async function ghlUpsertContactWithTags(
   };
 }
 
+export async function ghlAddContactToWorkflow(
+  args: {
+    contact_id: string;
+    workflow_id: string;
+    event_start_time?: string;
+  },
+  creds: GhlCredentials | null
+): Promise<GhlApiResult> {
+  if (!creds?.token) {
+    return {
+      ok: false,
+      error: "Go High Level API token is not configured",
+      action: "not_configured",
+      fix: notConfiguredFix(),
+    };
+  }
+
+  const contactId = String(args.contact_id || "").trim();
+  const workflowId = String(args.workflow_id || "").trim();
+  if (!contactId) return { ok: false, error: "contact_id is required" };
+  if (!workflowId) return { ok: false, error: "workflow_id is required" };
+
+  const payload = { eventStartTime: args.event_start_time || new Date().toISOString() };
+  const r = await fetch(
+    `${GHL_BASE}/contacts/${encodeURIComponent(contactId)}/workflow/${encodeURIComponent(workflowId)}`,
+    {
+      method: "POST",
+      headers: headers(creds.token),
+      body: JSON.stringify(payload),
+    }
+  );
+  const text = await r.text();
+  const data = parseJsonResponse(text);
+  if (!r.ok) {
+    const msg = String((data as { message?: string }).message || text || r.statusText);
+    return { ok: false, error: msg, status: r.status };
+  }
+  return {
+    ok: true,
+    data: {
+      contact_id: contactId,
+      workflow_id: workflowId,
+      event_start_time: payload.eventStartTime,
+      credential_source: creds.source,
+      ghl: data,
+    },
+  };
+}
+
 export async function ghlNurtureSmsSend(
   args: {
     ghl_contact_id?: string;

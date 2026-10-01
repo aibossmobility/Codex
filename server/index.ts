@@ -119,7 +119,7 @@ import {
   clearGhlIntegration,
   resolveGhlCredentials,
 } from "./ghl-integration-store";
-import { ghlUpsertContactWithTags } from "./ghl-api";
+import { ghlAddContactToWorkflow, ghlUpsertContactWithTags } from "./ghl-api";
 import {
   ensureGhlAutomationTables,
   verifyAutomationAuth,
@@ -5165,6 +5165,92 @@ async function startServer() {
       res.json({ ok: true, ...(await forwardAlertToCloud(db, alertId)) });
     } catch (err) {
       res.status(500).json({ ok: false, error: err instanceof Error ? err.message : String(err) });
+    }
+  });
+
+  // ── AI Boss Mobility website intake → GHL workflow ────────────────────────
+  app.post("/api/integrations/ai-boss-intake", async (req, res) => {
+    const expectedSecret = String(process.env.AI_BOSS_INTAKE_SECRET || "").trim();
+    const suppliedSecret = String(req.headers["x-ai-boss-intake-secret"] || "").trim();
+    if (!expectedSecret) {
+      return res.status(503).json({ ok: false, error: "AI Boss intake bridge is not configured" });
+    }
+    if (suppliedSecret !== expectedSecret) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+
+    try {
+      const body = (req.body || {}) as Record<string, unknown>;
+      const name = String(body.name || "").trim().slice(0, 160);
+      const email = String(body.email || "").trim().toLowerCase().slice(0, 254);
+      const organization = String(body.organization || "").trim().slice(0, 240);
+      const need = String(body.need || "").trim().slice(0, 1000);
+      const pathKey = String(body.path || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "")
+        .slice(0, 60);
+
+      if (!name || !email || !email.includes("@")) {
+        return res.status(400).json({ ok: false, error: "Name and valid email are required" });
+      }
+
+      const ghlCredentials = resolveGhlCredentials(db);
+      if (!ghlCredentials) {
+        return res.status(503).json({ ok: false, error: "GoHighLevel is not configured" });
+      }
+
+      const [firstName, ...lastNameParts] = name.split(/\s+/).filter(Boolean);
+      const tags = [
+        "aiboss-website-inquiry",
+        pathKey ? `aiboss-path-${pathKey}` : "",
+      ].filter(Boolean);
+
+      const sourceParts = [
+        "AI Boss Mobility Website",
+        pathKey ? `Path: ${pathKey}` : "",
+        organization ? `Org: ${organization}` : "",
+        need ? `Need: ${need.slice(0, 180)}` : "",
+      ].filter(Boolean);
+
+      const upsert = await ghlUpsertContactWithTags(
+        {
+          firstName: firstName || name,
+          lastName: lastNameParts.join(" ") || undefined,
+          email,
+          source: sourceParts.join(" | "),
+          tags,
+        },
+        ghlCredentials
+      );
+      if (!upsert.ok) {
+        return res.status(502).json({ ok: false, error: upsert.error });
+      }
+
+      const contactId = String((upsert.data as Record<string, unknown>).contact_id || "").trim();
+      if (!contactId) {
+        return res.status(502).json({ ok: false, error: "GoHighLevel returned no contact id" });
+      }
+
+      const workflowId =
+        String(process.env.AI_BOSS_INQUIRY_WORKFLOW_ID || "").trim() ||
+        "cfe63644-b198-44f2-ba03-72ff4ca37254";
+      const enrolled = await ghlAddContactToWorkflow(
+        { contact_id: contactId, workflow_id: workflowId },
+        ghlCredentials
+      );
+      if (!enrolled.ok) {
+        return res.status(502).json({ ok: false, error: enrolled.error, contact_id: contactId });
+      }
+
+      console.info(`[ai-boss-intake] enrolled contact ${contactId} in workflow ${workflowId}`);
+      return res.json({ ok: true, contact_id: contactId, workflow_id: workflowId, enrolled: true });
+    } catch (err) {
+      console.error("[ai-boss-intake] bridge error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: err instanceof Error ? err.message : "Unable to route AI Boss inquiry",
+      });
     }
   });
 

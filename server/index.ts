@@ -119,7 +119,7 @@ import {
   clearGhlIntegration,
   resolveGhlCredentials,
 } from "./ghl-integration-store";
-import { ghlAddContactToWorkflow, ghlUpsertContactWithTags } from "./ghl-api";
+import { ghlUpsertContactWithTags } from "./ghl-api";
 import {
   ensureGhlAutomationTables,
   verifyAutomationAuth,
@@ -5203,6 +5203,7 @@ async function startServer() {
       const [firstName, ...lastNameParts] = name.split(/\s+/).filter(Boolean);
       const tags = [
         "aiboss-website-inquiry",
+        "aiboss-inquiry-demo",
         pathKey ? `aiboss-path-${pathKey}` : "",
       ].filter(Boolean);
 
@@ -5232,19 +5233,8 @@ async function startServer() {
         return res.status(502).json({ ok: false, error: "GoHighLevel returned no contact id" });
       }
 
-      const workflowId =
-        String(process.env.AI_BOSS_INQUIRY_WORKFLOW_ID || "").trim() ||
-        "cfe63644-b198-44f2-ba03-72ff4ca37254";
-      const enrolled = await ghlAddContactToWorkflow(
-        { contact_id: contactId, workflow_id: workflowId },
-        ghlCredentials
-      );
-      if (!enrolled.ok) {
-        return res.status(502).json({ ok: false, error: enrolled.error, contact_id: contactId });
-      }
-
-      console.info(`[ai-boss-intake] enrolled contact ${contactId} in workflow ${workflowId}`);
-      return res.json({ ok: true, contact_id: contactId, workflow_id: workflowId, enrolled: true });
+      console.info(`[ai-boss-intake] tagged contact ${contactId} for the AI Boss Inquiry workflow`);
+      return res.json({ ok: true, contact_id: contactId, trigger_tag: "aiboss-inquiry-demo", queued: true });
     } catch (err) {
       console.error("[ai-boss-intake] bridge error:", err);
       return res.status(500).json({

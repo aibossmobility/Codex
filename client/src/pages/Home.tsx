@@ -345,7 +345,7 @@ export default function Home() {
                 </p>
               </div>
               <video
-                className="h-[220px] w-full bg-black object-cover object-[center_72%] sm:h-[260px] md:h-[300px]"
+                className="h-[220px] w-full bg-black object-cover object-[center_20%] sm:h-[260px] md:h-[300px]"
                 controls
                 preload="metadata"
                 playsInline

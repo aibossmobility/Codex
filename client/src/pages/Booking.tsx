@@ -26,7 +26,7 @@ interface ConversionStatus {
   booked: boolean;
 }
 
-const CALENDLY_URL = "https://calendly.com/briankeithhill";
+const CALENDLY_URL = "https://calendly.com/briankeithhill/30";
 
 const CLOSER_STEPS = [
   {

@@ -53,6 +53,7 @@ import PapaLifeOutreach from "./pages/PapaLifeOutreach";
 import DigitalTwinDemo from "./pages/DigitalTwinDemo";
 import FatherFriendlyPractice from "./pages/FatherFriendlyPractice";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
+import MediaAiConsent from "./pages/MediaAiConsent";
 import {
   AboutBrianKeithHillPage,
   AdultDaughterRelationshipPage,
@@ -89,6 +90,8 @@ function Router() {
       <Route path="/terms-of-service" component={TermsPage} />
       <Route path="/privacy" component={PrivacyPage} />
       <Route path="/terms" component={TermsPage} />
+      <Route path="/consent" component={MediaAiConsent} />
+      <Route path="/media-ai-permission" component={MediaAiConsent} />
       <Route path={"/member-login"} component={MemberLogin} />
       <Route path={"/member-register"} component={MemberRegister} />
       <Route path={"/member-activate"} component={MemberActivate} />

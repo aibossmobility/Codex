@@ -149,7 +149,7 @@ export default function Home() {
   const quietChildAssessmentHref = "/assessment?src=homepage_quiet_child";
 
   function openPapaAiCoach() {
-    window.dispatchEvent(new Event("papa-ai:open"));
+    window.location.assign("/digital-twin");
   }
 
   return (

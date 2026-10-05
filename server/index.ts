@@ -3019,6 +3019,18 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       noindex: true,
     };
   }
+  if (pathname === "/digital-twin") {
+    const page: StaticServerPage = {
+      title: "Meet Brian’s Digital Twin | Papa Life",
+      description: "Speak with Brian Keith Hill’s Papa Life AI using your microphone.",
+      eyebrow: "Papa Life",
+      headline: "Talk with Brian’s Papa Life Digital Twin",
+      intro: "Start a voice conversation for practical Papa Life guidance grounded in Presence, Authority, Purpose, and Alignment.",
+      sections: [],
+      cta: { label: "Book a personal conversation", href: "/booking" },
+    };
+    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
+  }
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();
   if (pathname === "/shop") {

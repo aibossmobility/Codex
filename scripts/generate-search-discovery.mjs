@@ -13,6 +13,7 @@ const pages = [
   ["/relationship-assessment", "monthly", "0.95"],
   ["/marlee-assessment", "monthly", "0.9"],
   ["/papa-framework", "monthly", "0.9"],
+  ["/father-friendly-practice", "monthly", "0.8"],
   ["/adult-son-relationship", "monthly", "0.85"],
   ["/adult-daughter-relationship", "monthly", "0.85"],
   ["/why-adult-children-pull-away", "monthly", "0.85"],

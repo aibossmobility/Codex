@@ -6,6 +6,8 @@ const publicDir = path.resolve("dist/public");
 const templatePath = path.join(publicDir, "index.html");
 const template = fs.readFileSync(templatePath, "utf8");
 
+const enrichment = JSON.parse(fs.readFileSync(path.resolve("scripts/seo-page-enrichment.json"), "utf8"));
+
 const pages = [
   {
     path: "/",
@@ -415,6 +417,25 @@ const pages = [
   },
 ];
 
+const defaultLinks = [
+  ["Papa Life home", "/"], ["2-Minute Fatherhood Check-In", "/relationship-assessment"],
+  ["The PAPA Framework", "/papa-framework"], ["Course catalog", "/courses"],
+  ["Papa Life membership", "/membership"], ["Book a conversation", "/booking"],
+  ["All Papa Life resources", "/site-directory"],
+];
+for (const page of pages) {
+  const extra = enrichment[page.path];
+  if (extra) {
+    if (extra.title) page.title = extra.title;
+    if (extra.description) page.description = extra.description;
+    page.sections.push(...(extra.sections || []));
+    if (extra.relatedLinks) page.relatedLinks = extra.relatedLinks;
+  }
+  if (!page.relatedLinks?.length) page.relatedLinks = defaultLinks.filter(([, href]) => href !== page.path);
+  if (page.path === "/papa-framework") page.title = "The PAPA Framework for Fathers of Adult Children | Papa Life";
+  if (page.path === "/relationship-assessment") page.title = "2-Minute Fatherhood Check-In | Papa Life";
+}
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (ch) => {
     if (ch === "&") return "&amp;";
@@ -459,7 +480,8 @@ function render(page) {
     )
     .replace('<div id="root"></div>', `<div id="root">${bodyHtml(page)}</div>`);
 
-  const canonical = `<link rel="canonical" href="https://papalifecoach.com${page.path === "/" ? "" : page.path}" />`;
+  html = html.replace(/<link\s+rel="canonical"[^>]*>/gi, "");
+  const canonical = `<link rel="canonical" href="https://papalifecoach.com${({ "/privacy": "/privacy-policy", "/terms": "/terms-of-service" }[page.path] || page.path)}" />`;
   html = html.replace("</head>", `    ${canonical}\n  </head>`);
   if (page.keywords) html = html.replace("</head>", `    <meta name="keywords" content="${escapeHtml(page.keywords)}" />\n  </head>`);
   if (page.jsonLd) {

@@ -2844,6 +2844,7 @@ function serverPageShell(page: StaticServerPage, extraHtml = "") {
         <h1 style="font-size: clamp(2.25rem, 6vw, 4.75rem); line-height: 1.02; margin: 18px 0;">${escapeHtml(page.headline)}</h1>
         <p style="font-size: 1.2rem; line-height: 1.7; color: #d4d4d8; max-width: 760px;">${escapeHtml(page.intro)}</p>
         ${cta}
+        <nav aria-label="Papa Life resources"><a href="/">Home</a> · <a href="/relationship-assessment">2-Minute Check-In</a> · <a href="/papa-framework">PAPA Framework</a> · <a href="/courses">Courses</a> · <a href="/membership">Membership</a> · <a href="/booking">Book a conversation</a> · <a href="/site-directory">Site directory</a></nav>
         <div style="display: grid; gap: 24px; margin-top: 42px;">
           ${sections}
           ${extraHtml}
@@ -7011,7 +7012,8 @@ async function startServer() {
       : path.resolve(__dirname, "..", "dist", "public");
 
   const masterKnowledgeCenterPage = path.join(staticPath, "papa-life-master-knowledge-center", "index.html");
-  app.get(["/papa-life-master-knowledge-center", "/papa-life-master-knowledge-center/"], (_req, res) => {
+  app.get(["/papa-life-master-knowledge-center", "/papa-life-master-knowledge-center/"], (req, res) => {
+    if (req.path.endsWith("/")) return res.redirect(301, "/papa-life-master-knowledge-center" + (req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : ""));
     res.sendFile(masterKnowledgeCenterPage);
   });
 
@@ -7036,7 +7038,33 @@ async function startServer() {
     res.type("application/xml").send(xml);
   });
 
-  app.use(express.static(staticPath));
+  // Serve public documents at the URL used by the sitemap and canonical.
+  // Private app/API routes are excluded from this normalization.
+  const publicSeoPaths = new Set([
+    "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
+    "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
+    "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
+    "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
+    "/tuesday-live", "/membership", "/shop", "/papa-journey", "/booking", "/contact",
+    "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
+  ]);
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    const rawPath = req.path;
+    const normalized = normalizeAppPath(rawPath.replace(/\/index\.html$/, "") || "/");
+    const canonical = canonicalPublicPath(normalized);
+    if (!publicSeoPaths.has(canonical) && !/^\/courses\/\d+$/.test(canonical)) return next();
+    if (rawPath !== canonical) {
+      const queryAt = req.originalUrl.indexOf("?");
+      const query = queryAt >= 0 ? req.originalUrl.slice(queryAt) : "";
+      return res.redirect(301, canonical + query);
+    }
+    const document = canonical === "/" ? path.join(staticPath, "index.html") : path.join(staticPath, canonical.slice(1), "index.html");
+    if (fs.existsSync(document)) return res.sendFile(document);
+    return next();
+  });
+
+  app.use(express.static(staticPath, { redirect: false }));
 
   app.get(["/admin/papa-life-outreach", "/admin/papa-life-outreach/"], (req, res, next) => {
     if ((req.session as any).adminId) return next();

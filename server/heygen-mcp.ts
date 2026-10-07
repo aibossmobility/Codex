@@ -205,7 +205,7 @@ export function bossmobileHeygenGuide() {
   };
 }
 
-/** List studio avatars and talking photos. GET /v2/avatars */
+/** List usable avatar looks. GET /v3/avatars/looks */
 export async function bossmobileHeygenListAvatars() {
   type T = {
     data?: {
@@ -222,66 +222,8 @@ export async function bossmobileHeygenListAvatars() {
       }>;
     };
   };
-  const json = await heygenJson<T>("/v2/avatars");
-  const avatars = (json.data?.avatars ?? []).map((a) => ({
-    avatar_id: a.avatar_id,
-    avatar_name: a.avatar_name,
-    gender: a.gender,
-    premium: a.premium,
-    default_voice_id: a.default_voice_id ?? null,
-  }));
-  const talking_photos = (json.data?.talking_photos ?? []).map((t) => ({
-    talking_photo_id: t.talking_photo_id,
-    talking_photo_name: t.talking_photo_name,
-  }));
-  return {
-    hint: "Use avatar_id for studio looks. For photo avatar, pass talking_photo_id to bossmobile_heygen_video_agent (or set HEYGEN_DEFAULT_TALKING_PHOTO_ID).",
-    avatar_count: avatars.length,
-    talking_photo_count: talking_photos.length,
-    avatars,
-    talking_photos,
-  };
-}
-
-/** List AI voices (includes clones). GET /v2/voices */
-export async function bossmobileHeygenListVoices(args?: {
-  name_contains?: string | null;
-  limit?: number | null;
-}) {
-  type T = {
-    data?: {
-      voices?: Array<{
-        voice_id?: string;
-        language?: string;
-        gender?: string;
-        name?: string;
-      }>;
-    };
-  };
-  const json = await heygenJson<T>("/v2/voices");
-  let voices = json.data?.voices ?? [];
-  const needle = args?.name_contains?.trim().toLowerCase();
-  if (needle) {
-    voices = voices.filter((v) => (v.name || "").toLowerCase().includes(needle));
-  }
-  const max = Math.min(Math.max(args?.limit ?? 400, 1), 500);
-  const total = voices.length;
-  const truncated = voices.length > max;
-  voices = voices.slice(0, max);
-  return {
-    hint: `Brian Keith Hill voice guard is ${BRIAN_HEYGEN_VOICE_ID}. Use this voice_id for Boss Mobile videos.`,
-    total_before_limit: total,
-    truncated,
-    voices: voices.map((v) => ({
-      voice_id: v.voice_id,
-      name: v.name,
-      language: v.language,
-      gender: v.gender,
-    })),
-  };
-}
-
-/** Fetch and strip a site page for script grounding */
+  const json = await heygenJson<T>("/v3/avatars/looks?limit=50");
+  const avatars = (json.data ?? []).map((a: any) => ({\n    avatar_id: a.id,\n    avatar_name: a.name,\n    avatar_type: a.avatar_type,\n    group_id: a.group_id ?? null,\n    gender: a.gender ?? null,\n    premium: false,\n    default_voice_id: a.default_voice_id ?? null,\n  }));\n  const talking_photos = avatars.filter((a) => a.avatar_type === "photo_avatar").map((a) => ({\n    talking_photo_id: a.avatar_id,\n    talking_photo_name: a.avatar_name,\n  }));\n  return {\n    hint: "HeyGen v3 uses avatar look IDs for video creation. Use avatar_id for studio, digital-twin, and photo-avatar looks.",\n    avatar_count: avatars.length,\n    talking_photo_count: talking_photos.length,\n    avatars,\n    talking_photos,\n  };\n}\n\n/** List AI voices (includes clones). GET /v3/voices */\nexport async function bossmobileHeygenListVoices(args?: {\n  name_contains?: string | null;\n  limit?: number | null;\n}) {\n  type T = {\n    data?: Array<{\n      voice_id?: string;\n      language?: string;\n      gender?: string;\n      name?: string;\n      type?: string;\n      default_engine?: string | null;\n      available_engines?: string[];\n    }>;\n  };\n  const json = await heygenJson<T>("/v3/voices?limit=100");\n  let voices = json.data ?? [];\n  const needle = args?.name_contains?.trim().toLowerCase();\n  if (needle) {\n    voices = voices.filter((v) => (v.name || "").toLowerCase().includes(needle));\n  }\n  const max = Math.min(Math.max(args?.limit ?? 100, 1), 100);\n  const total = voices.length;\n  const truncated = voices.length > max;\n  voices = voices.slice(0, max);\n  return {\n    hint: `Brian Keith Hill voice guard is ${BRIAN_HEYGEN_VOICE_ID}. Use this voice_id for Boss Mobile videos.`,\n    total_before_limit: total,\n    truncated,\n    voices: voices.map((v) => ({\n      voice_id: v.voice_id,\n      name: v.name,\n      language: v.language,\n      gender: v.gender,\n      type: v.type,\n      default_engine: v.default_engine ?? null,\n      available_engines: v.available_engines ?? [],\n    })),\n  };\n}\n\n/** Fetch and strip a site page for script grounding */
 export async function bossmobileHeygenFetchPage(pagePath: string) {
   const p = pagePath.startsWith("/") ? pagePath : `/${pagePath}`;
   const url = `${siteBase()}${p}`;

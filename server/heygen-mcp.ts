@@ -205,37 +205,57 @@ export function bossmobileHeygenGuide() {
   };
 }
 
-/** List studio avatars and talking photos. GET /v2/avatars */
+/** List usable avatar looks. GET /v3/avatars/looks */
 export async function bossmobileHeygenListAvatars() {
-  type T = {
-    data?: {
-      avatars?: Array<{
-        avatar_id?: string;
-        avatar_name?: string;
-        gender?: string;
-        premium?: boolean;
-        default_voice_id?: string | null;
-      }>;
-      talking_photos?: Array<{
-        talking_photo_id?: string;
-        talking_photo_name?: string;
-      }>;
-    };
+  type Look = {
+    id?: string;
+    name?: string;
+    avatar_type?: string;
+    group_id?: string | null;
+    gender?: string | null;
+    default_voice_id?: string | null;
+    preview_image_url?: string | null;
+    preview_video_url?: string | null;
+    supported_api_engines?: string[];
+    status?: string | null;
   };
-  const json = await heygenJson<T>("/v2/avatars");
-  const avatars = (json.data?.avatars ?? []).map((a) => ({
-    avatar_id: a.avatar_id,
-    avatar_name: a.avatar_name,
-    gender: a.gender,
-    premium: a.premium,
-    default_voice_id: a.default_voice_id ?? null,
+  type T = {
+    data?: Look[];
+    has_more?: boolean;
+    next_token?: string | null;
+  };
+
+  const looks: Look[] = [];
+  let token: string | null = null;
+  do {
+    const query = new URLSearchParams({ limit: "50" });
+    if (token) query.set("token", token);
+    const json = await heygenJson<T>(`/v3/avatars/looks?${query.toString()}`);
+    looks.push(...(json.data ?? []));
+    token = json.has_more ? json.next_token ?? null : null;
+  } while (token && looks.length < 500);
+
+  const avatars = looks.map((look) => ({
+    avatar_id: look.id,
+    avatar_name: look.name,
+    avatar_type: look.avatar_type,
+    group_id: look.group_id ?? null,
+    gender: look.gender ?? null,
+    default_voice_id: look.default_voice_id ?? null,
+    preview_image_url: look.preview_image_url ?? null,
+    preview_video_url: look.preview_video_url ?? null,
+    supported_api_engines: look.supported_api_engines ?? [],
+    status: look.status ?? null,
   }));
-  const talking_photos = (json.data?.talking_photos ?? []).map((t) => ({
-    talking_photo_id: t.talking_photo_id,
-    talking_photo_name: t.talking_photo_name,
-  }));
+  const talking_photos = avatars
+    .filter((a) => a.avatar_type === "photo_avatar")
+    .map((a) => ({
+      talking_photo_id: a.avatar_id,
+      talking_photo_name: a.avatar_name,
+    }));
+
   return {
-    hint: "Use avatar_id for studio looks. For photo avatar, pass talking_photo_id to bossmobile_heygen_video_agent (or set HEYGEN_DEFAULT_TALKING_PHOTO_ID).",
+    hint: "HeyGen v3 uses avatar look IDs for video creation. Use avatar_id for studio, digital-twin, and photo-avatar looks.",
     avatar_count: avatars.length,
     talking_photo_count: talking_photos.length,
     avatars,
@@ -243,40 +263,62 @@ export async function bossmobileHeygenListAvatars() {
   };
 }
 
-/** List AI voices (includes clones). GET /v2/voices */
+/** List AI voices (public + private clones). GET /v3/voices */
 export async function bossmobileHeygenListVoices(args?: {
   name_contains?: string | null;
   limit?: number | null;
 }) {
-  type T = {
-    data?: {
-      voices?: Array<{
-        voice_id?: string;
-        language?: string;
-        gender?: string;
-        name?: string;
-      }>;
-    };
+  type Voice = {
+    voice_id?: string;
+    language?: string;
+    gender?: string;
+    name?: string;
+    type?: string;
+    default_engine?: string | null;
+    available_engines?: string[];
+    preview_audio_url?: string | null;
   };
-  const json = await heygenJson<T>("/v2/voices");
-  let voices = json.data?.voices ?? [];
-  const needle = args?.name_contains?.trim().toLowerCase();
-  if (needle) {
-    voices = voices.filter((v) => (v.name || "").toLowerCase().includes(needle));
-  }
+  type T = {
+    data?: Voice[];
+    has_more?: boolean;
+    next_token?: string | null;
+  };
+
   const max = Math.min(Math.max(args?.limit ?? 400, 1), 500);
-  const total = voices.length;
-  const truncated = voices.length > max;
-  voices = voices.slice(0, max);
+  const voices: Voice[] = [];
+  for (const type of ["public", "private"] as const) {
+    let token: string | null = null;
+    do {
+      const query = new URLSearchParams({ type, limit: "100" });
+      if (token) query.set("token", token);
+      const json = await heygenJson<T>(`/v3/voices?${query.toString()}`);
+      voices.push(...(json.data ?? []));
+      token = json.has_more ? json.next_token ?? null : null;
+    } while (token && voices.length < 500);
+    if (voices.length >= 500) break;
+  }
+
+  const needle = args?.name_contains?.trim().toLowerCase();
+  const filtered = needle
+    ? voices.filter((v) => (v.name || "").toLowerCase().includes(needle))
+    : voices;
+  const total = filtered.length;
+  const truncated = filtered.length > max;
+  const selected = filtered.slice(0, max);
+
   return {
     hint: `Brian Keith Hill voice guard is ${BRIAN_HEYGEN_VOICE_ID}. Use this voice_id for Boss Mobile videos.`,
     total_before_limit: total,
     truncated,
-    voices: voices.map((v) => ({
+    voices: selected.map((v) => ({
       voice_id: v.voice_id,
       name: v.name,
       language: v.language,
       gender: v.gender,
+      type: v.type,
+      default_engine: v.default_engine ?? null,
+      available_engines: v.available_engines ?? [],
+      preview_audio_url: v.preview_audio_url ?? null,
     })),
   };
 }

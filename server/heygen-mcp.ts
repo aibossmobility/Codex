@@ -233,7 +233,7 @@ export async function bossmobileHeygenListAvatars() {
     const json = await heygenJson<T>(`/v3/avatars/looks?${query.toString()}`);
     looks.push(...(json.data ?? []));
     token = json.has_more ? json.next_token ?? null : null;
-  } while (token && looks.length < 500);
+  } while (token);
 
   const avatars = looks.map((look) => ({
     avatar_id: look.id,

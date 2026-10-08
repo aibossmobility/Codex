@@ -2141,7 +2141,7 @@ const contentSecurityPolicy = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
   "media-src 'self' blob: data:",
-  "frame-src 'self' https://meetn.com",
+  "frame-src 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -2276,7 +2276,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" },
+    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ama-hmvg-imr" },
   },
   "/tuesday-live": {
     title: "Papa Life Tuesday Live | August 25, 2026 Replay",
@@ -2294,7 +2294,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Watch Tuesday Replay", href: "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5" },
+    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ama-hmvg-imr" },
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",
@@ -6168,7 +6168,7 @@ async function startServer() {
     });
   });
 
-  // ── Record Calendly booking ───────────────────────────────────────────────
+  // ── Record Google Calendar booking ───────────────────────────────────────────────
 
   app.post("/api/booking", (req, res) => {
     try {
@@ -6177,7 +6177,7 @@ async function startServer() {
       db.prepare("UPDATE conversion_pipeline SET booked_at = datetime('now'), updated_at = datetime('now') WHERE email = ?")
         .run(email.trim().toLowerCase());
       // Log engagement
-      db.prepare("INSERT INTO engagement_log (email, event_type, event_detail) VALUES (?, 'booking', 'PAPA Clarity Session booked via Calendly')")
+      db.prepare("INSERT INTO engagement_log (email, event_type, event_detail) VALUES (?, 'booking', 'PAPA Clarity Session booked via Google Calendar')")
         .run(email.trim().toLowerCase());
       res.json({ ok: true });
     } catch (err) {

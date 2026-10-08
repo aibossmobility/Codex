@@ -4,4 +4,4 @@ export const PAPA_EMAIL_SERIES_LINK = "/go/email-series";
 
 export const PAPA_PAYMENT_LINK = "/go/join";
 
-export const PAPA_CALENDLY_LINK = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";
+export const PAPA_GOOGLE_BOOKING_LINK = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";

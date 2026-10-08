@@ -33,7 +33,7 @@ Title: Father-Adult Child Relationship Coach | AI Business Consultant
          Certified Peer Support Specialist
 Location: San Leandro, CA
 Primary Email: brian@bossmobility.net
-Booking: https://calendly.com/briankeithhill
+Booking: https://calendar.app.google/Jcu2RaCp4jyC1zE36
 
 EDUCATION:
 - B.S. in Recreation, CSUEB (1985)
@@ -110,7 +110,7 @@ PAPA LIFE SITE ASSETS:
 - Free resources: https://afcdmbri.gensparkspace.com/resources/
 - One Clear Path funnel: https://aacsezvf.gensparkspace.com/
 - Operator Command Center (internal): https://aozducgd.gensparkspace.com/
-- Live Meeting Room: https://meetn.com/briankeithhill (The Papa Life Circle Room)
+- Live Meeting Room: https://meet.google.com/ama-hmvg-imr (The Papa Life Circle Room)
 
 BRAND COLORS:
 - Black: #0A0A0A (backgrounds, navbar, footer)
@@ -150,7 +150,7 @@ Abdalla Ibrahim: abdalllla00@gmail.com
 
 TECHNICAL INFRASTRUCTURE:
 - Hosting: Genspark | Storage: Google Drive | Voice Agents: ElevenLabs
-- Automation: Make.com | Scheduling: Calendly | Live Meetings: Meetn
+- Automation: Make.com | Scheduling: Google Calendar | Live Meetings: Google Meet
 - Video Production: HeyGen | Course Management: bossmobilelifecoach.com MCP
 - CRM: iShareProposals / GoHighLevel (GHL)
 
@@ -482,7 +482,7 @@ COURSE BUILD WORKFLOW (CRITICAL — follow without exception):
 
 PAPA LIFE CIRCLES MODEL:
 - 8-12 fathers per circle
-- Venues: coffee shops, barbershops, online (via Meetn)
+- Venues: coffee shops, barbershops, online (via Google Meet)
 - Live online room: meetn.com/briankeithhill
 - Facilitator-multiplier model targeting 100K fathers via 10K groups
 - Three leadership layers: Mentors, Trainers, Ambassadors

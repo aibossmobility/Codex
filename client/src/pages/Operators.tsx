@@ -112,7 +112,7 @@ const OPERATORS = [
     },
     link: {
       href: "https://calendar.app.google/Jcu2RaCp4jyC1zE36",
-      label: "Book on Calendly",
+      label: "Book with Google Calendar",
       external: true,
     },
   },

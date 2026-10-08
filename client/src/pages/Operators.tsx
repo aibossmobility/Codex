@@ -111,7 +111,7 @@ const OPERATORS = [
       ],
     },
     link: {
-      href: "https://calendly.com/briankeithhill",
+      href: "https://calendar.app.google/Jcu2RaCp4jyC1zE36",
       label: "Book on Calendly",
       external: true,
     },

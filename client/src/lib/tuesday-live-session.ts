@@ -1,6 +1,6 @@
 export const TUESDAY_LIVE_SESSION = {
   topic: "When Silence Feels Personal",
-  liveHostUrl: "https://meetn.com/briankeithhill",
+  liveHostUrl: "https://meet.google.com/ama-hmvg-imr",
   youtubeStudioUrl: "https://studio.youtube.com/",
   cue: [
     "0–5: Welcome and prayer",

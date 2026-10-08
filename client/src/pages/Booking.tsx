@@ -26,7 +26,7 @@ interface ConversionStatus {
   booked: boolean;
 }
 
-const CALENDLY_URL = "https://calendly.com/briankeithhill";
+const GOOGLE_BOOKING_URL = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";
 
 const CLOSER_STEPS = [
   {
@@ -80,11 +80,11 @@ export default function Booking() {
         body: JSON.stringify({
           email: email.trim(),
           event_type: "booking_click",
-          event_detail: "Clicked Calendly booking link",
+          event_detail: "Clicked Google Calendar booking link",
         }),
       }).catch(() => {});
     }
-    window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+    window.open(GOOGLE_BOOKING_URL, "_blank", "noopener,noreferrer");
   };
 
   const requirements = [
@@ -270,7 +270,7 @@ export default function Booking() {
                       Book PAPA Clarity Session
                     </Button>
                     <p className="text-xs text-gray-600">
-                      30 minutes with Brian Keith Hill via Calendly
+                      Meet with Brian Keith Hill on Google Meet. Scheduling is handled through Google Calendar.
                     </p>
                   </CardContent>
                 </Card>

@@ -1,16 +1,16 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
-import { ArrowLeft, ExternalLink, PlayCircle } from "lucide-react";
+import { ArrowLeft, CalendarDays, ExternalLink, Video } from "lucide-react";
 
-const replayUrl = "https://meetn.com/replay/duxiNy0WzVrUwVxwvnYs6GkmzWToXzN5";
+const liveUrl = "https://meet.google.com/ama-hmvg-imr";
 
 export default function TuesdayLive() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
-        title="Papa Life Tuesday Live | August 25, 2026 Replay"
-        description="Watch the Papa Life Tuesday Live replay for August 25, 2026: Consistency After the Conversation."
-        keywords="Papa Life Tuesday Live, fathers of adult children, Consistency After the Conversation, Brian Keith Hill"
+        title="Papa Life Tuesday Trust | Live on Google Meet"
+        description="Join Brian Keith Hill for Papa Life Tuesday Trust every Tuesday at 1:00 PM Pacific on Google Meet."
+        keywords="Papa Life Tuesday Trust, fathers of adult children, Google Meet, Brian Keith Hill"
       />
 
       <header className="border-b border-white/10 bg-black/95">
@@ -26,57 +26,65 @@ export default function TuesdayLive() {
       </header>
 
       <main className="bg-black">
-        <section className="border-b border-white/10 py-12 md:py-16">
-          <div className="container max-w-5xl">
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-yellow">Papa Life Tuesday Live Replay</p>
-            <h1 className="mt-4 text-4xl font-extrabold text-white md:text-6xl">Consistency After the Conversation</h1>
-            <p className="mt-4 text-lg text-white/65">August 25, 2026 • Papa Life Tuesday Live</p>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/72">
-              The conversation is only the beginning. This session is about what a father does next: staying present,
-              keeping his word, rebuilding trust in small deposits, and becoming consistent enough that his adult child
-              can experience the change over time.
+        <section className="border-b border-white/10 py-14 md:py-20">
+          <div className="container max-w-5xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-yellow">Papa Life Tuesday Trust</p>
+            <h1 className="mt-4 text-4xl font-extrabold text-white md:text-6xl">One Question. One Conversation. One Next Step.</h1>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/70">
+              Join Brian Keith Hill for a live, human conversation for fathers of adult children navigating distance,
+              trust, repair, boundaries, and reconnection.
             </p>
+
+            <div className="mx-auto mt-8 flex max-w-xl flex-col gap-3 rounded-2xl border border-brand-yellow/25 bg-brand-yellow/8 p-6 text-left sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <CalendarDays className="mt-0.5 h-6 w-6 flex-shrink-0 text-brand-yellow" aria-hidden="true" />
+                <div>
+                  <p className="font-extrabold text-white">Tuesdays at 1:00 PM Pacific</p>
+                  <p className="mt-1 text-sm text-white/60">Live on Google Meet</p>
+                </div>
+              </div>
+              <a
+                href={liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-yellow px-6 font-extrabold text-black transition-opacity hover:opacity-90"
+              >
+                <Video className="h-5 w-5" aria-hidden="true" />
+                Join Google Meet
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </section>
 
         <section className="py-10 md:py-14">
           <div className="container max-w-5xl">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
-              <div className="aspect-video bg-black">
-                <iframe
-                  src={replayUrl}
-                  title="Papa Life Tuesday Live — August 25, 2026"
-                  className="h-full w-full"
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  allowFullScreen
-                />
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-zinc-950 p-6 md:p-8">
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-yellow">What to expect</p>
+                <h2 className="mt-3 text-3xl font-extrabold text-white">Conversation, not performance.</h2>
+                <p className="mt-4 leading-relaxed text-white/70">
+                  We begin with one real fatherhood question, connect it to the PAPA Framework, make room for honest
+                  conversation, and finish with one practical next step a father can take that week.
+                </p>
               </div>
-              <div className="border-t border-white/10 p-5 md:p-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-bold text-white">Having trouble with the embedded player?</p>
-                    <p className="mt-1 text-sm text-white/55">Open the official replay directly in Meetn.</p>
-                  </div>
-                  <a
-                    href={replayUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-yellow px-6 font-extrabold text-black transition-opacity hover:opacity-90"
-                  >
-                    <PlayCircle className="h-5 w-5" aria-hidden="true" />
-                    Watch Tuesday Replay
-                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                  </a>
-                </div>
+
+              <div className="rounded-2xl border border-white/10 bg-zinc-950 p-6 md:p-8">
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-yellow">Recordings</p>
+                <h2 className="mt-3 text-3xl font-extrabold text-white">A new Google-based archive is coming.</h2>
+                <p className="mt-4 leading-relaxed text-white/70">
+                  New sessions are being recorded through Google Meet. Recordings will be added to the Papa Life
+                  archive after they are verified and prepared for sharing.
+                </p>
               </div>
             </div>
 
             <div className="mt-10 rounded-2xl border border-brand-yellow/25 bg-brand-yellow/8 p-6 md:p-8">
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-yellow">For Fathers of Adult Children</p>
-              <h2 className="mt-3 text-3xl font-extrabold text-white">The goal is not one perfect conversation.</h2>
+              <h2 className="mt-3 text-3xl font-extrabold text-white">You do not have to solve the whole relationship today.</h2>
               <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/70 md:text-lg">
-                Trust is rebuilt through what happens after the conversation. Stay humble. Stay present. Keep showing up.
-                As long as you are both alive, it is not too late to take another faithful step toward reconnection.
+                Come ready to listen, reflect, and choose one honest next step. Papa Life is about becoming more
+                present, trustworthy, purposeful, and aligned over time.
               </p>
             </div>
           </div>

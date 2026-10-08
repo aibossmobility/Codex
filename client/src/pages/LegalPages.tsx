@@ -80,7 +80,7 @@ export function PrivacyPage() {
       </p>
       <ul>
         <li>Fill out a lead form (name, email, phone number, age range, and answers about your relationship with your adult child)</li>
-        <li>Book a coaching call through Calendly</li>
+        <li>Book a coaching conversation through Google Calendar</li>
         <li>Register for Tuesday Live sessions</li>
         <li>Join Papa Life membership ($4.99/month) through our checkout</li>
         <li>Send a message through our contact page or Papa Life AI Coach, including the content you choose to enter</li>
@@ -123,7 +123,7 @@ export function PrivacyPage() {
       <h2>5. How We Share Information</h2>
       <p>We do not sell your personal information. We only share it with:</p>
       <ul>
-        <li>Service providers who help us operate Papa Life, including our CRM (GoHighLevel), scheduling provider (Calendly), payment processor (Stripe), website analytics provider (HeyCatch), hosting and security providers, AI, video and voice providers, and email/SMS delivery systems</li>
+        <li>Service providers who help us operate Papa Life, including our CRM (GoHighLevel), scheduling and video-meeting provider (Google Calendar and Google Meet), payment processor (Stripe), website analytics provider (HeyCatch), hosting and security providers, AI, video and voice providers, and email/SMS delivery systems</li>
         <li>Law enforcement or courts, if we are required to by law</li>
         <li>A buyer, if Papa Life is ever sold or merged with another company</li>
       </ul>

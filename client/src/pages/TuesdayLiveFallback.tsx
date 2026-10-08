@@ -77,7 +77,7 @@ export default function TuesdayLiveFallback() {
           <CardContent className="p-5">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">Papa Life Tuesday Live</p>
             <h2 className="mt-2 text-3xl font-black leading-tight">{topic}</h2>
-            <p className="mt-3 text-sm text-gray-400">Use this screen as the visual and narration source when the Mac is unavailable. Start it, then share this phone screen inside Meetn.</p>
+            <p className="mt-3 text-sm text-gray-400">Use this screen as the visual and narration source when the Mac is unavailable. Start it, then share this phone screen inside Google Meet.</p>
           </CardContent>
         </Card>
 
@@ -107,7 +107,7 @@ export default function TuesdayLiveFallback() {
         </div>
 
         <Button className="h-14 w-full bg-brand-red text-white hover:bg-brand-red/90" onClick={() => window.open(TUESDAY_LIVE_SESSION.liveHostUrl, "_blank", "noopener,noreferrer")}>
-          <Mic2 className="mr-2 h-5 w-5" />Open Meetn host room
+          <Mic2 className="mr-2 h-5 w-5" />Open Google Meet host room
           <ExternalLink className="ml-2 h-4 w-4" />
         </Button>
 
@@ -115,7 +115,7 @@ export default function TuesdayLiveFallback() {
           <RotateCcw className="mr-2 h-4 w-4" />Reset session
         </Button>
 
-        <p className="text-center text-xs leading-relaxed text-gray-500">Phone narration begins only after you tap Start narration. Meetn, YouTube, and Facebook publishing remain separate host-account actions; this page does not publish or send anything by itself.</p>
+        <p className="text-center text-xs leading-relaxed text-gray-500">Phone narration begins only after you tap Start narration. Google Meet, YouTube, and Facebook publishing remain separate host-account actions; this page does not publish or send anything by itself.</p>
       </main>
     </div>
   );

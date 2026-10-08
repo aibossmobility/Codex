@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SiteLogoStacked } from "@/components/SiteLogo";
 import { LessonMediaPlayer } from "@/components/LessonMediaPlayer";
 import { Loader2 } from "lucide-react";
-import { CALENDLY_BOOK_URL } from "@/lib/papa-funnel";
+import { GOOGLE_BOOKING_URL } from "@/lib/papa-funnel";
 
 const PAPA_RECONNECTION_INFOGRAPHIC = "/media/papa-life-distance-reconnection-infographic.png";
 
@@ -164,7 +164,7 @@ export default function PapaFirstLesson() {
               variant="outline"
               className="w-full sm:w-auto border-white/15 bg-transparent text-gray-100 hover:bg-white/10 hover:text-white font-bold px-8 py-6 text-lg rounded-full"
             >
-              <a href={CALENDLY_BOOK_URL} target="_blank" rel="noopener noreferrer">
+              <a href={GOOGLE_BOOKING_URL} target="_blank" rel="noopener noreferrer">
                 Book a Conversation
               </a>
             </Button>

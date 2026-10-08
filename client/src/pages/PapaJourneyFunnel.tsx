@@ -26,7 +26,7 @@ import {
 import { SiteLogo } from "@/components/SiteLogo";
 import { SiteMediaVideo } from "@/components/SiteMediaVideo";
 import {
-  PAPA_CALENDLY_LINK,
+  PAPA_GOOGLE_BOOKING_LINK,
   PAPA_EMAIL_SERIES_LINK,
   PAPA_FATHERHOOD_STAGES_LINK,
   PAPA_PAYMENT_LINK,
@@ -1350,7 +1350,7 @@ function FinalCTA() {
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
             </a>
             <a
-              href={PAPA_CALENDLY_LINK}
+              href={PAPA_GOOGLE_BOOKING_LINK}
               className="inline-flex items-center gap-2 text-gray-300 hover:text-white border border-white/15 hover:border-white/30 font-semibold text-base px-8 py-5 rounded-full transition-colors"
             >
               Talk to Brian first

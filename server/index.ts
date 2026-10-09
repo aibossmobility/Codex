@@ -1,3 +1,4 @@
+import { getExistingPublicCheckoutLink } from "./existing-public-payment-links";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -6871,7 +6872,11 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      public_checkout_url: product.public_checkout_url || null,
+      public_checkout_url: getExistingPublicCheckoutLink(
+        product.code,
+        product.public_price_cents ?? (product.code.includes(".module.") ? 1499 : product.code === "curriculum.digital.complete" ? 7900 : product.code === "curriculum.bundle.complete" ? 12900 : product.price_cents),
+        product.public_checkout_url
+      ),
     }));
     res.json({
       products,

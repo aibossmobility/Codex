@@ -23,7 +23,8 @@ export default function MemberBilling() {
   const [statusMessage, setStatusMessage] = useState("");
   const [billing, setBilling] = useState<BillingState | null>(null);
   const [amountDisplay, setAmountDisplay] = useState("$4.99");
-  const [checkoutProvider, setCheckoutProvider] = useState("stripe");
+  const [checkoutProvider, setCheckoutProvider] = useState("pending");
+  const [checkoutAvailable, setCheckoutAvailable] = useState(false);
 
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
   const sessionId = params.get("session_id");
@@ -39,6 +40,7 @@ export default function MemberBilling() {
     setBilling(data.billing);
     if (data.amount_display) setAmountDisplay(data.amount_display);
     if (data.checkout_provider) setCheckoutProvider(data.checkout_provider);
+    setCheckoutAvailable(data.checkout_available === true);
     if (data.billing?.hasPortalAccess) {
       navigate("/portal");
     }
@@ -97,9 +99,7 @@ export default function MemberBilling() {
       if (!data.checkout_url) {
         throw new Error("Checkout URL was not returned");
       }
-      if (data.provider === "fastpay") {
-        setStatusMessage("Opening the Boss Mobility payment page. Portal access may need confirmation after payment.");
-      }
+
       window.location.href = data.checkout_url;
     } catch (err: any) {
       setError(err.message || "Unable to start checkout");
@@ -143,14 +143,14 @@ export default function MemberBilling() {
                   <p className="text-xs uppercase tracking-wide text-gray-500">Portal access</p>
                   <p className="text-white text-2xl font-bold mt-1">{amountDisplay}</p>
                   <p className="text-gray-500 text-xs mt-1">
-                    {checkoutProvider === "fastpay"
-                      ? "Payment through Boss Mobility checkout"
-                      : "One-time payment via Stripe"}
+                    {checkoutAvailable && checkoutProvider === "stripe"
+                      ? "Secure $4.99 monthly subscription checkout"
+                      : "Membership checkout is being updated. No charge will be made."}
                   </p>
                 </div>
                 <Button
                   onClick={handleCheckout}
-                  disabled={actionLoading}
+                  disabled={actionLoading || !checkoutAvailable}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-5 rounded-xl text-sm"
                 >
                   {actionLoading ? (
@@ -158,7 +158,7 @@ export default function MemberBilling() {
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Opening checkout...
                     </>
                   ) : (
-                    "Pay and Continue"
+                    "Start $4.99 Monthly Membership"
                   )}
                 </Button>
               </div>
@@ -178,7 +178,7 @@ export default function MemberBilling() {
 
             <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Secure checkout powered by Boss Mobility
+              Papa Life membership — existing members remain unaffected
             </div>
           </CardContent>
         </Card>

@@ -2063,7 +2063,7 @@ function adminIntegrationStatusPayload() {
     payment: {
       stripe_configured: Boolean(STRIPE_SECRET_KEY),
       checkout_provider: checkoutProvider,
-      checkout_payment_link_configured: Boolean(pricing.checkout_payment_link?.trim()),
+      checkout_payment_link_configured: false, // Legacy payment links are explicitly retired for new members.
       payment_webhook_configured: Boolean(process.env.PAYMENT_WEBHOOK_SECRET?.trim()),
       manual_mark_paid_available: true,
     },
@@ -2076,6 +2076,37 @@ function adminIntegrationStatusPayload() {
     email,
     recent_notifications: recentNotificationEvents(5),
   };
+}
+
+const PAPA_LIFE_MONTHLY_PRICE_ID = (process.env.PAPA_LIFE_MONTHLY_STRIPE_PRICE_ID || "").trim();
+const PAPA_LIFE_APPROVED_STRIPE_ACCOUNT = "acct_1AAmQSHTXZZV4XVQ";
+const PAPA_LIFE_APPROVED_STRIPE_PRODUCT = "prod_UtmLGTR1BgZODY";
+const PAPA_LIFE_APPROVED_GHL_LOCATION = "BYx4g32AidgEkTBg7nLQ";
+
+async function verifyCurrentPapaLifeSubscriptionPrice(): Promise<void> {
+  if (!STRIPE_SECRET_KEY || !PAPA_LIFE_MONTHLY_PRICE_ID) {
+    throw new Error("Papa Life membership billing is being updated. No charge was made.");
+  }
+  // Fail closed if a secret for the old Alpha-era Stripe account is configured instead.
+  const headers = { Authorization: `Bearer ${STRIPE_SECRET_KEY}` };
+  const [accountResponse, priceResponse] = await Promise.all([
+    fetch("https://api.stripe.com/v1/account", { headers }),
+    fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(PAPA_LIFE_MONTHLY_PRICE_ID)}`, { headers }),
+  ]);
+  if (!accountResponse.ok || !priceResponse.ok) {
+    throw new Error("Papa Life's approved Stripe billing connection could not be verified.");
+  }
+  const account = await accountResponse.json() as any;
+  const price = await priceResponse.json() as any;
+  if (account.id !== PAPA_LIFE_APPROVED_STRIPE_ACCOUNT ||
+      price.id !== PAPA_LIFE_MONTHLY_PRICE_ID ||
+      price.product !== PAPA_LIFE_APPROVED_STRIPE_PRODUCT ||
+      price.metadata?.location_id !== PAPA_LIFE_APPROVED_GHL_LOCATION ||
+      price.active !== true || price.currency !== "usd" ||
+      price.unit_amount !== 499 || price.type !== "recurring" ||
+      price.recurring?.interval !== "month" || price.recurring?.interval_count !== 1) {
+    throw new Error("Membership checkout is not configured for the approved iShareHow Labs $4.99/month price.");
+  }
 }
 
 async function stripeCreateCheckoutSession(payload: URLSearchParams) {
@@ -3835,8 +3866,9 @@ async function startServer() {
       amount_display: formatAmountDisplay(pricing.member_price_usd_cents, pricing.member_currency),
       currency: pricing.member_currency,
       product_name: pricing.member_product_name,
-      checkout_provider: STRIPE_SECRET_KEY ? "stripe" : "fastpay",
-      checkout_payment_link: appendCheckoutTracking(pricing.checkout_payment_link, member),
+      checkout_provider: STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID ? "stripe" : "pending",
+      checkout_available: Boolean(STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID),
+      checkout_payment_link: null,
     });
   });
 
@@ -3852,36 +3884,25 @@ async function startServer() {
         return res.json({ ok: true, already_paid: true, checkout_url: null });
       }
 
-      if (!STRIPE_SECRET_KEY) {
-        return res.json({
-          ok: true,
-          provider: "fastpay",
-          checkout_url: appendCheckoutTracking(pricing.checkout_payment_link, member),
-          manual_reconciliation_required: true,
-          message:
-            "Stripe is not configured. Redirecting to the active Boss Mobility payment link.",
-        });
+      if (!STRIPE_SECRET_KEY || !PAPA_LIFE_MONTHLY_PRICE_ID) {
+        return res.status(503).json({ ok: false, error: "Papa Life's secure monthly membership checkout is being updated. No charge was made." });
       }
+      await verifyCurrentPapaLifeSubscriptionPrice();
 
       const baseUrl = appBaseUrl(req);
       const successUrl = `${baseUrl}/member-billing?success=1&session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${baseUrl}/member-billing?canceled=1`;
 
       const form = new URLSearchParams();
-      form.set("mode", "payment");
+      form.set("mode", "subscription");
       form.set("success_url", successUrl);
       form.set("cancel_url", cancelUrl);
       form.set("customer_email", member.email);
       form.set("client_reference_id", String(member.id));
       form.set("metadata[member_id]", String(member.id));
 
-      if (pricing.member_stripe_price_id) {
-        form.set("line_items[0][price]", pricing.member_stripe_price_id);
-      } else {
-        form.set("line_items[0][price_data][currency]", pricing.member_currency);
-        form.set("line_items[0][price_data][unit_amount]", String(pricing.member_price_usd_cents));
-        form.set("line_items[0][price_data][product_data][name]", pricing.member_product_name);
-      }
+      form.set("line_items[0][price]", PAPA_LIFE_MONTHLY_PRICE_ID);
+      form.set("subscription_data[metadata][member_id]", String(member.id));
       form.set("line_items[0][quantity]", "1");
 
       const sessionData = await stripeCreateCheckoutSession(form);
@@ -3911,7 +3932,7 @@ async function startServer() {
       }
 
       const sessionData = await stripeRetrieveCheckoutSession(session_id);
-      const paid = sessionData?.payment_status === "paid";
+      const paid = sessionData?.payment_status === "paid" && sessionData?.mode === "subscription" && Boolean(sessionData?.subscription);
       const matchesMember =
         String(sessionData?.client_reference_id || "") === String(member.id) ||
         String(sessionData?.metadata?.member_id || "") === String(member.id);
@@ -6825,7 +6846,7 @@ async function startServer() {
   app.get("/api/public/pricing", (_req, res) => {
     const pricing = getPricingSettings(db);
     res.json({
-      checkout_payment_link: pricing.checkout_payment_link,
+      checkout_payment_link: null,
       member_trial_hours: 0,
       member_price_usd_cents: pricing.member_price_usd_cents,
       member_currency: pricing.member_currency,
@@ -6953,7 +6974,7 @@ async function startServer() {
           campaign: "give_listen_love_serve_email_series",
         },
         join: {
-          destination: "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444",
+          destination: "https://papalifecoach.com/join",
           campaign: "papa_life_paid_access",
         },
       };

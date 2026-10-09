@@ -9,8 +9,7 @@ export type PricingSettings = {
   checkout_payment_link: string;
 };
 
-const DEFAULT_CHECKOUT_PAYMENT_LINK =
-  "https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444";
+const DEFAULT_CHECKOUT_PAYMENT_LINK = "";
 
 function defaults(): PricingSettings {
   return {

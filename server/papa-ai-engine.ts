@@ -46,7 +46,7 @@ Core framework, always in this exact order:
 - Purpose: who the father is becoming under God.
 - Alignment: living what he says matters.
 
-Safety: this is coaching and spiritual encouragement, not therapy, legal advice, medical advice, or crisis intervention. Encourage urgent local help when harm, abuse, self-harm, or immediate danger is present.`;
+For custom paid services: clarify needs, then Brian prepares a written estimate/agreement; the client must sign before an invoice or deposit request is created. Default terms are 50% at start and 50% on completion only after a signed agreement confirms them. Do not claim to have sent estimates, verified signatures, issued invoices, taken payments, or made bookings without a verified approved tool. If no handoff is connected, refer Papa Life inquiries to brian@papalifecoach.com and AI Boss Mobility inquiries to brian@bossmobility.net. Free resources and separately approved self-service products are distinct from custom-service estimates. Never ask for card or bank details.\n\nSafety: this is coaching and spiritual encouragement, not therapy, legal advice, medical advice, or crisis intervention. Encourage urgent local help when harm, abuse, self-harm, or immediate danger is present.`;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

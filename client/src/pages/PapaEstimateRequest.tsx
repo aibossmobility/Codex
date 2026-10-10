@@ -26,8 +26,10 @@ export default function PapaEstimateRequest() {
   const [note, setNote] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
+  const [salesReady, setSalesReady] = useState(false);
   const active = Date.now() >= CUTOVER;
   useEffect(() => {
+    fetch("/api/public/papa-commerce-policy").then((r) => r.json()).then((data) => setSalesReady(Boolean(data.purchase?.sales_ready))).catch(() => setSalesReady(false));
     fetch("/api/public/commerce-catalog")
       .then((r) => r.json())
       .then((data) => setOffers((data.products || []).filter((x: Offer) => x.code !== "membership.community.monthly")))
@@ -36,7 +38,7 @@ export default function PapaEstimateRequest() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!active || busy) return;
+    if (!active || !salesReady || busy) return;
     setBusy(true);
     setResult(null);
     try {
@@ -62,8 +64,9 @@ export default function PapaEstimateRequest() {
         <p className="font-bold uppercase tracking-wider text-[#f2c230]">Papa Life product requests</p>
         <h1 className="mt-3 text-3xl font-extrabold md:text-5xl">Understand the value before you pay.</h1>
         <p className="mt-4 text-white/80">Choose a product, request a written estimate, review its price and terms, and sign only when you are comfortable. Payment is not collected on this form. An estimate request is not an invoice or a confirmed purchase.</p>
-        {!active && <div className="mt-8 rounded-xl border border-[#f2c230] bg-[#2b2916] p-5">This new process begins November 1, 2026. Until then, existing purchase options continue to operate under their current terms.</div>}
-        {active && !result?.ok && <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-white/20 bg-white/5 p-6">
+        {!active && <div className="mt-8 rounded-xl border border-[#f2c230] bg-[#2b2916] p-5">The new process begins November 1, 2026. Legacy sales links are closed for safety; no payment is collected on this website.</div>}
+        {active && !salesReady && <div className="mt-8 rounded-xl border border-[#f2c230] bg-[#152b20] p-6"><h2 className="text-2xl font-bold">Sales are moving to GoHighLevel</h2><p className="mt-3">Papa Life will use only the verified GoHighLevel product catalog, written estimates, electronic signatures, and payment requests. Products shown on the website are not yet ready for checkout. Older P2P and bossmobility.net sales links are not authorized.</p><p className="mt-3">No estimate, invoice, or payment has been created. For product questions, use the Papa Life contact address below.</p></div>}
+        {active && salesReady && !result?.ok && <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-white/20 bg-white/5 p-6">
           <label className="block font-semibold">Papa Life product
             <select required value={productCode} onChange={(event) => setProductCode(event.target.value)} className="mt-2 w-full rounded-lg border border-white/30 bg-[#152b20] p-3 text-white">
               <option value="">Select a product</option>

@@ -8,7 +8,7 @@ export const FUNNEL_PAGE_PATHS = {
   video: "/papa-intro",
   journal: "/papa-journal",
   firstLesson: "/papa-first-lesson",
-  googleBooking: "https://calendar.app.google/Jcu2RaCp4jyC1zE36",
+  googleBooking: "mailto:brian@papalifecoach.com?subject=Papa%20Life%20Conversation%20Request",
 } as const;
 
 /** Sequence A — Submitted intake, did NOT watch video (send immediately) */
@@ -29,7 +29,7 @@ export const SEQUENCE_B = {
 export const SEQUENCE_C = {
   subject: "You do not need more information right now.",
   bodyTemplate: () =>
-    `You do not need more information right now. You need the right next step. Book here: ${FUNNEL_PAGE_PATHS.googleBooking}`,
+    `You do not need more information right now. You need the right next step. Request a Papa Life conversation here: ${FUNNEL_PAGE_PATHS.googleBooking}`,
 };
 
 /** Sequence D — No activity after intake (send after 3 days) */

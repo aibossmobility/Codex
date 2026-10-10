@@ -1,5 +1,22 @@
 # Papa Life Commercial System
 
+## Scheduled Commercial Policy Change — November 1, 2026
+
+**Status:** Implementation in progress. This section supersedes the historical membership-based product model below **only on or after November 1, 2026 at 12:00 a.m. Pacific**, and only after the billing, delivery and signature integrations have been validated.
+
+- The legacy $4.99 monthly membership stops being offered. Optional one-time contributions of **$4.99 or $5** support Papa Life; they grant **no membership access, discounts or paid material**. Do not auto-convert existing subscriptions to donations.
+- All new paid books, manuscripts, courses, digital audio, service packages and workshops require a written price-specific estimate/agreement, customer review, verifiable electronic acceptance/signature, then the agreed secure payment. Issue accurate payment receipts and invoices only after the corresponding events have been verified.
+- Standard catalog products may have AI-managed intake, standard price quotes, agreement delivery, follow-up and fulfillment through approved tested tools; the Digital Twin is the normal process owner. The same logic serves AI Boss Mobility with its **own** brand, contact information and customer records.
+- Preserve prior one-time purchases in the purchased-entitlements store; those buyers should never have to donate or buy the same product again.
+- For legacy recurring subscribers, notify each person before any billing cancellation. Verify the applicable paid-through period with the payment provider and do not revoke already purchased benefits early. Do not make a subscription cancellation or donor conversion based only on a website copy update. Legacy coverage is protected during reconciliation.
+- Access/payment cutover must be verified from a customer perspective, not merely by CI builds. Until e-signature, GHL/CRM, payment, tax/receipt, delivery and customer communications have passed acceptance testing, keep this change as a draft and do not claim the Digital Twins can fully process it without a human fallback.
+- The website can record a price-based request, but **a recorded estimate request is not an executed or signed agreement**, and must not trigger card billing, invoicing, entitlement grant, or fulfillment.
+
+**Historical policy below:** Kept intact to explain prior purchases and membership terms. It is not the authorized offer for new November 1 transactions.
+
+---
+
+
 ## Canonical Commercial Model
 
 Papa Life operates one recurring membership with optional member-only permanent purchases. **Papa Life Membership costs $4.99 per month and includes community access plus protected streaming access to Course 11, Lessons 75–86, while the membership remains active.** After joining, a member may separately purchase permanent/downloadable digital lessons, manuscript PDFs, or complete-program bundles. Those purchases remain available to that buyer independently of later membership status.

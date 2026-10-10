@@ -111,8 +111,8 @@ const OPERATORS = [
       ],
     },
     link: {
-      href: "https://calendar.app.google/Jcu2RaCp4jyC1zE36",
-      label: "Book with Google Calendar",
+      href: "mailto:brian@papalifecoach.com?subject=Papa%20Life%20Conversation%20Request",
+      label: "Request a Papa Life Conversation",
       external: true,
     },
   },

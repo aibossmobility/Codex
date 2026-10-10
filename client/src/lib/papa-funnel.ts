@@ -1,6 +1,9 @@
 /** Papa Life homepage funnel — mirrors server `PAPA_FUNNEL_ISSUE_*` */
 
-export const GOOGLE_BOOKING_URL = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";
+import { PAPA_CONVERSATION_REQUEST_URL } from "./papa-links";
+
+// Compatibility alias for the Papa Life request destination until its own appointment schedule is connected.
+export const GOOGLE_BOOKING_URL = PAPA_CONVERSATION_REQUEST_URL;
 
 export const HEYGEN_EMBED_URL = "https://app.heygen.com/embeds/e0919c0ef5f54baead1bfe23bdc695a0";
 

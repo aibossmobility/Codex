@@ -2,7 +2,7 @@ import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { ArrowLeft, CalendarDays, ExternalLink, Video } from "lucide-react";
 
-const liveUrl = "https://meet.google.com/ama-hmvg-imr";
+const liveUrl = "https://meet.google.com/ohx-nvaf-stt";
 
 export default function TuesdayLive() {
   return (

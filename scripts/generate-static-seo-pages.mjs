@@ -356,10 +356,10 @@ const pages = [
     title: "Booking | Papa Life Coach",
     description: "Booking page for Papa Life Coach.",
     eyebrow: "Booking",
-    headline: "Book time with Papa Life Coach.",
-    intro: "Use this page to move from interest into a scheduled conversation or next step.",
+    headline: "Request a conversation with Papa Life.",
+    intro: "Email Brian at brian@papalifecoach.com to request a conversation. We will confirm a time and Google Meet details by email.",
     sections: [
-      ["Next step", "Choose an available path for booking or follow-up."],
+      ["Next step", "Use the Papa Life conversation request link. An email request is not a confirmed appointment."],
       ["Prepare", "Start with the assessment if you are looking for fatherhood relationship support."],
     ],
   },

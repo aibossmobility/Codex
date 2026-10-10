@@ -2307,7 +2307,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ama-hmvg-imr" },
+    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
   },
   "/tuesday-live": {
     title: "Papa Life Tuesday Live | August 25, 2026 Replay",
@@ -2325,7 +2325,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ama-hmvg-imr" },
+    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",

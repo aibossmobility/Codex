@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, RequestHandler } from "express";
 import type Database from "better-sqlite3";
 import { nanoid } from "nanoid";
 import { getCommerceProductByCode } from "./commerce-entitlements";
@@ -46,7 +46,8 @@ export function papaPublicPriceCents(product: {
 export function registerPapaEstimateRequestRoutes(
   app: Express,
   db: Database.Database,
-  notify: (message: { event_type: string; subject: string; summary: string; payload: unknown }) => Promise<unknown>
+  notify: (message: { event_type: string; subject: string; summary: string; payload: unknown }) => Promise<unknown>,
+  requireAdmin: RequestHandler
 ) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS papa_estimate_requests (
@@ -65,6 +66,20 @@ export function registerPapaEstimateRequestRoutes(
     CREATE INDEX IF NOT EXISTS idx_papa_estimate_request_status
       ON papa_estimate_requests(status, created_at);
   `);
+
+  // Estimate queue is private; never expose names, emails or notes publicly.
+  app.get("/api/admin/papa-estimate-requests", requireAdmin, (req, res) => {
+    const requestedLimit = Number(req.query.limit || 50);
+    const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(100, Math.floor(requestedLimit))) : 50;
+    const status = typeof req.query.status === "string" ? req.query.status : "";
+    if (status && !["estimate_requested", "estimate_prepared", "estimate_sent", "signed_verified", "payment_requested", "deposit_received", "invoiced", "fulfilled", "void"].includes(status)) {
+      return res.status(400).json({ ok: false, error: "Invalid estimate status." });
+    }
+    const records = status
+      ? db.prepare("SELECT * FROM papa_estimate_requests WHERE status = ? ORDER BY created_at DESC LIMIT ?").all(status, limit)
+      : db.prepare("SELECT * FROM papa_estimate_requests ORDER BY created_at DESC LIMIT ?").all(limit);
+    return res.json({ ok: true, records });
+  });
 
   app.get("/api/public/papa-commerce-policy", (_req, res) => {
     res.json({

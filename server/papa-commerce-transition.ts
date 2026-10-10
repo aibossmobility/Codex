@@ -101,7 +101,7 @@ export function registerPapaEstimateRequestRoutes(
     void notify({
       event_type: "papa_estimate_requested",
       subject: `Papa Life estimate request ${reference}`,
-      summary: `Papa Life estimate request ${reference}\\nItem: ${product.canonical_name}\\nAdvertised subtotal: ${subtotalCents} cents ${product.currency}\\nCustomer: ${name} <${email}>\\nNotes: ${note}\\nPrepare signed estimate, then arrange payment. Do not issue an invoice without verified agreement.`,
+      summary: `Papa Life estimate request ${reference}\nItem: ${product.canonical_name}\nAdvertised subtotal: ${subtotalCents} cents ${product.currency}\nCustomer: ${name} <${email}>\nNotes: ${note}\nPrepare signed estimate, then arrange payment. Do not issue an invoice without verified agreement.`,
       payload: { reference, product_code: product.code, subtotal_cents: subtotalCents, contact_email: email },
     }).catch(() => {});
     return res.status(201).json({

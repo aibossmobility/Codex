@@ -20,7 +20,7 @@ for (const [filename, content] of [
   assert.ok(!/https?:\/\/agent\.bossmobility\.net/i.test(content), filename + " contains a legacy payment URL");
 }
 assert.ok(!/external-tracking\.js/i.test(join), "Legacy tracking must not run from join doorway");
-assert.ok(/const destination = "\/sales-transition(?:\/index\\.html)?";/.test(index), "Join route must remain internal and safe");
+assert.ok(/const destination = "\/sales-transition(?:\/index\.html)?";/.test(index), "Join route must remain internal and safe");
 assert.ok(/public_checkout_url: null/.test(index), "Public catalog must not expose legacy checkout links");
 assert.ok(/checkout_url: null/.test(index), "Member catalog must not expose legacy checkout links");
 assert.ok(/Legacy membership checkout is closed/.test(index), "New legacy recurring checkout must remain closed");

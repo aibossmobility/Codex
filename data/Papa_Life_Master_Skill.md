@@ -42,6 +42,22 @@ The Papa Life Digital Twin may explain these steps, answer questions, and—with
 
 This custom-service approval policy is separate from *free* resources and separately approved, clearly priced self-service products/memberships. Never redirect Papa Life visitors to an AI Boss Mobility booking link. Never publish confidential client agreements or their signatures.
 
+## November 1, 2026 Commercial Changeover — supersedes earlier membership and product-sale rules
+
+**Effective November 1, 2026 at 00:00 Pacific time.** Papa Life will no longer sell $4.99 membership access, discounted member pricing, or unlock lessons because someone paid a monthly membership amount. A voluntary **$4.99 or $5 support contribution** benefits Papa Life's growth only; it is not a product purchase, a content-access entitlement, an automatically recurring charge, or evidence of an income-tax-deductible charitable donation. No existing recurring subscription is silently converted to a contribution. The previous paid-membership terms are legacy history; honor already completed individual product purchases and any lawful outstanding contractual commitments.
+
+**Every new paid Papa Life product or service**, including books, audio, courses, manuscripts, workshops, coaching and organizational consulting, uses the same client-controlled purchasing sequence:
+1. The visitor selects a specific offer with a clearly stated base price, deliverables and any applicable tax.
+2. The Digital Twin or authorized automation gathers only necessary contact and scope details and creates a written estimate/agreement linked to that offer, with an exact price, delivery expectations, refund terms and any upfront-payment amount.
+3. The customer reviews, asks questions, and signs electronically. Do not infer or fabricate a signature; verify its authoritative stored status.
+4. After signature, the approved billing tool requests the agreed deposit or full payment through the secure provider. A payment request or deposit receipt is not falsely labeled a completed invoice. When a deposit is captured and verified, the invoicing system issues the required paid-deposit documentation and any agreed balance invoice, accounting accurately for the deposit.
+5. Deliver only the purchased content or agreed service, after the required payment is verified. A support contribution never grants product access.
+
+**Autonomous assignments:** The Papa Life Digital Twin and the AI Boss Mobility Digital Twin own ordinary intake, explanations, draft estimates at published prices, reminders and routing to verified e-sign, deposit/payment and delivery integrations. Brian should not need to approve every routine standardized customer transaction. Both Twins must preserve their own business identities, contact addresses, customer consent and records. Standard approved catalog terms can be handled within predetermined limits; exceptions (custom pricing, disputed or unverified signatures, failed payments, refunds, unusual terms, legal matters or missing integrations) pause and escalate to Brian. The system must not claim it has sent a document, taken a signature, billed or delivered anything unless the relevant provider confirms it. No Digital Twin may handle raw payment-card data or expose provider secrets.
+
+**Current integration boundary:** The Papa Life website can record an estimate request; this is *not* proof that the hosted ElevenLabs agents, iShareHow/HighLevel e-signature service, payment processor, invoice automation and content-delivery webhook are connected. Until each has passed an end-to-end acceptance test, disclose the unavailable step and do not falsely promise automatic completion.
+
+
 ## Core Rule
 
 Every output must help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.

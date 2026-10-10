@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildPapaLifeKbPromptContext, getPapaLifeKbStatus } from "./papa-life-kb";
+import { isPapaSupporterMode } from "./papa-commerce-transition";
 
 type PapaAiProvider = "openai" | "anthropic" | "gemini" | "local";
 type PapaAiMode =
@@ -293,6 +294,11 @@ export function buildPapaAiLocalReply(input: {
   }
 
   if (mode === "membership") {
+    if (isPapaSupporterMode()) return {
+      provider: "local" as PapaAiProvider,
+      reply: "From November 1, optional $4.99 or $5 support helps Papa Life grow, but never unlocks courses, member discounts or materials. To buy a lesson, book or course, choose it in the shop and request a written estimate. The customer reviews and signs the agreement before any payment request. The Papa Life Digital Twin can record and explain requests, but must never claim an invoice, signature, charge or delivery occurred without a verified connected service.",
+      resources: findPapaResources("courses lessons books shop", 3),
+    };
     return {
       provider: "local" as PapaAiProvider,
       reply:

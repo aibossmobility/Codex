@@ -111,6 +111,7 @@ import {
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
+import { isPapaSupporterMode, papaPublicPriceCents, registerPapaEstimateRequestRoutes } from "./papa-commerce-transition";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import {
   ensureGhlIntegrationTable,
@@ -1721,6 +1722,19 @@ function getMemberAccessState(member: any, pricing = getPricingSettings(db)) {
       trial_expires_at: trialEndsAt,
       trial_hours: pricing.member_trial_hours,
       amount_cents: pricing.member_price_usd_cents,
+    };
+  }
+
+  // From Nov 1 support is voluntary. Never make access to the free community depend on donations.
+  if (isPapaSupporterMode()) {
+    return {
+      hasPortalAccess: true,
+      billingRequired: false,
+      reason: "supporter_mode_free_account",
+      payment_status: paymentStatus,
+      trial_expires_at: trialEndsAt,
+      trial_hours: 0,
+      amount_cents: 0,
     };
   }
 
@@ -4549,13 +4563,13 @@ async function startServer() {
       const membershipCourse = isMembershipCourse(course);
       const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
       if (isAudioCurriculum) {
-        if (membershipCourse && communityAccess) return true;
+        if (membershipCourse && communityAccess && !isPapaSupporterMode()) return true;
         if (legacyCourseIds.has(Number(course.id))) return true;
         const lessonIds = db.prepare("SELECT id FROM lessons WHERE course_id = ?")
           .all(course.id) as Array<{ id: number }>;
         return lessonIds.some((lesson) => entitledDigitalLessonIds.has(Number(lesson.id)));
       }
-      return (membershipCourse && communityAccess) || legacyCourseIds.has(Number(course.id));
+      return (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyCourseIds.has(Number(course.id));
     });
     res.json(visible);
   });
@@ -4578,19 +4592,19 @@ async function startServer() {
       "SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC"
     ).all(course.id) as any[];
 
-    if (!isAudioCurriculum && !(membershipCourse && communityAccess) && !legacyGrant) {
+    if (!isAudioCurriculum && !(membershipCourse && communityAccess && !isPapaSupporterMode()) && !legacyGrant) {
       return res.status(403).json({ ok: false, error: "An active Papa Life Membership is required for this course." });
     }
 
     if (isAudioCurriculum) {
-      const hasAnyDigitalModule = (membershipCourse && communityAccess) || legacyGrant || rawLessons.some((lesson) =>
+      const hasAnyDigitalModule = (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyGrant || rawLessons.some((lesson) =>
         memberCanAccessLesson(db, memberId, Number(lesson.id))
       );
       if (!hasAnyDigitalModule) {
         return res.status(403).json({ ok: false, error: "An active Papa Life Membership or a purchased digital module is required for this curriculum." });
       }
       const lessons = rawLessons.map((lesson) => {
-        const entitled = (membershipCourse && communityAccess) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        const entitled = (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
         const repairedAudioUrl = protectedPapaAudioUrl(Number(lesson.id), Number(lesson.sort_order));
         return {
           ...lesson,
@@ -4636,7 +4650,7 @@ async function startServer() {
     }
 
     const member = loadMemberById(memberId);
-    const allowed = (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community)
+    const allowed = (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community && !isPapaSupporterMode())
       || memberCanAccessLesson(db, memberId, lesson.id)
       || memberHasLegacyCourseGrant(db, memberId, lesson.course_id);
     if (!allowed) {
@@ -6843,6 +6857,8 @@ async function startServer() {
     }
   });
 
+  registerPapaEstimateRequestRoutes(app, db, sendAdminNotification);
+
   app.get("/api/public/pricing", (_req, res) => {
     const pricing = getPricingSettings(db);
     res.json({
@@ -6850,7 +6866,7 @@ async function startServer() {
       member_trial_hours: 0,
       member_price_usd_cents: pricing.member_price_usd_cents,
       member_currency: pricing.member_currency,
-      member_product_name: "Papa Life Membership",
+      member_product_name: isPapaSupporterMode() ? "Optional Papa Life Support (no content privileges)" : "Papa Life Membership",
       member_price_display: formatAmountDisplay(
         pricing.member_price_usd_cents,
         pricing.member_currency
@@ -6861,13 +6877,15 @@ async function startServer() {
   });
 
   app.get("/api/public/commerce-catalog", (_req, res) => {
-    const products = listCommerceProducts(db).map((product) => ({
+    const products = listCommerceProducts(db)
+      .filter((product) => !isPapaSupporterMode() || product.format !== "membership")
+      .map((product) => ({
       code: product.code,
       canonical_name: product.canonical_name,
       format: product.format,
       module_number: product.module_number,
-      member_price_cents: product.price_cents,
-      member_price_display: formatAmountDisplay(product.price_cents, product.currency),
+      member_price_cents: isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents,
+      member_price_display: formatAmountDisplay(isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents, product.currency),
       public_price_cents: product.public_price_cents ?? (
         product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.")
           ? 1499
@@ -6892,27 +6910,31 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      public_checkout_url: product.public_checkout_url || null,
+      public_checkout_url: isPapaSupporterMode() ? null : (product.public_checkout_url || null),
     }));
     res.json({
       products,
       tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
-      membership_scope: "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases.",
+      membership_scope: isPapaSupporterMode()
+        ? "Support contributions are optional and grant no content access, discounts, or membership rights. Products require a written estimate and client signature before payment arrangements."
+        : "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases.",
     });
   });
 
   app.get("/api/member/commerce-catalog", requireMemberPortalAccess, (_req, res) => {
-    const products = listCommerceProducts(db).map((product) => ({
+    const products = listCommerceProducts(db)
+      .filter((product) => !isPapaSupporterMode() || product.format !== "membership")
+      .map((product) => ({
       code: product.code,
       canonical_name: product.canonical_name,
       format: product.format,
       module_number: product.module_number,
-      price_cents: product.price_cents,
-      price_display: formatAmountDisplay(product.price_cents, product.currency),
+      price_cents: isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents,
+      price_display: formatAmountDisplay(isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents, product.currency),
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      checkout_url: product.checkout_url || null,
+      checkout_url: isPapaSupporterMode() ? null : (product.checkout_url || null),
     }));
     res.json({
       products,
@@ -7016,8 +7038,8 @@ async function startServer() {
   });
 
   app.get("/go/join", (req, res) => {
-    const destination = "/join";
-    const campaign = "papa_life_intake_first_enrollment";
+    const destination = isPapaSupporterMode() ? "/join" : "/join";
+    const campaign = isPapaSupporterMode() ? "papa_support_contribution" : "papa_life_intake_first_enrollment";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));
     res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);

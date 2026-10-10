@@ -1,6 +1,7 @@
 import { CalendarDays, ClipboardCheck } from "lucide-react";
+import { PAPA_CONVERSATION_REQUEST_URL } from "@/lib/papa-links";
 
-const BOOKING_URL = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";
+const BOOKING_URL = PAPA_CONVERSATION_REQUEST_URL;
 
 export function GlobalBookingButton() {
   return (
@@ -15,13 +16,11 @@ export function GlobalBookingButton() {
       </a>
       <a
         href={BOOKING_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Schedule a conversation with Brian Keith Hill using Google Calendar"
+        aria-label="Request a Papa Life conversation with Brian Keith Hill by email"
         className="inline-flex max-w-full min-h-10 items-center text-center justify-center gap-2 rounded-full border border-[#f2c230] bg-[#145b35] px-4 py-2 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#0f492a] focus:outline-none focus:ring-4 focus:ring-[#f2c230]/40"
       >
         <CalendarDays className="h-4 w-4" aria-hidden="true" />
-        <span>Book a Google Meet Conversation</span>
+        <span>Request a Papa Life Conversation</span>
       </a>
     </div>
   );

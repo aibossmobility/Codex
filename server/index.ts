@@ -3872,52 +3872,12 @@ async function startServer() {
     });
   });
 
-  app.post("/api/member/billing/create-checkout-session", requireMemberSession, async (req, res) => {
-    try {
-      const memberId = Number((req.session as any).memberId);
-      const member = loadMemberById(memberId);
-      if (!member) return res.status(401).json({ ok: false, error: "Unauthorized" });
-
-      const pricing = getPricingSettings(db);
-      const billing = getMemberAccessState(member, pricing);
-      if (billing.payment_status === "paid") {
-        return res.json({ ok: true, already_paid: true, checkout_url: null });
-      }
-
-      if (!STRIPE_SECRET_KEY || !PAPA_LIFE_MONTHLY_PRICE_ID) {
-        return res.status(503).json({ ok: false, error: "Papa Life's secure monthly membership checkout is being updated. No charge was made." });
-      }
-      await verifyCurrentPapaLifeSubscriptionPrice();
-
-      const baseUrl = appBaseUrl(req);
-      const successUrl = `${baseUrl}/member-billing?success=1&session_id={CHECKOUT_SESSION_ID}`;
-      const cancelUrl = `${baseUrl}/member-billing?canceled=1`;
-
-      const form = new URLSearchParams();
-      form.set("mode", "subscription");
-      form.set("success_url", successUrl);
-      form.set("cancel_url", cancelUrl);
-      form.set("customer_email", member.email);
-      form.set("client_reference_id", String(member.id));
-      form.set("metadata[member_id]", String(member.id));
-
-      form.set("line_items[0][price]", PAPA_LIFE_MONTHLY_PRICE_ID);
-      form.set("subscription_data[metadata][member_id]", String(member.id));
-      form.set("line_items[0][quantity]", "1");
-
-      const sessionData = await stripeCreateCheckoutSession(form);
-
-      db.prepare("UPDATE members SET stripe_checkout_session_id = ? WHERE id = ?")
-        .run(sessionData.id || null, member.id);
-
-      return res.json({
-        ok: true,
-        checkout_url: sessionData.url,
-        session_id: sessionData.id,
-      });
-    } catch (error: any) {
-      return res.status(500).json({ ok: false, error: error?.message || "Unable to start checkout" });
-    }
+  app.post("/api/member/billing/create-checkout-session", requireMemberSession, (_req, res) => {
+    // Retired new-member checkout. Existing paid members retain their records.
+    return res.status(410).json({
+      ok: false,
+      error: "Legacy membership checkout is closed. New sales must use verified GoHighLevel estimates and signatures.",
+    });
   });
 
   app.post("/api/member/billing/confirm", requireMemberSession, async (req, res) => {
@@ -4062,97 +4022,14 @@ async function startServer() {
     }
   });
 
-  app.post("/api/webhooks/commerce-paid", (req, res) => {
-    if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
-      return res.status(503).json({ ok: false, error: "PAYMENT_WEBHOOK_SECRET is not configured" });
-    }
-    if (!verifyPaymentWebhookAuth(req)) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
-
-    const body = (req.body || {}) as Record<string, any>;
-    const provider = cleanPublicText(body.provider ?? body.source ?? "external", 80) || "external";
-    const sourceEventId = cleanPublicText(
-      body.event_id ?? body.eventId ?? body.transaction_id ?? body.transactionId ??
-      body.payment_id ?? body.paymentId ?? body.session_id ?? body.id ?? body.data?.object?.id,
-      180
-    );
-    if (!sourceEventId) {
-      return res.status(400).json({ ok: false, error: "A unique payment event or transaction id is required." });
-    }
-
-    const eventKey = `${provider}:${sourceEventId}`;
-    const eventCreated = recordCommerceEvent(db, {
-      eventKey,
-      provider,
-      eventType: cleanPublicText(body.type ?? body.event_type ?? "payment.completed", 100),
-      externalOrderId: sourceEventId,
-      payload: body,
+  app.post("/api/webhooks/commerce-paid", (_req, res) => {
+    // No new entitlement may be granted from an unverified legacy payment system.
+    // A new, separately authenticated HighLevel fulfillment handler will replace
+    // this route only after signature, location, product, price and payment checks.
+    return res.status(503).json({
+      ok: false,
+      error: "New product-sales provisioning is paused pending verified GoHighLevel integration.",
     });
-    if (!eventCreated) {
-      const existingEvent = db.prepare(
-        "SELECT status FROM commerce_events WHERE event_key = ?"
-      ).get(eventKey) as { status?: string } | undefined;
-      if (existingEvent?.status === "processed") {
-        return res.json({ ok: true, duplicate: true, event_key: eventKey });
-      }
-    }
-
-    try {
-      const productCode = cleanPublicText(
-        body.product_code ?? body.productCode ?? body.metadata?.product_code ??
-        body.data?.object?.metadata?.product_code,
-        120
-      );
-      const product = getCommerceProductByCode(db, productCode);
-      if (!product || !product.active) {
-        throw new Error("A valid active Papa Life product_code is required.");
-      }
-
-      const memberIdRaw = body.member_id ?? body.memberId ?? body.metadata?.member_id ??
-        body.client_reference_id ?? body.data?.object?.metadata?.member_id ??
-        body.data?.object?.client_reference_id;
-      const email = cleanPublicText(
-        body.email ?? body.customer_email ?? body.customer?.email ??
-        body.data?.object?.customer_details?.email ?? body.data?.object?.customer_email,
-        160
-      ).toLowerCase();
-      let member = Number.isFinite(Number(memberIdRaw)) ? loadMemberById(Number(memberIdRaw)) : null;
-      if (!member && isValidEmail(email)) member = loadMemberByEmail(email);
-      if (!member) throw new Error("Member not found. Complete intake and account creation before payment.");
-
-      const paidStatus = String(
-        body.payment_status ?? body.status ?? body.data?.object?.payment_status ?? "paid"
-      ).toLowerCase();
-      if (!["paid", "complete", "completed", "succeeded", "success"].includes(paidStatus)) {
-        throw new Error(`Payment is not complete: ${paidStatus}`);
-      }
-
-      const subtotalRaw = body.amount_subtotal ?? body.subtotal_cents ?? body.subtotal ??
-        body.data?.object?.amount_subtotal ?? null;
-      if (subtotalRaw !== null && Number(subtotalRaw) !== product.price_cents) {
-        throw new Error(`Pre-tax subtotal does not match ${product.canonical_name}.`);
-      }
-
-      grantMemberProductEntitlement(db, {
-        memberId: Number(member.id),
-        productCode: product.code,
-        source: provider,
-        externalOrderId: sourceEventId,
-        metadata: { event_key: eventKey, provisioned_by: "commerce_webhook" },
-      });
-      completeCommerceEvent(db, eventKey, "processed");
-      return res.json({
-        ok: true,
-        event_key: eventKey,
-        member_id: member.id,
-        product_code: product.code,
-        access: memberAccessScopes(loadMemberById(Number(member.id))),
-      });
-    } catch (error: any) {
-      completeCommerceEvent(db, eventKey, "failed", error?.message || "Commerce provisioning failed");
-      return res.status(400).json({ ok: false, event_key: eventKey, error: error?.message || "Commerce provisioning failed" });
-    }
   });
 
   // ── Admin: member management ──────────────────────────────────────────────
@@ -6892,7 +6769,8 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      public_checkout_url: product.public_checkout_url || null,
+      // No unverified legacy checkout links may escape into the public catalog.
+      public_checkout_url: null,
     }));
     res.json({
       products,
@@ -6912,7 +6790,9 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      checkout_url: product.checkout_url || null,
+      // Purchased access remains intact; new checkout URLs must be verified in the
+      // authorized HighLevel location before ever being exposed.
+      checkout_url: null,
     }));
     res.json({
       products,
@@ -7016,8 +6896,10 @@ async function startServer() {
   });
 
   app.get("/go/join", (req, res) => {
-    const destination = "/join";
-    const campaign = "papa_life_intake_first_enrollment";
+    // Old join/payment links may point at an unauthorized P2P-era account.
+    // Never redirect a Papa Life visitor into a legacy checkout.
+    const destination = "/sales-transition";
+    const campaign = "legacy_sales_paused";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));
     res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);

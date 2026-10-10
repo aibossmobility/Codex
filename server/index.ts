@@ -3873,6 +3873,7 @@ async function startServer() {
   });
 
   app.post("/api/member/billing/create-checkout-session", requireMemberSession, async (req, res) => {
+    return res.status(410).json({ ok: false, error: "Legacy membership checkout is closed. New sales must use verified GoHighLevel estimates and signatures." });
     try {
       const memberId = Number((req.session as any).memberId);
       const member = loadMemberById(memberId);
@@ -4063,6 +4064,9 @@ async function startServer() {
   });
 
   app.post("/api/webhooks/commerce-paid", (req, res) => {
+    // Do not provision any new product from a legacy sales link until the source
+    // HighLevel location, product, signed estimate and payment are verified.
+    return res.status(503).json({ ok: false, error: "New product-sales provisioning is paused pending verified GoHighLevel integration." });
     if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
       return res.status(503).json({ ok: false, error: "PAYMENT_WEBHOOK_SECRET is not configured" });
     }
@@ -6892,7 +6896,8 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      public_checkout_url: product.public_checkout_url || null,
+      // No unverified legacy checkout links may escape into the public catalog.
+      public_checkout_url: null,
     }));
     res.json({
       products,
@@ -6912,7 +6917,9 @@ async function startServer() {
       currency: product.currency,
       billing_type: product.billing_type,
       tax_behavior: product.tax_behavior,
-      checkout_url: product.checkout_url || null,
+      // Purchased access remains intact; new checkout URLs must be verified in the
+      // authorized HighLevel location before ever being exposed.
+      checkout_url: null,
     }));
     res.json({
       products,
@@ -7016,8 +7023,10 @@ async function startServer() {
   });
 
   app.get("/go/join", (req, res) => {
-    const destination = "/join";
-    const campaign = "papa_life_intake_first_enrollment";
+    // Old join/payment links may point at an unauthorized P2P-era account.
+    // Never redirect a Papa Life visitor into a legacy checkout.
+    const destination = "/sales-transition";
+    const campaign = "legacy_sales_paused";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));
     res.redirect(302, `${destination}?src=${source}&campaign=${campaign}`);

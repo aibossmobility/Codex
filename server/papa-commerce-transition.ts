@@ -1,7 +1,5 @@
 import type { Express, RequestHandler } from "express";
 import type Database from "better-sqlite3";
-import { nanoid } from "nanoid";
-import { getCommerceProductByCode } from "./commerce-entitlements";
 
 /**
  * November 1, 2026 at midnight America/Los_Angeles (PDT at that moment).

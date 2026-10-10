@@ -93,6 +93,8 @@ export function registerPapaEstimateRequestRoutes(
       active: isPapaSupporterMode(),
       donation: { suggested_cents: [499, 500], optional: true, unlocks_content: false, automatic_conversion: false },
       purchase: {
+        sales_ready: false,
+        price_source: "authorized GoHighLevel location only",
         steps: ["item and posted price", "written estimate and agreement", "customer reviews and signs", "verified deposit/payment request", "payment confirmed", "receipt/invoice and fulfillment"],
         estimate_required: true,
         signature_before_payment: true,
@@ -101,56 +103,14 @@ export function registerPapaEstimateRequestRoutes(
     });
   });
 
-  app.post("/api/public/papa-estimate-requests", async (req, res) => {
-    if (!isPapaSupporterMode()) {
-      return res.status(409).json({ ok: false, error: "The new Papa Life estimate process begins November 1, 2026." });
-    }
-    const name = String(req.body?.name || "").trim().replace(/\s+/g, " ");
-    const email = String(req.body?.email || "").trim().toLowerCase();
-    const productCode = String(req.body?.product_code || "").trim();
-    const note = String(req.body?.note || "").trim();
-    if (name.length < 2 || name.length > 120 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || note.length > 1500 || productCode.length > 100) {
-      return res.status(400).json({ ok: false, error: "Provide your name, email and selected product; keep your note under 1,500 characters." });
-    }
-    const product = getCommerceProductByCode(db, productCode);
-    if (!product || !product.active || product.format === "membership") {
-      return res.status(404).json({ ok: false, error: "That Papa Life item is not available for an estimate." });
-    }
-    const subtotalCents = papaPublicPriceCents(product);
-    if (!Number.isSafeInteger(subtotalCents) || subtotalCents < 0) {
-      return res.status(503).json({ ok: false, error: "A verified price is not available for this item." });
-    }
-    const recentDuplicate = db.prepare(`
-      SELECT id FROM papa_estimate_requests
-      WHERE contact_email = ? AND product_code = ?
-      AND created_at >= datetime('now', '-5 minutes')
-      LIMIT 1
-    `).get(email, product.code) as {id: string} | undefined;
-    if (recentDuplicate) {
-      return res.json({ ok: true, reference: recentDuplicate.id, status: "estimate_requested", duplicate: true });
-    }
-    const reference = "PL-EST-" + nanoid(12);
-    db.prepare(`
-      INSERT INTO papa_estimate_requests
-      (id, product_code, product_name, quoted_subtotal_cents, currency, contact_name, contact_email, note)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(reference, product.code, product.canonical_name, subtotalCents, product.currency, name, email, note);
-    // Notification is best-effort: the request is stored even if no email provider exists.
-    void notify({
-      event_type: "papa_estimate_requested",
-      subject: `Papa Life estimate request ${reference}`,
-      summary: `Papa Life estimate request ${reference}\nItem: ${product.canonical_name}\nAdvertised subtotal: ${subtotalCents} cents ${product.currency}\nCustomer: ${name} <${email}>\nNotes: ${note}\nPrepare signed estimate, then arrange payment. Do not issue an invoice without verified agreement.`,
-      payload: { reference, product_code: product.code, subtotal_cents: subtotalCents, contact_email: email },
-    }).catch(() => {});
-    return res.status(201).json({
-      ok: true,
-      reference,
-      status: "estimate_requested",
-      product: product.canonical_name,
-      subtotal_cents: subtotalCents,
-      currency: product.currency,
-      tax_notice: "Applicable tax and any payment schedule must be disclosed in the final written estimate before approval.",
-      next_step: "Your request has been recorded. An estimate is not yet signed or invoiced.",
+  app.post("/api/public/papa-estimate-requests", (_req, res) => {
+    // This endpoint cannot quote from the website's legacy price table.
+    // The replacement must create/send estimates entirely from Brian's
+    // authorized GHL location with a provider-verified product and price.
+    return res.status(503).json({
+      ok: false,
+      error: "Papa Life estimates are being connected to the verified GoHighLevel sales catalog. No estimate, invoice, or payment was created.",
+      next_step: "Please use Papa Life's contact option for product questions while we verify the GoHighLevel workflow.",
     });
   });
 }

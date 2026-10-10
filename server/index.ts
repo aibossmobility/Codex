@@ -6864,7 +6864,7 @@ async function startServer() {
     }
   });
 
-  registerPapaEstimateRequestRoutes(app, db, sendAdminNotification);
+  registerPapaEstimateRequestRoutes(app, db, sendAdminNotification, requireAuth);
 
   app.get("/api/public/pricing", (_req, res) => {
     const pricing = getPricingSettings(db);

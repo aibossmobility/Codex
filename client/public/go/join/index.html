@@ -1,35 +1,24 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Join PAPA Life</title>
-    <meta name="robots" content="noindex" />
-    <script
-      src="https://links.isharehow.app/js/external-tracking.js"
-      data-tracking-id="tk_8be0012f5f1d4997bf14342ca05c32a5">
-    </script>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const source = params.get("src") || "site";
-      const url = new URL("https://agent.bossmobility.net/payment-link/68d610ad67ee3bd205696444");
-      url.searchParams.set("utm_source", source);
-      url.searchParams.set("utm_medium", "bossmobile_site");
-      url.searchParams.set("utm_campaign", "papa_life_paid_access");
-      fetch("/api/traffic-click", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        keepalive: true,
-        body: JSON.stringify({
-          doorway: "join",
-          source,
-          referrer: document.referrer || "",
-          user_agent: navigator.userAgent || "",
-        }),
-      }).finally(() => window.location.replace(url.toString()));
-    </script>
-  </head>
-  <body>
-    <p>Opening PAPA Life checkout...</p>
-  </body>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="robots" content="noindex"/>
+  <title>Papa Life — Purchasing Update</title>
+  <style>
+    body{background:#111c17;color:#fff;font:18px/1.6 system-ui,Arial,sans-serif;margin:0}
+    main{max-width:710px;margin:8vh auto;padding:32px}
+    h1{color:#f2c230;line-height:1.2}
+    a{color:#f2c230}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Papa Life purchasing is being updated.</h1>
+  <p>We are preparing a clearer process for purchasing lessons, manuscripts, and courses. You will be able to review a written estimate and approve it before payment.</p>
+  <p>We are not collecting payments through this page. Please do not use older payment links or membership checkout pages.</p>
+  <p><a href="/shop">Review the Papa Life catalog</a> or email <a href="mailto:brian@papalifecoach.com?subject=Papa%20Life%20Product%20Question">brian@papalifecoach.com</a> for a question about materials.</p>
+  <p>Existing product purchases and previously paid access are not affected by this notice.</p>
+</main>
+</body>
 </html>

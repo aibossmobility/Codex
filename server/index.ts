@@ -6898,7 +6898,8 @@ async function startServer() {
   app.get("/go/join", (req, res) => {
     // Old join/payment links may point at an unauthorized P2P-era account.
     // Never redirect a Papa Life visitor into a legacy checkout.
-    const destination = "/sales-transition";
+    // Railway serves this static file directly; the extensionless route was returning 404.
+    const destination = "/sales-transition/index.html";
     const campaign = "legacy_sales_paused";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));

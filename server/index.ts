@@ -6893,65 +6893,61 @@ async function startServer() {
   });
 
   app.get("/api/public/commerce-catalog", (_req, res) => {
+    const supporterMode = isPapaSupporterMode();
     const products = listCommerceProducts(db)
-      .filter((product) => !isPapaSupporterMode() || product.format !== "membership")
-      .map((product) => ({
-      code: product.code,
-      canonical_name: product.canonical_name,
-      format: product.format,
-      module_number: product.module_number,
-      member_price_cents: isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents,
-      member_price_display: formatAmountDisplay(isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents, product.currency),
-      public_price_cents: product.public_price_cents ?? (
-        product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.")
-          ? 1499
-          : product.code === "curriculum.digital.complete"
-            ? 7900
-            : product.code === "curriculum.bundle.complete"
-              ? 12900
-              : product.price_cents
-      ),
-      public_price_display: formatAmountDisplay(
-        product.public_price_cents ?? (
-          product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.")
-            ? 1499
-            : product.code === "curriculum.digital.complete"
-              ? 7900
-              : product.code === "curriculum.bundle.complete"
-                ? 12900
-                : product.price_cents
-        ),
-        product.currency
-      ),
-      currency: product.currency,
-      billing_type: product.billing_type,
-      tax_behavior: product.tax_behavior,
-      public_checkout_url: isPapaSupporterMode() ? null : (product.public_checkout_url || null),
-    }));
+      .filter((product) => !supporterMode || product.format !== "membership")
+      .map((product) => {
+        const standardPriceCents = papaPublicPriceCents(product);
+        return {
+          code: product.code,
+          canonical_name: product.canonical_name,
+          format: product.format,
+          module_number: product.module_number,
+          // Existing consumers use "public_price" for the higher regular price.
+          public_price_cents: standardPriceCents,
+          public_price_display: formatAmountDisplay(standardPriceCents, product.currency),
+          // New canonical fields make the single posted price unambiguous.
+          standard_price_cents: standardPriceCents,
+          standard_price_display: formatAmountDisplay(standardPriceCents, product.currency),
+          // Former member discounts are never advertised in supporter mode.
+          ...(!supporterMode ? {
+            member_price_cents: product.price_cents,
+            member_price_display: formatAmountDisplay(product.price_cents, product.currency),
+          } : {}),
+          currency: product.currency,
+          billing_type: product.billing_type,
+          tax_behavior: product.tax_behavior,
+          public_checkout_url: supporterMode ? null : (product.public_checkout_url || null),
+        };
+      });
     res.json({
       products,
       tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
-      membership_scope: isPapaSupporterMode()
-        ? "Support contributions are optional and grant no content access, discounts, or membership rights. Products require a written estimate and client signature before payment arrangements."
+      membership_scope: supporterMode
+        ? "Support contributions are optional and grant no content access, discounts, or membership rights. Every paid product uses its standard listed price and requires a written estimate and customer signature before payment."
         : "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases.",
     });
   });
 
   app.get("/api/member/commerce-catalog", requireMemberPortalAccess, (_req, res) => {
+    const supporterMode = isPapaSupporterMode();
     const products = listCommerceProducts(db)
-      .filter((product) => !isPapaSupporterMode() || product.format !== "membership")
+      .filter((product) => !supporterMode || product.format !== "membership")
       .map((product) => ({
-      code: product.code,
-      canonical_name: product.canonical_name,
-      format: product.format,
-      module_number: product.module_number,
-      price_cents: isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents,
-      price_display: formatAmountDisplay(isPapaSupporterMode() ? papaPublicPriceCents(product) : product.price_cents, product.currency),
-      currency: product.currency,
-      billing_type: product.billing_type,
-      tax_behavior: product.tax_behavior,
-      checkout_url: isPapaSupporterMode() ? null : (product.checkout_url || null),
-    }));
+        code: product.code,
+        canonical_name: product.canonical_name,
+        format: product.format,
+        module_number: product.module_number,
+        price_cents: supporterMode ? papaPublicPriceCents(product) : product.price_cents,
+        price_display: formatAmountDisplay(
+          supporterMode ? papaPublicPriceCents(product) : product.price_cents,
+          product.currency
+        ),
+        currency: product.currency,
+        billing_type: product.billing_type,
+        tax_behavior: product.tax_behavior,
+        checkout_url: supporterMode ? null : (product.checkout_url || null),
+      }));
     res.json({
       products,
       tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",

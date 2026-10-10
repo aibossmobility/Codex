@@ -21,15 +21,14 @@ export function isPapaSupporterMode(nowMs: number = Date.now()) {
  * safeguard before the final release; it does not create new membership sales.
  */
 export function hasLegacyPrepaidStreamingRights(
-  member: { status?: string; payment_status?: string; enrolled_at?: string | null; created_at?: string | null } | null | undefined,
-  nowMs: number = Date.now()
+  member: { status?: string; payment_status?: string; enrolled_at?: string | null; created_at?: string | null } | null | undefined
 ) {
   if (!member || member.status !== "active" || member.payment_status !== "paid") return false;
   const enrolledMs = Date.parse(String(member.enrolled_at || member.created_at || ""));
   if (!Number.isFinite(enrolledMs) || enrolledMs >= PAPA_SUPPORTER_CUTOVER_MS) return false;
   // Before changeover, legacy memberships retain their original terms.
   // After changeover, retain existing pre-paid rights pending provider reconciliation.
-  return nowMs >= 0;
+  return true;
 }
 
 export function papaPublicPriceCents(product: {

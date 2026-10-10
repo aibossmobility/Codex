@@ -16,6 +16,7 @@ type Offer = {
 export default function Shop() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState("all");
+  const supporterMode = Date.now() >= Date.parse("2026-11-01T07:00:00.000Z");
 
   useEffect(() => {
     fetch("/api/public/commerce-catalog")
@@ -27,13 +28,13 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-[#f4dea0] text-[#17231c]">
-      <PageMeta title="Papa Life Shop — Choose Membership or Buy Permanently" description="Buy Papa Life audio lessons, manuscripts, and complete programs—with or without membership." />
+      <PageMeta title={supporterMode ? "Papa Life Shop — Review Prices and Request an Estimate" : "Papa Life Shop — Choose Membership or Buy Permanently"} description={supporterMode ? "Choose Papa Life material, review the listed price, and request a written estimate for signature before payment." : "Buy Papa Life audio lessons, manuscripts, and complete programs—with or without membership."} />
       <nav className="border-b border-[#17231c]/20 bg-[#f2c230]">
         <div className="container flex min-h-20 items-center justify-between gap-5 py-3">
           <a href="/"><SiteLogo size="md" /></a>
           <div className="flex items-center gap-3">
             <a href="/member-login" className="text-sm font-bold hover:text-[#b33a32]">Member Login</a>
-            <a href="/join" className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white">Join for $4.99</a>
+            <a href="/join" className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white">{supporterMode ? "Support Papa Life" : "Join for $4.99"}</a>
           </div>
         </div>
       </nav>
@@ -50,12 +51,19 @@ export default function Shop() {
         </div>
       </header>
 
+      {supporterMode ? (
+        <section className="bg-[#b33a32] py-8 text-white"><div className="container grid gap-5 md:grid-cols-2">
+          <div className="rounded-lg bg-white/10 p-6"><h2 className="text-2xl font-extrabold">Every product starts with an estimate</h2><p className="mt-2 text-white/90">Review the posted price, request a written agreement and sign before making a payment. No separate membership is required to request materials.</p></div>
+          <div className="rounded-lg bg-[#f2c230] p-6 text-[#17231c]"><h2 className="text-2xl font-extrabold">Support Papa Life's growth</h2><p className="mt-2">Optional contributions of $4.99 or $5 help the mission. Support does not unlock content, discounts or member privileges.</p><a href="/join" className="mt-4 inline-flex items-center font-extrabold text-[#145b35] underline">Learn about supporting Papa Life</a></div>
+        </div></section>
+      ) : (
       <section className="bg-[#b33a32] py-8 text-white">
         <div className="container grid gap-5 md:grid-cols-2">
           <div className="rounded-lg bg-white/10 p-6"><h2 className="text-2xl font-extrabold">Buy Without Membership</h2><p className="mt-2 text-white/80">Pay the regular one-time price and keep permanent access to what you purchase.</p></div>
           <div className="rounded-lg bg-[#f2c230] p-6 text-[#17231c]"><h2 className="text-2xl font-extrabold">Join and Save</h2><p className="mt-2">Get Course 11 streaming immediately and unlock member pricing on permanent purchases.</p><a href="/join" className="mt-4 inline-flex items-center gap-2 font-extrabold text-[#145b35]">Join for $4.99 monthly <ArrowRight className="h-4 w-4" /></a></div>
         </div>
       </section>
+      )}
 
       <section className="bg-[#f8f0db] py-14">
         <div className="container">
@@ -102,7 +110,7 @@ export default function Shop() {
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <ShoppingBag className="mx-auto h-10 w-10 text-[#145b35]" />
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">Choose the support that meets you where you are</h2>
-          <p className="mt-3 text-lg text-[#5b655e]">Start with the relationship need that feels most important today. You may purchase one lesson, choose a complete journey, or join for ongoing support.</p>
+          <p className="mt-3 text-lg text-[#5b655e]">Start with the relationship need that feels most important today. {supporterMode ? "Choose a product and request a written estimate before payment." : "You may purchase one lesson, choose a complete journey, or join for ongoing support."}</p>
         </div>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
           {[['all','All Products'],['digital','Audio Lessons'],['manuscript','Manuscripts'],['bundle','Bundles']].map(([value,label]) => <button key={value} onClick={() => setFilter(value)} className={`rounded-full px-5 py-2 text-sm font-bold ${filter === value ? 'bg-[#145b35] text-white' : 'bg-[#f8f0db] text-[#145b35]'}`}>{label}</button>)}
@@ -112,16 +120,27 @@ export default function Shop() {
             <article key={offer.code} className="flex flex-col rounded-xl border-4 border-[#145b35] bg-[#f8f0db] p-6 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-[#b33a32]">{offer.format === 'digital' ? 'Audio Lesson' : offer.format === 'manuscript' ? 'Manuscript PDF' : 'Complete Bundle'}</p>
               <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.canonical_name}</h2>
+              {supporterMode ? (
+                <>
+                  <p className="mt-6 text-xs font-bold text-[#5b655e]">Posted price (before applicable tax)</p>
+                  <p className="text-2xl font-extrabold text-[#145b35]">{offer.public_price_display}</p>
+                  <a href={`/request-estimate?product=${encodeURIComponent(offer.code)}`} className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#b33a32] px-5 font-extrabold text-white">Request a signed estimate <ArrowRight className="h-4 w-4" /></a>
+                </>
+              ) : (
+                <>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <div className="rounded-md border border-[#17231c]/15 p-3"><p className="text-xs font-bold text-[#5b655e]">Regular price</p><p className="mt-1 text-2xl font-black">{offer.public_price_display}</p></div>
                 <div className="rounded-md bg-[#f2c230] p-3"><p className="text-xs font-bold text-[#145b35]">Member price</p><p className="mt-1 text-2xl font-black text-[#145b35]">{offer.member_price_display}</p></div>
               </div>
               {offer.public_checkout_url ? <a href={offer.public_checkout_url} className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#b33a32] px-5 font-extrabold text-white">Buy without membership <ArrowRight className="h-4 w-4" /></a> : <div className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#17231c]/20 px-5 text-sm font-bold text-[#5b655e]"><LockKeyhole className="h-4 w-4" /> Public checkout being connected</div>}
               <a href="/join" className="mt-3 inline-flex items-center justify-center gap-2 text-sm font-extrabold text-[#145b35]">Join and save <ArrowRight className="h-4 w-4" /></a>
+
+                </>
+              )}
             </article>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">No forced choice</h2><p className="mt-2 text-white/80">Your permanent purchases remain yours. Membership provides ongoing Course 11 streaming, community access, and discounted permanent-purchase prices while active.</p></div></div></div>
+        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">No forced choice</h2><p className="mt-2 text-white/80">{supporterMode ? "Support contributions do not provide access privileges. Already purchased digital materials remain yours, and every new purchase begins with a written estimate and signature." : "Your permanent purchases remain yours. Membership provides ongoing Course 11 streaming, community access, and discounted permanent-purchase prices while active."}</p></div></div></div>
       </main>
     </div>
   );

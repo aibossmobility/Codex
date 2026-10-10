@@ -193,7 +193,7 @@ export function PrivacyPage() {
         <br />
         <strong>Address:</strong> 485 Fortuna Avenue, San Leandro, CA 94577
         <br />
-        <strong>Email:</strong> Brian@bossmobility.net
+        <strong>Email:</strong> brian@papalifecoach.com
         <br />
         <strong>Phone:</strong> (510) 415-2098
       </p>
@@ -202,6 +202,7 @@ export function PrivacyPage() {
 }
 
 export function TermsPage() {
+  const supporterMode = Date.now() >= Date.parse("2026-11-01T07:00:00.000Z");
   return (
     <LegalShell
       title="Terms of Service"
@@ -210,13 +211,13 @@ export function TermsPage() {
       <p>
         <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> August 20, 2026
+        <strong>Last Updated:</strong> {supporterMode ? "November 1, 2026" : "August 20, 2026"}
       </p>
       <p>
         Welcome to Papa Life, a fatherhood coaching service owned and operated by{" "}
         <strong>Brian Keith Hill</strong> (&quot;Papa Life,&quot; &quot;we,&quot; &quot;us&quot;). By using
-        PapaLifeCoach.com, our AI coach (Papa Life AI Coach), our courses, or joining our $4.99/month membership,
-        you agree to these terms.
+        PapaLifeCoach.com, our AI coach (Papa Life AI Coach), and our courses and services,
+        you agree to the applicable terms presented at the time of purchase.
       </p>
       <h2>1. Who We Are</h2>
       <p>
@@ -231,12 +232,16 @@ export function TermsPage() {
         form, book a session, or sign up for membership. You agree not to misuse the site, our AI coach, or
         our content — including trying to hack, copy, resell, or scrape our material without permission.
       </p>
-      <h2>3. Membership and Payment</h2>
-      <p>
-Papa Life membership costs $4.99 per month with no free trial. Your card will be billed
-automatically each month until you cancel. You can cancel anytime in two clicks with no phone call
-required. We do not offer refunds for partial months already paid, unless required by law.
-      </p>
+      <h2>3. {supporterMode ? "Voluntary Support and Product Purchases" : "Membership and Payment"}</h2>
+      {supporterMode ? (
+        <>
+          <p>Starting November 1, 2026, optional $4.99 or $5 contributions support Papa Life's growth. A contribution does not buy materials, provide membership access, or qualify for discounts. Existing recurring membership charges are not automatically converted into contributions.</p>
+          <p>Paid materials and services follow a separate process: select a product, receive and review a written estimate and terms, sign to accept, and then complete the agreed secure payment. An estimate request is not a purchase or an invoice. Receipts and any balance invoices are issued based on verified payment and signed terms.</p>
+          <p>Existing purchasers keep rights to individually purchased materials. Pre-existing monthly subscribers retain any benefits owed for already paid periods while their agreements are reconciled. Contributions are not represented as tax-deductible charitable gifts.</p>
+        </>
+      ) : (
+        <p>Papa Life membership costs $4.99 per month with no free trial. Your card will be billed automatically each month until you cancel. You can cancel under the provider's terms. Refunds are governed by the agreement and applicable law.</p>
+      )}
       <h2>4. Text Messages and Communication</h2>
       <p>
         If you provide your phone number and opt in, you agree to receive text messages from Papa Life about

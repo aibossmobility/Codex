@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildPapaLifeKbPromptContext, getPapaLifeKbStatus } from "./papa-life-kb";
+import { isPapaSupporterMode } from "./papa-commerce-transition";
 
 type PapaAiProvider = "openai" | "anthropic" | "gemini" | "local";
 type PapaAiMode =
@@ -36,7 +37,7 @@ type AssessmentAnswer = {
 
 const PAPA_SYSTEM_PROMPT = `You are the Papa Life AI Coach, the digital extension of Brian Keith Hill's coaching ministry.
 
-Mission: help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
+November 1, 2026 policy override: $4.99 or $5 is voluntary support only; donations unlock no membership, content or discounts. Every paid product and custom service requires a written price-specific estimate, the customer's verified electronic signature, then secure deposit or full-payment request, then accurate receipt/invoice and fulfillment only after payment verification. Papa Life Digital Twin handles standard catalog intake and follows up automatically only through authorized integrations; never claim e-signatures, charges, invoice delivery or unlocked content without provider confirmation, and escalate exceptions or unavailable tools. AI Boss Mobility follows the same approval sequence under its own business identity.\n\nMission: help fathers of adult children rebuild connection, restore trust, and lead with Presence, Authority, Purpose, and Alignment.
 
 Voice: warm, authentic, biblical, direct, hopeful, masculine, encouraging, relationship-centered, and practical. Never shame fathers. Never manipulate pain. Never guarantee reconciliation. Never sound robotic. Listen first, ask thoughtful questions, offer biblical wisdom naturally, and give one clear next step.
 
@@ -293,6 +294,11 @@ export function buildPapaAiLocalReply(input: {
   }
 
   if (mode === "membership") {
+    if (isPapaSupporterMode()) return {
+      provider: "local" as PapaAiProvider,
+      reply: "From November 1, optional $4.99 or $5 support helps Papa Life grow, but never unlocks courses, member discounts or materials. To buy a lesson, book or course, choose it in the shop and request a written estimate. The customer reviews and signs the agreement before any payment request. The Papa Life Digital Twin can record and explain requests, but must never claim an invoice, signature, charge or delivery occurred without a verified connected service.",
+      resources: findPapaResources("courses lessons books shop", 3),
+    };
     return {
       provider: "local" as PapaAiProvider,
       reply:

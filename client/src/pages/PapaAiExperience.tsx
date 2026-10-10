@@ -255,6 +255,7 @@ function localReply(mode: Mode, text: string) {
     return "Bible Study: Read James 1:19. Observation: listening comes before speaking. Interpretation: mature fatherhood does not lose authority when it slows down. Application: before your next conversation, write what you heard, what you can own, and what you will do differently. Reflection: where have I been trying to be understood before helping my child feel heard? Prayer: Lord, make me quick to listen and slow to speak.";
   }
   if (mode === "membership") {
+    if (Date.now() >= Date.parse("2026-11-01T07:00:00.000Z")) return "Papa Life support contributions of $4.99 or $5 are optional and do not unlock materials or discounts. Every paid material or service begins with a written estimate, then customer signature, then a secure payment request; visit the Papa Life shop to choose what interests you. Brian\u2019s Digital Twin can explain and record your request but cannot claim to have charged or signed anything without verified confirmation.";
     return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
   }
   if (mode === "tuesday") {

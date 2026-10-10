@@ -143,6 +143,7 @@ function ActionLink({
 }
 
 export default function Home() {
+  const supporterMode = Date.now() >= Date.parse("2026-11-01T07:00:00.000Z");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [relationshipSignal, setRelationshipSignal] = useState<"red" | "yellow" | "green">("yellow");
   const joinHref = "/go/join?src=homepage";
@@ -187,7 +188,7 @@ export default function Home() {
               href={joinHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
             >
-              Enroll Now — Immediate Access
+              {supporterMode ? "Support Papa Life" : "Enroll Now — Immediate Access"}
             </a>
           </div>
           <button
@@ -229,7 +230,7 @@ export default function Home() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-md bg-[#b33a32] px-4 py-3 font-extrabold text-white"
               >
-                Enroll Now — Immediate Access
+                {supporterMode ? "Support Papa Life" : "Enroll Now — Immediate Access"}
               </a>
             </div>
           </div>
@@ -706,7 +707,7 @@ export default function Home() {
             <p className="mt-5 text-white/75">
               Begin the work of becoming the father healthy reconnection may become possible with.
             </p>
-            <p className="mt-6 text-lg font-extrabold text-[#f2c230]">Papa Life Membership — $4.99 per month</p>
+            <p className="mt-6 text-lg font-extrabold text-[#f2c230]">{supporterMode ? "Optional support — $4.99 or $5; no purchase privileges" : "Papa Life Membership — $4.99 per month"}</p>
             <p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p>
           </div>
         </section>

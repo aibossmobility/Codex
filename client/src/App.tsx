@@ -19,6 +19,7 @@ import MemberResetPassword from "./pages/MemberResetPassword";
 import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
 import Shop from "./pages/Shop";
+import PapaEstimateRequest from "./pages/PapaEstimateRequest";
 import Join from "./pages/Join";
 import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
 import FatherJourney from "./pages/FatherJourney";
@@ -97,6 +98,7 @@ function Router() {
       <Route path={"/member-billing"} component={MemberBilling} />
       <Route path={"/portal"} component={MemberPortal} />
       <Route path={"/shop"} component={Shop} />
+      <Route path="/request-estimate" component={PapaEstimateRequest} />
       <Route path={"/join"} component={Join} />
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/my-journey" component={FatherJourney} />

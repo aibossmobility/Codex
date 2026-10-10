@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { SiteCtaBlocks } from "@/components/SiteCtaBlocks";
+import { PAPA_CONVERSATION_REQUEST_URL } from "@/lib/papa-links";
 
 interface ConversionStatus {
   stage: string;
@@ -26,7 +27,7 @@ interface ConversionStatus {
   booked: boolean;
 }
 
-const GOOGLE_BOOKING_URL = "https://calendar.app.google/Jcu2RaCp4jyC1zE36";
+const GOOGLE_BOOKING_URL = PAPA_CONVERSATION_REQUEST_URL;
 
 const CLOSER_STEPS = [
   {
@@ -67,24 +68,21 @@ export default function Booking() {
     setLoading(false);
   };
 
-  const handleBook = async () => {
+  const handleBook = () => {
+    // Sending a request email is not a confirmed appointment.
     if (email.trim()) {
-      await fetch("/api/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-      }).catch(() => {});
-      await fetch("/api/engagement", {
+      void fetch("/api/engagement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim(),
-          event_type: "booking_click",
-          event_detail: "Clicked Google Calendar booking link",
+          event_type: "booking_request_click",
+          event_detail: "Requested Papa Life conversation by email",
         }),
+        keepalive: true,
       }).catch(() => {});
     }
-    window.open(GOOGLE_BOOKING_URL, "_blank", "noopener,noreferrer");
+    window.location.href = GOOGLE_BOOKING_URL;
   };
 
   const requirements = [
@@ -116,7 +114,7 @@ export default function Booking() {
             PAPA Clarity Session
           </Badge>
           <h1 className="font-heading text-4xl md:text-5xl font-extrabold tracking-tight text-white text-glow">
-            Book Your <span className="text-primary">Clarity Session</span>
+            Request Your <span className="text-primary">Clarity Session</span>
           </h1>
           <p className="text-gray-400 max-w-xl mx-auto">
             A 60-minute one-on-one session with Brian Keith Hill. Not a sales
@@ -267,10 +265,10 @@ export default function Booking() {
                       className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-6 rounded-full font-bold shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-all hover:scale-105"
                     >
                       <Calendar className="mr-2 h-5 w-5" />
-                      Book PAPA Clarity Session
+                      Request PAPA Clarity Session
                     </Button>
                     <p className="text-xs text-gray-600">
-                      Meet with Brian Keith Hill on Google Meet. Scheduling is handled through Google Calendar.
+                      Email brian@papalifecoach.com to request a time. A Google Meet link is provided after the appointment is confirmed.
                     </p>
                   </CardContent>
                 </Card>

@@ -3876,17 +3876,18 @@ async function startServer() {
       ok: true,
       user: memberSessionPayload(member),
       billing,
-      amount_cents: pricing.member_price_usd_cents,
-      amount_display: formatAmountDisplay(pricing.member_price_usd_cents, pricing.member_currency),
+      amount_cents: isPapaSupporterMode() ? 0 : pricing.member_price_usd_cents,
+      amount_display: isPapaSupporterMode() ? "Optional support" : formatAmountDisplay(pricing.member_price_usd_cents, pricing.member_currency),
       currency: pricing.member_currency,
-      product_name: pricing.member_product_name,
-      checkout_provider: STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID ? "stripe" : "pending",
-      checkout_available: Boolean(STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID),
+      product_name: isPapaSupporterMode() ? "No membership payment is required" : pricing.member_product_name,
+      checkout_provider: isPapaSupporterMode() ? "not_applicable" : (STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID ? "stripe" : "pending"),
+      checkout_available: !isPapaSupporterMode() && Boolean(STRIPE_SECRET_KEY && PAPA_LIFE_MONTHLY_PRICE_ID),
       checkout_payment_link: null,
     });
   });
 
   app.post("/api/member/billing/create-checkout-session", requireMemberSession, async (req, res) => {
+    if (isPapaSupporterMode()) return res.status(410).json({ ok: false, error: "Monthly membership checkout retired November 1, 2026. Optional support never unlocks content." });
     try {
       const memberId = Number((req.session as any).memberId);
       const member = loadMemberById(memberId);
@@ -7038,7 +7039,7 @@ async function startServer() {
   });
 
   app.get("/go/join", (req, res) => {
-    const destination = isPapaSupporterMode() ? "/join" : "/join";
+    const destination = "/join";
     const campaign = isPapaSupporterMode() ? "papa_support_contribution" : "papa_life_intake_first_enrollment";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));

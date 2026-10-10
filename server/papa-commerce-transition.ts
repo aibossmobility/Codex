@@ -36,11 +36,17 @@ export function papaPublicPriceCents(product: {
   price_cents: number;
   public_price_cents: number | null;
 }) {
-  if (product.public_price_cents != null) return product.public_price_cents;
-  if (product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.")) return 1499;
-  if (product.code === "curriculum.digital.complete") return 7900;
-  if (product.code === "curriculum.bundle.complete") return 12900;
-  return product.price_cents;
+  // The former higher public/regular price becomes the sole standard price.
+  // Never substitute a discounted member price if a catalog override is lower.
+  const establishedRegularPrice =
+    product.code.startsWith("curriculum.digital.module.") || product.code.startsWith("curriculum.manuscript.module.")
+      ? 1499
+      : product.code === "curriculum.digital.complete"
+        ? 7900
+        : product.code === "curriculum.bundle.complete"
+          ? 12900
+          : product.price_cents;
+  return Math.max(product.price_cents, product.public_price_cents ?? establishedRegularPrice);
 }
 
 export function registerPapaEstimateRequestRoutes(

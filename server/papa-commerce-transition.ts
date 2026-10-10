@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import type Database from "better-sqlite3";
 import { nanoid } from "nanoid";
-import { getCommerceProductByCode, listCommerceProducts } from "./commerce-entitlements";
+import { getCommerceProductByCode } from "./commerce-entitlements";
 
 /**
  * November 1, 2026 at midnight America/Los_Angeles (PDT at that moment).
@@ -67,11 +67,11 @@ export function registerPapaEstimateRequestRoutes(
     if (!isPapaSupporterMode()) {
       return res.status(409).json({ ok: false, error: "The new Papa Life estimate process begins November 1, 2026." });
     }
-    const name = String(req.body?.name || "").trim().replace(/\\s+/g, " ");
+    const name = String(req.body?.name || "").trim().replace(/\s+/g, " ");
     const email = String(req.body?.email || "").trim().toLowerCase();
     const productCode = String(req.body?.product_code || "").trim();
     const note = String(req.body?.note || "").trim();
-    if (name.length < 2 || name.length > 120 || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || note.length > 1500 || productCode.length > 100) {
+    if (name.length < 2 || name.length > 120 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || note.length > 1500 || productCode.length > 100) {
       return res.status(400).json({ ok: false, error: "Provide your name, email and selected product; keep your note under 1,500 characters." });
     }
     const product = getCommerceProductByCode(db, productCode);

@@ -6778,11 +6778,11 @@ async function startServer() {
           format: product.format,
           module_number: product.module_number,
           // Existing consumers use "public_price" for the higher regular price.
-          public_price_cents: standardPriceCents,
-          public_price_display: formatAmountDisplay(standardPriceCents, product.currency),
+          public_price_cents: supporterMode ? null : standardPriceCents,
+          public_price_display: supporterMode ? "Pricing requires a verified GoHighLevel estimate" : formatAmountDisplay(standardPriceCents, product.currency),
           // New canonical fields make the single posted price unambiguous.
-          standard_price_cents: standardPriceCents,
-          standard_price_display: formatAmountDisplay(standardPriceCents, product.currency),
+          standard_price_cents: supporterMode ? null : standardPriceCents,
+          standard_price_display: supporterMode ? "Pending GoHighLevel price verification" : formatAmountDisplay(standardPriceCents, product.currency),
           // Former member discounts are never advertised in supporter mode.
           ...(!supporterMode ? {
             member_price_cents: product.price_cents,
@@ -6798,7 +6798,7 @@ async function startServer() {
       products,
       tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
       membership_scope: supporterMode
-        ? "Support contributions are optional and grant no content access, discounts, or membership rights. Every paid product uses its standard listed price and requires a written estimate and customer signature before payment."
+        ? "Support contributions confer no membership rights. Only a price verified in the authorized GoHighLevel location may be quoted or invoiced; there is no website checkout."
         : "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases.",
     });
   });
@@ -6812,11 +6812,8 @@ async function startServer() {
         canonical_name: product.canonical_name,
         format: product.format,
         module_number: product.module_number,
-        price_cents: supporterMode ? papaPublicPriceCents(product) : product.price_cents,
-        price_display: formatAmountDisplay(
-          supporterMode ? papaPublicPriceCents(product) : product.price_cents,
-          product.currency
-        ),
+        price_cents: supporterMode ? null : product.price_cents,
+        price_display: supporterMode ? "Pricing through GoHighLevel" : formatAmountDisplay(product.price_cents, product.currency),
         currency: product.currency,
         billing_type: product.billing_type,
         tax_behavior: product.tax_behavior,

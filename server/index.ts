@@ -111,7 +111,7 @@ import {
 import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
-import { isPapaSupporterMode, papaPublicPriceCents, registerPapaEstimateRequestRoutes } from "./papa-commerce-transition";
+import { hasLegacyPrepaidStreamingRights, isPapaSupporterMode, papaPublicPriceCents, registerPapaEstimateRequestRoutes } from "./papa-commerce-transition";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import {
   ensureGhlIntegrationTable,
@@ -1790,7 +1790,7 @@ function memberSessionPayload(member: any) {
 function loadMemberById(memberId: number) {
   return db
     .prepare(
-      "SELECT id, first_name, last_name, email, status, payment_status, trial_started_at, trial_expires_at, paid_at, stripe_customer_id, stripe_checkout_session_id FROM members WHERE id = ?"
+      "SELECT id, first_name, last_name, email, status, payment_status, trial_started_at, trial_expires_at, paid_at, stripe_customer_id, stripe_checkout_session_id, enrolled_at, created_at FROM members WHERE id = ?"
     )
     .get(memberId) as any;
 }
@@ -1809,6 +1809,14 @@ function memberAccessScopes(member: any) {
     curriculum,
     portal: Boolean(billing.hasPortalAccess) || curriculum,
   };
+}
+
+// Paid subscription rights predating November 1 are held until the paid-through
+// reconciliation is complete. Donation/support payments never create new access.
+function membershipStreamingAccess(member: any) {
+  return isPapaSupporterMode()
+    ? hasLegacyPrepaidStreamingRights(member)
+    : Boolean(memberAccessScopes(member).community);
 }
 
 function requireMemberAuth(req: Request, res: Response, next: NextFunction) {
@@ -4541,7 +4549,6 @@ async function startServer() {
   app.get("/api/member/courses", requireMemberPortalAccess, (req, res) => {
     const memberId = Number((req.session as any).memberId);
     const member = loadMemberById(memberId);
-    const communityAccess = memberAccessScopes(member).community;
     const entitledDigitalLessonIds = new Set(
       getMemberEntitledProducts(db, memberId)
         .filter((product) => product.format === "digital" && product.lesson_id)
@@ -4564,13 +4571,13 @@ async function startServer() {
       const membershipCourse = isMembershipCourse(course);
       const isAudioCurriculum = membershipCourse || course.title === "Papa Life Audio Curriculum";
       if (isAudioCurriculum) {
-        if (membershipCourse && communityAccess && !isPapaSupporterMode()) return true;
+        if (membershipCourse && membershipStreamingAccess(member)) return true;
         if (legacyCourseIds.has(Number(course.id))) return true;
         const lessonIds = db.prepare("SELECT id FROM lessons WHERE course_id = ?")
           .all(course.id) as Array<{ id: number }>;
         return lessonIds.some((lesson) => entitledDigitalLessonIds.has(Number(lesson.id)));
       }
-      return (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyCourseIds.has(Number(course.id));
+      return (membershipCourse && membershipStreamingAccess(member)) || legacyCourseIds.has(Number(course.id));
     });
     res.json(visible);
   });
@@ -4578,7 +4585,6 @@ async function startServer() {
   app.get("/api/member/courses/:id", requireMemberPortalAccess, (req, res) => {
     const memberId = Number((req.session as any).memberId);
     const member = loadMemberById(memberId);
-    const communityAccess = memberAccessScopes(member).community;
     const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(req.params.id) as any;
     if (!course) return res.status(404).json({ ok: false, error: "Not found" });
 
@@ -4593,19 +4599,19 @@ async function startServer() {
       "SELECT * FROM lessons WHERE course_id = ? ORDER BY sort_order ASC, created_at ASC"
     ).all(course.id) as any[];
 
-    if (!isAudioCurriculum && !(membershipCourse && communityAccess && !isPapaSupporterMode()) && !legacyGrant) {
+    if (!isAudioCurriculum && !(membershipCourse && membershipStreamingAccess(member)) && !legacyGrant) {
       return res.status(403).json({ ok: false, error: "An active Papa Life Membership is required for this course." });
     }
 
     if (isAudioCurriculum) {
-      const hasAnyDigitalModule = (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyGrant || rawLessons.some((lesson) =>
+      const hasAnyDigitalModule = (membershipCourse && membershipStreamingAccess(member)) || legacyGrant || rawLessons.some((lesson) =>
         memberCanAccessLesson(db, memberId, Number(lesson.id))
       );
       if (!hasAnyDigitalModule) {
         return res.status(403).json({ ok: false, error: "An active Papa Life Membership or a purchased digital module is required for this curriculum." });
       }
       const lessons = rawLessons.map((lesson) => {
-        const entitled = (membershipCourse && communityAccess && !isPapaSupporterMode()) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
+        const entitled = (membershipCourse && membershipStreamingAccess(member)) || legacyGrant || memberCanAccessLesson(db, memberId, Number(lesson.id));
         const repairedAudioUrl = protectedPapaAudioUrl(Number(lesson.id), Number(lesson.sort_order));
         return {
           ...lesson,
@@ -4651,7 +4657,7 @@ async function startServer() {
     }
 
     const member = loadMemberById(memberId);
-    const allowed = (isMembershipCourse({ id: lesson.course_id }) && memberAccessScopes(member).community && !isPapaSupporterMode())
+    const allowed = (isMembershipCourse({ id: lesson.course_id }) && membershipStreamingAccess(member))
       || memberCanAccessLesson(db, memberId, lesson.id)
       || memberHasLegacyCourseGrant(db, memberId, lesson.course_id);
     if (!allowed) {

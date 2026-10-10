@@ -3986,6 +3986,15 @@ async function startServer() {
   });
 
   app.post("/api/webhooks/member-paid", async (req, res) => {
+    // Once the membership product is retired, do not create memberships, grant
+    // Course 11 access, or reinterpret an old Stripe renewal as a donation.
+    // Legacy subscriber renewals/paid-through rights require separate reconciliation.
+    if (isPapaSupporterMode()) {
+      return res.status(410).json({
+        ok: false,
+        error: "The legacy Papa Life membership-payment webhook is retired. No access was granted or support conversion performed.",
+      });
+    }
     if (!process.env.PAYMENT_WEBHOOK_SECRET?.trim()) {
       return res.status(503).json({
         ok: false,

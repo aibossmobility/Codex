@@ -1057,14 +1057,14 @@ function LibraryView({ user, access }: { user: MemberUser | null; access: Portal
     <div className="space-y-8">
       <div>
         <h2 className="text-xl font-bold text-white">My Manuscripts and Resources</h2>
-        <p className="text-sm text-gray-500 mt-1">Secure access to purchased manuscript PDFs and membership resources.</p>
+        <p className="text-sm text-gray-500 mt-1">Secure access to individually purchased Papa Life manuscripts and resources.</p>
       </div>
       <SiteCtaBlocks placement="member_library" />
 
       <section className="space-y-4">
         <div>
-          <h3 className="text-white font-semibold">Member Purchase Options</h3>
-          <p className="text-xs text-gray-500 mt-1">$4.99 membership includes Course 11 streaming. These optional one-time purchases provide permanent digital or manuscript access.</p>
+          <h3 className="text-white font-semibold">Papa Life Purchase Options</h3>
+          <p className="text-xs text-gray-500 mt-1">{Date.now() >= Date.parse("2026-11-01T07:00:00.000Z") ? "Support donations never unlock content. Request a written estimate for each new paid product; previously purchased content remains available." : "$4.99 membership includes Course 11 streaming. These optional one-time purchases provide permanent digital or manuscript access."}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {offers.filter((offer) => offer.code !== "membership.community.monthly").map((offer) => (
@@ -1076,7 +1076,9 @@ function LibraryView({ user, access }: { user: MemberUser | null; access: Portal
                 </div>
                 <span className="text-brand-yellow font-bold whitespace-nowrap">{offer.price_display}</span>
               </div>
-              {offer.checkout_url ? (
+              {Date.now() >= Date.parse("2026-11-01T07:00:00.000Z") ? (
+                <a href={`/request-estimate?product=${encodeURIComponent(offer.code)}`} className="inline-flex mt-4 px-3 py-2 rounded-md bg-brand-yellow text-black text-xs font-bold hover:bg-brand-yellow/90">Request estimate</a>
+              ) : offer.checkout_url ? (
                 <a href={offer.checkout_url} className="inline-flex mt-4 px-3 py-2 rounded-md bg-brand-yellow text-black text-xs font-bold hover:bg-brand-yellow/90">Purchase</a>
               ) : (
                 <p className="text-xs text-gray-500 mt-4">Member checkout link is being connected.</p>

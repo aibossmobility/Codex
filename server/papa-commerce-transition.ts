@@ -2,11 +2,17 @@ import type { Express, RequestHandler } from "express";
 import type Database from "better-sqlite3";
 
 /**
- * November 1, 2026 at midnight America/Los_Angeles (PDT at that moment).
- * Public checkout routes must not claim donation = membership after this instant.
- * Existing lifetime/purchased entitlements are never deleted by this transition.
+ * Planned launch: October 15, 2026 at midnight America/Los_Angeles (PDT).
+ * Change PAPA_SUPPORTER_CUTOVER_AT to a valid ISO timestamp to move the date.
+ * This does not enable sales: provider-verified GoHighLevel checkout must be
+ * independently approved and tested. Preserve all prepaid entitlements.
  */
-export const PAPA_SUPPORTER_CUTOVER_AT = "2026-11-01T07:00:00.000Z";
+export const DEFAULT_PAPA_SUPPORTER_CUTOVER_AT = "2026-10-15T07:00:00.000Z";
+const configuredCutover = process.env.PAPA_SUPPORTER_CUTOVER_AT?.trim();
+if (configuredCutover && (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$/.test(configuredCutover) || !Number.isFinite(Date.parse(configuredCutover)))) {
+  throw new Error("PAPA_SUPPORTER_CUTOVER_AT must be a valid UTC ISO timestamp");
+}
+export const PAPA_SUPPORTER_CUTOVER_AT = configuredCutover || DEFAULT_PAPA_SUPPORTER_CUTOVER_AT;
 export const PAPA_SUPPORTER_CUTOVER_MS = Date.parse(PAPA_SUPPORTER_CUTOVER_AT);
 export function isPapaSupporterMode(nowMs: number = Date.now()) {
   return nowMs >= PAPA_SUPPORTER_CUTOVER_MS;

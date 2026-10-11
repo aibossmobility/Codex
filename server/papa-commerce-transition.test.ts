@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   PAPA_SUPPORTER_CUTOVER_MS,
+  DEFAULT_PAPA_SUPPORTER_CUTOVER_AT,
   hasLegacyPrepaidStreamingRights,
   isPapaSupporterMode,
   papaPublicPriceCents,
@@ -11,8 +12,9 @@ const oldMember = {
   payment_status: "paid",
   enrolled_at: "2026-10-10T00:00:00.000Z",
 };
-const newMember = { ...oldMember, enrolled_at: "2026-11-01T07:00:01.000Z" };
+const newMember = { ...oldMember, enrolled_at: new Date(PAPA_SUPPORTER_CUTOVER_MS + 1000).toISOString() };
 
+assert.equal(DEFAULT_PAPA_SUPPORTER_CUTOVER_AT, "2026-10-15T07:00:00.000Z");
 assert.equal(isPapaSupporterMode(PAPA_SUPPORTER_CUTOVER_MS - 1), false);
 assert.equal(isPapaSupporterMode(PAPA_SUPPORTER_CUTOVER_MS), true);
 assert.equal(isPapaSupporterMode(PAPA_SUPPORTER_CUTOVER_MS + 1), true);
@@ -32,4 +34,4 @@ assert.equal(papaPublicPriceCents({code:"curriculum.manuscript.module.01",price_
 assert.equal(papaPublicPriceCents({code:"curriculum.digital.module.01",price_cents:999,public_price_cents:899}),999, "A lower configured public price must not undercut the established higher price");
 assert.equal(papaPublicPriceCents({code:"curriculum.digital.complete",price_cents:5900,public_price_cents:7900}),7900);
 assert.equal(papaPublicPriceCents({code:"curriculum.bundle.complete",price_cents:9900,public_price_cents:12900}),12900);
-console.log("Papa Life November supporter/legacy-entitlement rules passed.");
+console.log("Papa Life October 15 launch scheduling/legacy-entitlement rules passed.");

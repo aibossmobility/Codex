@@ -6895,6 +6895,12 @@ async function startServer() {
     );
   });
 
+  app.get(["/sales-transition", "/sales-transition/"], (_req, res) => {
+    // Keep the readable notice URL working on servers that do not map
+    // extensionless directories to their static index.html files.
+    res.redirect(302, "/sales-transition/index.html");
+  });
+
   app.get("/go/join", (req, res) => {
     // Old join/payment links may point at an unauthorized P2P-era account.
     // Never redirect a Papa Life visitor into a legacy checkout.

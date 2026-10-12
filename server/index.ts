@@ -6943,7 +6943,7 @@ async function startServer() {
     const staticPaths = [
       "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
-      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/papa-first-lesson", "/papa-intro",
+      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/membership", "/shop",
       "/papa-journey", "/booking", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
     ];
@@ -6960,7 +6960,7 @@ async function startServer() {
     "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
-    "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
+    "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/membership", "/shop", "/papa-journey", "/booking", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
   ]);
@@ -6977,6 +6977,8 @@ async function startServer() {
     }
     const document = canonical === "/" ? path.join(staticPath, "index.html") : path.join(staticPath, canonical.slice(1), "index.html");
     if (fs.existsSync(document)) return res.sendFile(document);
+    // /start is a React route; serve the app shell until an SEO snapshot exists.
+    if (canonical === "/start") return res.sendFile(path.join(staticPath, "index.html"));
     return next();
   });
 

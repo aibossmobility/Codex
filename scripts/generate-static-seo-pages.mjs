@@ -268,11 +268,11 @@ const pages = [
   },
   {
     path: "/membership",
-    title: "Papa Life Membership | Papa Life Coach",
-    description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
-    eyebrow: "Membership",
+    title: "Papa Life Learning and Membership Transition | Papa Life Coach",
+    description: "Explore Papa Life learning resources and the transition away from the former monthly membership. New monthly enrollment is closed.",
+    eyebrow: "Learning and membership",
     headline: "Build consistency instead of relying on one emotional moment.",
-    intro: "Membership helps fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
+    intro: "The former $4.99 monthly membership is closed to new enrollments. Explore free fatherhood resources and completed guided lessons; existing members retain access during the transition. New purchases will use approved GoHighLevel prices and tested checkout paths.",
     sections: [
       ["Course structure", "Work through practical lessons built for fathers navigating relationships with adult children."],
       ["Ongoing support", "Use AI coaching, resources, and community-oriented support to stay steady."],
@@ -396,10 +396,10 @@ const pages = [
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using papalifecoach.com, Papa Life courses, or current coaching resources, visitors agree to these terms. The former $4.99/month membership is closed to new enrollment.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
+      ["Membership", "The former $4.99/month membership is closed to new purchases. Existing subscribers retain their rights under their original terms until a confirmed change or cancellation. New product and service prices are controlled by the current GoHighLevel sales process."],
     ],
   },
   {
@@ -409,10 +409,10 @@ const pages = [
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using papalifecoach.com, Papa Life courses, or current coaching resources, visitors agree to these terms. The former $4.99/month membership is closed to new enrollment.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
+      ["Membership", "The former $4.99/month membership is closed to new purchases. Existing subscribers retain their rights under their original terms until a confirmed change or cancellation. New product and service prices are controlled by the current GoHighLevel sales process."],
     ],
   },
 ];

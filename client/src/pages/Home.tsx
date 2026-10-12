@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 
 const navigation = [
-  { label: "Start Here", href: "#is-this-you" },
+  { label: "Start Here", href: "/start" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "2-Minute Check-In", href: "/assessment?src=homepage_nav" },
   { label: "Member Login", href: "/member-login" },
@@ -427,6 +427,7 @@ export default function Home() {
       </div>
 
       <main>
+        <section className="bg-[#061715] px-6 py-10 text-center text-white"><h2 className="text-3xl font-black">Ready to invest in your growth as a father?</h2><p className="mx-auto mt-3 max-w-2xl text-lg text-gray-200">Real change starts with the steps you choose to take today.</p><a href="/start" className="mt-6 inline-flex rounded-full bg-[#f2c230] px-9 py-4 text-lg font-extrabold text-[#17231c]">Start Here — Explore Courses →</a></section>
         <section aria-labelledby="why-papa-life-heading" className="bg-white py-14 md:py-18">
           <div className="container">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">

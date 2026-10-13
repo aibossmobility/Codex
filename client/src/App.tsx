@@ -16,17 +16,14 @@ import MemberRegister from "./pages/MemberRegister";
 import MemberActivate from "./pages/MemberActivate";
 import MemberForgotPassword from "./pages/MemberForgotPassword";
 import MemberResetPassword from "./pages/MemberResetPassword";
-import MemberBilling from "./pages/MemberBilling";
 import MemberPortal from "./pages/MemberPortal";
 import Shop from "./pages/Shop";
-import Join from "./pages/Join";
 import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
 import FatherJourney from "./pages/FatherJourney";
 import Strategist from "./pages/Strategist";
 import ThemeMatrix from "./pages/ThemeMatrix";
 import Operators from "./pages/Operators";
 import Governance from "./pages/Governance";
-import Booking from "./pages/Booking";
 import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
@@ -83,7 +80,7 @@ function Router() {
       <Route path="/podcast" component={PapaAiExperience} />
       <Route path="/tuesday" component={TuesdayLive} />
       <Route path="/tuesday-live" component={TuesdayLive} />
-      <Route path="/membership" component={PapaAiExperience} />
+      <Route path="/membership"><Redirect to="/courses" /></Route>
       <Route path="/contact" component={PapaAiExperience} />
       <Route path="/privacy-policy" component={PrivacyPage} />
       <Route path="/terms-of-service" component={TermsPage} />
@@ -94,10 +91,10 @@ function Router() {
       <Route path={"/member-activate"} component={MemberActivate} />
       <Route path="/member-forgot-password" component={MemberForgotPassword} />
       <Route path="/member-reset-password" component={MemberResetPassword} />
-      <Route path={"/member-billing"} component={MemberBilling} />
+      <Route path="/member-billing"><Redirect to="/courses" /></Route>
       <Route path={"/portal"} component={MemberPortal} />
       <Route path={"/shop"} component={Shop} />
-      <Route path={"/join"} component={Join} />
+      <Route path="/join"><Redirect to="/courses" /></Route>
       <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
       <Route path="/my-journey" component={FatherJourney} />
       <Route path="/assessment"><Redirect to="/relationship-assessment" /></Route>
@@ -117,7 +114,7 @@ function Router() {
       <Route path={"/theme-matrix"} component={ThemeMatrix} />
       <Route path={"/operators"} component={Operators} />
       <Route path={"/governance"} component={Governance} />
-      <Route path={"/booking"} component={Booking} />
+      <Route path="/booking"><Redirect to="/courses" /></Route>
       <Route path={"/research-lab"} component={ResearchLab} />
       <Route path={"/executive-memory"} component={ExecutiveMemory} />
 

@@ -401,7 +401,7 @@ async function loadReports() {
                 label="Revenue / Conversions"
                 value={fields.revenue}
                 onChange={(value) => updateField("revenue", value)}
-                placeholder="1 new $4.99/mo subscriber, 1 Clarity Session booked..."
+                placeholder="1 course interest, 1 digital coaching inquiry..."
                 minHeight="min-h-[92px]"
               />
             </div>

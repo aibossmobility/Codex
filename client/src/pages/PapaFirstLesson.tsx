@@ -134,7 +134,7 @@ export default function PapaFirstLesson() {
             ) : (
               <Card className="border-white/10 bg-[#111]">
                 <CardContent className="py-8 text-center text-gray-400 text-sm">
-                  Lesson media is not published yet. Sign in to the member portal when your access is ready, or continue below to book a conversation.
+                  Lesson media is not published yet. Sign in to the member portal when your access is ready, or continue below to explore self-guided courses.
                 </CardContent>
               </Card>
             )}
@@ -143,13 +143,13 @@ export default function PapaFirstLesson() {
 
         {!loading && (!course || !lesson) && (
           <p className="text-gray-400 text-center py-8">
-            Your first course lesson will appear here when it is available in the catalog. You can still book a conversation below.
+            Your first course lesson will appear here when it is available in the catalog. You can still explore Papa Life courses below.
           </p>
         )}
 
         <div className="border border-white/10 rounded-2xl p-6 md:p-8 space-y-4 bg-white/[0.02]">
           <p className="text-gray-200 leading-relaxed">
-            You do not have to carry this alone. If this is hitting home, the next step is simple. Book a conversation and we will look at what is really
+            You do not have to carry this alone. If this is hitting home, the next step is simple. Explore Papa Life Courses and we will look at what is really
             happening in your relationship with your adult child and what to do next.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">

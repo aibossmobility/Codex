@@ -22,7 +22,7 @@ export default function MemberBilling() {
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [billing, setBilling] = useState<BillingState | null>(null);
-  const [amountDisplay, setAmountDisplay] = useState("$4.99");
+  const [amountDisplay, setAmountDisplay] = useState("Legacy access");
   const [checkoutProvider, setCheckoutProvider] = useState("pending");
   const [checkoutAvailable, setCheckoutAvailable] = useState(false);
 
@@ -123,7 +123,7 @@ export default function MemberBilling() {
             <div className="text-center space-y-1">
               <h2 className="text-white text-xl font-bold">Membership Billing</h2>
               <p className="text-gray-400 text-sm">
-                Papa Life membership is $4.99 per month with no free trial. Payment is required to activate membership access.
+                New monthly membership enrollment has ended. Explore the courses and self-guided programs instead.
               </p>
             </div>
 
@@ -144,13 +144,13 @@ export default function MemberBilling() {
                   <p className="text-white text-2xl font-bold mt-1">{amountDisplay}</p>
                   <p className="text-gray-500 text-xs mt-1">
                     {checkoutAvailable && checkoutProvider === "stripe"
-                      ? "Secure $4.99 monthly subscription checkout"
+                      ? "New monthly enrollment is closed"
                       : "Membership checkout is being updated. No charge will be made."}
                   </p>
                 </div>
                 <Button
                   onClick={handleCheckout}
-                  disabled={actionLoading || !checkoutAvailable}
+                  disabled={true}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-5 rounded-xl text-sm"
                 >
                   {actionLoading ? (
@@ -158,7 +158,7 @@ export default function MemberBilling() {
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Opening checkout...
                     </>
                   ) : (
-                    "Start $4.99 Monthly Membership"
+                    "Explore the Course Catalog"
                   )}
                 </Button>
               </div>
@@ -178,7 +178,7 @@ export default function MemberBilling() {
 
             <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Papa Life membership — existing members remain unaffected
+              Existing member records and entitlements remain unchanged
             </div>
           </CardContent>
         </Card>

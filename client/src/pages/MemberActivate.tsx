@@ -83,7 +83,7 @@ export default function MemberActivate() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <SiteLogoStacked size="lg" className="mb-2" />
-          <p className="text-gray-500 text-sm mt-1">Activate your Papa Life Membership account</p>
+          <p className="text-gray-500 text-sm mt-1">Activate your Papa Life Courses account</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-8">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-yellow/10 mx-auto mb-6">
@@ -102,7 +102,7 @@ export default function MemberActivate() {
           ) : (
             <>
               <h1 className="text-white font-bold text-lg text-center mb-2">Set your password</h1>
-              <p className="text-gray-400 text-sm text-center mb-6">Your $4.99 membership is active. Set a password to enter Course 11.</p>
+              <p className="text-gray-400 text-sm text-center mb-6">Your existing Papa Life access is active. Set a password to enter your learning library.</p>
               <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label className="text-gray-400 text-sm">Member</Label>

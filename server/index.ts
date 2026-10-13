@@ -2272,7 +2272,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       {
         heading: "Practice the path",
         body:
-          "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships.",
+          "Papa Life combines practical coaching, reflection tools, digital coaching resources, and support for fathers rebuilding adult-child relationships.",
       },
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
@@ -2280,14 +2280,14 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
     description:
-      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and membership help.",
+      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance.",
     eyebrow: "AI Coach",
     headline: "Ask for guidance when you need words, next steps, or perspective.",
     intro:
       "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
       { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment." },
-      { heading: "Resource guidance", body: "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises." },
+      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, Tuesday Live support, and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
   },
@@ -2329,7 +2329,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",
-    description: "Free and member resources for fathers rebuilding connection with adult children through Papa Life.",
+    description: "Free and learning resources for fathers rebuilding connection with adult children through Papa Life.",
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
     intro:
@@ -2362,22 +2362,22 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "Papa Life podcast material supports fathers who want a calmer, wiser way to handle distance, silence, and difficult conversations.",
     sections: [
       { heading: "For strained relationships", body: "Episodes focus on adult-child distance, fatherhood identity, repair, faith, and emotional maturity." },
-      { heading: "Keep moving", body: "Use the podcast alongside the assessment, workshop, and membership lessons." },
+      { heading: "Keep moving", body: "Use the podcast alongside the assessment, workshop, and guided lessons." },
     ],
-    cta: { label: "Explore Papa Life", href: "/membership" },
+    cta: { label: "Explore Papa Life", href: "/courses" },
   },
   "/membership": {
-    title: "Papa Life Membership | Papa Life Coach",
-    description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
-    eyebrow: "Membership",
+    title: "Papa Life Courses | Papa Life Coach",
+    description: "Papa Life courses give fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
+    eyebrow: "Courses",
     headline: "Build consistency instead of relying on one emotional moment.",
     intro:
-      "Membership helps fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
+      "Self-guided courses help fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
     sections: [
       { heading: "Course structure", body: "Work through practical lessons built for fathers navigating relationships with adult children." },
       { heading: "Ongoing support", body: "Use AI coaching, resources, and community-oriented support to stay steady." },
     ],
-    cta: { label: "Join Papa Life", href: "/go/join" },
+    cta: { label: "Explore Papa Life Courses", href: "/courses" },
   },
   "/contact": {
     title: "Contact Papa Life Coach",
@@ -2388,7 +2388,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "Papa Life Coach supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
     sections: [
       { heading: "Start here", body: "If you are a father trying to reconnect with an adult child, the free assessment is the best first step." },
-      { heading: "For broader support", body: "Use the AI Coach or membership path to get oriented around resources and next actions." },
+      { heading: "For broader support", body: "Use the AI Coach or course catalog to get oriented around resources and next actions." },
     ],
     cta: { label: "Take the 2-Minute Check-In", href: "/assessment" },
   },
@@ -2539,7 +2539,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "A safer way forward", body: "Papa Life helps fathers listen, accept healthy responsibility, communicate with humility, and rebuild trust through consistent actions." },
       { heading: "No false promises", body: "We cannot control another person's response. We can change how we show up." },
     ],
-    cta: { label: "Join Papa Life — Immediate Access", href: "/go/join?src=welcome-to-papa-life" },
+    cta: { label: "Explore Papa Life Courses", href: "/courses" },
   },
   "/papa-framework": {
     title: "The PAPA Framework for Fathers | Presence, Authority, Purpose, Alignment",
@@ -2569,7 +2569,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "Papa Life uses the Alameda County Fathers Corps Father-Friendly Principles as a practical local benchmark for father-centered service, especially for fathers whose children are adults.",
     sections: [
       { heading: "Father-centered design", body: "Papa Life is built around fathers of adult children and the realities of distance, silence, regret, role transition, and reconnection." },
-      { heading: "Father-specific support", body: "The 2-Minute Fatherhood Check-In, PAPA Framework, courses, AI coaching, membership resources, and live teaching are designed specifically for fathers." },
+      { heading: "Father-specific support", body: "The 2-Minute Fatherhood Check-In, PAPA Framework, courses, AI coaching, guided course resources, and live teaching are designed specifically for fathers." },
       { heading: "Father participation", body: "Papa Life works with the father's responsibility and choices. The work begins with listening, self-examination, growth, and consistent action rather than controlling an adult child." },
       { heading: "Partner development", body: "Papa Life is developing provider training, peer-father pathways, referral relationships, and father-feedback practices for stronger father-friendly service." },
     ],
@@ -2613,7 +2613,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "By using Papa Life Coach and Papa Life resources, visitors agree to use the site responsibly and understand that coaching resources do not replace professional medical, mental health, legal, or financial advice.",
     sections: [
       { heading: "Site use", body: "Resources, assessments, and AI coaching are provided for education, reflection, and coaching support." },
-      { heading: "Membership", body: "Member features and paid access are governed by the purchase and access terms shown during signup." },
+      { heading: "Courses", body: "Member features and paid access are governed by the purchase and access terms shown during signup." },
     ],
   },
   "/member-login": {
@@ -2651,27 +2651,27 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Members",
     headline: "Create your Papa Life member account.",
     intro:
-      "Registration gives members access to the course portal, progress tools, and member resources.",
+      "Registration gives members access to the course portal, progress tools, and learning resources.",
     sections: [{ heading: "Continue after signup", body: "After creating an account, members can sign in and continue the Papa Life course path." }],
     cta: { label: "Create Account", href: "/member-register" },
     noindex: true,
   },
   "/member-billing": {
     title: "Papa Life Billing",
-    description: "Complete billing for Papa Life membership.",
+    description: "New monthly enrollment is closed.",
     eyebrow: "Billing",
-    headline: "Complete membership access.",
-    intro: "This page supports Papa Life membership billing and access.",
-    sections: [{ heading: "Secure checkout", body: "Follow the on-page steps to complete membership access." }],
+    headline: "Explore available Papa Life courses.",
+    intro: "Previously enrolled members can use their existing portal. New visitors should explore the course catalog.",
+    sections: [{ heading: "Secure checkout", body: "Use the published course catalog and verified payment instructions." }],
     noindex: true,
   },
   "/join": {
-    title: "Join Papa Life | $4.99 Monthly Membership",
-    description: "Start the $4.99 monthly Papa Life Membership enrollment and receive immediate access to Course 11 after payment.",
-    eyebrow: "Papa Life Membership",
-    headline: "Join Papa Life for $4.99 per month.",
-    intro: "Complete the membership intake, continue to secure recurring checkout, and activate your member account to enter Course 11.",
-    sections: [{ heading: "No free trial", body: "Membership bills $4.99 monthly until canceled and includes immediate access to Course 11 after successful payment." }],
+    title: "Explore Papa Life Courses",
+    description: "New monthly enrollment is closed. Explore currently offered self-paced courses.",
+    eyebrow: "Papa Life Courses",
+    headline: "Explore Papa Life courses and guided learning.",
+    intro: "New monthly enrollment is closed; current offerings appear in the course catalog.",
+    sections: [{ heading: "No free trial", body: "New recurring enrollment is not available." }],
     noindex: true,
   },
   "/member-activate": {
@@ -2740,7 +2740,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "PAPA pillars", body: "Presence, Authority, Purpose, and Alignment organize the path." },
       { heading: "Continue steadily", body: "Use the journey to build consistency and repair-oriented habits over time." },
     ],
-    cta: { label: "Join Papa Life", href: "/go/join" },
+    cta: { label: "Explore Papa Life Courses", href: "/courses" },
   },
   "/papa-intro": {
     title: "Papa Life Intro Video",
@@ -2809,9 +2809,9 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     title: "Booking | Papa Life Coach",
     description: "Booking page for Papa Life Coach.",
     eyebrow: "Booking",
-    headline: "Book time with Papa Life Coach.",
-    intro: "Use this page to move from interest into a scheduled conversation or next step.",
-    sections: [{ heading: "Next step", body: "Choose an available path for booking or follow-up." }],
+    headline: "Explore Papa Life courses and digital coaching.",
+    intro: "Choose a self-guided course or digital resource to start online.",
+    sections: [{ heading: "Next step", body: "Explore current learning options without scheduling a meeting." }],
   },
   "/research-lab": {
     title: "Research Lab | Papa Life Coach",
@@ -2875,7 +2875,7 @@ function serverPageShell(page: StaticServerPage, extraHtml = "") {
         <h1 style="font-size: clamp(2.25rem, 6vw, 4.75rem); line-height: 1.02; margin: 18px 0;">${escapeHtml(page.headline)}</h1>
         <p style="font-size: 1.2rem; line-height: 1.7; color: #d4d4d8; max-width: 760px;">${escapeHtml(page.intro)}</p>
         ${cta}
-        <nav aria-label="Papa Life resources"><a href="/">Home</a> · <a href="/relationship-assessment">2-Minute Check-In</a> · <a href="/papa-framework">PAPA Framework</a> · <a href="/courses">Courses</a> · <a href="/membership">Membership</a> · <a href="/booking">Book a conversation</a> · <a href="/site-directory">Site directory</a></nav>
+        <nav aria-label="Papa Life resources"><a href="/">Home</a> · <a href="/relationship-assessment">2-Minute Check-In</a> · <a href="/papa-framework">PAPA Framework</a> · <a href="/courses">Courses</a> · <a href="/site-directory">Site directory</a></nav>
         <div style="display: grid; gap: 24px; margin-top: 42px;">
           ${sections}
           ${extraHtml}
@@ -3058,7 +3058,7 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       headline: "Talk with Brian’s Papa Life Digital Twin",
       intro: "Start a voice conversation for practical Papa Life guidance grounded in Presence, Authority, Purpose, and Alignment.",
       sections: [],
-      cta: { label: "Book a personal conversation", href: "/booking" },
+      cta: { label: "Explore Papa Life Courses", href: "/courses" },
     };
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
@@ -3070,9 +3070,9 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       description: "Papa Life resources and offers for fathers of adult children.",
       eyebrow: "Papa Life",
       headline: "Papa Life Shop",
-      intro: "Explore Papa Life resources, membership, books, and relationship-building tools.",
+      intro: "Explore Papa Life resources, courses, books, and relationship-building tools.",
       sections: [],
-      cta: { label: "Explore Papa Life", href: "/membership" },
+      cta: { label: "Explore Papa Life", href: "/courses" },
     };
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
@@ -5666,7 +5666,7 @@ async function startServer() {
       const ctaSelected = cleanPublicText(req.body?.cta_selected || req.body?.ctaSelected, 160);
       const source = cleanPublicText(req.body?.source, 120) || "Papa Life AI Coach";
       const actionCoachLead = source === "Papa Life Action Coach";
-      const followUpStatus = ["Private Conversation", "Membership"].includes(interest)
+      const followUpStatus = ["Private Conversation", "Courses"].includes(interest)
         ? "priority_follow_up"
         : "standard_follow_up";
       if (actionCoachLead && !Boolean(req.body?.consent?.marketing)) {
@@ -6727,7 +6727,7 @@ async function startServer() {
       member_trial_hours: 0,
       member_price_usd_cents: pricing.member_price_usd_cents,
       member_currency: pricing.member_currency,
-      member_product_name: "Papa Life Membership",
+      member_product_name: "Papa Life Courses",
       member_price_display: formatAmountDisplay(
         pricing.member_price_usd_cents,
         pricing.member_currency
@@ -6775,7 +6775,7 @@ async function startServer() {
     res.json({
       products,
       tax_notice: "Applicable tax is calculated and displayed before payment confirmation.",
-      membership_scope: "Membership is optional. Anyone may buy permanent products at the regular price. Active $4.99 members receive Course 11 streaming and lower member prices on permanent purchases.",
+      membership_scope: "New monthly subscriptions are retired. Existing member entitlements remain subject to their original terms. Current course purchases will use approved GoHighLevel pricing and checkout when verified.",
     });
   });
 
@@ -6895,7 +6895,7 @@ async function startServer() {
     );
   });
 
-  app.get("/go/join", (req, res) => {
+  app.get("/courses", (req, res) => {
     // Old join/payment links may point at an unauthorized P2P-era account.
     // Never redirect a Papa Life visitor into a legacy checkout.
     const destination = "/sales-transition";
@@ -6943,8 +6943,8 @@ async function startServer() {
       "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/papa-first-lesson", "/papa-intro",
-      "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/membership", "/shop",
-      "/papa-journey", "/booking", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
+      "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
+      "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
     ];
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
     const today = new Date().toISOString().slice(0, 10);
@@ -6960,7 +6960,7 @@ async function startServer() {
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
     "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
-    "/tuesday-live", "/membership", "/shop", "/papa-journey", "/booking", "/contact",
+    "/tuesday-live", "/shop", "/papa-journey", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
   ]);
   app.use((req, res, next) => {

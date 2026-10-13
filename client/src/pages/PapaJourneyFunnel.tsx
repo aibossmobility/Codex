@@ -287,7 +287,7 @@ function Hero() {
 
         {/* Trust signals */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 text-xs">
-          {["Membership Access", "$4.99/month", "Cancel Anytime", "Private & Secure"].map((item) => (
+          {["Course Library", "Self-Paced Learning", "Clear Access Terms", "Private & Secure"].map((item) => (
             <span key={item} className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> {item}
             </span>
@@ -402,7 +402,7 @@ function ReconnectionTeachingSection() {
                   href={PAPA_PAYMENT_LINK}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-sm font-extrabold text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
-                  Join PAPA Life — $4.99/mo
+                  Explore Papa Life Courses
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
@@ -1119,15 +1119,15 @@ function ProgramSection() {
                 <Star className="w-3.5 h-3.5 text-primary" />
                 <span className="text-primary text-xs font-semibold">Join PAPA Life</span>
               </div>
-              <h3 className="text-white text-3xl font-extrabold mb-3">Papa Life Membership</h3>
+              <h3 className="text-white text-3xl font-extrabold mb-3">Papa Life Courses</h3>
               <p className="text-gray-400 text-base max-w-md mx-auto mb-8 leading-relaxed">
-                Join Papa Life for $4.99/month with community access and Course 11 streaming. Members may separately purchase permanent digital lessons and manuscript PDFs.
+                Explore self-paced courses, AI-guided reflection, and available educational resources. Review each course’s description and current access terms before purchasing.
               </p>
               <a href={PAPA_PAYMENT_LINK} className="group inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold text-lg px-10 py-4 rounded-full transition-all shadow-[0_0_40px_rgba(56,189,248,0.3)] hover:shadow-[0_0_60px_rgba(56,189,248,0.5)]">
-                Join PAPA Life — $4.99/mo
+                Explore Papa Life Courses
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </a>
-              <p className="text-gray-600 text-xs mt-4">No free trial · Cancel anytime · Your data is private</p>
+              <p className="text-gray-600 text-xs mt-4">Self-paced learning · Review available course details</p>
             </div>
           </div>
         </Reveal>
@@ -1285,7 +1285,7 @@ function FreeResourcesSection() {
           >
             <div className="text-left">
               <p className="text-lg">Continue Into PAPA Life</p>
-              <p className="text-sm mt-1 opacity-80">Join the community and member area for $4.99/month.</p>
+              <p className="text-sm mt-1 opacity-80">Explore the current course catalog and digital coaching resources.</p>
             </div>
             <ArrowRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1" />
           </a>
@@ -1334,10 +1334,10 @@ function FinalCTA() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-brand-yellow">Pick up the phone. Begin.</span>
             </h2>
             <p className="text-gray-400 text-xl leading-relaxed mb-2">
-              Papa Life Membership for <span className="text-brand-yellow font-bold">$4.99/month</span>
+              Papa Life Courses and Digital Coaching
             </p>
             <p className="text-gray-500 text-base max-w-xl mx-auto mb-10">
-              No free trial. Membership includes the community, member area, and Course 11 streaming; permanent downloads and manuscripts are optional member purchases.
+              Explore current courses and available digital learning resources. Previous purchases remain available according to their original access terms.
             </p>
           </div>
 
@@ -1346,7 +1346,7 @@ function FinalCTA() {
               href={PAPA_PAYMENT_LINK}
               className="group inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold text-xl px-12 py-5 rounded-full transition-all shadow-[0_0_60px_rgba(56,189,248,0.3)] hover:shadow-[0_0_80px_rgba(56,189,248,0.5)]"
             >
-              Join Papa Life — $4.99/mo
+              Explore Papa Life Courses
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
             </a>
             <a

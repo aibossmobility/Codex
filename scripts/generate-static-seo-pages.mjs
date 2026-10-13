@@ -21,7 +21,7 @@ const pages = [
     sections: [
       ["Start with clarity", "Take the 2-Minute Fatherhood Check-In to notice where things stand today and choose an honest, practical next step."],
       ["Learn the new role", "Use the free workshop and course library to move from pressure and control into listening, humility, consistency, and trust."],
-      ["Practice the path", "Papa Life combines practical coaching, reflection tools, membership resources, and support for fathers rebuilding adult-child relationships."],
+      ["Practice the path", "Papa Life combines practical coaching, reflection tools, self-paced course resources, and support for fathers rebuilding adult-child relationships."],
       ["Founded by Brian Keith Hill", "Brian Keith Hill is the founder of Papa Life, a Scripture-centered fatherhood movement for fathers of adult children."],
     ],
   },
@@ -82,13 +82,13 @@ const pages = [
     path: "/ai-coach",
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
     description:
-      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and membership help.",
+      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance.",
     eyebrow: "AI Coach",
     headline: "Ask for guidance when you need words, next steps, or perspective.",
     intro: "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
       ["Assessment help", "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment."],
-      ["Resource guidance", "Get pointed toward lessons, membership resources, Tuesday Live support, and practical exercises."],
+      ["Resource guidance", "Get pointed toward lessons, self-paced course resources, Tuesday Live support, and practical exercises."],
     ],
   },
   {
@@ -217,7 +217,7 @@ const pages = [
       ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
       ["Learn the PAPA Framework", "/papa-framework"],
       ["Why adult children pull away", "/why-adult-children-pull-away"],
-      ["Book a conversation", "/booking"],
+      ["Explore Papa Life Courses", "/courses"],
     ],
   },
   {
@@ -268,11 +268,11 @@ const pages = [
   },
   {
     path: "/membership",
-    title: "Papa Life Membership | Papa Life Coach",
-    description: "Papa Life membership gives fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
-    eyebrow: "Membership",
+    title: "Papa Life Courses | Papa Life Coach",
+    description: "Papa Life courses give fathers structure, lessons, reflection tools, and support for rebuilding adult-child relationships.",
+    eyebrow: "Courses",
     headline: "Build consistency instead of relying on one emotional moment.",
-    intro: "Membership helps fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
+    intro: "Self-paced courses help fathers keep practicing Presence, Authority, Purpose, and Alignment through guided lessons and reflection tools.",
     sections: [
       ["Course structure", "Work through practical lessons built for fathers navigating relationships with adult children."],
       ["Ongoing support", "Use AI coaching, resources, and community-oriented support to stay steady."],
@@ -299,7 +299,7 @@ const pages = [
     intro: "Papa Life podcast material supports fathers who want a calmer, wiser way to handle distance, silence, and difficult conversations.",
     sections: [
       ["For strained relationships", "Episodes focus on adult-child distance, fatherhood identity, repair, faith, and emotional maturity."],
-      ["Keep moving", "Use the podcast alongside the assessment, workshop, and membership lessons."],
+      ["Keep moving", "Use the podcast alongside the assessment, workshop, and guided course lessons."],
     ],
   },
   {
@@ -311,7 +311,7 @@ const pages = [
     intro: "Papa Life Coach supports fathers, families, and leaders who want clearer next steps and stronger relationships.",
     sections: [
       ["Start here", "If you are a father trying to reconnect with an adult child, the free assessment is the best first step."],
-      ["For broader support", "Use the AI Coach or membership path to get oriented around resources and next actions."],
+      ["For broader support", "Use the AI Coach or course catalog to get oriented around resources and next actions."],
     ],
   },
   {
@@ -352,7 +352,7 @@ const pages = [
     ],
   },
   {
-    path: "/booking",
+    path: "/courses",
     title: "Booking | Papa Life Coach",
     description: "Booking page for Papa Life Coach.",
     eyebrow: "Booking",
@@ -372,7 +372,7 @@ const pages = [
     intro:
       "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on papalifecoach.com, how it is used, and how visitors can control it.",
     sections: [
-      ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process membership payments, improve services, and follow the law."],
+      ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process authorized purchases, improve services, and follow the law."],
       ["SMS consent", "Phone numbers and SMS consent are never sold or shared with third parties for their own marketing."],
     ],
   },
@@ -385,34 +385,34 @@ const pages = [
     intro:
       "Papa Life is a fatherhood coaching service owned and operated by Brian Keith Hill. This policy explains what information is collected on papalifecoach.com, how it is used, and how visitors can control it.",
     sections: [
-      ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process membership payments, improve services, and follow the law."],
+      ["Information use", "Information may be used to respond to requests, send coaching resources and reminders, process authorized purchases, improve services, and follow the law."],
       ["SMS consent", "Phone numbers and SMS consent are never sold or shared with third parties for their own marketing."],
     ],
   },
   {
     path: "/terms",
     title: "Terms of Service | Papa Life Coach",
-    description: "Terms for using Papa Life, papalifecoach.com, ORACLE, courses, and membership.",
+    description: "Terms for using Papa Life, papalifecoach.com, ORACLE, courses and digital guidance.",
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or available self-paced courses, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
+      ["Courses", "Monthly enrollment is retired. Check the current catalog for purchase prices and terms."],
     ],
   },
   {
     path: "/terms-of-service",
     title: "Terms of Service | Papa Life Coach",
-    description: "Terms for using Papa Life, papalifecoach.com, ORACLE, courses, and membership.",
+    description: "Terms for using Papa Life, papalifecoach.com, ORACLE, courses and digital guidance.",
     eyebrow: "Terms of Service",
     headline: "Terms of Service",
     intro:
-      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or the $4.99/month membership, visitors agree to these terms.",
+      "By using papalifecoach.com, the ORACLE AI coach, Papa Life courses, or available self-paced courses, visitors agree to these terms.",
     sections: [
       ["Coaching service", "Papa Life is a coaching and educational service, not therapy, counseling, or licensed mental health care."],
-      ["Membership", "Papa Life membership costs $4.99 per month with no free trial and bills monthly until canceled."],
+      ["Courses", "Monthly enrollment is retired. Check the current catalog for purchase prices and terms."],
     ],
   },
 ];
@@ -420,7 +420,7 @@ const pages = [
 const defaultLinks = [
   ["Papa Life home", "/"], ["2-Minute Fatherhood Check-In", "/relationship-assessment"],
   ["The PAPA Framework", "/papa-framework"], ["Course catalog", "/courses"],
-  ["Papa Life membership", "/membership"], ["Book a conversation", "/booking"],
+
   ["All Papa Life resources", "/site-directory"],
 ];
 for (const page of pages) {

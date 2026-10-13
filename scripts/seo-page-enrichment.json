@@ -12,58 +12,6 @@
       ]
     ]
   },
-  "/membership": {
-    "sections": [
-      [
-        "What membership is for",
-        "The $4.99 monthly membership gives fathers a structured way to keep working on their own part of an adult-child relationship. Guided lessons and reflection tools help turn a good intention into a repeatable practice. Start with one lesson, apply one idea in an ordinary conversation, and return to reflect on what changed."
-      ],
-      [
-        "Practice between conversations",
-        "Use the PAPA Framework to review how you showed up: Were you present enough to listen? Did your influence respect the other person's adulthood? What purpose guided the exchange? Did your behavior match your values? The aim is steady growth rather than pressure for an immediate response."
-      ],
-      [
-        "Choose the right starting point",
-        "If you are still deciding whether membership fits, use the free Check-In or first workshop lesson before joining. Membership does not promise reconciliation, and your adult child does not have to participate for you to begin practicing. Explore the course path and available resources, then choose the level of support that fits your situation."
-      ]
-    ]
-  },
-  "/booking": {
-    "title": "Book a Papa Life Conversation | Brian Keith Hill",
-    "description": "Request a Papa Life conversation with Brian Keith Hill about your relationship with an adult child, the PAPA Framework, and your next steps.",
-    "sections": [
-      [
-        "What to bring to the conversation",
-        "Think of one recent interaction that captures the problem: a tense phone call, an unanswered message, advice that landed badly, or a boundary you do not understand. You do not need a complete family history to begin. A concrete example makes it easier to explore what happened and what is within your control."
-      ],
-      [
-        "Prepare without rehearsing a defense",
-        "The 2-Minute Fatherhood Check-In can help you name what you notice about trust, communication, and your changing role. Come ready to describe your own behavior as well as your concerns. The purpose is to find a practical next step, not to prove that one person is right."
-      ],
-      [
-        "Plan a step you can follow through on",
-        "A next step may involve listening differently, honoring space, making a specific apology, or choosing a calmer time to speak. Papa Life provides coaching and education; the other person's decisions remain their own. Use the Papa Life email request link on this page, or visit Contact if you need help getting started. A requested appointment is confirmed only after you receive confirmation."
-      ]
-    ],
-    "relatedLinks": [
-      [
-        "Request a Papa Life conversation",
-        "mailto:brian@papalifecoach.com?subject=Papa%20Life%20Conversation%20Request"
-      ],
-      [
-        "Prepare with the 2-Minute Check-In",
-        "/relationship-assessment"
-      ],
-      [
-        "Learn the PAPA Framework",
-        "/papa-framework"
-      ],
-      [
-        "Contact Papa Life",
-        "/contact"
-      ]
-    ]
-  },
   "/courses": {
     "sections": [
       [
@@ -92,7 +40,7 @@
       ],
       [
         "Continue with support",
-        "Explore the course catalog, membership, and Papa Life AI Coach for further guidance. If a situation needs a personal conversation, use the booking or contact page. Resources can help you prepare; they do not replace respectful communication or the other person's freedom to set boundaries."
+        "Explore the course catalog, available courses, and Papa Life AI Coach for further guidance. If a situation needs a personal conversation, use the course or contact page. Resources can help you prepare; they do not replace respectful communication or the other person's freedom to set boundaries."
       ]
     ]
   },
@@ -174,7 +122,7 @@
       ],
       [
         "Choose your next step",
-        "After the introduction, take the free Check-In, explore the first lesson, or learn the framework in more detail. You can also book a conversation when you need help thinking through a specific interaction. Move at a pace that supports consistent practice rather than pressuring yourself or your adult child."
+        "After the introduction, take the free Check-In, explore the first lesson, or learn the framework in more detail. You can also explore Papa Life courses when you need help thinking through a specific interaction. Move at a pace that supports consistent practice rather than pressuring yourself or your adult child."
       ]
     ]
   },
@@ -199,8 +147,8 @@
         "mailto:brian@papalifecoach.com"
       ],
       [
-        "Book a conversation",
-        "/booking"
+        "Explore Papa Life Courses",
+        "/courses"
       ],
       [
         "Take the Check-In",

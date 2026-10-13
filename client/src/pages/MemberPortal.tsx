@@ -1064,7 +1064,7 @@ function LibraryView({ user, access }: { user: MemberUser | null; access: Portal
       <section className="space-y-4">
         <div>
           <h3 className="text-white font-semibold">Member Purchase Options</h3>
-          <p className="text-xs text-gray-500 mt-1">$4.99 membership includes Course 11 streaming. These optional one-time purchases provide permanent digital or manuscript access.</p>
+          <p className="text-xs text-gray-500 mt-1">Existing member access depends on prior purchases. Current optional resources are listed separately.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {offers.filter((offer) => offer.code !== "membership.community.monthly").map((offer) => (
@@ -1117,7 +1117,7 @@ function LibraryView({ user, access }: { user: MemberUser | null; access: Portal
         <section className="space-y-4">
           <div>
             <h3 className="text-white font-semibold">Community Resource Library</h3>
-            <p className="text-xs text-gray-500 mt-1">Guides, worksheets, and tools included with the $4.99 monthly Papa Life Membership.</p>
+            <p className="text-xs text-gray-500 mt-1">Guides, worksheets, and tools available to qualifying existing members.</p>
           </div>
           <div className="flex gap-1.5 flex-wrap">
             {["All", "Purpose", "Authority", "Presence", "Alignment", "General"].map((p) => (

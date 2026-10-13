@@ -27,4 +27,8 @@ assert.ok(/Legacy membership checkout is closed/.test(index), "New legacy recurr
 assert.ok(/New product-sales provisioning is paused/.test(index), "Unknown-source sales webhooks must not grant access");
 assert.ok(/permanently disabled/i.test(installer), "Old link installer must be disabled");
 assert.ok(!/window\.open\(/.test(form), "Legacy checkout form must not open payment URLs");
+// Public course discovery must not be hijacked by the retired payment handler.
+assert.ok(/app\.get\("\/go\/join",/.test(index), "Legacy payment doorway must remain /go/join");
+assert.ok(!/app\.get\("\/courses",\s*\(req, res\) => \{[\s\S]*?legacy_sales_paused/.test(index), "Course catalog must not route to retired sales notice");
+assert.ok(/app\.get\(\["\/booking", "\/membership", "\/member-billing", "\/join"\]/.test(index), "Retired booking and monthly membership URLs must redirect to course catalog");
 console.log("Legacy checkout and P2P payment links are blocked in all guarded sales entry points.");

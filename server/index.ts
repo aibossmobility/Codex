@@ -6895,7 +6895,13 @@ async function startServer() {
     );
   });
 
-  app.get("/courses", (req, res) => {
+  // Preserve old bookmarks without exposing retired bookings or subscription offers.
+  // The course catalog itself must remain reachable and must never be diverted to checkout.
+  app.get(["/booking", "/membership", "/member-billing", "/join"], (_req, res) => {
+    res.redirect(302, "/courses");
+  });
+
+  app.get("/go/join", (req, res) => {
     // Old join/payment links may point at an unauthorized P2P-era account.
     // Never redirect a Papa Life visitor into a legacy checkout.
     // Railway serves this static file directly; the extensionless route was returning 404.

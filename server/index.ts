@@ -6898,7 +6898,8 @@ async function startServer() {
   app.get("/courses", (req, res) => {
     // Old join/payment links may point at an unauthorized P2P-era account.
     // Never redirect a Papa Life visitor into a legacy checkout.
-    const destination = "/sales-transition";
+    // Railway serves this static file directly; the extensionless route was returning 404.
+    const destination = "/sales-transition/index.html";
     const campaign = "legacy_sales_paused";
     logTrafficClick(req, "join", destination, campaign);
     const source = encodeURIComponent(String(req.query.src || "site"));
@@ -6942,7 +6943,7 @@ async function startServer() {
     const staticPaths = [
       "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
-      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/papa-first-lesson", "/papa-intro",
+      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
       "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
     ];
@@ -6959,7 +6960,7 @@ async function startServer() {
     "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
-    "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
+    "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/shop", "/papa-journey", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
   ]);
@@ -6976,6 +6977,8 @@ async function startServer() {
     }
     const document = canonical === "/" ? path.join(staticPath, "index.html") : path.join(staticPath, canonical.slice(1), "index.html");
     if (fs.existsSync(document)) return res.sendFile(document);
+    // /start is a React route; serve the app shell until an SEO snapshot exists.
+    if (canonical === "/start") return res.sendFile(path.join(staticPath, "index.html"));
     return next();
   });
 

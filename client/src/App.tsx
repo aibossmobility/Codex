@@ -35,6 +35,7 @@ import AiBossTakeover from "./pages/AiBossTakeover";
 import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
 import YouTubeGrowth from "./pages/YouTubeGrowth";
 import Courses from "./pages/Courses";
+import PapaStart from "./pages/PapaStart";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
 import PapaIntroVideo from "./pages/PapaIntroVideo";
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/media-library"><Redirect to="/courses" /></Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />
+      <Route path="/start" component={PapaStart} />
       <Route path={"/login"} component={Login} />
       <Route path="/dashboard"><Redirect to="/crm-console" /></Route>
       <Route path={"/crm"} component={CrmIntake} />

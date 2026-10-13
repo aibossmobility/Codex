@@ -273,10 +273,10 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 {relationship.commercial ? (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <a href="/assessment" className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-yellow px-3 py-2 text-xs font-extrabold text-black hover:bg-white"><HeartHandshake className="h-4 w-4" />2-Minute Fatherhood Check-In</a>
-                    <a href="/booking" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-extrabold text-white hover:border-brand-yellow hover:text-brand-yellow"><CalendarCheck className="h-4 w-4" />Talk with Brian</a>
+                    <a href="/courses" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-extrabold text-white hover:border-brand-yellow hover:text-brand-yellow"><CalendarCheck className="h-4 w-4" />Talk with Brian</a>
                   </div>
                 ) : (
-                  <a href="/booking" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-yellow/45 px-3 py-2 text-xs font-extrabold text-brand-yellow hover:bg-brand-yellow hover:text-black"><CalendarCheck className="h-4 w-4" />Connect with Brian personally</a>
+                  <a href="/courses" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-yellow/45 px-3 py-2 text-xs font-extrabold text-brand-yellow hover:bg-brand-yellow hover:text-black"><CalendarCheck className="h-4 w-4" />Connect with Brian personally</a>
                 )}
                 <p className="mt-3 flex items-start gap-2 text-[11px] leading-relaxed text-white/45"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />This twin reflects Brian's approved values and knowledge. It does not pretend Brian personally read a message he has not seen.</p>
               </div>

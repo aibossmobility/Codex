@@ -707,7 +707,7 @@ export default function Home() {
             <p className="mt-5 text-white/75">
               Begin the work of becoming the father healthy reconnection may become possible with.
             </p>
-            <p className="mt-6 text-lg font-extrabold text-[#f2c230]">Papa Life Membership — $4.99 per month</p>
+            <p className="mt-6 text-lg font-extrabold text-[#f2c230]">Self-Paced Papa Life Courses &amp; Digital Coaching</p>
             <p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p>
           </div>
         </section>

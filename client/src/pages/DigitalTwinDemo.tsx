@@ -98,9 +98,9 @@ export default function DigitalTwinDemo() {
                 <CalendarCheck className="h-7 w-7 text-[#16853b]" />
                 <h2 className="mt-4 text-xl font-extrabold">Human Connection</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  Book a personal conversation with Brian.
+                  Explore Papa Life courses and digital coaching resources.
                 </p>
-                <a href="/booking" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                <a href="/courses" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Talk with Brian
                 </a>
               </div>

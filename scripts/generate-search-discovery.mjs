@@ -28,7 +28,6 @@ const pages = [
   ["/podcast", "monthly", "0.7"],
   ["/tuesday", "weekly", "0.8"],
   ["/tuesday-live", "weekly", "0.8"],
-  ["/membership", "monthly", "0.8"],
   ["/shop", "weekly", "0.75"],
   ["/papa-journey", "monthly", "0.8"],
   ["/booking", "monthly", "0.65"],

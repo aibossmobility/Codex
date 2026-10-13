@@ -59,7 +59,7 @@ type LeadContact = {
 
 const papaPillars: PapaPillar[] = ["Presence", "Authority", "Purpose", "Alignment"];
 const SMS_CONSENT_TEXT =
-  "By submitting this form, you agree to receive text messages from Papa Life regarding coaching appointments, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";
+  "By submitting this form, you agree to receive text messages from Papa Life regarding digital coaching resources, educational resources, reminders, and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. SMS consent is not shared with third parties.";
 
 type AssessmentQuestion = {
   id: string;
@@ -193,10 +193,10 @@ const relatedLinks: Array<{ title: string; copy: string; Icon: LucideIcon; href:
     href: "/tuesday-live",
   },
   {
-    title: "Membership",
+    title: "Courses",
     copy: "Move from one answer into a guided Papa Life path.",
     Icon: Users,
-    href: "/membership",
+    href: "/courses",
   },
 ];
 
@@ -217,8 +217,8 @@ const modeCopy: Record<Mode, { title: string; prompt: string; icon: typeof Bot }
     icon: CalendarDays,
   },
   membership: {
-    title: "Membership",
-    prompt: "Ask about membership, courses, community, pricing, or next steps.",
+    title: "Courses",
+    prompt: "Ask about current courses, digital coaching, pricing, or next steps.",
     icon: Users,
   },
   prayer: {
@@ -242,7 +242,7 @@ function currentModeFromPath(location: string): Mode {
   const path = location.replace(/\/$/, "") || "/";
   if (path === "/resources" || path === "/books" || path === "/podcast") return "resource";
   if (path === "/tuesday-live") return "tuesday";
-  if (path === "/membership") return "membership";
+  if (path === "/courses") return "membership";
   return "coach";
 }
 
@@ -255,7 +255,7 @@ function localReply(mode: Mode, text: string) {
     return "Bible Study: Read James 1:19. Observation: listening comes before speaking. Interpretation: mature fatherhood does not lose authority when it slows down. Application: before your next conversation, write what you heard, what you can own, and what you will do differently. Reflection: where have I been trying to be understood before helping my child feel heard? Prayer: Lord, make me quick to listen and slow to speak.";
   }
   if (mode === "membership") {
-    return "Papa Life membership is for fathers who want more than one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
+    return "Papa Life courses help fathers move beyond one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
   }
   if (mode === "tuesday") {
     return "That is a strong Tuesday Live question. Bring it as one clear sentence: what should a father do when he wants repair, but his adult child is not ready? The teaching should start with humility, move through Presence, and end with one practical step.";
@@ -703,7 +703,7 @@ function LeadOffer({ lead, setLead }: {
             so Brian's team can follow up. Do not submit private crisis, medical, legal, or emergency information here.
           </p>
           <div className="flex flex-wrap gap-2">
-            {["Free Assessment", "Give Listen Love Serve", "Tuesday Live Show", "Newsletter", "Membership", "Free Chapter"].map((item) => (
+            {["Free Assessment", "Give Listen Love Serve", "Tuesday Live Show", "Newsletter", "Courses", "Free Chapter"].map((item) => (
               <button
                 key={item}
                 type="button"
@@ -826,7 +826,7 @@ export default function PapaAiExperience() {
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
         title="Papa Life AI Coach | Biblical Fatherhood Coaching"
-        description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, Tuesday Live support, and membership help."
+        description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance."
         keywords="Papa Life AI Coach, fathers of adult children, biblical fatherhood coaching, PAPA Framework, fatherhood assessment"
       />
 

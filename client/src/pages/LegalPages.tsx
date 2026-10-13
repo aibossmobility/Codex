@@ -63,7 +63,7 @@ export function PrivacyPage() {
       <p>
         <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> August 29, 2026
+        <strong>Last Updated:</strong> October 13, 2026
       </p>
       <p>
         Papa Life (&quot;we,&quot; &quot;us,&quot; &quot;our&quot;) is a fatherhood coaching service owned and operated by{" "}
@@ -80,9 +80,9 @@ export function PrivacyPage() {
       </p>
       <ul>
         <li>Fill out a lead form (name, email, phone number, age range, and answers about your relationship with your adult child)</li>
-        <li>Book a coaching conversation through Google Calendar</li>
+        <li>Choose courses or self-guided coaching resources</li>
         <li>Register for Tuesday Live sessions</li>
-        <li>Join Papa Life membership ($4.99/month) through our checkout</li>
+        <li>Purchase an available self-paced course or service after reviewing current terms</li>
         <li>Send a message through our contact page or Papa Life AI Coach, including the content you choose to enter</li>
         <li>Take an assessment or reflection tool, including the answers and scores you choose to submit</li>
         <li>Create or use a member account, including account and access information</li>
@@ -107,7 +107,7 @@ export function PrivacyPage() {
       <ul>
         <li>Respond to your questions and requests</li>
         <li>Send you coaching resources, reminders, and account notifications</li>
-        <li>Process membership payments and manage your account</li>
+        <li>Process authorized course purchases and manage existing account access</li>
         <li>Send text messages and emails you have agreed to receive</li>
         <li>Improve our website, courses, and coaching programs</li>
         <li>Follow the law and protect our business</li>
@@ -115,7 +115,7 @@ export function PrivacyPage() {
       <h2>4. Text Messages (SMS)</h2>
       <p>
         If you give us your phone number and check the SMS consent box on a form, you agree to receive
-        text messages from Papa Life about coaching appointments, educational resources, reminders, and
+        text messages from Papa Life about course access, educational resources, reminders, and
         account notifications. Message frequency varies. Message and data rates may apply. Reply{" "}
         <strong>STOP</strong> to unsubscribe at any time, or <strong>HELP</strong> for assistance. Your
         phone number and SMS consent are never sold or shared with third parties for their own marketing.
@@ -152,7 +152,7 @@ export function PrivacyPage() {
         <li>Ask us to see, correct, or delete your personal information</li>
         <li>Unsubscribe from emails using the link at the bottom of any email</li>
         <li>Reply STOP to any text message to stop receiving texts</li>
-        <li>Cancel your Papa Life membership at any time in two clicks</li>
+        <li>Manage previously purchased access under the terms applicable at purchase</li>
       </ul>
       <p>To make any of these requests, email us at Brian@bossmobility.net.</p>
       <h2>9. Children&apos;s Privacy</h2>
@@ -205,17 +205,17 @@ export function TermsPage() {
   return (
     <LegalShell
       title="Terms of Service"
-      description="Terms for using Papa Life, PapaLifeCoach.com, Papa Life AI Coach, courses, and membership."
+      description="Terms for using Papa Life, PapaLifeCoach.com, Papa Life AI Coach, courses, and digital services."
     >
       <p>
         <strong>Effective Date:</strong> August 20, 2026
         <br />
-        <strong>Last Updated:</strong> August 20, 2026
+        <strong>Last Updated:</strong> October 13, 2026
       </p>
       <p>
         Welcome to Papa Life, a fatherhood coaching service owned and operated by{" "}
         <strong>Brian Keith Hill</strong> (&quot;Papa Life,&quot; &quot;we,&quot; &quot;us&quot;). By using
-        PapaLifeCoach.com, our AI coach (Papa Life AI Coach), our courses, or joining our $4.99/month membership,
+        PapaLifeCoach.com, our AI coach (Papa Life AI Coach), our courses, or purchasing currently available services,
         you agree to these terms.
       </p>
       <h2>1. Who We Are</h2>
@@ -228,19 +228,17 @@ export function TermsPage() {
       <h2>2. Using Our Site</h2>
       <p>
         You must be 18 or older to use Papa Life. You agree to give accurate information when you fill out a
-        form, book a session, or sign up for membership. You agree not to misuse the site, our AI coach, or
+        form, choose a course, or request a service. You agree not to misuse the site, our AI coach, or
         our content — including trying to hack, copy, resell, or scrape our material without permission.
       </p>
-      <h2>3. Membership and Payment</h2>
+      <h2>3. Purchases and Existing Member Access</h2>
       <p>
-Papa Life membership costs $4.99 per month with no free trial. Your card will be billed
-automatically each month until you cancel. You can cancel anytime in two clicks with no phone call
-required. We do not offer refunds for partial months already paid, unless required by law.
+New monthly membership enrollment is closed. Any currently offered course or service will disclose its price and access terms before payment. Existing member rights and obligations continue under their original purchase terms. Contact Papa Life for questions about existing subscriptions.
       </p>
       <h2>4. Text Messages and Communication</h2>
       <p>
         If you provide your phone number and opt in, you agree to receive text messages from Papa Life about
-        coaching appointments, educational resources, reminders, and account notifications. Message frequency
+        course access, educational resources, reminders, and account notifications. Message frequency
         varies. Message and data rates may apply. Reply STOP to unsubscribe or HELP for assistance. See our
         Privacy Policy for more on how we handle your information.
       </p>

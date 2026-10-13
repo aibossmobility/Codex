@@ -34,7 +34,7 @@ export const ASSESSMENT_PAGE = {
       "Thank you for completing the assessment. Your answers help us understand where you are — and where you want to go with your adult child.",
       "Check your email for your personalized results and next steps. If you are ready to move past awareness into guided action, unlock the full PAPA Journey and keep going with structure, reflection, and coaching.",
     ],
-    primaryCta: { label: "Unlock the Full PAPA Journey — $4.99/mo →", href: "/member-billing" },
+    primaryCta: { label: "Explore Papa Life Courses →", href: "/courses" },
     secondaryCta: { label: "Find My Fatherhood Stage →", href: "https://fatherhood5-c3sirayz.manus.space/" },
   },
   jsonLd: [ORGANIZATION_SCHEMA, ASSESSMENT_WEB_APP_SCHEMA],

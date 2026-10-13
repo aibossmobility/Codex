@@ -27,12 +27,12 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-[#f4dea0] text-[#17231c]">
-      <PageMeta title="Papa Life Shop — Explore Self-Paced Courses" description="Explore Papa Life audio lessons, manuscripts and guided programs. Final price and checkout are confirmed through the approved sales process." />
+      <PageMeta title="Papa Life Products — Explore Self-Paced Courses" description="Explore Papa Life audio lessons, manuscripts and guided programs. Final price and checkout are confirmed through the approved sales process." />
       <nav className="border-b border-[#17231c]/20 bg-[#f2c230]">
         <div className="container flex min-h-20 items-center justify-between gap-5 py-3">
           <a href="/"><SiteLogo size="md" /></a>
           <div className="flex items-center gap-3">
-            <a href="/member-login" className="text-sm font-bold hover:text-[#b33a32]">Member Login</a>
+            <a href="/my-journey" className="text-sm font-bold hover:text-[#b33a32]">Awareness Wheel</a>
             <a href="/courses" className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white">Explore Courses</a>
           </div>
         </div>
@@ -112,12 +112,12 @@ export default function Shop() {
             <article key={offer.code} className="flex flex-col rounded-xl border-4 border-[#145b35] bg-[#f8f0db] p-6 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-[#b33a32]">{offer.format === 'digital' ? 'Audio Lesson' : offer.format === 'manuscript' ? 'Manuscript PDF' : 'Complete Bundle'}</p>
               <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.canonical_name}</h2>
-              <p className="mt-5 text-sm text-[#5b655e]">Product preview. Approved GoHighLevel price, agreement and secure payment details will be shown when this offer is available for purchase.</p>
+              <p className="mt-5 text-sm text-[#5b655e]">Explore this resource. Approved GoHighLevel prices and purchase steps are presented in GoHighLevel—not on the Papa Life website.</p>
               <a href="/courses" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-5 font-extrabold text-white">Explore Course Details <ArrowRight className="h-4 w-4" /></a>
             </article>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">No forced choice</h2><p className="mt-2 text-white/80">Existing entitlements remain subject to original purchase terms. New purchases only use current approved prices, agreements and payment links.</p></div></div></div>
+        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Your purchase happens in GoHighLevel</h2><p className="mt-2 text-white/80">This website helps you choose what meets your needs. GoHighLevel manages approved product pricing, agreements, payment, and access. Previous purchases remain subject to their original terms.</p></div></div></div>
       </main>
     </div>
   );

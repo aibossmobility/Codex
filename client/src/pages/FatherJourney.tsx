@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, ChevronDown, Lock, LogIn, Save } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Lock, Save } from "lucide-react";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Button } from "@/components/ui/button";
@@ -194,7 +194,7 @@ export default function FatherJourney() {
         <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <a href="/"><SiteLogo size="md" /></a>
           <div className="flex items-center gap-3">
-            {member ? <span className="hidden text-sm font-bold sm:block">Welcome, {member.first_name || "Dad"}</span> : <a href="/member-login?return=/my-journey" className="inline-flex items-center gap-2 text-sm font-bold"><LogIn className="h-4 w-4" /> Sign in to save</a>}
+            {member ? <span className="hidden text-sm font-bold sm:block">Welcome, {member.first_name || "Dad"}</span> : <a href="/shop" className="inline-flex items-center gap-2 text-sm font-bold">Explore Papa Life Products</a>}
           </div>
         </div>
       </header>
@@ -291,6 +291,12 @@ export default function FatherJourney() {
               </div>
             </div>}
           </div>}
+          {active === "awareness" && <div className="mt-6 rounded-2xl border-2 border-[#145b35] bg-[#f2f8ed] p-5">
+            <p className="text-xs font-black uppercase tracking-widest text-[#145b35]">From Awareness to Action</p>
+            <h3 className="mt-1 text-xl font-black">Find a Papa Life resource for your next step.</h3>
+            <p className="mt-2 text-sm text-[#425047]">Explore self-paced courses and manuscripts for fathers of adult children. No monthly membership or appointment required.</p>
+            <a href="/shop" className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#145b35] px-5 py-3 text-sm font-black text-white">Explore Courses &amp; Resources <ArrowRight className="ml-2 h-4 w-4" /></a>
+          </div>}
           {active === "take_action" && <div className="mt-6 rounded-2xl border border-[#e1c15d] bg-[#fffaf0] p-5">
             <h3 className="text-xl font-black">Choose one relationship practice</h3>
             <p className="mt-1 text-sm text-[#5b655e]">The goal is not to finish a task. It is to interrupt an old pattern and let your child experience something different.</p>
@@ -316,12 +322,12 @@ export default function FatherJourney() {
             <h3 className="mt-1 text-2xl font-black">Do not stop at the wheel.</h3>
             <p className="mt-2 text-sm text-[#425047]">You finished this reflection cycle. The next step is to keep learning, practice one change in real life, and come back to record what happened.</p>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              {member ? <a href="/portal?view=courses" className="inline-flex items-center justify-center rounded-lg bg-[#d51f26] px-5 py-3 text-sm font-black text-white">Continue to my lessons <ArrowRight className="ml-2 h-4 w-4" /></a> : <a href={`/member-login?return=${encodeURIComponent("/portal?view=courses")}`} className="inline-flex items-center justify-center rounded-lg bg-[#d51f26] px-5 py-3 text-sm font-black text-white">Sign in and continue <ArrowRight className="ml-2 h-4 w-4" /></a>}
-              <a href="/portal" className="inline-flex items-center justify-center rounded-lg border border-[#17231c] px-5 py-3 text-sm font-black text-[#17231c]">Open my member home</a>
+              <a href="/shop" className="inline-flex items-center justify-center rounded-lg bg-[#d51f26] px-5 py-3 text-sm font-black text-white">Explore Courses &amp; Resources <ArrowRight className="ml-2 h-4 w-4" /></a>
+              <a href="/courses" className="inline-flex items-center justify-center rounded-lg border border-[#17231c] px-5 py-3 text-sm font-black text-[#17231c]">Review Course Details</a>
             </div>
-            <p className="mt-3 text-xs font-bold text-[#5b655e]">When you return, Papa Life will reopen at your next unfinished destination. Completed member work is saved to your account.</p>
+            <p className="mt-3 text-xs font-bold text-[#5b655e]">Explore the materials that can help you work on the next step. Purchases and access instructions are handled through the approved GoHighLevel sales process.</p>
           </div>}
-          {!member && <p className="mt-5 text-sm text-[#5b655e]">Your work is saved on this device. Sign in to keep it available across devices and allow Papa Life to support you when you request help.</p>}
+          {!member && <p className="mt-5 text-sm text-[#5b655e]">Your reflections are saved on this device. Browse Papa Life courses and resources whenever you are ready.</p>}
         </section>
       </main>
     </div>

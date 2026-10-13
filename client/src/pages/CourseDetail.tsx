@@ -95,7 +95,7 @@ export default function CourseDetail() {
             </div>
 
             <div className="rounded-2xl border border-brand-yellow/20 bg-brand-yellow/5 px-5 py-4 mb-10 text-sm text-brand-yellow">
-              Lesson videos and materials are available after you sign in to the member portal. This page is a preview of the curriculum.
+              This is a preview of a Papa Life learning resource. Approved purchase details, payment and access will be handled through GoHighLevel; no checkout happens here.
             </div>
 
             <h2 className="font-heading text-lg font-bold text-white mb-4 flex items-center gap-2">
@@ -132,7 +132,7 @@ export default function CourseDetail() {
 
             <div className="flex flex-col sm:flex-row gap-4 mt-12">
               <Button asChild className="bg-primary text-primary-foreground font-bold rounded-full px-8">
-                <a href="/member-login">Sign in to watch</a>
+                <a href="/shop">Explore Papa Life Products</a>
               </Button>
               <Button variant="outline" asChild className="border-white/20 text-white rounded-full">
                 <Link href="/courses">

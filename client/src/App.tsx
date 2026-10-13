@@ -18,7 +18,6 @@ import MemberForgotPassword from "./pages/MemberForgotPassword";
 import MemberResetPassword from "./pages/MemberResetPassword";
 import MemberPortal from "./pages/MemberPortal";
 import Shop from "./pages/Shop";
-import PapaJourneyFunnel from "./pages/PapaJourneyFunnel";
 import FatherJourney from "./pages/FatherJourney";
 import Strategist from "./pages/Strategist";
 import ThemeMatrix from "./pages/ThemeMatrix";
@@ -42,7 +41,6 @@ import PapaIntroVideo from "./pages/PapaIntroVideo";
 import PapaJournal from "./pages/PapaJournal";
 import PapaFirstLesson from "./pages/PapaFirstLesson";
 import PapaDailyWorkReport from "./pages/PapaDailyWorkReport";
-import RelationshipAssessment from "./pages/RelationshipAssessment";
 import PapaAiExperience from "./pages/PapaAiExperience";
 import TuesdayLive from "./pages/TuesdayLive";
 import MarleeAssessment from "./pages/MarleeAssessment";
@@ -97,10 +95,10 @@ function Router() {
       <Route path={"/portal"} component={MemberPortal} />
       <Route path={"/shop"} component={Shop} />
       <Route path="/join"><Redirect to="/courses" /></Route>
-      <Route path={"/papa-journey"} component={PapaJourneyFunnel} />
+      <Route path={"/papa-journey"}><Redirect to="/" /></Route>
       <Route path="/my-journey" component={FatherJourney} />
-      <Route path="/assessment"><Redirect to="/relationship-assessment" /></Route>
-      <Route path="/relationship-assessment" component={RelationshipAssessment} />
+      <Route path="/assessment"><Redirect to="/" /></Route>
+      <Route path="/relationship-assessment"><Redirect to="/" /></Route>
       <Route path="/marlee-assessment" component={MarleeAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />
       <Route path="/adult-daughter-relationship" component={AdultDaughterRelationshipPage} />

@@ -1,4 +1,3 @@
-import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import {
@@ -6,147 +5,59 @@ import {
   CheckCircle2,
   MessageCircle,
   Menu,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
-  { label: "Start Here", href: "/start" },
   { label: "Brian’s Story", href: "#brian-story" },
-  { label: "2-Minute Check-In", href: "/assessment?src=homepage_nav" },
-  { label: "Member Login", href: "/member-login" },
-];
-
-const selfIdentificationStatements = [
-  "My son or daughter rarely calls or responds.",
-  "I am not sure when or why our relationship changed.",
-  "I miss being part of my grandchildren’s lives.",
-  "I want to apologize, but I do not know what to say.",
-  "Our conversations quickly become defensive or tense.",
-  "I regret choices I made when my children were younger.",
-  "I have prayed for reconciliation but still need practical direction.",
-  "I want to rebuild trust without trying to control my adult child.",
-  "I know something needs to change, and I am willing to begin with myself.",
-];
-
-const costOfWaiting = [
-  "More missed birthdays and holidays.",
-  "Greater emotional distance.",
-  "Lost time with grandchildren.",
-  "Misunderstandings becoming fixed family stories.",
-  "Additional years of regret.",
-  "Opportunities for conversation passing without preparation.",
-];
-
-const fathersServed = [
-  "Love their adult children.",
-  "Want a healthier relationship.",
-  "Carry regret, confusion, or unanswered questions.",
-  "Want to rebuild trust.",
-  "Need practical guidance about what to say and what not to say.",
-  "Are willing to listen before defending themselves.",
-  "Are willing to examine their choices and patterns.",
-  "Understand that change may take time.",
-  "Want Scripture-centered guidance and the support of other fathers.",
-];
-
-const readinessBoundaries = [
-  "You only want help proving your adult child is wrong.",
-  "You want a technique for forcing someone to respond.",
-  "You believe the other person must change first.",
-  "You are unwilling to examine your own actions.",
-  "You expect an instant reconciliation guarantee.",
-];
-
-const transformations = [
-  ["Silence", "Safer conversation"],
-  ["Defensiveness", "Listening"],
-  ["Shame", "Healthy responsibility"],
-  ["Confusion", "Clarity"],
-  ["Control", "Presence"],
-  ["Isolation", "Community"],
-  ["Fear", "Renewed hope"],
-];
-
-const benefits = [
-  "Listen without immediately defending.",
-  "Take responsibility without collapsing into shame.",
-  "Apologize without explanation or manipulation.",
-  "Understand authority without control.",
-  "Rebuild trust through small, consistent actions.",
-  "Respond wisely when an adult child pulls away.",
-  "Lead with presence instead of pressure.",
-  "Become emotionally and spiritually safer to talk to.",
-];
-
-const mostFatherhoodPrograms = [
-  "Parenting younger children",
-  "Discipline and household structure",
-  "Child development",
-  "Managing the family",
-];
-
-const papaLifeDifference = [
-  "Rebuilding relationships with adult children",
-  "Restoring trust after distance or conflict",
-  "Learning to listen without defending",
-  "Leading through humility, presence, and consistency",
+  { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
+  { label: "Explore Courses", href: "/shop" },
 ];
 
 const relationshipSignals = [
   {
     key: "red",
-    label: "Red",
-    title: "We’re distant, tense, or not talking.",
-    guidance: "Start by lowering pressure. Presence comes before persuasion.",
+    label: "RED",
+    title: "I'm not sure what to do.",
+    guidance: "Begin by understanding what is happening and learning how to listen without pressure.",
+    courses: ["Listening Without Defending", "When Your Adult Child Pulls Away", "When Silence Feels Personal"],
+    action: "Explore Support for Getting Unstuck",
     buttonClass: "border-[#b33a32] bg-[#b33a32] text-white",
   },
   {
     key: "yellow",
-    label: "Yellow",
-    title: "I want to reconnect, but I’m not sure how.",
-    guidance: "Start with one safe question and listen without preparing a defense.",
+    label: "YELLOW",
+    title: "I want to reconnect.",
+    guidance: "Prepare for a safer conversation, learn to take responsibility, and reduce pressure.",
+    courses: ["The First Repair Sentence", "Presence Over Pressure", "Apology Without Explanation"],
+    action: "Explore Courses for Reconnection",
     buttonClass: "border-[#d8aa16] bg-[#f2c230] text-[#17231c]",
   },
   {
     key: "green",
-    label: "Green",
-    title: "We’re connected, and I want to keep building trust.",
-    guidance: "Keep making small deposits of presence, humility, and consistency.",
+    label: "GREEN",
+    title: "I'm ready to make changes.",
+    guidance: "Build trust through small, consistent action and become safer to talk to.",
+    courses: ["Consistency After the Conversation", "Rebuilding Trust in Small Deposits", "Becoming Safe to Talk To"],
+    action: "Choose My Next Course",
     buttonClass: "border-[#145b35] bg-[#145b35] text-white",
   },
 ] as const;
 
-function ActionLink({
-  href,
-  children,
-  light = false,
-}: {
-  href: string;
-  children: React.ReactNode;
-  light?: boolean;
-}) {
-  return (
-    <a
-      href={href}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-extrabold transition-transform hover:-translate-y-0.5 ${
-        light
-          ? "bg-[#f2c230] text-[#17231c] hover:bg-[#f7d75e]"
-          : "bg-[#145b35] text-white hover:bg-[#0f492a]"
-      }`}
-    >
-      {children}
-      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-    </a>
-  );
-}
+const wheelSteps = [
+  { label: "Awareness", top: "9%", left: "50%", signal: "red" },
+  { label: "Engage", top: "30%", left: "82%", signal: "yellow" },
+  { label: "Understand", top: "75%", left: "76%", signal: "yellow" },
+  { label: "Take Action", top: "78%", left: "25%", signal: "green" },
+  { label: "Reconnection", top: "30%", left: "17%", signal: "green" },
+] as const;
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [relationshipSignal, setRelationshipSignal] = useState<"red" | "yellow" | "green">("yellow");
-  const joinHref = "/go/join?src=homepage";
-  const quietChildAssessmentHref = "/assessment?src=homepage_quiet_child";
+  const shopHref = "/shop";
+  const wheelHref = "/#fatherhood-wheel";
 
   function openPapaAiCoach() {
     window.location.assign("/digital-twin");
@@ -155,8 +66,8 @@ export default function Home() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
       <PageMeta
-        title="Papa Life | Help for Fathers of Adult Children"
-        description="Papa Life helps fathers of adult children rebuild trust, restore communication, and move from distance to reconnection through Scripture-centered guidance and practical tools."
+        title="Papa Life Fatherhood Resource Center | Courses & Original Resources"
+        description="Explore original Papa Life audio lessons, manuscripts and learning resources for fathers of adult children. Find your next step with the Awareness Wheel."
         keywords="fathers of adult children, reconnect with adult child, Papa Life, fatherhood, relationship repair"
       />
 
@@ -184,10 +95,10 @@ export default function Home() {
               1-Minute AI Experience
             </button>
             <a
-              href={joinHref}
+              href={shopHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
             >
-              Enroll Now — Immediate Access
+              Explore Courses &amp; Resources
             </a>
           </div>
           <button
@@ -225,86 +136,54 @@ export default function Home() {
                 1-Minute AI Experience
               </button>
               <a
-                href={joinHref}
+                href={shopHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-md bg-[#b33a32] px-4 py-3 font-extrabold text-white"
               >
-                Enroll Now — Immediate Access
+                Explore Courses &amp; Resources
               </a>
             </div>
           </div>
         )}
       </nav>
 
-      <header className="relative overflow-hidden bg-[#f8f0db] text-[#17231c]">
-        <img
-          src="/images/papa-life-reconnection-path-hero.jpg"
-          alt=""
-          aria-hidden="true"
-          width={1672}
-          height={941}
-          loading="eager"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(235,218,179,0.94)_0%,rgba(235,218,179,0.82)_40%,rgba(235,218,179,0.28)_58%,rgba(235,218,179,0.04)_72%)]" />
-        <div className="container relative z-10 flex min-h-[650px] items-center py-16 md:py-20">
-          <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
-              Papa Life · For Fathers of Adult Children
-            </p>
-            <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.04] sm:text-5xl md:text-7xl">
-              When Your Adult Child Gets Quiet, Don’t Chase the Silence.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#314239] md:text-xl">
-              Silence can tempt a father to call again, text again, explain again, or push for an answer. But pressure rarely rebuilds trust. Papa Life helps you choose a better next step: calm presence, humility, and consistency.
-            </p>
-            <p className="mt-5 text-lg font-bold text-[#145b35] md:text-xl">
-              Presence. Humility. Consistency.
-            </p>
-            <p className="mt-2 text-base font-extrabold text-[#b33a32] md:text-lg">
-              As long as you’re both alive, it’s never too late.
-            </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              <ActionLink href={quietChildAssessmentHref} light>
-                Take the 2-Minute Fatherhood Check-In
-              </ActionLink>
-              <button
-                type="button"
-                onClick={openPapaAiCoach}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[#145b35]/45 bg-white/65 px-6 py-3 font-extrabold text-[#145b35] hover:border-[#145b35] hover:bg-white"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                Talk With Brian’s Papa Life AI
-              </button>
-            </div>
-            <p className="mt-5 max-w-2xl text-sm font-semibold leading-relaxed text-[#314239]">
-              Start with clarity. Take the check-in first, then use Brian’s Papa Life AI to think through your next calm, practical step.
-            </p>
-          </div>
-        </div>
-      </header>
+
 
       <section id="fatherhood-wheel" className="border-y border-[#17231c]/15 bg-[#fffaf0] py-12 md:py-16" aria-labelledby="fatherhood-wheel-heading">
         <div className="container">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Your Papa Life Starting Point</p>
-            <h2 id="fatherhood-wheel-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">
-              Where are you with your child right now?
-            </h2>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Awareness First • Take Action with the Right Support</p>
+            <h1 id="fatherhood-wheel-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">
+              Where Are You With Your Child—and What Can Help?
+            </h1>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
-              Every father-child relationship has seasons. Use the steering wheel to name where things feel today, then take one calm next step.
+              Start by identifying where you are with your adult child. Choose Red, Yellow, or Green to see courses and resources that could help you move forward.
             </p>
           </div>
 
-          <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-12">
+          <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
             <div className="rounded-2xl border border-[#17231c]/15 bg-white p-5 shadow-sm md:p-7">
-              <img
-                src="/images/papa-life-journey-wheel.webp"
-                alt="Papa Life fatherhood journey steering wheel"
-                className="mx-auto w-full max-w-[520px]"
-                loading="lazy"
-              />
+              <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+                <img
+                  src="/images/papa-life-journey-wheel.webp"
+                  alt="Papa Life five-stage journey steering wheel"
+                  className="h-full w-full object-contain"
+                  loading="eager"
+                />
+                {wheelSteps.map((step, index) => (
+                  <button
+                    type="button"
+                    key={step.label}
+                    onClick={() => setRelationshipSignal(step.signal)}
+                    style={{top: step.top, left: step.left}}
+                    className="absolute z-10 flex min-h-10 w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg border-2 border-[#f2c230] bg-[#17231c] px-1 py-2 text-center text-white shadow-lg hover:bg-[#145b35] focus:outline-none focus:ring-4 focus:ring-[#f2c230]"
+                    aria-label={"Step " + (index + 1) + ": " + step.label + ". View suggested products"}
+                  >
+                    <span className="text-[10px] font-black text-[#f2c230] sm:text-xs">{"STEP " + (index + 1)}</span>
+                    <span className="text-[10px] font-extrabold uppercase leading-tight sm:text-sm">{step.label}</span>
+                  </button>
+                ))}
+              </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {relationshipSignals.map((signal) => {
                   const active = relationshipSignal === signal.key;
@@ -335,380 +214,94 @@ export default function Home() {
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-[#17231c]/15 bg-[#17231c] text-white shadow-xl">
-              <div className="p-5 md:p-7">
-                <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">
-                  Red. Yellow. Green.
-                </p>
-                <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">Brian explains how to begin reconnecting.</h3>
-                <p className="mt-3 leading-relaxed text-white/72">
-                  Brian explains the three relationship seasons and one safe question that can help a father begin again without pressure.
-                </p>
-              </div>
-              <video
-                className="aspect-video w-full bg-black object-contain object-center"
-                controls
-                preload="metadata"
-                playsInline
-                poster="/images/papa-life-path-brian-poster.png"
-              >
-                <source src="/videos/papa-life-red-yellow-green.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-              <div className="border-t border-white/10 p-5 md:p-7">
-                <p className="text-sm leading-relaxed text-white/70">
-                  Connection doesn’t always start with a big conversation. Sometimes it starts with one safe question.
-                </p>
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <a
-                    href={`/assessment?src=homepage_wheel_${relationshipSignal}`}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white"
-                  >
-                    Take the 2-Minute Fatherhood Check-In
+              <div className="p-6 md:p-8">
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Your Papa Life Options</p>
+                <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">Choose What Helps You Take the Next Step.</h3>
+                <p className="mt-3 leading-relaxed text-white/80">Select your color beside the wheel. These relevant courses can help you move from awareness to action.</p>
+                <div className="mt-6 rounded-xl border border-[#f2c230]/40 bg-white/5 p-5">
+                  <p className="text-xs font-black uppercase tracking-wider text-[#f2c230]">Suggested for you</p>
+                  <p className="mt-2 text-base font-semibold">{relationshipSignals.find((signal) => signal.key === relationshipSignal)?.guidance}</p>
+                  <ul className="mt-4 space-y-3">
+                    {relationshipSignals.find((signal) => signal.key === relationshipSignal)?.courses.map((course) => (
+                      <li key={course} className="flex items-start gap-2 font-semibold text-white/90">
+                        <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-[#f2c230]" aria-hidden="true" />
+                        <span>{course}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-5 rounded-xl bg-white/10 p-5">
+                  <h4 className="font-extrabold text-[#f2c230]">More Ways to Learn</h4>
+                  <p className="mt-2 text-sm text-white/85">Explore individual audio lessons, manuscripts and the complete 12-lesson program. Original books, music, and spoken-word offerings will be featured when ready and cleared for sale.</p>
+                </div>
+                <div className="mt-5 flex flex-col gap-3">
+                  <a href="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white">
+                    {relationshipSignals.find((signal) => signal.key === relationshipSignal)?.action}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </a>
-                  <button
-                    type="button"
-                    onClick={openPapaAiCoach}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]"
-                  >
+                  <a href="/my-journey" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">Explore the Five-Step Journey</a>
+                  <button type="button" onClick={openPapaAiCoach} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">
                     <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                    Talk With Digital Brian
+                    Ask Brian’s Digital AI About the Options
                   </button>
-                  <a
-                    href="/tuesday"
-                    className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/20 px-5 py-3 text-sm font-extrabold text-white/85 hover:bg-white/10"
-                  >
-                    Join Tuesday Live
-                  </a>
                 </div>
+                <p className="mt-5 text-xs leading-relaxed text-white/65">This website helps you choose. Approved product terms, agreements, and payments are handled in the separate GoHighLevel sales process.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <section className="border-y border-[#17231c]/15 bg-[#17231c] py-10 text-white md:py-14" aria-label="Meet Brian Keith Hill">
-        <div className="container grid items-start gap-7 lg:grid-cols-[minmax(0,.8fr)_minmax(420px,1.2fr)] lg:gap-10">
-          <div className="pt-2">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet Brian Keith Hill</p>
-            <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Meet Brian Keith Hill.</h2>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/72">
-              After your 2-Minute Fatherhood Check-In, talk with Brian’s Papa Life AI about what to do next when your adult child is distant, guarded, or silent.
-            </p>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a
-                href={quietChildAssessmentHref}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-[#f7d75e]"
-              >
-                1. Take the Check-In
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <button
-                type="button"
-                onClick={openPapaAiCoach}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 py-3 text-sm font-extrabold text-white hover:bg-white/10"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                2. Talk With Brian’s AI
-              </button>
-            </div>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/58">
-              As long as you’re both alive, it’s never too late.
-            </p>
-          </div>
-          <BrianLiveAvatar />
-        </div>
-      </section>
-
-      <div className="bg-[#b33a32] py-5 text-center text-white">
-        <p className="container text-sm font-black uppercase tracking-[0.16em] md:text-base">
-          Faith-grounded · Purpose-driven · Community-powered
-        </p>
-      </div>
 
       <main>
-        <section className="bg-[#061715] px-6 py-10 text-center text-white"><h2 className="text-3xl font-black">Ready to invest in your growth as a father?</h2><p className="mx-auto mt-3 max-w-2xl text-lg text-gray-200">Real change starts with the steps you choose to take today.</p><a href="/start" className="mt-6 inline-flex rounded-full bg-[#f2c230] px-9 py-4 text-lg font-extrabold text-[#17231c]">Start Here — Explore Courses →</a></section>
-        <section aria-labelledby="why-papa-life-heading" className="bg-white py-14 md:py-18">
+        <section id="products" aria-labelledby="products-heading" className="bg-[#f8f0db] py-14 md:py-20">
           <div className="container">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
-              For Fathers of Adult Children
-            </p>
-            <h2 id="why-papa-life-heading" className="mt-3 max-w-4xl text-3xl font-extrabold md:text-5xl">
-              Why Papa Life?
-            </h2>
-            <p className="mt-5 max-w-4xl text-xl font-extrabold leading-relaxed text-[#17231c]">
-              Most fatherhood programs focus on raising children. Papa Life exists for fathers whose sons and daughters are already adults.
-            </p>
-            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-[#314239]">
-              Papa Life serves fathers whose children are already grown. This work is not about custody, co-parenting, or raising young children. It is about rebuilding trust, restoring meaningful communication, taking responsibility without shame, and becoming safer to talk to.
-            </p>
-            <div className="mt-9 grid gap-5 lg:grid-cols-2">
-              <article className="rounded-xl border border-[#17231c]/15 bg-[#f8f0db] p-6 md:p-8">
-                <h3 className="text-2xl font-extrabold text-[#b33a32]">Most Fatherhood Programs</h3>
-                <ul className="mt-5 space-y-3">
-                  {mostFatherhoodPrograms.map((item) => (
-                    <li key={item} className="flex gap-3 font-semibold leading-relaxed">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#b33a32]" aria-hidden="true" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-              <article className="rounded-xl border-2 border-[#145b35] bg-[#145b35] p-6 text-white shadow-lg md:p-8">
-                <h3 className="text-2xl font-extrabold text-[#f2c230]">Papa Life</h3>
-                <ul className="mt-5 space-y-3">
-                  {papaLifeDifference.map((item) => (
-                    <li key={item} className="flex gap-3 font-semibold leading-relaxed">
-                      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#f2c230]" aria-hidden="true" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section aria-labelledby="featured-dear-fathers-heading" className="bg-[#f8f0db] py-8 md:py-10">
-          <div className="container">
-            <a
-              href="https://dearfathers.com/2026/09/brian-keith-hill-opens-up-about-fatherhood-papa-life-and-more/"
-              target="_blank"
-              rel="noreferrer"
-              className="group flex flex-col gap-4 rounded-xl border-2 border-[#f2c230] bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:flex-row md:items-center md:justify-between md:p-8"
-            >
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
-                  Featured in Dear Fathers
-                </p>
-                <h2 id="featured-dear-fathers-heading" className="mt-2 text-2xl font-extrabold md:text-3xl">
-                  Brian Keith Hill Opens Up About Fatherhood, Papa Life, and More
-                </h2>
-                <p className="mt-3 max-w-4xl leading-relaxed text-[#314239]">
-                  Dear Fathers invited Brian to share the story behind Papa Life, what he has learned as a father, and why fathers of adult children still have room to grow, repair, and reconnect.
-                </p>
-              </div>
-              <span className="inline-flex shrink-0 items-center gap-2 font-extrabold text-[#145b35] group-hover:text-[#b33a32]">
-                Read the feature
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </span>
-            </a>
-          </div>
-        </section>
-
-        <section id="is-this-you" aria-labelledby="is-this-you-heading" className="scroll-mt-6 bg-[#f8f0db] py-16 md:py-20">
-          <div className="container">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">
-              Welcome to Papa Life
-            </p>
-            <h2 id="is-this-you-heading" className="mt-3 max-w-4xl text-3xl font-extrabold md:text-5xl">
-              Does This Sound Like You?
-            </h2>
-            <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">
-              You love your adult child. You want a healthier relationship. And you are ready to begin with the part you can change.
-            </p>
-            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {selfIdentificationStatements.map((statement) => (
-                <div key={statement} className="flex gap-3 rounded-lg border border-[#17231c]/15 bg-white p-5 shadow-sm">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#145b35]" aria-hidden="true" />
-                  <p className="font-semibold leading-relaxed">{statement}</p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-8 max-w-4xl rounded-lg bg-[#f2c230] p-6 text-lg font-extrabold">
-              If several of these statements describe your life, Papa Life was created for fathers like you.
-            </p>
-            <div className="mt-7">
-              <ActionLink href="#transformation">See How Papa Life Helps</ActionLink>
-            </div>
-          </div>
-        </section>
-
-        <section aria-labelledby="cost-of-waiting-heading" className="bg-[#b33a32] py-16 text-white md:py-20">
-          <div className="container grid items-start gap-10 lg:grid-cols-[1.1fr_.9fr]">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6cf55]">Why begin now</p>
-              <h2 id="cost-of-waiting-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
-                Silence Rarely Heals Itself.
-              </h2>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/85">
-                Continued waiting can leave a father carrying more distance, more regret, and less preparation for the conversations that may still be possible.
-              </p>
-              <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                {costOfWaiting.map((item) => (
-                  <li key={item} className="flex gap-3 leading-relaxed">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#f2c230]" aria-hidden="true" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <blockquote className="rounded-xl bg-[#17231c] p-8 text-2xl font-extrabold leading-relaxed text-[#f2c230] shadow-xl">
-              “The greatest risk is not hearing ‘no.’ The greatest risk is allowing another year to pass without becoming ready.”
-            </blockquote>
-          </div>
-        </section>
-
-        <section aria-labelledby="fathers-served-heading" className="bg-white py-16 md:py-20">
-          <div className="container">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#145b35]">A place for honest work</p>
-            <h2 id="fathers-served-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
-              Papa Life Is for Fathers Who…
-            </h2>
-            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {fathersServed.map((item) => (
-                <div key={item} className="flex gap-3 rounded-lg border border-[#17231c]/15 bg-[#f8f0db] p-5">
-                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#145b35]" aria-hidden="true" />
-                  <p className="font-semibold leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section aria-labelledby="readiness-heading" className="bg-[#17231c] py-16 text-white md:py-20">
-          <div className="container grid gap-10 lg:grid-cols-[1fr_.9fr]">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">A compassionate boundary</p>
-              <h2 id="readiness-heading" className="mt-3 max-w-3xl text-4xl font-extrabold md:text-5xl">
-                Papa Life May Not Be the Right Next Step Yet If…
-              </h2>
-              <ul className="mt-8 space-y-4">
-                {readinessBoundaries.map((item) => (
-                  <li key={item} className="flex gap-3 text-lg leading-relaxed text-white/85">
-                    <X className="mt-1 h-5 w-5 shrink-0 text-[#b33a32]" aria-hidden="true" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="self-center rounded-xl border border-[#f2c230]/30 bg-white/5 p-8">
-              <p className="text-2xl font-extrabold leading-relaxed text-[#f2c230]">
-                The door remains open. Papa Life begins when a father is willing to work on the part of the relationship he can control—himself.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section id="transformation" aria-labelledby="transformation-heading" className="scroll-mt-6 bg-[#f2c230] py-16 md:py-20">
-          <div className="container">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">From distance to reconnection</p>
-            <h2 id="transformation-heading" className="mt-3 max-w-5xl text-4xl font-extrabold md:text-5xl">
-              From Distance to Reconnection Begins With the Father You Become.
-            </h2>
-            <div className="mt-9 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {transformations.map(([from, to]) => (
-                <div key={from} className="flex items-center justify-between gap-4 rounded-lg bg-[#f8f0db] p-5 shadow-sm">
-                  <span className="font-bold text-[#b33a32]">{from}</span>
-                  <ArrowRight className="h-5 w-5 shrink-0" aria-hidden="true" />
-                  <span className="font-extrabold text-[#145b35]">{to}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-8 max-w-3xl text-xl font-extrabold leading-relaxed">
-              We cannot control another person’s response. We can change how we show up.
-            </p>
-          </div>
-        </section>
-
-        <section aria-labelledby="benefits-heading" className="bg-[#f8f0db] py-16 md:py-20">
-          <div className="container">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#145b35]">Practical guidance</p>
-            <h2 id="benefits-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
-              What Papa Life Helps Fathers Do
-            </h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {benefits.map((item) => (
-                <div key={item} className="flex gap-3 rounded-lg bg-white p-5 shadow-sm">
-                  <ShieldCheck className="h-6 w-6 shrink-0 text-[#145b35]" aria-hidden="true" />
-                  <p className="font-semibold leading-relaxed">{item}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 grid gap-4 rounded-xl bg-[#145b35] p-6 text-white md:grid-cols-3 md:p-8">
-              {['Start with clarity.', 'Learn the new role.', 'Practice the path.'].map((step, index) => (
-                <p key={step} className="text-center text-lg font-extrabold">
-                  <span className="mr-2 text-[#f2c230]">0{index + 1}</span>
-                  {step}
-                </p>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="brian-story" aria-labelledby="brian-story-heading" className="bg-white py-16 md:py-20">
-          <div className="container">
-            <div className="max-w-4xl">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">A father-to-father word from Brian</p>
-              <h2 id="brian-story-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">I Know What It Is to Carry the Silence.</h2>
-              <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">
-                Brian Keith Hill is the founder of Boss Mobility and Papa Life. He helps fathers face the places where pride, pain, misunderstanding, and silence have damaged family relationships—then take the next honest step with faith, humility, and presence.
-              </p>
-              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
-                Fifty years of marriage have also taught Brian that fatherhood was never meant to be carried alone. He is grateful for the faithful love, honest correction, grace, and companionship God has used to shape the father he is still becoming.
-              </p>
-              <a href="/about-brian-keith-hill" className="mt-6 inline-flex items-center gap-2 font-extrabold text-[#145b35] hover:text-[#b33a32]">
-                About Brian and the work
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-
-        <section aria-labelledby="connect-brian-heading" className="bg-[#f8f0db] py-16 md:py-20">
-          <div className="container text-center">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#145b35]">Connect With Brian</p>
-            <h2 id="connect-brian-heading" className="mt-3 text-4xl font-extrabold md:text-5xl">
-              Stay Connected With Papa Life
-            </h2>
-            <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-[#314239]">
-              Follow Brian Keith Hill for fatherhood encouragement, practical teaching, live conversations, and updates across the platforms you already use.
-            </p>
-            <div className="mx-auto mt-8 flex max-w-5xl flex-wrap justify-center gap-3">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Original Papa Life Resources</p>
+            <h2 id="products-heading" className="mt-3 max-w-4xl text-3xl font-extrabold md:text-5xl">Knowledge You Can Use at Your Own Pace.</h2>
+            <p className="mt-4 max-w-3xl text-lg text-[#314239]">Learn through original content created by Brian Keith Hill. Choose what helps you understand your circumstances, strengthen your decisions, and take the next step with greater wisdom.</p>
+            <div className="mt-9 grid gap-6 lg:grid-cols-3">
               {[
-                ["LinkedIn", "https://www.linkedin.com/in/brian-hill-bossmobility/"],
-                ["X", "https://x.com/bossmobility"],
-                ["Instagram", "https://instagram.com/bossmobilitylifecoach"],
-                ["YouTube", "https://www.youtube.com/channel/UC_etyzPwAS0W8GWWwFT9sow"],
-                ["TikTok", "https://www.tiktok.com/@bossmobilitylifecoach"],
-                ["Threads", "https://www.threads.net/@papalifecoach"],
-                ["Facebook", "https://www.facebook.com/BrianKeithHillPapaLife3"],
-                ["Twitch", "https://www.twitch.tv/papalifecoach"],
-                ["Alignable", "https://www.alignable.com/san-leandro-ca/papa-life-fatherhood-life-coach-ambassador-of-the-east-bay-ca?preview=true&user=11616493"],
-              ].map(([label, href]) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full border-2 border-[#17231c] bg-white px-5 py-3 font-extrabold text-[#17231c] transition hover:border-[#b33a32] hover:bg-[#f2c230]"
-                >
-                  {label}
-                </a>
+                { name: "Complete 12-Lesson Audio Program", detail: "A complete self-paced learning path covering listening, ownership, presence, healthy authority, apology, and rebuilding trust.", label: "View Complete Program", href: "/shop" },
+                { name: "Individual Audio Lessons", detail: "Choose the topic that fits your current situation. Learn and revisit insights at a pace that works for you.", label: "Explore All 12 Lessons", href: "/shop" },
+                { name: "Written Manuscripts & Bundles", detail: "Read the material on your own, take notes, and revisit the ideas that matter most to you.", label: "View Written Resources", href: "/shop" },
+              ].map((offer) => (
+                <article key={offer.name} className="flex flex-col rounded-xl border-2 border-[#145b35] bg-white p-7 shadow-sm">
+                  <h3 className="text-2xl font-extrabold">{offer.name}</h3>
+                  <p className="mt-3 flex-1 leading-relaxed text-[#425047]">{offer.detail}</p>
+                  <a href={offer.href} className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#114629]">
+                    {offer.label} <ArrowRight className="h-4 w-4" aria-hidden="true"/>
+                  </a>
+                </article>
               ))}
+            </div>
+            <div className="mt-9 rounded-xl border border-[#e4c669] bg-[#fff8e0] p-6">
+              <h3 className="text-xl font-extrabold">More Original Intellectual Property</h3>
+              <p className="mt-2 text-[#425047]">Books, original songs, spoken word, and additional learning products will join the catalog as rights, delivery formats, and GoHighLevel sales links are confirmed. They are not available for purchase here yet.</p>
             </div>
           </div>
         </section>
 
-        <section aria-labelledby="final-invitation-heading" className="bg-[#17231c] py-20 text-center text-white">
-          <div className="container">
-            <h2 id="final-invitation-heading" className="text-4xl font-extrabold md:text-5xl">
-              You Do Not Have to Carry This Alone.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
-              You may not be able to rewrite yesterday, but you can decide what kind of father you will be from this day forward.
-            </p>
-            <div className="mt-8">
-              <ActionLink href={quietChildAssessmentHref} light>
-                Take the 2-Minute Fatherhood Check-In
-              </ActionLink>
+        <section id="brian-story" aria-labelledby="creator-heading" className="bg-[#17231c] py-14 text-white md:py-18">
+          <div className="container grid items-center gap-7 md:grid-cols-[1.5fr_1fr]">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet the Creator</p>
+              <h2 id="creator-heading" className="mt-3 text-3xl font-extrabold md:text-4xl">Original Works by Brian Keith Hill</h2>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-white/80">Papa Life is a fatherhood resource center sharing Brian's original ideas, teaching, audio lessons, and written works for fathers of adult children. The goal is to make his knowledge accessible without requiring an appointment or personal meeting.</p>
             </div>
-            <p className="mt-5 text-white/75">
-              Begin the work of becoming the father healthy reconnection may become possible with.
-            </p>
-            <p className="mt-6 text-lg font-extrabold text-[#f2c230]">Self-Paced Papa Life Courses &amp; Digital Coaching</p>
-            <p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p>
+            <div className="rounded-xl border border-[#f2c230]/40 bg-white/10 p-6 text-center">
+              <p className="text-lg font-extrabold text-[#f2c230]">Not sure which product fits?</p>
+              <p className="mt-2 text-sm text-white/80">Brian's Digital AI can explain the resources, answer product questions, and help you decide what to explore.</p>
+              <button type="button" onClick={openPapaAiCoach} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#f2c230] px-5 py-3 font-extrabold text-[#17231c]">
+                <MessageCircle className="h-5 w-5" aria-hidden="true"/> Ask Brian's Digital AI
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="how-to-purchase" className="bg-[#f2c230] py-12 text-[#17231c]">
+          <div className="container max-w-4xl text-center">
+            <h2 id="how-to-purchase" className="text-3xl font-black md:text-4xl">Explore Here. Purchase Through GoHighLevel.</h2>
+            <p className="mt-4 text-lg">PapaLifeCoach.com helps you discover and choose. Approved product details, agreement or terms, payment, and access are handled through the separate GoHighLevel sales process—not through checkout on this website.</p>
+            <a href="/shop" className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-8 py-3 font-extrabold text-white">Browse the Product Catalog <ArrowRight className="h-4 w-4"/></a>
           </div>
         </section>
       </main>
@@ -725,7 +318,7 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-5 text-sm font-semibold text-white/75">
             <a href="/site-directory" className="hover:text-[#f2c230]">Site Directory</a>
             <a href="/father-friendly-practice" className="hover:text-[#f2c230]">Father-Friendly Practice</a>
-            <a href="/member-login" className="hover:text-[#f2c230]">Member Login</a>
+            <a href="/shop" className="hover:text-[#f2c230]">Explore Courses</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>
             <a href="tel:+15104152098" className="hover:text-[#f2c230]">510.415.2098</a>

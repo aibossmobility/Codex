@@ -55,14 +55,14 @@ export default function Courses() {
       </header>
 
       <main className="container max-w-5xl mx-auto px-6 py-16">
-        <section className="mb-10 rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-7 text-center"><h2 className="text-3xl font-black text-white">Real Change Starts Today.</h2><p className="mt-3 text-gray-200">Let Brian’s Digital AI help you explore the courses and choose a next step.</p><a href="/start" className="mt-5 inline-flex rounded-full bg-amber-400 px-7 py-3 font-bold text-black">Start Here — Guided Enrollment →</a></section>
+        <section className="mb-10 rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-7 text-center"><h2 className="text-3xl font-black text-white">Real Change Starts Today.</h2><p className="mt-3 text-gray-200">Let Brian’s Digital AI help you explore the courses and choose a next step.</p><a href="/start" className="mt-5 inline-flex rounded-full bg-amber-400 px-7 py-3 font-bold text-black">Start Here — Explore Your Options →</a></section>
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 mb-6">
             <GraduationCap className="w-7 h-7 text-primary" />
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-extrabold text-white mb-4">Courses</h1>
           <p className="text-gray-400 text-lg">
-            Programs built for fathers navigating relationships with adult children. Sign in to the member portal to watch lessons and track progress.
+            Courses for fathers navigating relationships with adult children. Explore the materials that fit your needs; the GoHighLevel sales process handles purchase and delivery.
           </p>
         </div>
 
@@ -107,9 +107,9 @@ export default function Courses() {
         )}
 
         <div className="text-center mt-16">
-          <p className="text-gray-500 text-sm mb-4">Already a member?</p>
+          <p className="text-gray-500 text-sm mb-4">Want help choosing?</p>
           <Button asChild className="bg-primary text-primary-foreground font-bold rounded-full px-8">
-            <a href="/member-login">Member Portal</a>
+            <a href="/my-journey">Start with the Awareness Wheel</a>
           </Button>
         </div>
       </main>

@@ -11,18 +11,23 @@ const enrichment = JSON.parse(fs.readFileSync(path.resolve("scripts/seo-page-enr
 const pages = [
   {
     path: "/",
-    title: "Papa Life - A Practical Path for Fathers of Adult Children",
+    title: "Papa Life Fatherhood Resource Center | Original Courses & Resources",
     description:
-      "Papa Life helps fathers understand distance, tension, and changing roles with adult children and begin rebuilding connection with humility, faith, and practical next steps.",
-    eyebrow: "Papa Life Coach",
-    headline: "Papa Life gives fathers a practical path back to connection.",
+      "Explore original Papa Life audio lessons, manuscripts and complete programs created by Brian Keith Hill. Start with the Awareness Wheel and choose the resources that fit your next step.",
+    eyebrow: "Papa Life Fatherhood Resource Center",
+    headline: "Where Are You With Your Adult Child—and What Can Help?",
     intro:
-      "For fathers whose adult sons or daughters feel distant, guarded, or silent, Papa Life offers the 2-Minute Fatherhood Check-In, guided lessons, AI coaching, and the PAPA Framework: Presence, Authority, Purpose, and Alignment.",
+      "Explore original self-paced audio lessons, written manuscripts, and learning resources by Brian Keith Hill. Begin with the Awareness Wheel, select the support that matches your situation, and review products before continuing to the approved GoHighLevel sales process.",
     sections: [
-      ["Start with clarity", "Take the 2-Minute Fatherhood Check-In to notice where things stand today and choose an honest, practical next step."],
-      ["Learn the new role", "Use the free workshop and course library to move from pressure and control into listening, humility, consistency, and trust."],
-      ["Practice the path", "Papa Life combines practical coaching, reflection tools, self-paced course resources, and support for fathers rebuilding adult-child relationships."],
-      ["Founded by Brian Keith Hill", "Brian Keith Hill is the founder of Papa Life, a Scripture-centered fatherhood movement for fathers of adult children."],
+      ["Awareness First", "Use the five-step Awareness Wheel to recognize where you are: Awareness, Engage, Understand, Take Action, and Reconnection."],
+      ["Choose Original Resources", "Review individual audio lessons, manuscripts, and complete 12-lesson programs designed for fathers of adult children. Buy knowledge rather than appointments or membership access."],
+      ["GoHighLevel Handles Purchasing", "PapaLifeCoach.com is for product discovery. Approved pricing, purchase terms, payment, and product access are handled separately by the current verified GoHighLevel sales system."],
+      ["Created by Brian Keith Hill", "Papa Life shares Brian Keith Hill's original learning materials and intellectual property. Books, original songs, and spoken-word offerings will be added when cleared and ready."],
+    ],
+    relatedLinks: [
+      ["Start with the Awareness Wheel", "/my-journey"],
+      ["Explore Papa Life Products", "/shop"],
+      ["Browse All Course Details", "/courses"],
     ],
   },
   {
@@ -60,7 +65,7 @@ const pages = [
       ["Frequently asked: Do I need my adult child to participate?", "No. The starting point is the part you can control: your own listening, language, consistency, boundaries, and willingness to change."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Learn the PAPA Framework", "/papa-framework"],
       ["Why adult children pull away", "/why-adult-children-pull-away"],
       ["Father-child estrangement help", "/father-child-estrangement"],
@@ -109,7 +114,7 @@ const pages = [
       ["Frequently asked: Does PAPA guarantee reconciliation?", "No. Reconciliation requires more than one person's effort and cannot be forced. The framework helps a father become more intentional, accountable, and consistent in the part he can control."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Adult son relationship help", "/adult-son-relationship"],
       ["Adult daughter relationship help", "/adult-daughter-relationship"],
       ["Father-child estrangement help", "/father-child-estrangement"],
@@ -135,7 +140,7 @@ const pages = [
       ["Frequently asked: Should I keep calling if he does not respond?", "Repeated contact can feel like pressure. If he has asked for space, respect it. If he has not given a clear boundary, consider a brief message that communicates care without demanding an immediate response."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Learn the PAPA Framework", "/papa-framework"],
       ["Why adult children pull away", "/why-adult-children-pull-away"],
       ["Father-child estrangement help", "/father-child-estrangement"],
@@ -161,7 +166,7 @@ const pages = [
       ["Frequently asked: What if she says she needs space?", "Take the boundary seriously. You can ask what space means in practical terms if that is unclear, then honor it. Respecting a boundary can communicate maturity and reduce pressure."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Learn the PAPA Framework", "/papa-framework"],
       ["Why adult children pull away", "/why-adult-children-pull-away"],
       ["Father-child estrangement help", "/father-child-estrangement"],
@@ -187,7 +192,7 @@ const pages = [
       ["Frequently asked: Does giving space mean I am giving up?", "No. Respecting a boundary can be an active form of care. You can remain open to repair while refusing to chase or punish."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Adult son relationship help", "/adult-son-relationship"],
       ["Adult daughter relationship help", "/adult-daughter-relationship"],
       ["Father-child estrangement help", "/father-child-estrangement"],
@@ -214,7 +219,7 @@ const pages = [
       ["Frequently asked: Should I keep sending messages during no contact?", "If your adult child has clearly requested no contact, respect that boundary unless there is a genuine emergency or another agreed exception. If the boundary is unclear, one calm message asking what contact is welcome can reduce guessing."],
     ],
     relatedLinks: [
-      ["Take the 2-Minute Fatherhood Check-In", "/marlee-assessment"],
+      ["Explore Papa Life Products", "/shop"],
       ["Learn the PAPA Framework", "/papa-framework"],
       ["Why adult children pull away", "/why-adult-children-pull-away"],
       ["Explore Papa Life Courses", "/courses"],
@@ -418,7 +423,7 @@ const pages = [
 ];
 
 const defaultLinks = [
-  ["Papa Life home", "/"], ["2-Minute Fatherhood Check-In", "/relationship-assessment"],
+  ["Papa Life home", "/"], ["Start with Awareness Wheel", "/my-journey"],
   ["The PAPA Framework", "/papa-framework"], ["Course catalog", "/courses"],
 
   ["All Papa Life resources", "/site-directory"],

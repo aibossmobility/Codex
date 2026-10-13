@@ -1,14 +1,14 @@
 {
   "/": {
-    "description": "Papa Life helps fathers of adult children rebuild trust and communication through the 2-Minute Check-In, PAPA Framework, coaching, and practical next steps.",
+    "description": "Papa Life is a fatherhood resource center for original audio lessons, manuscripts, complete programs, and future books, music, and spoken word created by Brian Keith Hill. Explore resources here and purchase through approved GoHighLevel sales links.",
     "sections": [
       [
-        "When distance becomes the pattern",
-        "An adult child may answer briefly, avoid certain topics, or ask for space. Before pressing for an explanation, notice how your own words and timing affect the conversation. Reconnection starts with becoming easier to talk to, listening without defending, and taking responsibility for specific actions."
+        "Original knowledge, ready to explore",
+        "Explore self-paced course materials based on your own interests and challenges. No membership, appointment, or personal coaching session is needed to choose."
       ],
       [
-        "Choose a step you can sustain",
-        "Begin with the free 2-Minute Fatherhood Check-In, learn the PAPA Framework, or explore a lesson. You do not have to solve the whole relationship today. Choose one change in how you listen, respond, or follow through, then practice it consistently."
+        "Begin with awareness, continue to products",
+        "Use the interactive Awareness Wheel to identify where you are, compare suggested learning resources, and follow the verified GoHighLevel process when ready to purchase."
       ]
     ]
   },
@@ -23,29 +23,29 @@
         "Listen for one idea you can apply instead of trying to finish everything at once. You might pause before offering advice, ask an open question, or acknowledge an impact without adding an explanation. Afterward, reflect on what you did and what you want to practice again."
       ],
       [
-        "Explore before choosing member access",
-        "Begin with the free first lesson or Check-In if you want to understand the approach. Course previews help you see the learning path; lesson access and progress tools are available through the member portal. Your adult child does not need to join for you to begin working on your own listening and consistency."
+        "Explore the products before purchasing",
+        "Preview individual audio lessons, manuscripts, and complete-program bundles. Product details, price, agreement or terms, payment and access are managed by the current GoHighLevel sales process. The website has no checkout."
       ]
     ]
   },
   "/resources": {
     "sections": [
       [
-        "Find a resource for your current need",
-        "Use the Check-In when you need clarity about the relationship, the PAPA Framework when you need a map for your own behavior, and the free first lesson when you want to understand the change in the fatherhood role. Each starting point leads toward a practical action rather than a demand for a particular response."
+        "Find a learning resource for your current need",
+        "Start with the Awareness Wheel when you need clarity, review the PAPA Framework when you want context, and explore specific audio lessons or manuscripts for deeper learning."
       ],
       [
         "Turn learning into an ordinary habit",
         "After reading or listening, write down one behavior you want to practice in your next conversation. Keep the action specific: ask before giving advice, listen until the other person finishes, or follow through on a promise. Reflection matters most when it changes what another person repeatedly experiences."
       ],
       [
-        "Continue with support",
-        "Explore the course catalog, available courses, and Papa Life AI Coach for further guidance. If a situation needs a personal conversation, use the course or contact page. Resources can help you prepare; they do not replace respectful communication or the other person's freedom to set boundaries."
+        "Choose the resource that fits",
+        "Explore products in the Papa Life catalog, ask Brian's Digital AI for an explanation, and complete an approved purchase through GoHighLevel when a verified link is available."
       ]
     ]
   },
   "/ai-coach": {
-    "description": "Use the Papa Life AI Coach to reflect on communication, trust, the PAPA Framework, and practical next steps with your adult son or daughter.",
+    "description": "Brian's Papa Life Digital AI helps visitors identify relevant original audio lessons, manuscripts, and learning resources. Product purchases take place through approved GoHighLevel sales links, not on the website.",
     "sections": [
       [
         "Start with a clear situation",
@@ -137,26 +137,22 @@
         "Papa Life's focus is fathers of adult children and the habits that support healthier relationships. If you are exploring an educational conversation or a possible collaboration, describe the people you serve, the question you want to address, and the kind of discussion you have in mind."
       ],
       [
-        "Choose a contact path",
-        "Use the contact controls on this page or the booking page for an available conversation. Share only the family details needed to explain your request. Papa Life offers coaching and education, with humility, accountability, and respect for each person's boundaries at the center."
+        "Explore original learning products",
+        "Choose from Papa Life's original audio lessons and manuscripts via the website catalog. Business inquiries may use the Papa Life contact email; product purchase and access take place in GoHighLevel."
       ]
     ],
     "relatedLinks": [
       [
+        "Explore Papa Life Products",
+        "/shop"
+      ],
+      [
+        "Start with the Awareness Wheel",
+        "/my-journey"
+      ],
+      [
         "Email Papa Life",
         "mailto:brian@papalifecoach.com"
-      ],
-      [
-        "Explore Papa Life Courses",
-        "/courses"
-      ],
-      [
-        "Take the Check-In",
-        "/relationship-assessment"
-      ],
-      [
-        "Explore father-friendly practice",
-        "/father-friendly-practice"
       ]
     ]
   }

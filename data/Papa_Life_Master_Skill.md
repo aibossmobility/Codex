@@ -1107,3 +1107,27 @@ Email 3: Authority is not control.
 Email 4: Presence rebuilds trust slowly.
 Email 5: Take one humble next step.
 CTA each day: write one honest sentence and pray before acting.
+
+
+## Papa Life Visual Brand and Product Image Standard — October 12, 2026
+
+All Papa Life course, audio, podcast, manuscript, book, guide, and workbook images must reflect one consistent brand family, featuring culturally relevant fathers and adult children, emphasizing Black, Indigenous, Latino and other people of color and authentic, respectful relationship-building. The course title, payment-product name, catalog listing, audio title, PDF title and printed cover text must match the canonical lesson title. Images must remain readable in small thumbnails, preserve faces and wording across crops, and employ the correct product-type label and calls to action: Enroll Now for courses, Listen Now for audio/podcasts, and Read/Download for written materials.
+
+**Canonical 12 Papa Life lesson titles** (single source of truth):
+
+01. Listening Without Defending
+02. Owning Impact Without Shame
+03. The First Repair Sentence
+04. Presence Over Pressure
+05. When Your Adult Child Pulls Away
+06. Authority Without Control
+07. Apology Without Explanation
+08. Consistency After the Apology
+09. Small Deposits of Trust
+10. When Silence Feels Personal
+11. Purpose Not Panic
+12. Becoming Safe to Talk To
+
+**Visual design governance:** (1) trust/reconnection mission; (2) presence over pressure; (3) mature adults; (4) warm dignified visuals; (5) consistent logo/title/CTA; (6) exact printed title; (7) correct item type; (8) relevant call to action; (9) matching series layout; (10) approved canonical titles; (11) item-specific covers; (12) respectful cultural representation; (13) emotional fit; (14) uncropped, legible versions at required dimensions; (15) numbered filenames; (16) systematic QA; (17) matched catalog, course interior and checkout art; (18) one coherent brand; (19) master asset inventory; (20) claims of checkout/payment/delivery only when verified.
+
+Master editable assets live under Mac mini: Documents/Papa Life/Brand and Product Assets. Platform-specific product media and course thumbnails are separate fields and require their own checks. Current price/entitlement terms remain governed by the other canonical commercialization and customer-consent sections in this document; this branding addendum does not activate new sales.

@@ -129,6 +129,7 @@ export default function Shop() {
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">Choose the support that meets you where you are</h2>
           <p className="mt-3 text-lg text-[#5b655e]">Choose one of 12 self-guided audio lessons for $14.99 each. Enroll directly through the secure course checkout—no appointment or membership required. You can also explore upcoming manuscripts and bundles.</p>
         </div>
+        <div className="mx-auto mb-8 max-w-3xl rounded-xl border-2 border-[#145b35] bg-[#fffdf4] p-5 text-center"><p className="font-bold">Know your rights before enrolling: digital-product refund requests are accepted within 7 calendar days after purchase.</p><a href="/refund-policy" className="mt-2 inline-block font-extrabold text-[#145b35] underline">Read the Refund &amp; Cancellation Policy →</a></div>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
           {[['all','All Products'],['digital','Audio Lessons'],['manuscript','Manuscripts'],['bundle','Bundles']].map(([value,label]) => <button key={value} onClick={() => setFilter(value)} className={`rounded-full px-5 py-2 text-sm font-bold ${filter === value ? 'bg-[#145b35] text-white' : 'bg-[#f8f0db] text-[#145b35]'}`}>{label}</button>)}
         </div>
@@ -143,6 +144,7 @@ export default function Shop() {
                   <a href={PAPA_LIVE_COURSE_OFFERS[offer.module_number]} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-5 font-extrabold text-white">
                     Enroll Now — {offer.public_price_display} <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
+                  <a href="/refund-policy" className="mt-3 text-sm font-semibold text-[#145b35] underline">7-day refund policy — read before purchase</a>
                 </>
               ) : (
                 <>

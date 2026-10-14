@@ -5,6 +5,7 @@ import { SiteLogo } from "@/components/SiteLogo";
 const legalLinks = [
   { href: "/privacy-policy", label: "Privacy Policy" },
   { href: "/terms-of-service", label: "Terms of Service" },
+  { href: "/refund-policy", label: "Refunds & Cancellations" },
 ];
 
 function LegalShell({
@@ -285,6 +286,54 @@ New monthly membership enrollment is closed. Any currently offered course or ser
         <br />
         <strong>Phone:</strong> (510) 415-2098
       </p>
+    </LegalShell>
+  );
+}
+
+
+/** Customer-facing refund and cancellation terms shared with AI Boss Mobility. */
+export function RefundPolicyPage() {
+  return (
+    <LegalShell title="Refund and Cancellation Policy" description="Papa Life digital-product refunds, consulting cancellations, signed-estimate deposits and final-payment terms.">
+      <p><strong>AI Boss Mobility Consulting &amp; Papa Life</strong></p>
+      <p><strong>Effective Date: October 15, 2026</strong></p>
+            <p>{"We aim to provide reliable products, professional services, and fair treatment to every customer. This policy explains how refunds and cancellations are handled for digital products, consulting and AI services, service issues, and circumstances in which a refund or cancellation right is required by applicable law."}</p>
+      <div className="rounded-xl border-2 border-[#f2c230] bg-[#17231c] p-5 text-white">
+        <strong>At a glance:</strong> Papa Life digital products have a 7-calendar-day refund request window. Custom consulting requires a signed estimate, a 50% upfront deposit and a final 50% payment upon completion before delivery. The full terms are below.
+      </div>
+      <h2>Digital Products</h2>
+      <p>{"Customers who purchase Papa Life audio lessons, digital courses, manuscripts, or digital bundles may request a full refund within 7 calendar days after the purchase date, subject to any non-waivable rights provided by applicable law."}</p>
+      <p>{"If a digital product is not delivered, cannot be accessed, or is materially different from its description, please contact us promptly. We will make reasonable efforts to correct the issue or, where appropriate, provide a refund or other remedy required by the circumstances and applicable law."}</p>
+      <p>{"After the seven-day period, digital-product purchases are generally nonrefundable. A refund or other remedy may nevertheless be available if the product is defective, was not delivered as described, or applicable law requires one."}</p>
+      <p>{"Approved refunds will generally be issued to the original payment method, unless applicable law or the payment provider requires or permits another method."}</p>
+      <h2>Professional Consulting and AI Services</h2>
+      <p>{"Customized consulting and AI services require a written estimate and agreement signed by the customer before payment is requested. The agreement will identify the services, scope, fees, deadlines, and any other applicable terms."}</p>
+      <p>{"Unless the signed agreement states otherwise, payment terms are: 50% deposit after signing the agreement and before work begins; remaining 50% upon completion, before final delivery."}</p>
+      <p>{"Cancellation before work begins: A customer may request cancellation before work begins. Any refund of a deposit will be determined under the signed agreement and may be reduced by specifically authorized, disclosed, and nonrefundable third-party expenses already incurred."}</p>
+      <p>{"Cancellation after work begins: The customer is responsible for work performed and authorized expenses incurred through the effective cancellation date, as provided in the signed agreement. Any unearned portion of an advance payment will be refunded, subject to applicable law and the agreement."}</p>
+      <p>{"Completed projects: After the agreed services have been completed in accordance with the signed scope, a refund is generally not available solely because the customer changes their mind. We will review any reported failure to provide services required by the signed agreement and provide any correction, refund, or other remedy required by the agreement or applicable law."}</p>
+      <ul>
+        <li>50% deposit after signing the agreement and before work begins.</li>
+        <li>Remaining 50% upon completion, before final delivery.</li>
+      </ul>
+      <h2>Defective or Nonconforming Services</h2>
+      <p>{"If consulting or AI services are materially defective, incomplete, or do not conform to the signed agreement, please notify us promptly and describe the issue in reasonable detail. We will make reasonable efforts to investigate and, where appropriate, correct or complete the affected work."}</p>
+      <p>{"If the issue cannot reasonably be corrected, we may provide an appropriate partial or full refund for the affected services, consistent with the signed agreement and applicable law. Nothing in this process limits any rights or remedies that cannot lawfully be waived."}</p>
+      <h2>Refunds Required by Law</h2>
+      <p>{"Nothing in this policy excludes, limits, or waives any refund right, cancellation right, warranty, or other remedy that applicable law requires us to provide. If applicable law gives you a right to cancel or receive a refund, we will honor that right in accordance with the applicable legal requirements."}</p>
+      <h2>How to Request a Refund or Cancellation</h2>
+      <p>Please follow these steps:</p>
+      <ol className="ml-6 list-decimal space-y-2">
+        <li>{"Send your request to the appropriate email address below using the email address associated with your purchase."}</li>
+        <li>{"Include your order number, the date of purchase or agreement, and a brief description of the requested refund or cancellation. For consulting or AI services, identify the signed agreement and services involved."}</li>
+        <li>{"Submit the request at least 30 days before the requested cancellation date, unless the signed agreement or applicable law provides a different period."}</li>
+        <li>{"Cancellation becomes effective when we receive and acknowledge the request, or on the later effective date stated in the request, signed agreement, or applicable law. Work and authorized expenses incurred before that effective date remain subject to the applicable agreement and this policy."}</li>
+        <li>{"We will acknowledge receipt within two business days and send written confirmation of the decision and effective cancellation date by email. Approved refunds will generally be initiated promptly, but the time required for funds to appear in your account depends on the payment provider and financial institution."}</li>
+      </ol>
+            <p>{"The 30-day advance request applies to future-dated service cancellations when applicable. It does not delay or restrict the 7-day digital-product refund period, cancellation before work begins, or any rights required by law."}</p>
+      <p><strong>Papa Life:</strong> <a className="underline text-brand-yellow" href="mailto:brian@papalifecoach.com">brian@papalifecoach.com</a></p>
+      <p><strong>AI Boss Mobility Consulting:</strong> <a className="underline text-brand-yellow" href="mailto:brian@bossmobility.net">brian@bossmobility.net</a></p>
+      <p>This policy does not limit any rights or remedies provided by applicable law.</p>
     </LegalShell>
   );
 }

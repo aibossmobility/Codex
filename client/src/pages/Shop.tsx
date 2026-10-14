@@ -30,6 +30,14 @@ const PAPA_LIVE_COURSE_OFFERS: Record<number, string> = {
   12: "https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/offers/a0464514-e9f5-4e45-aaa1-ed2262c4387f",
 };
 
+// Keep public shop labels aligned with the published GoHighLevel checkout titles.
+// Only the verified lessons with outdated catalog titles are overridden.
+const PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES: Record<number, string> = {
+  8: "Papa Life Lesson 08 — Consistency After the Apology",
+  9: "Papa Life Lesson 09 — Small Deposits of Trust",
+  11: "Papa Life Lesson 11 — Purpose Not Panic",
+};
+
 export default function Shop() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState("digital");
@@ -128,7 +136,7 @@ export default function Shop() {
           {visible.map((offer) => (
             <article key={offer.code} className="flex flex-col rounded-xl border-4 border-[#145b35] bg-[#f8f0db] p-6 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-[#b33a32]">{offer.format === 'digital' ? 'Audio Lesson' : offer.format === 'manuscript' ? 'Manuscript PDF' : 'Complete Bundle'}</p>
-              <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.canonical_name}</h2>
+              <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.format === "digital" && offer.module_number && PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] ? PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] : offer.canonical_name}</h2>
               {offer.format === "digital" && offer.module_number && PAPA_LIVE_COURSE_OFFERS[offer.module_number] ? (
                 <>
                   <p className="mt-5 text-sm text-[#5b655e]">One-time purchase. Your secure checkout and lesson access are handled through the Papa Life course portal. No subscription or appointment required.</p>

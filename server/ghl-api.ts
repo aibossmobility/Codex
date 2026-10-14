@@ -212,6 +212,74 @@ export async function ghlUpsertContactWithTags(
   };
 }
 
+/**
+ * Ensure a written-estimate inquiry appears in the dedicated AI Boss pipeline.
+ * No estimate, contract, invoice, payment link or SMS is sent here.
+ * Read existing opportunities first so webhook retries cannot create duplicates.
+ */
+export async function ghlEnsureAiBossEstimateOpportunity(
+  args: { contactId: string; contactName: string },
+  creds: GhlCredentials | null
+): Promise<GhlApiResult> {
+  if (!creds?.token || !creds.locationId) {
+    return { ok: false, error: "GoHighLevel CRM credentials are incomplete" };
+  }
+  const contactId = String(args.contactId || "").trim();
+  const contactName = String(args.contactName || "").trim().slice(0, 140);
+  if (!contactId || !contactName) return { ok: false, error: "Contact ID and name are required" };
+  const locationId = creds.locationId;
+  const get = async (url: string, version = "v3") => {
+    const response = await fetch(url, { headers: { ...headers(creds.token), Version: version } });
+    const data = parseJsonResponse(await response.text());
+    if (!response.ok) throw new Error(`GHL ${response.status}: ${String(data.message || "Request failed").slice(0, 180)}`);
+    return data;
+  };
+  try {
+    // Existing HighLevel installations accept the legacy version for list-pipelines.
+    const pipelines = await get(`${GHL_BASE}/opportunities/pipelines?locationId=${encodeURIComponent(locationId)}`, "2021-07-28");
+    const candidates = Array.isArray(pipelines.pipelines) ? pipelines.pipelines as Array<Record<string, unknown>> : [];
+    const pipeline = candidates.find((item) => String(item.name || "").trim() === "AI Boss Mobility — Client Estimates & Agreements");
+    const pipelineId = String(pipeline?.id || "").trim();
+    const stages = Array.isArray(pipeline?.stages) ? pipeline.stages as Array<Record<string, unknown>> : [];
+    const firstStage = stages.find((item) => String(item.name || "").trim() === "Estimate Being Prepared");
+    const stageId = String(firstStage?.id || "").trim();
+    if (!pipelineId || !stageId) return { ok: false, error: "AI Boss estimate pipeline or initial stage not found" };
+
+    const qs = new URLSearchParams({ locationId, contactId, pipelineId, status: "all", limit: "100" });
+    const search = await get(`${GHL_BASE}/opportunities/search?${qs.toString()}`);
+    const existing = Array.isArray(search.opportunities) ? search.opportunities as Array<Record<string, unknown>> : [];
+    if (existing.length) {
+      return { ok: true, data: { opportunity_id: String(existing[0].id || ""), created: false } };
+    }
+
+    const response = await fetch(`${GHL_BASE}/opportunities/`, {
+      method: "POST",
+      headers: { ...headers(creds.token), Version: "v3" },
+      body: JSON.stringify({
+        locationId,
+        pipelineId,
+        pipelineStageId: stageId,
+        contactId,
+        name: `AI Boss estimate — ${contactName}`,
+        status: "open",
+        monetaryValue: 0,
+      }),
+    });
+    const data = parseJsonResponse(await response.text());
+    if (!response.ok) return {
+      ok: false,
+      error: `GHL ${response.status}: ${String(data.message || "Unable to create estimate opportunity").slice(0, 180)}`,
+      status: response.status,
+    };
+    const opp = data.opportunity && typeof data.opportunity === "object" ? data.opportunity as Record<string, unknown> : {};
+    const opportunityId = String(opp.id || "").trim();
+    if (!opportunityId) return { ok: false, error: "CRM did not confirm the new estimate opportunity ID" };
+    return { ok: true, data: { opportunity_id: opportunityId, created: true } };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Unable to prepare estimate opportunity" };
+  }
+}
+
 export async function ghlAddContactToWorkflow(
   args: {
     contact_id: string;

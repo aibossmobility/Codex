@@ -120,6 +120,7 @@ import {
   resolveGhlCredentials,
 } from "./ghl-integration-store";
 import { ghlEnsureAiBossEstimateOpportunity, ghlUpsertContactWithTags } from "./ghl-api";
+import { recordAiBossEstimateIntakeNote } from "./ai-boss-estimate-notes";
 import {
   ensureGhlAutomationTables,
   verifyAutomationAuth,
@@ -5095,7 +5096,7 @@ async function startServer() {
       const name = String(body.name || "").trim().slice(0, 160);
       const email = String(body.email || "").trim().toLowerCase().slice(0, 254);
       const organization = String(body.organization || "").trim().slice(0, 240);
-      const need = String(body.need || "").trim().slice(0, 1000);
+      const need = String(body.need || "").trim().slice(0, 3000);
       const pathKey = String(body.path || "")
         .trim()
         .toLowerCase()
@@ -5146,11 +5147,24 @@ async function startServer() {
 
       // The tag-based workflow remains intact. For written estimates, also ensure a
       // visible pipeline opportunity exists; never send a document or request payment here.
-      const estimateOpportunity = pathKey === "written_estimate_request"
+      const isEstimateRequest = pathKey === "written_estimate_request";
+      const estimateNote = isEstimateRequest
+        ? await recordAiBossEstimateIntakeNote({
+            contactId, name, email, organization, need,
+            submittedAt: String(body.submitted_at || "").trim().slice(0, 36),
+          }, ghlCredentials)
+        : null;
+      const estimateOpportunity = isEstimateRequest
         ? await ghlEnsureAiBossEstimateOpportunity({ contactId, contactName: name }, ghlCredentials)
         : null;
-      if (estimateOpportunity && !estimateOpportunity.ok) {
-        console.error("[ai-boss-intake] estimate opportunity unavailable:", estimateOpportunity.error);
+      if (isEstimateRequest && (!estimateNote?.ok || !estimateOpportunity?.ok)) {
+        console.error("[ai-boss-intake] complete estimate intake not confirmed", {
+          noteSaved: estimateNote?.ok === true,
+          opportunityCreated: estimateOpportunity?.ok === true,
+          noteError: estimateNote && !estimateNote.ok ? estimateNote.error : undefined,
+          opportunityError: estimateOpportunity && !estimateOpportunity.ok ? estimateOpportunity.error : undefined,
+        });
+        return res.status(502).json({ ok: false, error: "CRM estimate preparation not confirmed" });
       }
       console.info(`[ai-boss-intake] tagged contact ${contactId} for the AI Boss Inquiry workflow`);
       return res.json({
@@ -5159,6 +5173,7 @@ async function startServer() {
         trigger_tag: "aiboss-inquiry-demo",
         queued: true,
         estimate_pipeline_confirmed: estimateOpportunity?.ok === true,
+        estimate_note_saved: estimateNote?.ok === true,
       });
     } catch (err) {
       console.error("[ai-boss-intake] bridge error:", err);

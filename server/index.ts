@@ -6965,7 +6965,7 @@ async function startServer() {
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
-      "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
+      "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
     ];
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
     const today = new Date().toISOString().slice(0, 10);
@@ -6982,7 +6982,7 @@ async function startServer() {
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
     "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/shop", "/papa-journey", "/contact",
-    "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service",
+    "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
   ]);
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();

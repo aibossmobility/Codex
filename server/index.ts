@@ -119,7 +119,7 @@ import {
   clearGhlIntegration,
   resolveGhlCredentials,
 } from "./ghl-integration-store";
-import { ghlUpsertContactWithTags } from "./ghl-api";
+import { ghlEnsureAiBossEstimateOpportunity, ghlUpsertContactWithTags } from "./ghl-api";
 import {
   ensureGhlAutomationTables,
   verifyAutomationAuth,
@@ -5144,8 +5144,22 @@ async function startServer() {
         return res.status(502).json({ ok: false, error: "GoHighLevel returned no contact id" });
       }
 
+      // The tag-based workflow remains intact. For written estimates, also ensure a
+      // visible pipeline opportunity exists; never send a document or request payment here.
+      const estimateOpportunity = pathKey === "written_estimate_request"
+        ? await ghlEnsureAiBossEstimateOpportunity({ contactId, contactName: name }, ghlCredentials)
+        : null;
+      if (estimateOpportunity && !estimateOpportunity.ok) {
+        console.error("[ai-boss-intake] estimate opportunity unavailable:", estimateOpportunity.error);
+      }
       console.info(`[ai-boss-intake] tagged contact ${contactId} for the AI Boss Inquiry workflow`);
-      return res.json({ ok: true, contact_id: contactId, trigger_tag: "aiboss-inquiry-demo", queued: true });
+      return res.json({
+        ok: true,
+        contact_id: contactId,
+        trigger_tag: "aiboss-inquiry-demo",
+        queued: true,
+        estimate_pipeline_confirmed: estimateOpportunity?.ok === true,
+      });
     } catch (err) {
       console.error("[ai-boss-intake] bridge error:", err);
       return res.status(500).json({

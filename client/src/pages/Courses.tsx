@@ -62,8 +62,9 @@ export default function Courses() {
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-extrabold text-white mb-4">Courses</h1>
           <p className="text-gray-400 text-lg">
-            Courses for fathers navigating relationships with adult children. Explore the materials that fit your needs; the GoHighLevel sales process handles purchase and delivery.
+            Courses for fathers navigating relationships with adult children. Choose the lessons that fit your needs, then enroll through the secure GoHighLevel course portal.
           </p>
+          <a href="/shop" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-md bg-[#f2c230] px-7 py-3 font-extrabold text-[#17231c]">Browse and Enroll in Audio Lessons — $14.99 each</a>
         </div>
 
         {loading && (

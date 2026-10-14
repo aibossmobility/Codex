@@ -48,7 +48,7 @@ import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
 import DigitalTwinDemo from "./pages/DigitalTwinDemo";
 import FatherFriendlyPractice from "./pages/FatherFriendlyPractice";
-import { PrivacyPage, TermsPage } from "./pages/LegalPages";
+import { PrivacyPage, TermsPage, RefundPolicyPage } from "./pages/LegalPages";
 import {
   AboutBrianKeithHillPage,
   AdultDaughterRelationshipPage,
@@ -84,6 +84,7 @@ function Router() {
       <Route path="/contact" component={PapaAiExperience} />
       <Route path="/privacy-policy" component={PrivacyPage} />
       <Route path="/terms-of-service" component={TermsPage} />
+      <Route path="/refund-policy" component={RefundPolicyPage} />
       <Route path="/privacy" component={PrivacyPage} />
       <Route path="/terms" component={TermsPage} />
       <Route path={"/member-login"} component={MemberLogin} />

@@ -321,6 +321,7 @@ export default function Home() {
             <a href="/shop" className="hover:text-[#f2c230]">Explore Courses</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>
+            <a href="/refund-policy" className="font-bold text-[#f2c230] hover:underline">Refunds &amp; Cancellations</a>
             <a href="tel:+15104152098" className="hover:text-[#f2c230]">510.415.2098</a>
           </div>
         </div>

@@ -249,13 +249,13 @@ const pages = [
     path: "/courses",
     title: "Papa Life Courses | Papa Life Coach",
     description:
-      "Programs built for fathers navigating relationships with adult children. Preview Papa Life courses and sign in to watch lessons.",
+      "Explore Papa Life courses and resources for fathers rebuilding trust and connection with adult children.",
     eyebrow: "Courses",
     headline: "Papa Life course catalog",
-    intro: "Programs built for fathers navigating relationships with adult children. Members can sign in to watch lessons and track progress.",
+    intro: "Explore Papa Life courses and resources for fathers of adult children. Choose a starting point that fits your needs.",
     sections: [
-      ["Course previews", "Papa Life courses support fathers with practical lessons organized around the PAPA Framework."],
-      ["Member access", "Sign in to the member portal to watch lesson videos and track progress."],
+      ["Explore courses", "Review lessons that strengthen listening, accountability, and relationships through the PAPA Framework."],
+      ["Ready to continue", "Browse available products and courses. If you are already enrolled, sign in to access your lessons."],
     ],
   },
   {
@@ -354,18 +354,6 @@ const pages = [
     sections: [
       ["Watch first", "Begin here to understand the mission, message, and next step."],
       ["Continue", "Move into the free workshop and Papa Life assessment for practical next steps."],
-    ],
-  },
-  {
-    path: "/courses",
-    title: "Booking | Papa Life Coach",
-    description: "Booking page for Papa Life Coach.",
-    eyebrow: "Booking",
-    headline: "Request a conversation with Papa Life.",
-    intro: "Email Brian at brian@papalifecoach.com to request a conversation. We will confirm a time and Google Meet details by email.",
-    sections: [
-      ["Next step", "Use the Papa Life conversation request link. An email request is not a confirmed appointment."],
-      ["Prepare", "Start with the assessment if you are looking for fatherhood relationship support."],
     ],
   },
   {
@@ -496,7 +484,12 @@ function render(page) {
   return html;
 }
 
+const generatedPaths = new Set();
 for (const page of pages) {
+  if (generatedPaths.has(page.path)) {
+    throw new Error(`Duplicate static SEO path: ${page.path}`);
+  }
+  generatedPaths.add(page.path);
   const html = render(page);
   if (page.path === "/") {
     fs.writeFileSync(templatePath, html);

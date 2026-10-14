@@ -9,6 +9,11 @@ const join = file("client/public/go/join/index.html");
 const form = file("client/src/components/CheckoutForm.tsx");
 const installer = file("scripts/connect-public-commerce-links.mjs");
 const envExample = file(".env.example");
+const staticSeo = file("scripts/generate-static-seo-pages.mjs");
+assert.equal((staticSeo.match(/^    path: "\/courses",/gm) || []).length, 1, "Only one static /courses page should exist");
+assert.ok(/Duplicate static SEO path:/.test(staticSeo), "SEO builder must reject duplicate paths instead of silently overwriting");
+assert.ok(!/title: "Booking \| Papa Life Coach"/.test(staticSeo), "Retired booking content must not hijack the course catalog");
+
 
 // Regression protection: never restore an Alpha/P2P-era hosted payment page.
 for (const [filename, content] of [

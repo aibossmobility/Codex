@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ export default function PapaIntroVideo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="papa-house-course min-h-screen bg-background text-foreground flex flex-col">
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container max-w-4xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Link href="/">
@@ -20,6 +21,8 @@ export default function PapaIntroVideo() {
           <SiteLogoStacked size="sm" className="sm:ml-auto" />
         </div>
       </header>
+
+      <HouseTrail current="The Theater" />
 
       <main className="flex-1 container max-w-4xl mx-auto px-4 py-8 md:py-12 space-y-8">
         <div className="space-y-4 text-gray-200 text-base md:text-lg leading-relaxed max-w-3xl mx-auto text-center">

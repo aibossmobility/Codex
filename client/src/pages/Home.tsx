@@ -1,5 +1,6 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
+import { HouseTrail } from "./PapaHouse";
 import {
   ArrowRight,
   CheckCircle2,
@@ -10,6 +11,7 @@ import {
 import { useState } from "react";
 
 const navigation = [
+  { label: "Come Inside", href: "/house" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
   { label: "Explore Courses", href: "/shop" },
@@ -64,14 +66,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
+    <div className="papa-house-home min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
       <PageMeta
         title="Papa Life Fatherhood Resource Center | Courses & Original Resources"
         description="Explore original Papa Life audio lessons, manuscripts and learning resources for fathers of adult children. Find your next step with the Awareness Wheel."
         keywords="fathers of adult children, reconnect with adult child, Papa Life, fatherhood, relationship repair"
       />
 
-      <nav className="relative z-50 border-b border-[#17231c]/20 bg-[#f2c230]">
+      <nav className="relative z-50 border-b-4 border-[#b63b31] bg-[#fff0d0]">
         <div className="container flex h-20 items-center justify-between gap-4">
           <a href="/" aria-label="Papa Life home">
             <SiteLogo size="md" />
@@ -112,7 +114,7 @@ export default function Home() {
           </button>
         </div>
         {mobileMenuOpen && (
-          <div className="border-t border-[#17231c]/20 bg-[#f2c230] px-4 py-4 lg:hidden">
+          <div className="border-t border-[#17231c]/20 bg-[#fff0d0] px-4 py-4 lg:hidden">
             <div className="container flex flex-col gap-1">
               {navigation.map((item) => (
                 <a
@@ -147,15 +149,27 @@ export default function Home() {
         )}
       </nav>
 
-
+      <section className="papa-house-outdoor-hero" aria-labelledby="welcome-home-heading">
+        <div className="papa-house-outdoor-inner">
+          <span className="papa-house-kicker">Papa Life · Fathers of Adult Children</span>
+          <h1 id="welcome-home-heading">Your journey has a place to <em>begin.</em></h1>
+          <p>Welcome. Step out of the noise and into a place built for reflection, wisdom, and the courage to reconnect. Come inside, make yourself comfortable, and discover what speaks to you.</p>
+          <div className="papa-house-outdoor-actions">
+            <a href="/house" className="papa-house-button">Come Inside <ArrowRight size={20} aria-hidden="true"/></a>
+            <a href="/shop" className="papa-house-button-outline">Browse Resources <ArrowRight size={18} aria-hidden="true"/></a>
+          </div>
+        </div>
+      </section>
+      <div className="papa-house-outdoor-note">A welcoming home for fathers to <strong>read, listen, reflect, and grow</strong>. <a href="/house">Explore the rooms</a> at your own pace.</div>
+      <HouseTrail current="Outside" />
 
       <section id="fatherhood-wheel" className="border-y border-[#17231c]/15 bg-[#fffaf0] py-12 md:py-16" aria-labelledby="fatherhood-wheel-heading">
         <div className="container">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Awareness First • Take Action with the Right Support</p>
-            <h1 id="fatherhood-wheel-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">
+            <h2 id="fatherhood-wheel-heading" className="mt-3 text-3xl font-extrabold md:text-5xl">
               Where Are You With Your Child—and What Can Help?
-            </h1>
+            </h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
               Start by identifying where you are with your adult child. Choose Red, Yellow, or Green to see courses and resources that could help you move forward.
             </p>

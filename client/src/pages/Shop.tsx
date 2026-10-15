@@ -1,5 +1,6 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
+import { HouseTrail } from "./PapaHouse";
 import { ArrowRight, CheckCircle2, Play, ShoppingBag } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -64,6 +65,7 @@ export default function Shop() {
           </div>
         </div>
       </nav>
+      <HouseTrail current="Resource Room" />
 
       <header className="relative isolate overflow-hidden bg-[#333022] text-white">
         <img

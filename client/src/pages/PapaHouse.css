@@ -1,0 +1,115 @@
+/* Papa Life home experience: scoped to public house surfaces; never touches private CRM or purchase flow. */
+.papa-house-page,.papa-house-home {--papa-gold:#f2bc38;--papa-clay:#a5362e;--papa-green:#174b35;--papa-ink:#251b16;--papa-cream:#fff3dc;font-family:inherit}
+.papa-house-page {color:var(--papa-ink); background:#f7ecd8;}
+.papa-house-page *, .papa-house-home * {box-sizing:border-box}
+.papa-house-page a:focus-visible,.papa-house-home a:focus-visible,.papa-house-page button:focus-visible {outline:3px solid #f2bc38;outline-offset:4px}
+.papa-house-header{background:linear-gradient(100deg,#fff9ec,#f0dcc0);border-bottom:5px solid transparent;border-image:linear-gradient(90deg,#14603e 0 33%,#e5aa20 33% 65%,#a5362e 65% 100%) 1;position:relative;z-index:5}
+.papa-house-header-inner{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:22px;padding:12px 24px;min-height:90px}
+.papa-house-header-links{display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:750}
+.papa-house-header-links a{color:#3d2920;text-decoration:none}
+.papa-house-header-links a:hover{color:#a5362e;text-decoration:underline}
+.papa-house-header-cta{display:flex;align-items:center;gap:8px;border-radius:100px;background:#174b35;color:#fff!important;padding:14px 18px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px #174b3533}
+.papa-house-header-cta:hover{background:#9b2f2a}
+.papa-house-trail{background:#39241a;color:#fff1d6;border-bottom:1px solid #f3c35e80}
+.papa-house-trail-inner{max-width:1240px;margin:0 auto;padding:13px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;letter-spacing:.02em}
+.papa-house-trail-link{color:#fff1d6;display:inline-flex;align-items:center;gap:7px;font-weight:750;text-decoration:none}
+.papa-house-trail-link:hover{text-decoration:underline;color:#ffce4e}
+.papa-house-trail-current{color:#f2bc38;font-weight:700}
+.papa-house-trail-separator{opacity:.4}
+.papa-house-kicker{text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:900;color:#ab442e;display:block}
+.papa-house-hall-hero{min-height:600px;position:relative;display:flex;align-items:center;overflow:hidden;background:#4a2b1c}
+.papa-house-hall-image,.papa-house-hall-shade{position:absolute;inset:0;width:100%;height:100%}
+.papa-house-hall-image{object-fit:cover;object-position:center}
+.papa-house-hall-shade{background:linear-gradient(90deg,rgba(34,20,15,.90),rgba(40,24,13,.76) 34%,rgba(40,24,13,.18) 72%,rgba(40,24,13,.02))}
+.papa-house-hall-content{position:relative;z-index:1;color:#fff4dd;max-width:1200px;width:100%;margin:auto;padding:84px 24px}
+.papa-house-hall-content .papa-house-kicker{color:#ffc342}
+.papa-house-hall-content h1{font-family:Georgia,serif;font-size:clamp(3.3rem,7vw,6.8rem);font-weight:700;line-height:1.05;max-width:620px;margin:20px 0}
+.papa-house-hall-content h1 em{font-weight:500;color:#ffc342}
+.papa-house-hall-content p{font-size:clamp(18px,2vw,24px);max-width:510px;line-height:1.55;margin-bottom:32px}
+.papa-house-button{display:inline-flex;justify-content:center;align-items:center;gap:12px;text-decoration:none;background:#f7c343;border:2px solid #f7c343;color:#271b14;font-weight:900;padding:15px 25px;border-radius:50px;min-height:52px;box-shadow:0 7px 20px #2212092b}
+.papa-house-button:hover{background:#ffe2a0;border-color:#ffe2a0}
+.papa-house-button-outline{display:inline-flex;justify-content:center;align-items:center;gap:10px;color:#f8edd9;text-decoration:none;border:2px solid #f8e9d6;padding:14px 25px;border-radius:50px;font-weight:850;min-height:52px}
+.papa-house-button-outline:hover{background:#fff2df;color:#3e281e}
+.papa-house-room-selection{padding:85px 24px 100px;background:radial-gradient(circle at 12% 12%,#ffecd0,transparent 34%),linear-gradient(160deg,#fff6e8,#e9d5b8 80%);}
+.papa-house-room-intro{max-width:830px;margin:0 auto 48px;text-align:center}
+.papa-house-room-intro h2,.papa-house-room-doors h2{font-family:Georgia,serif;font-size:clamp(2.1rem,4vw,3.8rem);line-height:1.12;color:#312219;font-weight:750;margin:12px 0 20px}
+.papa-house-room-intro p{font-size:18px;line-height:1.7;color:#55463a}
+.papa-house-room-grid{max-width:1220px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px}
+.papa-house-room-card{border-radius:22px;display:flex;min-height:320px;overflow:hidden;background:#f6ebd8;box-shadow:0 9px 25px #5535212e;transition:transform .2s,box-shadow .2s;border:1px solid #8657393b;color:#241912;text-decoration:none}
+.papa-house-room-card:hover{transform:translateY(-5px);box-shadow:0 14px 35px #55352150}
+.papa-house-room-photo{width:51%;position:relative;overflow:hidden}
+.papa-house-room-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .4s}
+.papa-house-room-card:hover .papa-house-room-photo img{transform:scale(1.05)}
+.papa-house-room-copy{width:49%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:29px}
+.papa-house-room-eyebrow{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#7f3827;line-height:1.7}
+.papa-house-room-copy h3{font-family:Georgia,serif;font-size:clamp(1.6rem,2.4vw,2.4rem);line-height:1.13;margin:12px 0 22px}
+.papa-house-room-link{display:inline-flex;align-items:center;gap:8px;border-bottom:2px solid currentColor;padding-bottom:5px;font-weight:900}
+.papa-house-room-card-living{background:#f9e5cb}
+.papa-house-room-card-library{background:#e9e3cc}
+.papa-house-room-card-listening{background:#d9e5d3}
+.papa-house-room-card-theater{background:#e8c8b7}
+.papa-house-room-card-dad{background:#eddcb5}
+.papa-house-room-card-resources{background:#ebdfca}
+.papa-house-room-card-sky{background:#e7e9dd}
+.papa-house-ethos{text-align:center;background:linear-gradient(115deg,#143f2c,#20462e 45%,#633a25);padding:85px 24px;color:#fff3d8}
+.papa-house-ethos h2{font-family:Georgia,serif;font-size:clamp(2rem,4vw,3.5rem);line-height:1.2;margin:16px 0}
+.papa-house-ethos p{font-size:18px;line-height:1.6}
+.papa-house-ethos p:first-child{font-size:15px;letter-spacing:.1em;color:#fbd16e}
+.papa-house-text-link{display:inline-flex;align-items:center;gap:10px;font-weight:900;font-size:16px;margin-top:24px;color:inherit;text-decoration:underline;text-underline-offset:6px}
+.papa-house-text-link:hover{color:#ffc843}
+.papa-house-footer{display:flex;flex-wrap:wrap;justify-content:center;gap:22px;padding:28px 18px;background:#302119;color:#ffe9c7;font-size:14px;font-weight:700}
+.papa-house-footer a{color:inherit}
+.papa-house-detail{--room-bg:#f1dec1;--room-accent:#743724}
+.papa-house-detail-library{--room-bg:#eae3cb;--room-accent:#496044}
+.papa-house-detail-listening{--room-bg:#dce4d2;--room-accent:#174b35}
+.papa-house-detail-theater{--room-bg:#e9c6b9;--room-accent:#9b2d28}
+.papa-house-detail-dad{--room-bg:#ecdab9;--room-accent:#71452c}
+.papa-house-detail-resources{--room-bg:#efe4d2;--room-accent:#4a5a31}
+.papa-house-detail-sky{--room-bg:#dcecf1;--room-accent:#1a658c}
+.papa-house-detail-hero{display:grid;grid-template-columns:1fr 1fr;min-height:680px;background:var(--room-bg);border-bottom:10px solid var(--room-accent)}
+.papa-house-detail-photo{position:relative;min-height:600px;overflow:hidden}
+.papa-house-detail-photo:after{content:"";position:absolute;inset:0;border:18px solid #f9f0dd22;pointer-events:none}
+.papa-house-detail-photo img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+.papa-house-detail-content{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:80px clamp(30px,5vw,100px)}
+.papa-house-detail-content .papa-house-kicker{color:var(--room-accent)}
+.papa-house-detail-content h1{font-family:Georgia,serif;font-weight:750;line-height:1.08;font-size:clamp(2.6rem,4.5vw,4.8rem);max-width:630px;margin:17px 0 25px}
+.papa-house-detail-content p{font-size:clamp(17px,1.5vw,21px);line-height:1.8;max-width:580px;color:#44382d}
+.papa-house-detail-actions{display:flex;gap:16px;flex-wrap:wrap;margin-top:32px}
+.papa-house-detail-actions .papa-house-button-outline{color:#34251b;border-color:#614736}
+.papa-house-detail-actions .papa-house-button-outline:hover{background:#fff3df}
+.papa-house-room-doors{padding:80px 24px 100px;background:linear-gradient(160deg,#fff8ed,#ead7ba)}
+.papa-house-room-doors>div:first-child{max-width:1200px;margin:auto}
+.papa-house-nearby{max-width:1200px;margin:30px auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.papa-house-nearby .papa-house-room-card{display:block;min-height:350px}
+.papa-house-nearby .papa-house-room-photo{height:210px;width:100%}
+.papa-house-nearby .papa-house-room-copy{width:100%;min-height:140px;padding:19px}
+.papa-house-nearby .papa-house-room-copy h3{font-size:25px;margin:8px 0}
+.papa-house-nearby .papa-house-room-link{margin-top:10px}
+.papa-house-room-doors>.papa-house-text-link{display:flex;max-width:1200px;margin:35px auto 0;width:fit-content;color:#4a3022}
+.papa-house-outdoor{background:#dbe6d4}
+.papa-house-outdoor-hero{position:relative;min-height:590px;overflow:hidden;background:linear-gradient(125deg,#cee5f0,#86c8ed 52%,#f9d883)}
+.papa-house-outdoor-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,40,29,.9),rgba(8,52,44,.74) 42%,transparent 74%),url('/images/papa-sky-portrait.webp') right center / auto 100% no-repeat}
+.papa-house-outdoor-inner{position:relative;min-height:590px;max-width:1240px;margin:auto;padding:90px 30px 70px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;color:#fff5df}
+.papa-house-outdoor-inner .papa-house-kicker{color:#ffcb54}
+.papa-house-outdoor-inner h1{font-family:Georgia,serif;font-size:clamp(3rem,6vw,6rem);max-width:720px;line-height:1.04;letter-spacing:-.02em;margin:18px 0}
+.papa-house-outdoor-inner h1 em{color:#ffd06a}
+.papa-house-outdoor-inner p{max-width:520px;font-size:clamp(18px,2vw,23px);line-height:1.62}
+.papa-house-outdoor-actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+.papa-house-outdoor-note{padding:23px;background:#f4e9d2;text-align:center;font-size:17px;line-height:1.6;color:#483225;border-bottom:1px solid #a6723840}
+.papa-house-outdoor-note a{font-weight:900;color:#174b35;text-decoration:underline}
+@media(max-width:1000px){.papa-house-header-links{gap:12px;font-size:13px}.papa-house-header-cta{display:none}.papa-house-detail-hero{min-height:unset}.papa-house-detail-content{padding:45px 35px}.papa-house-nearby{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.papa-house-header-inner{padding:10px 16px;gap:8px;flex-wrap:wrap}.papa-house-header-links{width:100%;justify-content:space-between;font-size:13px;padding-bottom:8px}.papa-house-trail-inner{padding:10px 16px}.papa-house-hall-hero{min-height:520px}.papa-house-hall-shade{background:linear-gradient(90deg,#21150fec,#21150fa8)}.papa-house-hall-content{padding:58px 22px}.papa-house-room-selection{padding:55px 17px}.papa-house-room-grid{grid-template-columns:1fr;gap:18px}.papa-house-room-card{min-height:240px}.papa-house-room-photo{width:46%}.papa-house-room-copy{width:54%;padding:18px}.papa-house-room-copy h3{font-size:1.65rem}.papa-house-detail-hero{display:flex;flex-direction:column}.papa-house-detail-photo{min-height:330px}.papa-house-detail-content{padding:48px 22px 58px}.papa-house-nearby{grid-template-columns:1fr}.papa-house-nearby .papa-house-room-card{min-height:310px}.papa-house-outdoor-hero:before{background:linear-gradient(90deg,#14322be8,#14322bc9 50%,#14322b38),url('/images/papa-sky-portrait.webp') center center / cover no-repeat}.papa-house-outdoor-inner{min-height:580px;padding:60px 22px}.papa-house-outdoor-inner h1{font-size:clamp(2.8rem,11vw,5rem)}}
+@media(max-width:400px){.papa-house-room-card{display:flex;min-height:210px}.papa-house-room-photo{width:42%}.papa-house-room-copy{width:58%;padding:12px}.papa-house-room-copy h3{font-size:1.4rem}.papa-house-room-link{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.papa-house-room-card,.papa-house-room-photo img{transition:none}}
+
+/* Room-to-room continuity for existing public pages; commerce markup untouched. */
+.papa-house-digital{background:radial-gradient(ellipse at 87% 20%,#52301b 0%,transparent 36%),linear-gradient(140deg,#241a14 0%,#263024 65%,#1c1c17 100%)!important}
+.papa-house-digital header{background:#2b1e17!important;border-color:#a67a35!important}
+.papa-house-digital main>section:first-of-type{background:linear-gradient(130deg,#34251b99,#1f312788)}
+.papa-house-ai{background:radial-gradient(ellipse at 95% 12%,#53321e,#261f19 50%,#13271d 100%)!important;color:#fff!important}
+.papa-house-ai header{background:#2d221b!important;border-color:#b99554!important}
+.papa-house-ai main>section:first-of-type{background:linear-gradient(130deg,#472e2099,#16291eee)!important}
+.papa-house-journey{background:linear-gradient(160deg,#fff5e5,#eedbc0 65%,#f8ead1)!important}
+.papa-house-journey main{background:radial-gradient(circle at 85% 10%,#f7d79888,transparent 43%)}
+.papa-house-course{background:radial-gradient(ellipse at 86% 10%,#573722,#211c18 68%)!important}
+.papa-house-course header{background:#34231c!important;border-bottom:2px solid #e1ac4c!important}

@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 import { ArrowLeft, Clock, GraduationCap, Loader2, Play } from "lucide-react";
@@ -61,7 +62,7 @@ export default function CourseDetail() {
   const colors = course ? pillarStyles[course.pillar] || pillarStyles.General : pillarStyles.General;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="papa-house-course min-h-screen bg-background text-foreground">
       <header className="border-b border-white/10 bg-black/40 backdrop-blur-sm sticky top-0 z-10">
         <div className="container max-w-3xl mx-auto px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Link href="/courses">
@@ -72,6 +73,8 @@ export default function CourseDetail() {
           <SiteLogoStacked size="sm" className="sm:ml-auto" />
         </div>
       </header>
+
+      <HouseTrail current="A Course to Explore" />
 
       <main className="container max-w-3xl mx-auto px-6 py-16">
         {loading && (

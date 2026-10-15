@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogoStacked } from "@/components/SiteLogo";
+import { HouseTrail } from "./PapaHouse";
 
 type CatalogCourse = {
   id: number;
@@ -121,6 +122,7 @@ export default function Courses() {
           </nav>
         </div>
       </header>
+      <HouseTrail current="Theater & Courses" />
 
       <main>
         <section

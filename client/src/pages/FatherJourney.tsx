@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronDown, Lock, Save } from "lucide-react";
 import { PageMeta } from "@/components/PageMeta";
@@ -188,9 +189,9 @@ export default function FatherJourney() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fff9e9] text-[#17231c]">
+    <div className="papa-house-journey min-h-screen bg-[#f7edd9] text-[#17231c]">
       <PageMeta title="My Fatherhood Journey | Papa Life" description="A private, guided relationship journey for fathers with children at every age and stage." />
-      <header className="border-b border-[#e6c75d] bg-[#f6c62f]">
+      <header className="border-b border-[#d4a14e] bg-[#f5e0b9]">
         <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <a href="/"><SiteLogo size="md" /></a>
           <div className="flex items-center gap-3">
@@ -198,6 +199,8 @@ export default function FatherJourney() {
           </div>
         </div>
       </header>
+
+      <HouseTrail current="Dad Cave & Journey" />
 
       <main className="mx-auto max-w-7xl px-4 py-8 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">

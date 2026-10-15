@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { brianKeithHillHeadshot } from "@/lib/site-assets";
@@ -43,7 +44,8 @@ function Cta({ children }: { children: React.ReactNode }) {
 export default function WelcomeToPapaLife() {
   return <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
     <PageMeta title="Papa Life | Help for Fathers of Adult Children" description="Papa Life helps fathers of adult children move from distance, silence, and regret toward humility, safer communication, renewed hope, and the possibility of reconnection." keywords="help for fathers of adult children, family estrangement, reconnect with adult child, Papa Life" canonicalPath="/welcome-to-papa-life" />
-    <nav className="border-b border-[#17231c]/15 bg-[#f2c230]"><div className="container flex h-20 items-center justify-between"><a href="/" aria-label="Papa Life home"><SiteLogo size="md" /></a><a href={joinHref} className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#0f492a]">Join Papa Life</a></div></nav>
+    <nav className="border-b border-[#17231c]/15 bg-[#f4dfb9]"><div className="container flex h-20 items-center justify-between"><a href="/" aria-label="Papa Life home"><SiteLogo size="md" /></a><a href={joinHref} className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#0f492a]">Join Papa Life</a></div></nav>
+    <HouseTrail current="Welcome" />
 
     <header className="bg-[#17231c] text-white"><div className="container grid min-h-[620px] items-center gap-10 py-16 lg:grid-cols-[1.15fr_.85fr]">
       <div><p className="text-sm font-black uppercase tracking-[.2em] text-[#f2c230]">From distance to reconnection</p><h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.</h1><p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">If silence, distance, regret, or unresolved hurt has come between you and your adult child, Papa Life was created with fathers like you in mind.</p><p className="mt-5 text-2xl font-extrabold text-[#f2c230]">As long as you’re both alive, it’s never too late.</p><div className="mt-8 flex flex-wrap gap-4"><Cta>Join Papa Life — Immediate Access</Cta><a href="#is-this-you" className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]">See If Papa Life Is for Me <ArrowDown className="h-4 w-4" /></a></div></div>

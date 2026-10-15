@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -823,7 +824,7 @@ export default function PapaAiExperience() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="papa-house-ai min-h-screen bg-[#261f19] text-white">
       <PageMeta
         title="Papa Life AI Coach | Biblical Fatherhood Coaching"
         description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance."
@@ -841,6 +842,8 @@ export default function PapaAiExperience() {
           </a>
         </div>
       </header>
+
+      <HouseTrail current="Papa Life AI & Resources" />
 
       <main>
         <section className="border-b border-white/10 bg-gradient-to-b from-white/[0.04] to-black py-12 md:py-18">

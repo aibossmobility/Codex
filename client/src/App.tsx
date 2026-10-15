@@ -9,6 +9,7 @@ import { GlobalBookingButton } from "./components/GlobalBookingButton";
 import { BrianDigitalTwin } from "./components/BrianDigitalTwin";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import PapaHouse from "./pages/PapaHouse";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import MemberLogin from "./pages/MemberLogin";
@@ -62,6 +63,8 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path="/house/:room" component={PapaHouse} />
+      <Route path="/house" component={PapaHouse} />
       <Route path="/media-library"><Redirect to="/courses" /></Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />

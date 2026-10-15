@@ -1,3 +1,4 @@
+import { HouseTrail } from "./PapaHouse";
 import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
@@ -14,7 +15,7 @@ const pillars = [
 
 export default function DigitalTwinDemo() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="papa-house-digital min-h-screen bg-[#2b211b] text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
         description="Talk with Brian Keith Hill’s Papa Life AI using your microphone."
@@ -33,6 +34,8 @@ export default function DigitalTwinDemo() {
         <div className="bg-[#c62828]" />
         <div className="bg-[#16853b]" />
       </div>
+
+      <HouseTrail current="The AI Guide" />
 
       <main>
         <section className="py-8 md:py-10 lg:py-14">

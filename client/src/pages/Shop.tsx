@@ -127,7 +127,7 @@ export default function Shop() {
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <ShoppingBag className="mx-auto h-10 w-10 text-[#145b35]" />
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">Choose the support that meets you where you are</h2>
-          <p className="mt-3 text-lg text-[#5b655e]">Choose one of 12 self-guided audio lessons for $14.99 each. Enroll directly through the secure course checkout—no appointment or membership required. You can also explore upcoming manuscripts and bundles.</p>
+          <p className="mt-3 text-lg text-[#5b655e]">Choose one of 12 self-guided audio lessons for $14.99 each. Pay the full $14.99 once through secure GoHighLevel course checkout—no estimate, signature, deposit, appointment, or membership required. You can also explore upcoming manuscripts and bundles.</p>
         </div>
         <div className="mx-auto mb-8 max-w-3xl rounded-xl border-2 border-[#145b35] bg-[#fffdf4] p-5 text-center"><p className="font-bold">Know your rights before enrolling: digital-product refund requests are accepted within 7 calendar days after purchase.</p><a href="/refund-policy" className="mt-2 inline-block font-extrabold text-[#145b35] underline">Read the Refund &amp; Cancellation Policy →</a></div>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
@@ -140,7 +140,7 @@ export default function Shop() {
               <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.format === "digital" && offer.module_number && PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] ? PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] : offer.canonical_name}</h2>
               {offer.format === "digital" && offer.module_number && PAPA_LIVE_COURSE_OFFERS[offer.module_number] ? (
                 <>
-                  <p className="mt-5 text-sm text-[#5b655e]">One-time purchase. Your secure checkout and lesson access are handled through the Papa Life course portal. No subscription or appointment required.</p>
+                  <p className="mt-5 text-sm text-[#5b655e]">One-time $14.99 purchase, paid in full at GoHighLevel checkout. No estimate, signature, split payment, deposit, subscription, or appointment required.</p>
                   <a href={PAPA_LIVE_COURSE_OFFERS[offer.module_number]} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-5 font-extrabold text-white">
                     Enroll Now — {offer.public_price_display} <ArrowRight className="ml-2 h-4 w-4" />
                   </a>

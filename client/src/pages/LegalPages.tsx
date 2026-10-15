@@ -294,20 +294,20 @@ New monthly membership enrollment is closed. Any currently offered course or ser
 /** Customer-facing refund and cancellation terms shared with AI Boss Mobility. */
 export function RefundPolicyPage() {
   return (
-    <LegalShell title="Refund and Cancellation Policy" description="Papa Life digital-product refunds, consulting cancellations, signed-estimate deposits and final-payment terms.">
+    <LegalShell title="Refund and Cancellation Policy" description="Papa Life one-time digital-product purchases and refunds; separate AI Boss Mobility custom-service payment terms.">
       <p><strong>AI Boss Mobility Consulting &amp; Papa Life</strong></p>
       <p><strong>Effective Date: October 15, 2026</strong></p>
             <p>{"We aim to provide reliable products, professional services, and fair treatment to every customer. This policy explains how refunds and cancellations are handled for digital products, consulting and AI services, service issues, and circumstances in which a refund or cancellation right is required by applicable law."}</p>
       <div className="rounded-xl border-2 border-[#f2c230] bg-[#17231c] p-5 text-white">
-        <strong>At a glance:</strong> Papa Life digital products have a 7-calendar-day refund request window. Custom consulting requires a signed estimate, a 50% upfront deposit and a final 50% payment upon completion before delivery. The full terms are below.
+        <strong>At a glance:</strong> Papa Life digital lessons are one-time, full-price purchases with no estimate, signature, or deposit requirement and a 7-calendar-day refund request window. Separately, AI Boss Mobility custom consulting requires a signed estimate, a 50% deposit and final 50% before delivery. The full terms are below.
       </div>
       <h2>Digital Products</h2>
       <p>{"Customers who purchase Papa Life audio lessons, digital courses, manuscripts, or digital bundles may request a full refund within 7 calendar days after the purchase date, subject to any non-waivable rights provided by applicable law."}</p>
       <p>{"If a digital product is not delivered, cannot be accessed, or is materially different from its description, please contact us promptly. We will make reasonable efforts to correct the issue or, where appropriate, provide a refund or other remedy required by the circumstances and applicable law."}</p>
       <p>{"After the seven-day period, digital-product purchases are generally nonrefundable. A refund or other remedy may nevertheless be available if the product is defective, was not delivered as described, or applicable law requires one."}</p>
       <p>{"Approved refunds will generally be issued to the original payment method, unless applicable law or the payment provider requires or permits another method."}</p>
-      <h2>Professional Consulting and AI Services</h2>
-      <p>{"Customized consulting and AI services require a written estimate and agreement signed by the customer before payment is requested. The agreement will identify the services, scope, fees, deadlines, and any other applicable terms."}</p>
+      <h2>AI Boss Mobility — Custom Consulting and AI Services</h2>
+      <p>{"AI Boss Mobility customized consulting and AI services require a written estimate and agreement signed by the customer before payment is requested. The agreement will identify the services, scope, fees, deadlines, and any other applicable terms."}</p>
       <p>{"Unless the signed agreement states otherwise, payment terms are: 50% deposit after signing the agreement and before work begins; remaining 50% upon completion, before final delivery."}</p>
       <p>{"Cancellation before work begins: A customer may request cancellation before work begins. Any refund of a deposit will be determined under the signed agreement and may be reduced by specifically authorized, disclosed, and nonrefundable third-party expenses already incurred."}</p>
       <p>{"Cancellation after work begins: The customer is responsible for work performed and authorized expenses incurred through the effective cancellation date, as provided in the signed agreement. Any unearned portion of an advance payment will be refunded, subject to applicable law and the agreement."}</p>

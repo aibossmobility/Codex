@@ -1,6 +1,6 @@
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
-import { ArrowRight, CheckCircle2, Heart, LockKeyhole, Play, ShoppingBag } from "lucide-react";
+import { ArrowRight, CheckCircle2, Play, ShoppingBag } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type Offer = {
@@ -15,6 +15,8 @@ type Offer = {
 
 // Public, one-time course offers confirmed Published in GoHighLevel on 2026-10-14.
  // This checkout mapping is intentionally separate from retired member and payment links.
+const PAPA_VIDEO_CHECKOUT = "https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/checkout/d448db0d-ef3f-4740-aff8-38d037fa8aec";
+
 const PAPA_LIVE_COURSE_OFFERS: Record<number, string> = {
   1: "https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/offers/35a532f1-9717-442b-8b92-a3c63738e743",
   2: "https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/offers/1ba70312-a07f-4902-911f-08e5d3490d74",
@@ -52,7 +54,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-[#f4dea0] text-[#17231c]">
-      <PageMeta title="Papa Life Products — Explore Self-Paced Courses" description="Explore Papa Life audio lessons, manuscripts and guided programs. Final price and checkout are confirmed through the approved sales process." />
+      <PageMeta title="Papa Life Products — Explore Self-Paced Courses" description="A welcoming place for fathers of adult children to discover original Papa Life videos, audio lessons, and written resources for rebuilding trust and connection." />
       <nav className="border-b border-[#17231c]/20 bg-[#f2c230]">
         <div className="container flex min-h-20 items-center justify-between gap-5 py-3">
           <a href="/"><SiteLogo size="md" /></a>
@@ -63,22 +65,30 @@ export default function Shop() {
         </div>
       </nav>
 
-      <header className="bg-[#145b35] text-white">
-        <div className="container grid items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:py-16">
-          <div>
-            <Heart className="h-12 w-12 fill-[#f2c230] text-[#f2c230]" />
-            <p className="mt-5 text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Love is still present—even when the relationship feels distant</p>
-            <h1 className="mt-4 text-4xl font-extrabold leading-tight md:text-6xl">You are not here because you stopped loving your child.</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/85">You are here because loving an adult child can be complicated—and you want to respond with greater wisdom, patience, and understanding. Papa Life offers compassionate next steps, not pressure.</p>
+      <header className="relative isolate overflow-hidden bg-[#333022] text-white">
+        <img
+          src="/images/papa-life-single-father.png"
+          alt="An older Black father sitting thoughtfully beside a window, books and warm afternoon light"
+          className="absolute inset-0 h-full w-full object-cover object-[61%_center]"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#19271e]/95 via-[#1c281f]/82 to-[#2a291d]/40" />
+        <div className="container relative py-20 sm:py-28 lg:py-32">
+          <div className="max-w-2xl">
+            <p className="inline-block border-b-2 border-[#f2c230] pb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-[#f2c230]">Welcome to Papa Life</p>
+            <h1 className="mt-5 font-serif text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">There is room here for the father you are becoming.</h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#fff4d9]">Step inside a collection of thoughtful lessons, stories, and resources for fathers navigating relationships with their adult children. Explore at your own pace, with honesty, hope, and no pressure.</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <a href="#video-collection" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#f2c230] px-7 py-3 font-extrabold text-[#17231c] transition hover:bg-[#ffe070]">Explore the video series <ArrowRight className="h-4 w-4" /></a>
+              <a href="#audio-lessons" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-[#fff0bf]/70 px-7 py-3 font-semibold text-white transition hover:bg-white/10">Browse audio lessons</a>
+            </div>
           </div>
-          <img src="/images/papa-life-heart-hero.png" alt="A father listening to his adult daughter, reconnecting with his adult son, and reflecting with hope" className="aspect-[16/9] w-full rounded-2xl border-4 border-[#f2c230] object-cover shadow-2xl" />
         </div>
       </header>
 
-      <section className="bg-[#b33a32] py-8 text-white">
-        <div className="container grid gap-5 md:grid-cols-2">
-          <div className="rounded-lg bg-white/10 p-6"><h2 className="text-2xl font-extrabold">Self-Guided Courses</h2><p className="mt-2 text-white/80">Explore individual lessons and complete paths at your own pace.</p></div>
-          <div className="rounded-lg bg-[#f2c230] p-6 text-[#17231c]"><h2 className="text-2xl font-extrabold">Know What You Are Choosing</h2><p className="mt-2">Review course content and access terms. No meeting or subscription is required to browse.</p><a href="/courses" className="mt-4 inline-flex items-center gap-2 font-extrabold text-[#145b35]">Explore Course Catalog <ArrowRight className="h-4 w-4" /></a></div>
+      <section className="border-b border-[#c5a76f]/45 bg-[#fff3d8] py-9">
+        <div className="container flex flex-col gap-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
+          <div><p className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#a33e32]">Choose what speaks to you</p><p className="mt-2 max-w-2xl text-lg text-[#455245]">A complete video series, individual audio lessons, and written resources all have their own place here.</p></div>
+          <a href="/my-journey" className="inline-flex shrink-0 items-center justify-center gap-2 font-extrabold text-[#145b35] underline underline-offset-4">Begin with the Awareness Wheel <ArrowRight className="h-4 w-4" /></a>
         </div>
       </section>
 
@@ -123,11 +133,31 @@ export default function Shop() {
         </div>
       </section>
 
-      <main className="container py-14">
+      <section id="video-collection" className="scroll-mt-8 bg-[#efdfbf] py-14 md:py-20">
+        <div className="container">
+          <div className="grid overflow-hidden rounded-[2rem] border border-[#9c805a]/25 bg-[#fffaf0] shadow-[0_18px_55px_rgba(73,49,22,0.13)] lg:grid-cols-[1.08fr_1fr]">
+            <div className="relative min-h-72 bg-[#17231c]">
+              <img src="/images/papa-life-wrestling-the-silence-away-video-cover.jpg" alt="Wrestling the Silence Away, the official Papa Life ten-episode video series cover" className="absolute inset-0 h-full w-full object-contain" />
+            </div>
+            <div className="flex flex-col justify-center px-7 py-10 sm:px-10 lg:py-14">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#b33a32]">Featured video series · A separate collection</p>
+              <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-[#17231c] sm:text-4xl">Wrestling the Silence Away</h2>
+              <p className="mt-4 text-lg leading-relaxed text-[#4c574b]">Ten original, prerecorded reflections for fathers of adult children—from the ache of distance through humility, listening, repair conversations, and everyday reconnection.</p>
+              <p className="mt-4 text-sm font-bold text-[#145b35]">10 videos · Approximately 12 minutes 23 seconds total · Watch at your pace</p>
+              <p className="mt-5 text-2xl font-extrabold text-[#17231c]">$19.99 <span className="text-base font-medium text-[#596657]">one-time · no subscription</span></p>
+              <a href={PAPA_VIDEO_CHECKOUT} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-12 w-fit items-center gap-2 rounded-full bg-[#145b35] px-7 py-3 font-extrabold text-white transition hover:bg-[#0c4127]">Purchase the video series — $19.99 <ArrowRight className="h-4 w-4" /></a>
+              <p className="mt-4 text-sm leading-relaxed text-[#596657]">Secure GoHighLevel course checkout. This video series is not part of the $14.99 individual audio lessons, manuscripts, or consulting services. Relationship outcomes are never guaranteed.</p>
+              <a href="/refund-policy" className="mt-3 w-fit text-sm font-bold text-[#145b35] underline underline-offset-4">Read the 7-day refund and cancellation policy</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main id="audio-lessons" className="container scroll-mt-8 py-14">
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <ShoppingBag className="mx-auto h-10 w-10 text-[#145b35]" />
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">Choose the support that meets you where you are</h2>
-          <p className="mt-3 text-lg text-[#5b655e]">Choose one of 12 self-guided audio lessons for $14.99 each. Pay the full $14.99 once through secure GoHighLevel course checkout—no estimate, signature, deposit, appointment, or membership required. You can also explore upcoming manuscripts and bundles.</p>
+          <p className="mt-3 text-lg text-[#5b655e]">The video collection above is a separate one-time purchase. Below you can choose from 12 self-guided audio lessons for $14.99 each, or explore written resources and bundles. No appointment, recurring membership, or service estimate is required for these digital lessons.</p>
         </div>
         <div className="mx-auto mb-8 max-w-3xl rounded-xl border-2 border-[#145b35] bg-[#fffdf4] p-5 text-center"><p className="font-bold">Know your rights before enrolling: digital-product refund requests are accepted within 7 calendar days after purchase.</p><a href="/refund-policy" className="mt-2 inline-block font-extrabold text-[#145b35] underline">Read the Refund &amp; Cancellation Policy →</a></div>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
@@ -155,7 +185,7 @@ export default function Shop() {
             </article>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for audio lessons</h2><p className="mt-2 text-white/80">Select Enroll Now on any audio lesson to open its published GoHighLevel course checkout. Other product formats remain preview-only until their purchase and fulfillment steps are verified. Previous purchases remain subject to their original terms.</p></div></div></div>
+        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Manuscripts and bundles remain preview-only until their purchase and fulfillment are ready. Previous purchases retain their original terms.</p></div></div></div>
       </main>
     </div>
   );

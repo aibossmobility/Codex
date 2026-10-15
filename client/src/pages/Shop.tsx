@@ -56,11 +56,11 @@ export default function Shop() {
     <div className="min-h-screen bg-[#f4dea0] text-[#17231c]">
       <PageMeta title="Papa Life Products — Explore Self-Paced Courses" description="A welcoming place for fathers of adult children to discover original Papa Life videos, audio lessons, and written resources for rebuilding trust and connection." />
       <nav className="border-b border-[#17231c]/20 bg-[#f2c230]">
-        <div className="container flex min-h-20 items-center justify-between gap-5 py-3">
+        <div className="container flex min-h-20 flex-col items-start justify-between gap-3 py-3 sm:flex-row sm:items-center">
           <a href="/"><SiteLogo size="md" /></a>
-          <div className="flex items-center gap-3">
-            <a href="/my-journey" className="text-sm font-bold hover:text-[#b33a32]">Awareness Wheel</a>
-            <a href="/courses" className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white">Explore Courses</a>
+          <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end sm:gap-3">
+            <a href="/my-journey" className="text-sm font-bold leading-snug hover:text-[#b33a32]">Awareness Wheel</a>
+            <a href="/courses" className="rounded-md bg-[#145b35] px-3 py-2 text-sm font-extrabold text-white sm:px-4 sm:py-3">Explore Courses</a>
           </div>
         </div>
       </nav>
@@ -75,7 +75,7 @@ export default function Shop() {
         <div className="container relative py-20 sm:py-28 lg:py-32">
           <div className="max-w-2xl">
             <p className="inline-block border-b-2 border-[#f2c230] pb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-[#f2c230]">Welcome to Papa Life</p>
-            <h1 className="mt-5 font-serif text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">There is room here for the father you are becoming.</h1>
+            <h1 className="mt-5 max-w-full break-words font-serif text-3xl font-bold leading-tight sm:text-5xl lg:text-6xl">There is room here for the father you are becoming.</h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#fff4d9]">Step inside a collection of thoughtful lessons, stories, and resources for fathers navigating relationships with their adult children. Explore at your own pace, with honesty, hope, and no pressure.</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a href="#video-collection" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#f2c230] px-7 py-3 font-extrabold text-[#17231c] transition hover:bg-[#ffe070]">Explore the video series <ArrowRight className="h-4 w-4" /></a>

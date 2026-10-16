@@ -65,22 +65,32 @@ export default function Shop() {
         </div>
       </nav>
 
-      <header className="relative isolate overflow-hidden bg-[#333022] text-white">
-        <img
-          src="/images/papa-life-single-father.png"
-          alt="An older Black father sitting thoughtfully beside a window, books and warm afternoon light"
-          className="absolute inset-0 h-full w-full object-cover object-[61%_center]"
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#19271e]/95 via-[#1c281f]/82 to-[#2a291d]/40" />
-        <div className="container relative py-20 sm:py-28 lg:py-32">
-          <div className="max-w-2xl">
-            <p className="inline-block border-b-2 border-[#f2c230] pb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-[#f2c230]">Welcome to Papa Life</p>
-            <h1 className="mt-5 max-w-full break-words font-serif text-3xl font-bold leading-tight sm:text-5xl lg:text-6xl">There is room here for the father you are becoming.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#fff4d9]">Step inside a collection of thoughtful lessons, stories, and resources for fathers navigating relationships with their adult children. Explore at your own pace, with honesty, hope, and no pressure.</p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a href="#video-collection" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#f2c230] px-7 py-3 font-extrabold text-[#17231c] transition hover:bg-[#ffe070]">Explore the video series <ArrowRight className="h-4 w-4" /></a>
-              <a href="#audio-lessons" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-[#fff0bf]/70 px-7 py-3 font-semibold text-white transition hover:bg-white/10">Browse audio lessons</a>
+      <header id="featured-book" className="relative isolate overflow-hidden border-b-4 border-[#d5ab4b] bg-[#f9efdc] text-[#17231c]">
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_5%_20%,rgba(238,199,117,0.25),transparent_60%),radial-gradient(ellipse_at_95%_75%,rgba(20,91,53,0.09),transparent_60%)]" />
+        <div className="container relative grid items-center gap-9 py-12 sm:gap-12 sm:py-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:py-20">
+          <div className="mx-auto w-full max-w-[20rem] sm:max-w-[24rem] lg:max-w-[25rem]">
+            <img
+              src="/images/run-your-own-race-book-cover.png"
+              alt="Run Your Own Race book cover: Brian Keith Hill wearing a backward black cap, black shirt, glasses and an African scarf, hands clasped against a colorful African savannah and winding road"
+              width="1024"
+              height="1536"
+              fetchPriority="high"
+              className="h-auto w-full rounded-sm border-4 border-[#d8ad45] shadow-[0_20px_55px_rgba(27,40,29,0.30)]"
+            />
+          </div>
+          <div className="mx-auto max-w-2xl text-center lg:text-left">
+            <p className="text-xs font-black uppercase tracking-[0.20em] text-[#a64031]">Featured Papa Life book · A journey of faith and purpose</p>
+            <h1 className="mt-4 font-serif text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">Run Your Own Race</h1>
+            <p className="mt-5 font-serif text-xl italic leading-relaxed text-[#315843]">A personal journey from Brian Keith Hill</p>
+            <p className="mt-5 text-lg leading-relaxed text-[#3f4d43]">Twenty-one chapters about faith, family, fatherhood, identity, and finding the courage to walk your own path. Written from lived experience for anyone ready to reflect, grow, and keep moving forward.</p>
+            <p className="mt-5 font-bold text-[#145b35]">21 chapters · Complete EPUB and PDF digital book</p>
+            <p className="mt-4 text-3xl font-black text-[#17231c]">$24.99 <span className="text-base font-medium text-[#58675d]">regular one-time price</span></p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <span role="status" className="inline-flex min-h-12 items-center rounded-full bg-[#145b35] px-7 py-3 font-extrabold text-white">Coming Soon · Book sales not yet open</span>
+              <a href="#audio-lessons" className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-[#145b35] px-6 py-3 font-extrabold text-[#145b35] hover:bg-[#145b35] hover:text-white">Explore available lessons <ArrowRight className="h-4 w-4" /></a>
             </div>
+            <p className="mt-4 text-sm leading-relaxed text-[#657267]">Digital book checkout and automatic delivery are being verified. No subscription, reservation, or appointment required.</p>
+            <p className="mt-4 border-t border-[#ddc99f] pt-4 text-base font-semibold text-[#315843]">There is room here for the father you are becoming.</p>
           </div>
         </div>
       </header>

@@ -3063,6 +3063,37 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     };
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
+  // Direct room links must return a usable public 200 response, not a 404.
+  if (pathname === "/house" || pathname.startsWith("/house/")) {
+    const roomPages: Record<string, {name: string; description: string; destination: string}> = {
+      "living-room": { name: "The Living Room", description: "Welcome to Papa Life. Begin with the Awareness Wheel and explore fatherhood resources.", destination: "/#fatherhood-wheel" },
+      library: { name: "The Reading Nook", description: "Explore written resources by Brian Keith Hill, including Run Your Own Race.", destination: "/shop" },
+      "listening-room": { name: "The Listening Room", description: "Find Papa Life audio lessons and reflections for fathers of adult children.", destination: "/shop" },
+      theater: { name: "The Theater", description: "Discover self-guided Papa Life videos and lessons in the resource shop.", destination: "/shop" },
+      "dad-cave": { name: "The Dad Cave", description: "Reflect on Presence, Authority, Purpose, and Alignment. Explore your fatherhood journey.", destination: "/my-journey" },
+      resources: { name: "The Resource Room", description: "Explore useful tools, written resources, audio lessons, and digital products.", destination: "/shop" },
+      "sky-room": { name: "The Sky Room", description: "Discover a brighter horizon with Run Your Own Race and Papa Life resources.", destination: "/shop" },
+    };
+    const slug = pathname === "/house" ? "" : pathname.slice("/house/".length);
+    const room = slug ? roomPages[slug] : null;
+    if (slug && !room) return notFoundServerPage();
+    const title = room ? room.name + " | Papa Life House" : "Welcome Inside | Explore the Papa Life House";
+    const description = room?.description || "Step into Papa Life's welcoming home, with rooms for books, audio, video, fatherhood conversations, and resources.";
+    const roomLinks = Object.entries(roomPages).map(([key, value]) =>
+      '<a href="/house/' + key + '">' + escapeHtml(value.name) + "</a>"
+    ).join(" · ");
+    const navigation = '<nav aria-label="Explore Papa Life rooms"><h2>Explore the rooms</h2><p>' + roomLinks + '</p></nav>';
+    const page: StaticServerPage = {
+      title,
+      description,
+      eyebrow: room ? "Papa Life · Make yourself at home" : "Papa Life · Come Inside",
+      headline: room ? room.name : "Make yourself at home.",
+      intro: description,
+      sections: [{ heading: "Wander at your own pace", body: "Read, listen, reflect, watch lessons and explore original Papa Life resources." }],
+      cta: room ? { label: "Explore resources in this room", href: room.destination } : { label: "Browse Resources", href: "/shop" },
+    };
+    return {status: 200, title, description, bodyHtml: serverPageShell(page, navigation)};
+  }
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();
   if (pathname === "/shop") {
@@ -6981,6 +7012,7 @@ async function startServer() {
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
       "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
+      "/house", "/house/living-room", "/house/library", "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources", "/house/sky-room",
     ];
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
     const today = new Date().toISOString().slice(0, 10);

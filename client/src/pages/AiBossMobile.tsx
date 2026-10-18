@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users, Volume2 } from "lucide-react";
+import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, ClipboardList, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,6 +60,16 @@ export default function AiBossMobile() {
   const [mission, setMission] = useState<Mission | null>(null);
   const [loading, setLoading] = useState(true);
   const [instruction, setInstruction] = useState("");
+  const [assignmentOpen, setAssignmentOpen] = useState(false);
+  const [assignmentProject, setAssignmentProject] = useState<"papa-life" | "ai-boss-mobility">("papa-life");
+  const [assignmentRole, setAssignmentRole] = useState("seo-website");
+  const [assignmentText, setAssignmentText] = useState("");
+  const [assignmentRequestId, setAssignmentRequestId] = useState(() => window.crypto.randomUUID());
+  const [assignmentSaving, setAssignmentSaving] = useState(false);
+  const [assignmentListening, setAssignmentListening] = useState(false);
+  const assignmentRecognitionRef = useRef<any>(null);
+  const [lastAssignmentId, setLastAssignmentId] = useState<number | null>(null);
+
   const [saving, setSaving] = useState(false);
   const [listening, setListening] = useState(false);
   const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
@@ -146,6 +156,7 @@ export default function AiBossMobile() {
       if (companionTimer) window.clearInterval(companionTimer);
       saveVoiceOnEndRef.current = false;
       recognitionRef.current?.abort?.();
+      assignmentRecognitionRef.current?.abort?.();
       window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       window.removeEventListener("appinstalled", onAppInstalled);
       manifest.remove();
@@ -198,6 +209,70 @@ export default function AiBossMobile() {
       toast.error(error instanceof Error ? error.message : "Instruction could not be captured.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  function dictateWorkerAssignment() {
+    if (assignmentListening) {
+      assignmentRecognitionRef.current?.stop?.();
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.message("Speech input isn't available in this browser. Please type the assignment.");
+      return;
+    }
+    const recognizer = new SpeechRecognition();
+    recognizer.lang = "en-US";
+    recognizer.continuous = false;
+    recognizer.interimResults = true;
+    const prefix = assignmentText.trim();
+    recognizer.onresult = (event: any) => {
+      const spoken = Array.from(event.results as any[])
+        .map((result: any) => result?.[0]?.transcript || "").join(" ").trim();
+      setAssignmentText([prefix, spoken].filter(Boolean).join(" ").slice(0, 2000));
+    };
+    recognizer.onerror = () => {
+      setAssignmentListening(false);
+      toast.message("Voice capture stopped. You can review or type the assignment.");
+    };
+    recognizer.onend = () => {
+      setAssignmentListening(false);
+      assignmentRecognitionRef.current = null;
+    };
+    assignmentRecognitionRef.current = recognizer;
+    try {
+      recognizer.start();
+      setAssignmentListening(true);
+    } catch {
+      toast.error("The microphone couldn't be started.");
+    }
+  }
+
+  async function submitWorkerAssignment(event: FormEvent) {
+    event.preventDefault();
+    if (assignmentText.trim().length < 12 || assignmentSaving) return;
+    setAssignmentSaving(true);
+    try {
+      const result = await apiJson<{ assignment: { id: number; status: string } }>("/api/admin/ai-boss/worker-assignments", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          project: assignmentProject,
+          role: assignmentRole,
+          instruction: assignmentText.trim(),
+          request_id: assignmentRequestId,
+        }),
+      });
+      setLastAssignmentId(result.assignment.id);
+      setAssignmentText("");
+      setAssignmentRequestId(window.crypto.randomUUID());
+      toast.success("Assignment queued for your approval. No worker has started yet.");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "The worker assignment could not be queued.");
+    } finally {
+      setAssignmentSaving(false);
     }
   }
 
@@ -268,7 +343,7 @@ export default function AiBossMobile() {
                 <Smartphone className="mr-2 h-4 w-4" />Install
               </Button>
             )}
-            <Button size="sm" variant="outline" className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/ai-boss/all-pages")}>All Pages</Button>
+            <Button size="sm" variant="outline" className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/papa-life-os/all-pages")}>All Pages</Button>
             <Button size="icon" variant="ghost" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
           </div>
         </div>
@@ -292,23 +367,62 @@ export default function AiBossMobile() {
           <StatusCard icon={Smartphone} label="Phone requests" value={String(mission?.open_mobile_instructions || 0)} tone="neutral" />
         </section>
 
-        <Card className="bg-[#111] border-brand-yellow/30 overflow-hidden">
+        <Card className="bg-[#111] border-brand-yellow/30">
           <CardContent className="p-5 sm:p-7">
-            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life Field Action</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life OS — Worker Command Center</p>
             <button
               type="button"
-              onClick={() => (listening && captureMode === "father" ? stopVoice() : startVoice("father"))}
-              disabled={saving}
-              className="mx-auto mt-5 flex aspect-square w-[min(72vw,360px)] max-w-full flex-col items-center justify-center rounded-full border-[10px] border-[#f2cb58] bg-[#d9aa21] px-8 text-center text-black transition active:scale-[0.98] disabled:opacity-70"
+              onClick={() => setAssignmentOpen((open) => !open)}
+              className="mx-auto mt-5 flex aspect-square w-[min(72vw,320px)] max-w-full flex-col items-center justify-center rounded-full border-[10px] border-[#f2cb58] bg-[#d9aa21] px-6 text-center text-black transition active:scale-[0.98]"
+              aria-expanded={assignmentOpen}
+              aria-controls="assign-worker-form"
             >
-              {saving && captureMode === "father" ? <Loader2 className="mb-4 h-9 w-9 animate-spin" /> : listening && captureMode === "father" ? <Mic className="mb-4 h-9 w-9 animate-pulse" /> : null}
-              <span className="text-lg font-black tracking-[0.14em]">I JUST</span>
-              <span className="mt-2 text-[clamp(1.9rem,7vw,2.8rem)] font-black leading-none">MET A FATHER</span>
-              <span className="mt-4 text-base font-bold">{listening && captureMode === "father" ? "Listening… tap when finished" : "Tap to remember what happened"}</span>
+              <ClipboardList className="mb-3 h-12 w-12" aria-hidden="true" />
+              <span className="text-sm font-black tracking-[0.14em]">PAPA LIFE OS</span>
+              <span className="mt-3 text-[clamp(1.65rem,6vw,2.5rem)] font-black leading-tight">GIVE ASSIGNMENT TO WORKERS</span>
+              <span className="mt-4 text-base font-semibold">{assignmentOpen ? "Tap to close assignment form" : "Tap to choose a worker"}</span>
             </button>
-            <div className="mt-5 flex justify-center">
-              <Button variant="ghost" className="text-white underline underline-offset-4" onClick={() => navigate("/crm-console")}><Users className="mr-2 h-4 w-4" />View relationships</Button>
-            </div>
+            {assignmentOpen && (
+              <form id="assign-worker-form" onSubmit={submitWorkerAssignment} className="mt-5 space-y-3 rounded-xl border border-brand-yellow/30 bg-black/40 p-4">
+                <label htmlFor="worker-project" className="block text-sm font-semibold text-white">Business</label>
+                <select id="worker-project" value={assignmentProject} onChange={(event) => {
+                  const project = event.target.value as "papa-life" | "ai-boss-mobility";
+                  setAssignmentProject(project);
+                  if (assignmentRole === "papa-life-director" && project !== "papa-life" || assignmentRole === "ai-boss-mobility-director" && project !== "ai-boss-mobility") setAssignmentRole("seo-website");
+                }} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
+                  <option value="papa-life">Papa Life</option>
+                  <option value="ai-boss-mobility">AI Boss Mobility Consulting</option>
+                </select>
+                <label htmlFor="worker-role" className="block text-sm font-semibold text-white">Assigned worker</label>
+                <select id="worker-role" value={assignmentRole} onChange={(event) => setAssignmentRole(event.target.value)} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
+                  <option value="seo-website">SEO & Website Worker</option>
+                  <option value="crm-sales">CRM & Sales Worker</option>
+                  <option value="quality-compliance">Quality & Compliance Worker</option>
+                  <option value="outreach-followup">Outreach & Follow-up Worker (draft review only)</option>
+                  <option value="content-distribution">Content & Distribution Worker (planning only)</option>
+                  <option value="scheduling-communications">Scheduling & Communications Worker</option>
+                  <option value="finance-records">Finance Records Worker</option>
+                  <option value="financial-director">Financial Director</option>
+                  <option value="marketing-revenue-director">Marketing & Revenue Director</option>
+                  {assignmentProject === "papa-life" && <option value="papa-life-director">Papa Life Director</option>}
+                  {assignmentProject === "ai-boss-mobility" && <option value="ai-boss-mobility-director">AI Boss Mobility Director</option>}
+                </select>
+                <label htmlFor="worker-instruction" className="block text-sm font-semibold text-white">What should the worker review?</label>
+                <Textarea id="worker-instruction" minLength={12} maxLength={2000} required value={assignmentText} onChange={(event) => setAssignmentText(event.target.value)} placeholder="Review broken links on my Papa Life website and prepare a report. No purchases, messages, or edits." className="min-h-28 border-white/20 bg-[#181818] text-base" />
+                <Button type="button" variant="outline" disabled={assignmentSaving} onClick={dictateWorkerAssignment} className="w-full border-brand-yellow/40 text-brand-yellow">
+                  <Mic2 className="mr-2 h-4 w-4" />{assignmentListening ? "Finish speaking" : "Speak assignment instead of typing"}
+                </Button>
+                <p className="text-xs text-gray-400">Read-only worker assignments. No model credits requested. Your approval is required before execution, and Mac delivery must be verified.</p>
+                <Button type="submit" disabled={assignmentSaving || assignmentText.trim().length < 12} className="w-full bg-brand-yellow text-black hover:bg-brand-yellow/90">
+                  {assignmentSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ClipboardList className="mr-2 h-4 w-4" />}
+                  Queue Worker Assignment
+                </Button>
+                {lastAssignmentId !== null && <p className="text-sm text-brand-yellow">Assignment #{lastAssignmentId} saved for approval. This does not mean the Mac worker has started.</p>}
+                <Button type="button" variant="outline" className="w-full border-white/30" onClick={() => navigate("/papa-life-os/approvals")}>
+                  <ShieldCheck className="mr-2 h-4 w-4" />Review Approvals &amp; Queue
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
 
@@ -372,7 +486,7 @@ export default function AiBossMobile() {
 
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickLink icon={Brain} label="Executive Memory" onClick={() => navigate("/executive-memory")} />
-          <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/executive-memory")} />
+          <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />
           <QuickLink icon={Mail} label="Gmail Operations" onClick={() => navigate("/executive-memory")} />
           <QuickLink icon={CalendarDays} label="Human Impact" onClick={() => navigate("/research-lab")} />
         </section>

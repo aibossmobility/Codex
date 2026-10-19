@@ -37,7 +37,6 @@ import PapaStart from "./pages/PapaStart";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
 import PapaIntroVideo from "./pages/PapaIntroVideo";
-import PapaJournal from "./pages/PapaJournal";
 import PapaFirstLesson from "./pages/PapaFirstLesson";
 import PapaDailyWorkReport from "./pages/PapaDailyWorkReport";
 import PapaAiExperience from "./pages/PapaAiExperience";
@@ -72,7 +71,7 @@ function Router() {
       <Route path={"/crm"} component={CrmIntake} />
       <Route path={"/crm-console"} component={Dashboard} />
       <Route path={"/papa-intro"} component={PapaIntroVideo} />
-      <Route path="/papa-journal" component={PapaJournal} />
+      <Route path="/papa-journal"><Redirect to="/papa-first-lesson" /></Route>
       <Route path="/papa-first-lesson" component={PapaFirstLesson} />
       <Route path="/papa-daily-work-report" component={PapaDailyWorkReport} />
       <Route path="/ai-coach" component={PapaAiExperience} />

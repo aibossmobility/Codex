@@ -6,9 +6,8 @@
 export const FUNNEL_PAGE_PATHS = {
   crm: "/crm",
   video: "/papa-intro",
-  journal: "/papa-journal",
   firstLesson: "/papa-first-lesson",
-  googleBooking: "mailto:brian@papalifecoach.com?subject=Papa%20Life%20Conversation%20Request",
+  courses: "/courses",
 } as const;
 
 /** Sequence A — Submitted intake, did NOT watch video (send immediately) */
@@ -18,18 +17,18 @@ export const SEQUENCE_A = {
     `You started for a reason. Go here and watch this first: ${baseUrl}${FUNNEL_PAGE_PATHS.video}`,
 };
 
-/** Sequence B — Watched, did NOT journal (send after 1 day) */
+/** Sequence B — Watched intro; suggest first digital lesson */
 export const SEQUENCE_B = {
   subject: "Awareness is not the same as movement.",
   bodyTemplate: (baseUrl: string) =>
-    `Awareness is not the same as movement. Take the next step here: ${baseUrl}${FUNNEL_PAGE_PATHS.journal}`,
+    `Awareness is not the same as movement. Take the next step here: ${baseUrl}${FUNNEL_PAGE_PATHS.firstLesson}`,
 };
 
-/** Sequence C — Journaled, did NOT book (send after 2 days) */
+/** Sequence C — Continue self-guided course path */
 export const SEQUENCE_C = {
   subject: "You do not need more information right now.",
-  bodyTemplate: () =>
-    `You do not need more information right now. You need the right next step. Request a Papa Life conversation here: ${FUNNEL_PAGE_PATHS.googleBooking}`,
+  bodyTemplate: (baseUrl: string) =>
+    `You do not need more information right now. Choose your next guided Papa Life lesson here: ${baseUrl}${FUNNEL_PAGE_PATHS.courses}`,
 };
 
 /** Sequence D — No activity after intake (send after 3 days) */

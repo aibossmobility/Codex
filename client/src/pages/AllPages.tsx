@@ -13,7 +13,6 @@ const groups: PageGroup[] = [
       { label: "Home", path: "/" },
       { label: "Courses", path: "/courses" },
       { label: "Papa Intro", path: "/papa-intro" },
-      { label: "Papa Journal", path: "/papa-journal" },
       { label: "Papa First Lesson", path: "/papa-first-lesson" },
       { label: "Papa Daily Work Report", path: "/papa-daily-work-report" },
       { label: "AI Coach", path: "/ai-coach" },

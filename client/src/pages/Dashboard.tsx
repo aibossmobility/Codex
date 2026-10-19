@@ -934,7 +934,6 @@ function Sidebar({
     { id: "sms", label: "SMS campaigns", Icon: Megaphone },
     { id: "curriculum", label: "Curriculum", Icon: GraduationCap },
     { id: "resources", label: "Teaching Docs", Icon: BookOpen },
-    { id: "journal-prompts", label: "Journal Prompts", Icon: BookMarked },
     { id: "metrics", label: "System Metrics", Icon: BarChart3 },
     { id: "settings", label: "Settings", Icon: Settings },
   ];
@@ -2744,7 +2743,6 @@ export default function Dashboard() {
         {view === "sms" && <SmsCampaigns />}
         {view === "curriculum" && <Curriculum />}
         {view === "resources" && <Resources />}
-        {view === "journal-prompts" && <JournalPrompts />}
         {view === "metrics" && <SystemMetrics stats={stats} />}
         {view === "settings" && <GhlIntegrationSettings />}
       </main>

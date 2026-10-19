@@ -23,3 +23,13 @@ Papa Life OS is now the owner command center for existing authenticated workers,
 - Confirm normal admin can queue and approve without Research Lab access.
 - Check that new membership registration returns 410, Research Lab route redirects, and daily reports save locally without contacting the legacy server.
 - Submit and approve one no-cost read-only website-worker assignment from Android; verify the Mac receipt and completion.
+
+## Legacy journal retirement
+- Unmounted the old /papa-journal intake; bookmarked links now send visitors to the current first lesson.
+- Updated intro and first-lesson links and removed the journal entry from the directory.
+- Removed journal navigation from the existing member portal and administrator CRM. Journal URLs in query strings cannot open the retired editor.
+- Disabled new legacy member journal entry submissions and admin prompt creation/edit endpoints (HTTP 410); preserved existing private historic records/read access and deletion/export pathways.
+- The unused iShareHow-branded PapaJourneyFunnel and old PapaJournal source components were retired from the working code; Git history preserves earlier copies.
+- This does not disable Papa Life OS Daily Work Reports, first lesson, course content, fatherhood reflections within lessons, or Mac worker assignments.
+
+- Legacy funnel sequences now direct users to the first lesson or course catalog, not a journal or appointment.

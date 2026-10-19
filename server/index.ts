@@ -2723,15 +2723,6 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     sections: [{ heading: "Watch first", body: "Begin here to understand the mission, message, and next step." }],
     cta: { label: "Start the Free Workshop", href: "/papa-first-lesson" },
   },
-  "/papa-journal": {
-    title: "Papa Life Journal",
-    description: "Journal prompts and reflection for fathers practicing the Papa Life path.",
-    eyebrow: "Journal",
-    headline: "Reflect before you react.",
-    intro: "Papa Life journaling helps fathers process emotion, clarify intent, and practice a steadier way of showing up.",
-    sections: [{ heading: "Reflection", body: "Use prompts to connect your values, words, and actions." }],
-    noindex: true,
-  },
   "/papa-daily-work-report": {
     title: "Papa Life Daily Work Report",
     description: "Daily work report for Papa Life operations.",
@@ -4616,17 +4607,14 @@ async function startServer() {
     res.json(prompts);
   });
 
-  app.post("/api/admin/journal-prompts", requireAuth, (req, res) => {
-    const { pillar, prompt_text } = req.body;
-    if (!pillar?.trim() || !prompt_text?.trim()) return res.status(400).json({ ok: false, error: "Pillar and prompt text required" });
-    const result = db.prepare("INSERT INTO journal_prompts (pillar, prompt_text) VALUES (?, ?)").run(pillar.trim(), prompt_text.trim());
-    res.json({ ok: true, id: result.lastInsertRowid });
+  // Prevent new entries and edits to the old member journaling program.
+  // Preserve existing prompts and member records for reference or export.
+  app.post("/api/admin/journal-prompts", requireAuth, (_req, res) => {
+    return res.status(410).json({ ok: false, error: "Legacy journal prompts are retired." });
   });
 
-  app.put("/api/admin/journal-prompts/:id", requireAuth, (req, res) => {
-    const { pillar, prompt_text, sort_order } = req.body;
-    db.prepare("UPDATE journal_prompts SET pillar = ?, prompt_text = ?, sort_order = ? WHERE id = ?").run(pillar, prompt_text, sort_order ?? 0, req.params.id);
-    res.json({ ok: true });
+  app.put("/api/admin/journal-prompts/:id", requireAuth, (_req, res) => {
+    return res.status(410).json({ ok: false, error: "Legacy journal prompts are retired." });
   });
 
   app.delete("/api/admin/journal-prompts/:id", requireAuth, (req, res) => {
@@ -4645,12 +4633,13 @@ async function startServer() {
     res.json(entries);
   });
 
-  app.post("/api/member/journal", requireMemberAuth, (req, res) => {
-    const memberId = (req.session as any).memberId;
-    const { pillar, prompt, body } = req.body;
-    if (!pillar?.trim() || !body?.trim()) return res.status(400).json({ ok: false, error: "Pillar and body required" });
-    const result = db.prepare("INSERT INTO journal_entries (member_id, pillar, prompt, body) VALUES (?, ?, ?, ?)").run(memberId, pillar.trim(), prompt?.trim() || "", body.trim());
-    res.json({ ok: true, id: result.lastInsertRowid });
+  // Legacy journal collection is retired. Historic entries remain available
+  // through the member-authenticated read endpoint and are not deleted.
+  app.post("/api/member/journal", requireMemberAuth, (_req, res) => {
+    return res.status(410).json({
+      ok: false,
+      error: "Legacy Papa Life journaling is closed. Explore current digital courses instead.",
+    });
   });
 
   app.delete("/api/member/journal/:id", requireMemberAuth, (req, res) => {

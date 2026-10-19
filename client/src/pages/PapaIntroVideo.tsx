@@ -54,8 +54,8 @@ export default function PapaIntroVideo() {
             asChild
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 text-lg rounded-full"
           >
-            <Link href="/papa-journal">
-              <a>Go To My Reflection Step</a>
+            <Link href="/papa-first-lesson">
+              <a>Start the First Lesson</a>
             </Link>
           </Button>
         </div>

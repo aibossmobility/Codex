@@ -13,7 +13,6 @@ import PapaHouse from "./pages/PapaHouse";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import MemberLogin from "./pages/MemberLogin";
-import MemberRegister from "./pages/MemberRegister";
 import MemberActivate from "./pages/MemberActivate";
 import MemberForgotPassword from "./pages/MemberForgotPassword";
 import MemberResetPassword from "./pages/MemberResetPassword";
@@ -24,7 +23,6 @@ import Strategist from "./pages/Strategist";
 import ThemeMatrix from "./pages/ThemeMatrix";
 import Operators from "./pages/Operators";
 import Governance from "./pages/Governance";
-import ResearchLab from "./pages/ResearchLab";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
 import AllPages from "./pages/AllPages";
@@ -39,7 +37,6 @@ import PapaStart from "./pages/PapaStart";
 import CourseDetail from "./pages/CourseDetail";
 import CrmIntake from "./pages/CrmIntake";
 import PapaIntroVideo from "./pages/PapaIntroVideo";
-import PapaJournal from "./pages/PapaJournal";
 import PapaFirstLesson from "./pages/PapaFirstLesson";
 import PapaDailyWorkReport from "./pages/PapaDailyWorkReport";
 import PapaAiExperience from "./pages/PapaAiExperience";
@@ -74,7 +71,7 @@ function Router() {
       <Route path={"/crm"} component={CrmIntake} />
       <Route path={"/crm-console"} component={Dashboard} />
       <Route path={"/papa-intro"} component={PapaIntroVideo} />
-      <Route path="/papa-journal" component={PapaJournal} />
+      <Route path="/papa-journal"><Redirect to="/papa-first-lesson" /></Route>
       <Route path="/papa-first-lesson" component={PapaFirstLesson} />
       <Route path="/papa-daily-work-report" component={PapaDailyWorkReport} />
       <Route path="/ai-coach" component={PapaAiExperience} />
@@ -91,7 +88,7 @@ function Router() {
       <Route path="/privacy" component={PrivacyPage} />
       <Route path="/terms" component={TermsPage} />
       <Route path={"/member-login"} component={MemberLogin} />
-      <Route path={"/member-register"} component={MemberRegister} />
+      <Route path={"/member-register"}><Redirect to="/courses" /></Route>
       <Route path={"/member-activate"} component={MemberActivate} />
       <Route path="/member-forgot-password" component={MemberForgotPassword} />
       <Route path="/member-reset-password" component={MemberResetPassword} />
@@ -119,7 +116,7 @@ function Router() {
       <Route path={"/operators"} component={Operators} />
       <Route path={"/governance"} component={Governance} />
       <Route path="/booking"><Redirect to="/courses" /></Route>
-      <Route path={"/research-lab"} component={ResearchLab} />
+      <Route path={"/research-lab"}><Redirect to="/papa-life-os" /></Route>
       <Route path={"/executive-memory"} component={ExecutiveMemory} />
 
       {/* Papa Life OS is the canonical operating interface. */}

@@ -52,8 +52,8 @@ export default function PapaFirstLesson() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm">
         <div className="container max-w-3xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <Link href="/papa-journal">
-            <a className="text-sm text-gray-400 hover:text-brand-yellow transition-colors">← Journal</a>
+          <Link href="/papa-intro">
+            <a className="text-sm text-gray-400 hover:text-brand-yellow transition-colors">← Intro Video</a>
           </Link>
           <SiteLogoStacked size="sm" className="sm:ml-auto" />
         </div>

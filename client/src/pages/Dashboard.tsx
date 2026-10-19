@@ -904,7 +904,6 @@ type View =
   | "alerts"
   | "metrics"
   | "resources"
-  | "members"
   | "curriculum"
   | "journal-prompts"
   | "sms"
@@ -915,8 +914,6 @@ interface AdminUser {
   username: string;
   display_name: string;
   email: string;
-  /** Brian-only Research Lab (server: RESEARCH_LAB_ADMIN_USERNAMES) */
-  researchLabAccess?: boolean;
 }
 
 function Sidebar({
@@ -935,10 +932,8 @@ function Sidebar({
     { id: "papa-ai", label: "Papa AI", Icon: MessageSquare },
     { id: "alerts", label: "Alerts", Icon: Mail },
     { id: "sms", label: "SMS campaigns", Icon: Megaphone },
-    { id: "members", label: "Members", Icon: UserCheck },
     { id: "curriculum", label: "Curriculum", Icon: GraduationCap },
     { id: "resources", label: "Teaching Docs", Icon: BookOpen },
-    { id: "journal-prompts", label: "Journal Prompts", Icon: BookMarked },
     { id: "metrics", label: "System Metrics", Icon: BarChart3 },
     { id: "settings", label: "Settings", Icon: Settings },
   ];
@@ -975,15 +970,7 @@ function Sidebar({
             {label}
           </button>
         ))}
-        {user?.researchLabAccess ? (
-          <Link
-            href="/research-lab"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-primary/90 hover:text-primary/90 hover:bg-primary/10 transition-colors"
-          >
-            <FileStack className="w-4 h-4" />
-            Research Lab
-          </Link>
-        ) : null}
+
       </nav>
 
       <div className="px-4 py-4 border-t border-white/10 space-y-3">
@@ -2548,7 +2535,7 @@ function PapaAiAdmin() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">CTA clicks</p>
                 <p className="mt-2 text-sm leading-relaxed text-gray-300">
-                  Assessment: {actionCoachSummary.cta_clicks.reconnection_assessment} · Private conversation: {actionCoachSummary.cta_clicks.private_conversation} · Tuesday Live: {actionCoachSummary.cta_clicks.tuesday_live} · Membership: {actionCoachSummary.cta_clicks.membership}
+                  Assessment: {actionCoachSummary.cta_clicks.reconnection_assessment} · Private conversation: {actionCoachSummary.cta_clicks.private_conversation} · Tuesday Live: {actionCoachSummary.cta_clicks.tuesday_live}
                 </p>
               </div>
               <div>
@@ -2754,10 +2741,8 @@ export default function Dashboard() {
         {view === "papa-ai" && <PapaAiAdmin />}
         {view === "alerts" && <AdminAlerts />}
         {view === "sms" && <SmsCampaigns />}
-        {view === "members" && <Members />}
         {view === "curriculum" && <Curriculum />}
         {view === "resources" && <Resources />}
-        {view === "journal-prompts" && <JournalPrompts />}
         {view === "metrics" && <SystemMetrics stats={stats} />}
         {view === "settings" && <GhlIntegrationSettings />}
       </main>

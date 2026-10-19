@@ -356,7 +356,6 @@ function PortalSidebar({
 }) {
   const communityItems: { id: PortalView; label: string; Icon: typeof LayoutDashboard }[] = [
     { id: "home", label: "My Journey", Icon: LayoutDashboard },
-    { id: "journal", label: "Journal", Icon: BookMarked },
     { id: "brotherhood", label: "Brotherhood", Icon: Users2 },
     { id: "events", label: "Events", Icon: CalendarDays },
   ];
@@ -517,7 +516,6 @@ function MyJourney({
           {/* Quick actions */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Write in Journal", icon: BookMarked, view: "journal" as PortalView, color: "from-primary/10 to-primary/5 border-primary/20 text-primary" },
               { label: "Join Brotherhood", icon: Users2, view: "brotherhood" as PortalView, color: "from-brand-yellow/10 to-brand-yellow/5 border-brand-yellow/20 text-brand-yellow" },
               { label: "Next Lesson", icon: GraduationCap, view: "courses" as PortalView, color: "from-green-400/10 to-green-400/5 border-green-400/20 text-green-400" },
             ].map(({ label, icon: Icon, view, color }) => (
@@ -1249,7 +1247,7 @@ function ProfileView({ user }: { user: MemberUser | null }) {
 export default function MemberPortal() {
   const [, navigate] = useLocation();
   const requestedView = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("view") : null;
-  const validViews: PortalView[] = ["home", "courses", "journal", "brotherhood", "events", "library", "profile"];
+  const validViews: PortalView[] = ["home", "courses", "brotherhood", "events", "library", "profile"];
   const initialView = validViews.includes(requestedView as PortalView) ? (requestedView as PortalView) : "home";
   const [view, setView] = useState<PortalView>(initialView);
   const [user, setUser] = useState<MemberUser | null>(null);
@@ -1338,7 +1336,6 @@ export default function MemberPortal() {
           <>
             {view === "home" && access.community && <MyJourney user={user} onNavigate={setView} />}
             {view === "courses" && <CoursesView courses={courses} completedIds={completedIds} onToggleComplete={handleToggleComplete} />}
-            {view === "journal" && access.community && <JournalView />}
             {view === "brotherhood" && access.community && <BrotherhoodView currentMemberId={user?.id || 0} />}
             {view === "events" && access.community && <EventsView />}
             {view === "library" && <LibraryView user={user} access={access} />}

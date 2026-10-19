@@ -23,5 +23,13 @@ const done=reportWorkerResult(db,Number(q.id),{lease:claim.lease,project:request
 assert.equal(done.status,"completed");
 assert.equal(claimApprovedWorkerAssignment(db),null);
 assert.equal((db.prepare("select count(*) as count from executive_actions").get() as any).count,1);
+const ghlRequest={project:"papa-life",role:"ghl-customer-service",instruction:"Review Papa Life customer follow-up issue without changing records.",request_id:randomUUID()};
+const ghlQueued=queueWorkerAssignment(db,ghlRequest);
+assert.equal(claimApprovedWorkerAssignment(db),null,"new unapproved GHL tasks never reach Mac");
+decideExecutiveAction(db,Number(ghlQueued.id),{decision:"approve",note:"Owner approved isolated GHL test"});
+const ghlClaim=claimApprovedWorkerAssignment(db)!;
+assert.equal(ghlClaim.role,"ghl-customer-service");
+assert.equal(ghlClaim.project,"papa-life");
+assert.equal(reportWorkerResult(db,Number(ghlQueued.id),{lease:ghlClaim.lease,project:"papa-life",role:"ghl-customer-service",read_only:true,completed:true}).status,"completed");
 db.close();
 console.log("Cloud worker relay: 1 approval gated claim; lease protection; verified result; no duplicate");

@@ -16,7 +16,7 @@ const LOCAL_DB = path.join(os.homedir(),"Developer","Codex-seo-health-20261004",
 const ROLES = new Set([
   "financial-director","marketing-revenue-director","papa-life-director",
   "ai-boss-mobility-director","outreach-followup","content-distribution",
-  "seo-website","crm-sales","finance-records","scheduling-communications","quality-compliance",
+  "seo-website","crm-sales","ghl-customer-service","finance-records","scheduling-communications","quality-compliance",
 ]);
 type Claim = {action_id:number;project:string;role:string;instruction:string;request_id:string;lease:string};
 

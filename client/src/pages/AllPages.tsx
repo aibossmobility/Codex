@@ -54,7 +54,6 @@ const groups: PageGroup[] = [
       { label: "Theme Matrix", path: "/theme-matrix" },
       { label: "Operators", path: "/operators" },
       { label: "Governance", path: "/governance" },
-      { label: "Research Lab", path: "/research-lab" },
       { label: "YouTube Growth", path: "/papa-life-os/youtube-growth" },
       { label: "Approvals & Queue", path: "/papa-life-os/approvals" },
       { label: "Takeover", path: "/papa-life-os/takeover" },

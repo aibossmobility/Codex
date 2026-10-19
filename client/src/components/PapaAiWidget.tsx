@@ -30,7 +30,7 @@ type ActionLink = {
   href: string;
   label: string;
   detail: string;
-  interest: "Reconnection Assessment" | "Private Conversation" | "Tuesday Live" | "Membership";
+  interest: "Reconnection Assessment" | "Private Conversation" | "Tuesday Live";
   icon: typeof ClipboardCheck;
   primary: boolean;
 };
@@ -70,14 +70,6 @@ const actionLinks: ActionLink[] = [
     detail: "Learn with other fathers",
     interest: "Tuesday Live",
     icon: Users,
-    primary: false,
-  },
-  {
-    href: "/courses",
-    label: "Explore Papa Life Courses",
-    detail: "Review course details and current access",
-    interest: "Membership",
-    icon: ArrowRight,
     primary: false,
   },
 ];

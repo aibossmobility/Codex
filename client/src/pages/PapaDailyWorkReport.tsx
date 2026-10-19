@@ -103,7 +103,7 @@ const sections = [
 
 const outcomeLabels = [
   "Digital Dojo session held",
-  "New subscriber / member added",
+  "Digital service or course purchase",
   "GHL pipeline stage moved",
   "Social post published",
   "Clarity Session booked",
@@ -113,7 +113,7 @@ const outcomeLabels = [
   "Master KB updated",
   "ORACLE / ElevenLabs agent updated",
   "Outreach emails / SMS sent",
-  "Journal entry saved to Ventures",
+  "Work report saved to Papa Life OS",
 ];
 
 function todayInputValue() {
@@ -282,11 +282,7 @@ async function loadReports() {
         throw new Error("Please log in first, then return to save this report.");
       }
       if (!res.ok || !json.ok) throw new Error(json.error || "Unable to save report.");
-      setMessage(
-        json.venturesSaved
-          ? "Saved to your website and copied to Ventures Journal."
-          : "Saved to your website. The Ventures Journal copy did not confirm, so the website record is safe."
-      );
+      setMessage("Saved to Papa Life OS. No outside journal service was contacted.");
       await loadReports();
     } catch (e: any) {
       if (String(e?.message || "").toLowerCase().includes("log in")) {
@@ -297,11 +293,11 @@ async function loadReports() {
         try {
           await saveThroughEngagementBridge();
           setMessage(
-            "Saved to the website activity log and saved in this browser. The dedicated report table and Ventures copy will turn on after the server restart."
+            "Saved to the website activity log and saved in this browser. The dedicated report table will be available when the website connection is restored."
           );
         } catch {
           setMessage(
-            "Saved in this browser. The dedicated report table and Ventures copy will turn on after the server restart."
+            "Saved in this browser. The dedicated report table will be available when the website connection is restored."
           );
         }
       }
@@ -512,15 +508,7 @@ async function loadReports() {
                   <article key={report.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h3 className="font-black text-black">{report.title}</h3>
-                      <span
-                        className={`rounded-sm px-2 py-1 text-xs font-bold ${
-                          report.ventures_saved
-                            ? "bg-[#e8f5e9] text-[#1b5e20]"
-                            : "bg-[#fff3cd] text-[#795500]"
-                        }`}
-                      >
-                        {report.ventures_saved ? "Ventures copied" : "Saved record"}
-                      </span>
+                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
                     </div>
                     {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
                     {reportOutcomes.length > 0 && (

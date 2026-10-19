@@ -1,6 +1,6 @@
 /**
  * GHL new-contact automation for Papa Life / Boss Mobile.
- * Used by Make.com Scenario 1 (webhook), Scenario 2 (claude-prompt), and papalife MCP tools.
+ * Preserves local GHL intake and alerts. Legacy Make/iShareHow outbound cloud forwarding is disabled.
  */
 import type { Database as BetterSqliteDatabase } from "better-sqlite3";
 import { randomBytes } from "crypto";
@@ -95,13 +95,13 @@ export function ensureGhlAutomationTables(db: BetterSqliteDatabase): void {
   }
 }
 
+/** The historical iShareHow / Unified Orchestrator forwarding path is retired.
+ * GHL contact intake, local notes, and alerts remain available on Papa Life OS.
+ * Intentionally ignore legacy Make/cloud webhook variables to prevent forwarding
+ * contacts or incurring external processing without a new explicit opt-in.
+ */
 export function cloudWebhookUrl(): string | null {
-  const url =
-    process.env.AUTOMATION_CLOUD_WEBHOOK_URL?.trim() ||
-    process.env.MAKE_SCENARIO2_WEBHOOK_URL?.trim() ||
-    process.env.MAKE_CLOUD_WEBHOOK_URL?.trim() ||
-    null;
-  return url || null;
+  return null;
 }
 
 export function siteAutomationBase(): string {
@@ -558,14 +558,9 @@ export function automationStatusPayload(db?: BetterSqliteDatabase): Record<strin
         note: "Add a Make HTTP module after Claude that POSTs here with the outreach note, OR call this webhook instead of Claude in Make to run Claude on-server.",
       },
       scenario_2: {
-        name: "iShareHow MCP → Claude AI → Response",
-        make_scenario_id: "5259335",
-        claude_endpoint: `${base}/api/automation/claude-prompt`,
-        cloud_outbound_webhook: cloudUrl || "(set AUTOMATION_CLOUD_WEBHOOK_URL — Make custom webhook URL)",
-        inbound_json: { prompt: "string — required" },
-        outbound_json: { event: "ghl_new_contact", prompt: "string", contact: "object", inbound: "object" },
-        mcp_tool: "papalife_claude_complete",
-        note: "Cloud POSTs {\"prompt\":\"...\"} to claude_endpoint; response body has \"response\" in Papa Life voice. Server POSTs full outbound JSON to cloud when a contact hits the DB.",
+        name: "Legacy Unified Orchestrator — disabled",
+        enabled: false,
+        note: "Retired iShareHow / Make cloud forwarding. Papa Life OS does not forward new contacts to the old orchestrator.",
       },
     },
     mcp: {
@@ -579,7 +574,7 @@ export function automationStatusPayload(db?: BetterSqliteDatabase): Record<strin
         "papalife_automation_status",
       ],
     },
-    voice_mode: "Brian's Claude: call papalife_list_ghl_contact_alerts and read voice_prompt aloud in voice chat.",
+    voice_mode: "Papa Life OS: review your GHL contact alerts locally; no external AI call is required.",
     webhook_auth: secret ? "Bearer token required (GHL_WEBHOOK_SECRET)" : "WARNING: no GHL_WEBHOOK_SECRET set — webhook is open",
     cloud_webhook_configured: Boolean(cloudUrl),
     anthropic_configured: Boolean(anthropicKey()),

@@ -1678,37 +1678,6 @@ ${outcomes.length > 0 ? outcomes.map((item) => `- ${item}`).join("\n") : "(none 
 ${textOrNoneForReport(fields.win)}`;
 }
 
-async function sendPapaDailyReportToVentures(date: string, markdown: string) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
-  try {
-    const res = await fetch("https://ventures.isharehow.app/mcp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: controller.signal,
-      body: JSON.stringify({
-        tool: "journey_journal_save",
-        params: {
-          title: `Papa Life Daily Work Report - ${date}`,
-          content: markdown,
-          book_title: "My Brain Book",
-          chapter: date.slice(0, 7).replace("-", " "),
-          entry_date: date,
-          tags: ["daily-report", "papa-life", "work-log"],
-        },
-      }),
-    });
-    if (!res.ok) {
-      return { ok: false, error: `Ventures returned ${res.status}` };
-    }
-    return { ok: true, error: null };
-  } catch (e: any) {
-    return { ok: false, error: e?.message || "Ventures save failed" };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
 function getMemberAccessState(member: any, pricing = getPricingSettings(db)) {
   const paymentStatus = String(member?.payment_status || "paid");
   const trialEndsAt = member?.trial_expires_at || null;
@@ -2108,7 +2077,7 @@ async function verifyCurrentPapaLifeSubscriptionPrice(): Promise<void> {
       price.active !== true || price.currency !== "usd" ||
       price.unit_amount !== 499 || price.type !== "recurring" ||
       price.recurring?.interval !== "month" || price.recurring?.interval_count !== 1) {
-    throw new Error("Membership checkout is not configured for the approved iShareHow Labs $4.99/month price.");
+    throw new Error("Legacy monthly membership checkout is retired and not authorized.");
   }
 }
 
@@ -2169,11 +2138,11 @@ const allowedAiOrigins = new Set([
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://unpkg.com https://links.isharehow.app https://static.cloudflareinsights.com https://in.heycatch.ai https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://unpkg.com https://static.cloudflareinsights.com https://in.heycatch.ai https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://links.isharehow.app https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
+  "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
   "media-src 'self' blob: data:",
   "frame-src 'self'",
   "object-src 'none'",
@@ -3605,7 +3574,6 @@ async function startServer() {
       const outcomes = normalizeOutcomes(req.body?.outcomes);
       const markdown = String(req.body?.markdown || "").trim() || buildPapaDailyReportMarkdown(date, fields, outcomes);
       const title = `Papa Life Daily Work Report - ${date}`;
-      const ventures = await sendPapaDailyReportToVentures(date, markdown);
       const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
 
       const result = db
@@ -3630,16 +3598,17 @@ async function startServer() {
           JSON.stringify(outcomes),
           fields.win || null,
           markdown,
-          ventures.ok ? 1 : 0,
-          ventures.error,
+          0,
+          null,
           user?.email || user?.username || null
         );
 
       res.json({
         ok: true,
         id: result.lastInsertRowid,
-        venturesSaved: ventures.ok,
-        venturesError: ventures.error,
+        venturesSaved: false,
+        venturesError: null,
+        storage: "papa-life-os",
       });
     } catch (e: any) {
       console.error("[papa-daily-work-report] save failed:", e);
@@ -3732,46 +3701,12 @@ async function startServer() {
     });
   });
 
-  app.post("/api/member/auth/register", async (req, res) => {
-    const { first_name, last_name, email, password } = req.body || {};
-    if (!first_name?.trim() || !last_name?.trim() || !email?.trim() || !password?.trim()) {
-      return res.status(400).json({ ok: false, error: "First name, last name, email, and password are required" });
-    }
-
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const existing = db.prepare("SELECT id FROM members WHERE email = ?").get(normalizedEmail) as { id?: number } | undefined;
-    if (existing?.id) {
-      return res.status(409).json({ ok: false, error: "An account with this email already exists" });
-    }
-
-    const hash = await bcrypt.hash(String(password), 10);
-    const enrolledAt = new Date().toISOString();
-    const result = db
-      .prepare(
-        "INSERT INTO members (first_name, last_name, email, password_hash, status, payment_status, trial_started_at, trial_expires_at, enrolled_at) VALUES (?, ?, ?, ?, 'active', 'payment_required', NULL, NULL, ?)"
-      )
-      .run(
-        String(first_name).trim(),
-        String(last_name).trim(),
-        normalizedEmail,
-        hash,
-        enrolledAt
-      );
-
-    const memberId = Number(result.lastInsertRowid);
-    const member = loadMemberById(memberId);
-
-    (req.session as any).memberId = member.id;
-    (req.session as any).memberUser = memberSessionPayload(member);
-
-    const billing = getMemberAccessState(member);
-    const access = memberAccessScopes(member);
-    res.status(201).json({
-      ok: true,
-      user: memberSessionPayload(member),
-      billing,
-      access,
-      billing_required: !access.portal,
+  // Legacy membership registration is retired. Existing records and authenticated
+  // access are preserved for historical obligations; new sales use digital services.
+  app.post("/api/member/auth/register", (_req, res) => {
+    return res.status(410).json({
+      ok: false,
+      error: "Papa Life memberships are closed. Browse current digital courses and services instead.",
     });
   });
 

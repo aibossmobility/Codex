@@ -25,5 +25,10 @@ assert.ok(mobile.includes("GIVE ASSIGNMENT TO WORKERS"),"Worker entry button mis
 assert.ok(mobile.includes('label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")}'),"Mobile approval shortcut still wrong");
 const portal=fs.readFileSync("client/src/pages/DigitalTwinPortal.tsx","utf8");
 assert.ok(!portal.includes("<iframe"),"The cross-domain Twin iframe is blocked by CSP");
-assert.ok(portal.includes("Open Digital Twin"),"Working external Twin destination missing");
+assert.ok(portal.includes('<DigitalBrianGuide mode="owner" />'),"Digital Brian no-model-cost OS guide missing");
+assert.ok(portal.includes('onClick={() => setVoiceOpen(true)}'),"Voice must require an explicit user action");
+assert.ok(!portal.includes("papa-life-digital-twin-preview-production"),"Old external Digital Twin preview should not be required");
+const publicTwin=fs.readFileSync("client/src/pages/DigitalTwinDemo.tsx","utf8");
+assert.ok(publicTwin.includes('<DigitalBrianGuide mode="visitor" />'),"Visitor-first no-model-cost guide missing");
+assert.ok(publicTwin.includes('onClick={() => setVoiceOpen(true)}'),"Public voice must require explicit opt in");
 console.log(JSON.stringify({all_pages:all.length,public_directory:pub.length,seo_directory:search.length,unmapped:0,obsolete:0,duplicates:0,broken_twin_embed_repaired:true,worker_icon_replaced:true},null,2));

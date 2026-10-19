@@ -218,7 +218,7 @@ export function getPapaAiStatus() {
     supported_providers: ["openai", "anthropic", "gemini"],
     inactive_message:
       provider === "local"
-        ? "Live provider is not connected yet. Papa Life guided coaching mode is active."
+        ? "No paid text-model calls enabled. Papa Life local guided coaching is active."
         : "Live AI provider is connected.",
   };
 }
@@ -296,8 +296,8 @@ export function buildPapaAiLocalReply(input: {
     return {
       provider: "local" as PapaAiProvider,
       reply:
-        "Papa Life membership is for fathers who do not want a one-time emotional moment. They want a path. The value is guided lessons, reflection, brotherhood, and steady practice around Presence, Authority, Purpose, and Alignment.\n\nIf you are ready to work through this with structure, start with the free assessment, then move into the membership path when you want ongoing guidance.",
-      resources: findPapaResources("membership courses community", 3),
+        "Papa Life now offers digital courses and services rather than new recurring memberships. Start with the available first lesson, then explore the current course catalog for a guided path through Presence, Authority, Purpose, and Alignment.",
+      resources: findPapaResources("digital courses learning PAPA", 3),
     };
   }
 
@@ -393,6 +393,9 @@ export function buildAssessmentReport(answers: AssessmentAnswer[]) {
 }
 
 function resolveConfiguredProvider(): PapaAiProvider {
+  // A configured API key is not consent to incur usage. The public assistant
+  // must answer locally unless the owner separately enables paid text chat.
+  if (process.env.PAPA_LIFE_PAID_CHAT_ENABLED !== "true") return "local";
   const preferred = normalizeProvider(process.env.DEFAULT_AI_PROVIDER);
   if (preferred === "gemini" && (process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY)) return "gemini";
   if (preferred === "openai" && process.env.OPENAI_API_KEY) return "openai";

@@ -367,6 +367,17 @@ export default function AiBossMobile() {
           <StatusCard icon={Smartphone} label="Phone requests" value={String(mission?.open_mobile_instructions || 0)} tone="neutral" />
         </section>
 
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-bold text-white">Digital Brian — inside Papa Life OS</p>
+              <p className="mt-1 text-sm text-white/65">Get no-model-cost guided answers and navigate your tools. ElevenLabs voice is optional. Workers run independently.</p>
+            </div>
+            <Button type="button" className="shrink-0 bg-brand-yellow font-bold text-black hover:bg-brand-yellow/90" onClick={() => navigate("/papa-life-os/digital-twin")}>
+              <Brain className="mr-2 h-4 w-4" />Open Digital Brian
+            </Button>
+          </CardContent>
+        </Card>
         <Card className="bg-[#111] border-brand-yellow/30">
           <CardContent className="p-5 sm:p-7">
             <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life OS — Worker Command Center</p>

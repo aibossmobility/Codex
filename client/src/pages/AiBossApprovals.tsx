@@ -60,7 +60,6 @@ export default function AiBossApprovals() {
       .then((response) => response.json())
       .then((data) => {
         if (!data.ok) navigate("/login");
-        else if (!data.user?.researchLabAccess) navigate("/crm-console");
         else void load();
       })
       .catch(() => navigate("/login"));
@@ -90,7 +89,7 @@ export default function AiBossApprovals() {
     <div className="min-h-screen bg-[#090909] text-white pb-20">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <Button size="icon" variant="ghost" onClick={() => navigate("/ai-boss")} aria-label="Back to AI Boss"><ArrowLeft className="w-4 h-4" /></Button>
+          <Button size="icon" variant="ghost" onClick={() => navigate("/papa-life-os")} aria-label="Back to Papa Life OS"><ArrowLeft className="w-4 h-4" /></Button>
           <ShieldCheck className="w-6 h-6 text-primary" />
           <div><h1 className="font-bold leading-tight">Approvals</h1><p className="text-xs text-gray-500">AI Boss Android Companion</p></div>
           <Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>

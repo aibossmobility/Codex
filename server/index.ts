@@ -6533,7 +6533,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/ai-boss/worker-assignments", requireAuth, requireResearchLabAccess, (req, res) => {
+  app.post("/api/admin/ai-boss/worker-assignments", requireAuth, (req, res) => {
     try {
       const assignment = queueWorkerAssignment(db, req.body);
       res.status(201).json({ ok: true, assignment,

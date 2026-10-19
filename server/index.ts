@@ -112,6 +112,8 @@ import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
+import { queueWorkerAssignment } from "./ai-boss-worker-assignments";
+import { claimApprovedWorkerAssignment, reportWorkerResult } from "./ai-boss-worker-relay";
 import {
   ensureGhlIntegrationTable,
   getGhlIntegrationPublic,
@@ -6501,6 +6503,44 @@ async function startServer() {
       res.status(201).json({ ok: true, conversation: saveExecutiveConversationBrief(db, req.body) });
     } catch (e) {
       res.status(400).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  const requireWorkerRelay = (req: Request, res: Response, next: NextFunction) => {
+    const expected = String(process.env.AI_BOSS_WORKER_RELAY_TOKEN || "").trim();
+    if (expected.length < 32) return res.status(503).json({ ok: false, error: "Worker relay not configured" });
+    const authorization = String(req.headers.authorization || "");
+    const provided = authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : "";
+    const a = Buffer.from(expected);
+    const b = Buffer.from(provided);
+    if (a.length !== b.length || !timingSafeEqual(a,b)) return res.status(401).json({ ok: false, error: "Unauthorized" });
+    next();
+  };
+
+  // Mac-initiated outbound-only bridge: never exposes the Mac or allows self-approval.
+  app.post("/api/ai-boss/worker-relay/claim", requireWorkerRelay, (_req, res) => {
+    try {
+      res.json({ ok: true, assignment: claimApprovedWorkerAssignment(db) });
+    } catch {
+      res.status(500).json({ ok: false, error: "Worker claim unavailable" });
+    }
+  });
+  app.post("/api/ai-boss/worker-relay/:id/result", requireWorkerRelay, (req, res) => {
+    try {
+      res.json({ ok: true, assignment: reportWorkerResult(db,Number(req.params.id),req.body) });
+    } catch {
+      res.status(400).json({ ok: false, error: "Invalid, expired, or unauthorized worker receipt" });
+    }
+  });
+
+  app.post("/api/admin/ai-boss/worker-assignments", requireAuth, requireResearchLabAccess, (req, res) => {
+    try {
+      const assignment = queueWorkerAssignment(db, req.body);
+      res.status(201).json({ ok: true, assignment,
+        message: "Assignment queued for independent approval. Not yet dispatched to Mac.",
+        external_ai_cost_micros: 0 });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : "Invalid assignment" });
     }
   });
 

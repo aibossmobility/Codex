@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -42,12 +42,20 @@ export default function DigitalTwinPortal() {
           </Button>
         </div>
       </header>
-      <iframe
-        title="Papa Life Digital Twin"
-        src={DIGITAL_TWIN_URL}
-        allow="microphone; camera; autoplay"
-        className="min-h-0 flex-1 w-full border-0 bg-black"
-      />
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-5 px-6 py-16 text-center">
+        <h2 className="text-2xl font-bold">Talk with Brian's Digital Twin</h2>
+        <p className="max-w-lg text-gray-300">
+          The Digital Twin opens in its own secure page. This avoids a browser restriction that prevents it from loading inside Papa Life OS.
+        </p>
+        <a href={DIGITAL_TWIN_URL} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center justify-center rounded-xl bg-brand-yellow px-6 py-4 font-bold text-black hover:bg-brand-yellow/90">
+          Open Digital Twin <ExternalLink className="ml-2 h-5 w-5" />
+        </a>
+        <p className="text-sm text-gray-400">
+          Voice and chat may use ElevenLabs credits. For free local worker assignments,
+          return to Papa Life OS and select Give Assignment to Workers instead.
+        </p>
+      </main>
     </div>
   );
 }

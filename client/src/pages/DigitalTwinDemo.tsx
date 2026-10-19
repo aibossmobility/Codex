@@ -1,5 +1,7 @@
 import { HouseTrail } from "./PapaHouse";
 import { BrianLiveAvatar } from "@/components/BrianLiveAvatar";
+import { DigitalBrianGuide } from "@/components/DigitalBrianGuide";
+import { useState } from "react";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { CalendarCheck, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
@@ -14,11 +16,12 @@ const pillars = [
 ] as const;
 
 export default function DigitalTwinDemo() {
+  const [voiceOpen, setVoiceOpen] = useState(false);
   return (
     <div className="papa-house-digital min-h-screen bg-[#2b211b] text-white">
       <PageMeta
         title="Meet Brian's Digital Twin | Papa Life"
-        description="Talk with Brian Keith Hill’s Papa Life AI using your microphone."
+        description="Explore free guided fatherhood help or choose an optional ElevenLabs voice conversation."
       />
 
       <header className="border-b border-[#f2c230]/35 bg-black">
@@ -48,7 +51,7 @@ export default function DigitalTwinDemo() {
                 Meet Brian Keith Hill
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                Ask a question out loud. Brian’s Papa Life AI listens and responds in his voice while his image stays on screen.
+                Choose a free starting point below. Live voice is optional and may use ElevenLabs credits; the recorded introduction does not start a voice session.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -70,7 +73,7 @@ export default function DigitalTwinDemo() {
                   <div>
                     <p className="font-extrabold">A place to begin.</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/65">
-                      Use the microphone by Brian’s image to start a voice conversation.
+                      Read the free guide first. Start live voice only if you choose to use ElevenLabs credits.
                     </p>
                   </div>
                 </div>
@@ -78,7 +81,27 @@ export default function DigitalTwinDemo() {
             </div>
 
             <div className="md:sticky md:top-4">
-              <BrianLiveAvatar />
+              <div className="space-y-4">
+                <DigitalBrianGuide mode="visitor" />
+                {!voiceOpen ? (
+                  <div className="rounded-2xl border border-[#f2c230]/30 bg-black/60 p-5">
+                    <video controls playsInline preload="metadata" poster="/videos/brian-green-sweater-papa-life-clean.jpg"
+                      className="aspect-video w-full rounded-lg bg-black object-cover"
+                      aria-label="Recorded Papa Life welcome video from Brian">
+                      <source src="/videos/brian-green-sweater-papa-life-clean.mp4" type="video/mp4" />
+                    </video>
+                    <p className="mt-2 text-xs text-white/50">Recorded introduction — no AI conversation is started.</p>
+                    <h2 className="mt-4 text-xl font-bold">Optional conversation in Brian's AI voice</h2>
+                    <p className="mt-2 text-sm text-white/70">This uses ElevenLabs and may consume paid credits. You can use the guide above without starting a voice call.</p>
+                    <button type="button" className="mt-4 rounded-lg bg-[#f2c230] px-5 py-3 font-bold text-black" onClick={() => setVoiceOpen(true)}>Load optional live voice</button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button type="button" className="rounded-lg border border-white/30 px-4 py-2 text-sm font-bold" onClick={() => setVoiceOpen(false)}>Close voice panel</button>
+                    <BrianLiveAvatar />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>

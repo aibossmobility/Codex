@@ -5,7 +5,7 @@ import { createExecutiveAction } from "./executive-action-queue-store";
 export const workerRoles = [
   "financial-director", "marketing-revenue-director", "papa-life-director",
   "ai-boss-mobility-director", "outreach-followup", "content-distribution",
-  "seo-website", "crm-sales", "finance-records",
+  "seo-website", "crm-sales", "ghl-customer-service", "finance-records",
   "scheduling-communications", "quality-compliance",
 ] as const;
 

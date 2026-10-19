@@ -408,6 +408,7 @@ export default function AiBossMobile() {
                 <select id="worker-role" value={assignmentRole} onChange={(event) => setAssignmentRole(event.target.value)} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
                   <option value="seo-website">SEO & Website Worker</option>
                   <option value="crm-sales">CRM & Sales Worker</option>
+                  <option value="ghl-customer-service">GoHighLevel Customer Service Worker — No-cost first</option>
                   <option value="quality-compliance">Quality & Compliance Worker</option>
                   <option value="outreach-followup">Outreach & Follow-up Worker (draft review only)</option>
                   <option value="content-distribution">Content & Distribution Worker (planning only)</option>
@@ -423,7 +424,7 @@ export default function AiBossMobile() {
                 <Button type="button" variant="outline" disabled={assignmentSaving} onClick={dictateWorkerAssignment} className="w-full border-brand-yellow/40 text-brand-yellow">
                   <Mic2 className="mr-2 h-4 w-4" />{assignmentListening ? "Finish speaking" : "Speak assignment instead of typing"}
                 </Button>
-                <p className="text-xs text-gray-400">Read-only worker assignments. No model credits requested. Your approval is required before execution, and Mac delivery must be verified.</p>
+                <p className="text-xs text-gray-400">Read-only worker assignments. The GoHighLevel Customer Service Worker diagnoses customer, CRM, estimate, agreement, workflow and account issues using existing no-cost methods first. Sending or changing records requires separate permission. No purchases or model credits requested.</p>
                 <Button type="submit" disabled={assignmentSaving || assignmentText.trim().length < 12} className="w-full bg-brand-yellow text-black hover:bg-brand-yellow/90">
                   {assignmentSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ClipboardList className="mr-2 h-4 w-4" />}
                   Queue Worker Assignment

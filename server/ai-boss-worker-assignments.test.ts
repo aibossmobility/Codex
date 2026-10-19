@@ -31,5 +31,11 @@ assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),
 assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),unauthorized:true}));
 assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),instruction:"send money"}));
 assert.equal(db.prepare("select count(*) as n from executive_actions").get()!.n,1);
+const ghl = queueWorkerAssignment(db,{...original,role:"ghl-customer-service",project:"ai-boss-mobility",request_id:randomUUID(),instruction:"Review customer estimate and pipeline concerns without modifying GHL."});
+assert.equal(ghl.status,"awaiting_approval");
+const ghlRow = db.prepare("select * from executive_actions where id=?").get(ghl.id) as any;
+assert.equal(ghlRow.project_key,"ai-boss-mobility");
+assert.equal(ghlRow.estimated_external_ai_cost_micros,0);
+assert.equal(JSON.parse(ghlRow.action_payload_json).no_writes,true);
 db.close();
 console.log("Worker assignment intake safety: passed, approval required, duplicate safe, no model/provider cost");

@@ -45,5 +45,21 @@ try {
   assert.equal(details.role,"quality-compliance");
   assert.equal(details.project,"papa-life");
   assert.equal(details.read_only,true);
+  const ghlClaim={action_id:13,project:"ai-boss-mobility",role:"ghl-customer-service",
+    instruction:"Investigate a consulting customer estimate before agreement signing",
+    request_id:randomUUID(),lease:randomUUID()};
+  const ghl=acceptVerifiedClaim(db,ghlClaim);
+  assert.equal(ghl.reused,false);
+  const serviceRun=spawnSync(process.execPath,["--import","/Users/bossmobility/Developer/Codex-seo-health-20261004/node_modules/tsx/dist/loader.mjs",worker],{encoding:"utf8",timeout:30000});
+  assert.equal(serviceRun.status,0,serviceRun.stderr);
+  const serviceResult=db.prepare("SELECT status,result_json FROM executive_actions WHERE id=?").get(ghl.local_action_id) as any;
+  assert.equal(serviceResult.status,"completed");
+  const reviewed=JSON.parse(serviceResult.result_json);
+  assert.equal(reviewed.role,"ghl-customer-service");
+  assert.equal(reviewed.project,"ai-boss-mobility");
+  assert.equal(reviewed.issue_type,"estimates-agreements");
+  assert.equal(reviewed.no_external_ai_cost,true);
+  assert.equal(reviewed.customer_record_verified,false);
+  console.log("Mac GHL Customer Service Worker: approved handoff, zero-cost review, no GHL writes PASS");
   console.log("Mac outbound worker relay: idempotent accepted cloud approval; local worker completed; no provider calls");
 }finally {db.close();}

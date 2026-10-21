@@ -19,7 +19,12 @@ assert.equal(claim.instruction,request.instruction);
 assert.equal(claimApprovedWorkerAssignment(db),null,"active lease prevents duplicate claims");
 assert.throws(()=>reportWorkerResult(db,q.id!,{lease:randomUUID(),project:request.project,role:request.role,read_only:true,completed:true}));
 assert.throws(()=>reportWorkerResult(db,q.id!,{lease:claim.lease,project:"papa-life",role:request.role,read_only:true,completed:true}));
-const done=reportWorkerResult(db,Number(q.id),{lease:claim.lease,project:request.project,role:request.role,read_only:true,completed:true});
+assert.throws(()=>reportWorkerResult(db,Number(q.id),{lease:claim.lease,project:request.project,role:request.role,read_only:true,outcome:"completed",summary:"Claimed a result but provided no verifiable proof.",evidence:[]}),"No evidence cannot mean completed");
+const done=reportWorkerResult(db,Number(q.id),{
+  lease:claim.lease,project:request.project,role:request.role,read_only:true,
+  outcome:"completed",summary:"Checked the live website links and saved a verifiable read-only result.",
+  evidence:[{kind:"http-check",description:"Checked the public homepage returned HTTP 200.",reference:"https://example.com/"}]
+});
 assert.equal(done.status,"completed");
 assert.equal(claimApprovedWorkerAssignment(db),null);
 assert.equal((db.prepare("select count(*) as count from executive_actions").get() as any).count,1);
@@ -30,6 +35,10 @@ decideExecutiveAction(db,Number(ghlQueued.id),{decision:"approve",note:"Owner ap
 const ghlClaim=claimApprovedWorkerAssignment(db)!;
 assert.equal(ghlClaim.role,"ghl-customer-service");
 assert.equal(ghlClaim.project,"papa-life");
-assert.equal(reportWorkerResult(db,Number(ghlQueued.id),{lease:ghlClaim.lease,project:"papa-life",role:"ghl-customer-service",read_only:true,completed:true}).status,"completed");
+assert.equal(reportWorkerResult(db,Number(ghlQueued.id),{
+  lease:ghlClaim.lease,project:"papa-life",role:"ghl-customer-service",read_only:true,
+  outcome:"blocked",explanation:"No authenticated customer-service record could be accessed or changed by this review-only worker.",
+  next_step:"Authorize a specifically scoped GHL record lookup before requesting this result again."
+}).status,"failed");
 db.close();
 console.log("Cloud worker relay: 1 approval gated claim; lease protection; verified result; no duplicate");

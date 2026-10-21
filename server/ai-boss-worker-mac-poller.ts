@@ -9,6 +9,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import { createExecutiveAction, decideExecutiveAction } from "./executive-action-queue-store";
+import { assessWorkerDeliverable } from "./ai-boss-worker-evidence";
 
 const BASE = "https://papalifecoach.com";
 const RELAY_FILE = path.join(os.homedir(),".config","papa-life-os","worker-relay.token");
@@ -106,18 +107,26 @@ export async function pollOnce() {
     const {local_action_id,claim}=acceptVerifiedClaim(db,received.assignment);
     const deadline=Date.now()+100_000;
     while(Date.now()<deadline) {
-      const row=db.prepare("SELECT status,result_json FROM executive_actions WHERE id=?").get(local_action_id) as any;
-      if(row?.status==="completed") {
-        const detail=JSON.parse(row.result_json||"null");
-        const result=detail?.details||detail?.result?.details||detail;
-        if(result?.role!==claim.role||result?.project!==claim.project||result?.read_only!==true)
+      const row=db.prepare("SELECT status,result_json,error_summary FROM executive_actions WHERE id=?").get(local_action_id) as any;
+      if(row?.status==="completed" || row?.status==="failed") {
+        let details: any = null;
+        try { details=JSON.parse(row.result_json||"null"); } catch { /* invalid result must not pass */ }
+        const result=details?.details||details?.result?.details||details;
+        if (row.status==="completed" &&
+          (result?.role!==claim.role||result?.project!==claim.project||result?.read_only!==true))
           throw Error("Local worker result provenance invalid");
+        const decision= row.status==="failed"
+          ? { outcome:"blocked" as const, explanation:String(row.error_summary||"Worker execution failed without a verifiable deliverable.").slice(0,1800),
+              next_step:"Inspect local worker failure, correct the blocker, and request a fresh approval." }
+          : assessWorkerDeliverable(claim.role,claim.project,claim.instruction,result);
         const response=await call("/api/ai-boss/worker-relay/"+claim.action_id+"/result",token,
-         {lease:claim.lease,project:claim.project,role:claim.role,completed:true,read_only:true});
-        if(!response?.ok||response.assignment?.status!=="completed")throw Error("Cloud receipt not acknowledged");
-        return {status:"completed",remote_action_id:claim.action_id,local_action_id};
+          {lease:claim.lease,project:claim.project,role:claim.role,read_only:true,...decision});
+        const expected=decision.outcome==="completed" ? "completed" : "failed";
+        if(!response?.ok||response.assignment?.status!==expected)throw Error("Cloud receipt not acknowledged");
+        return {status:expected,remote_action_id:claim.action_id,local_action_id,
+          result:decision.outcome==="completed"?"verified_deliverable":"needs_attention"};
       }
-      if(row?.status==="failed"||row?.status==="declined")throw Error("Worker failed or was declined");
+      if(row?.status==="declined")throw Error("Worker was declined");
       await new Promise(resolve=>setTimeout(resolve,3000));
     }
     return {status:"pending",remote_action_id:claim.action_id,local_action_id};

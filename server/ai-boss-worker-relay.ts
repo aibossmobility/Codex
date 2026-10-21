@@ -2,15 +2,37 @@ import { randomUUID } from "node:crypto";
 import type { Database as BetterSqliteDatabase } from "better-sqlite3";
 import { z } from "zod";
 import { workerAssignmentInput } from "./ai-boss-worker-assignments";
-import { beginExecutiveActionExecution, completeExecutiveActionExecution } from "./executive-action-queue-store";
+import { beginExecutiveActionExecution, completeExecutiveActionExecution, failExecutiveActionExecution } from "./executive-action-queue-store";
 
-const reportSchema = z.object({
-  lease: z.string().uuid(),
-  project: workerAssignmentInput.shape.project,
-  role: workerAssignmentInput.shape.role,
-  read_only: z.literal(true),
-  completed: z.literal(true),
+const evidenceSchema = z.object({
+  kind: z.enum(["http-check", "local-report", "read-only-analysis", "external-receipt"]),
+  description: z.string().trim().min(18).max(500),
+  reference: z.string().trim().min(4).max(1000),
 }).strict();
+
+/** Worker results must distinguish verified output from an incomplete request.
+ * Neither "completed: true" nor a list of reference documents proves work was done.
+ */
+const reportSchema = z.discriminatedUnion("outcome", [
+  z.object({
+    lease: z.string().uuid(),
+    project: workerAssignmentInput.shape.project,
+    role: workerAssignmentInput.shape.role,
+    read_only: z.literal(true),
+    outcome: z.literal("completed"),
+    summary: z.string().trim().min(24).max(2000),
+    evidence: z.array(evidenceSchema).min(1).max(25),
+  }).strict(),
+  z.object({
+    lease: z.string().uuid(),
+    project: workerAssignmentInput.shape.project,
+    role: workerAssignmentInput.shape.role,
+    read_only: z.literal(true),
+    outcome: z.literal("blocked"),
+    explanation: z.string().trim().min(24).max(2000),
+    next_step: z.string().trim().min(12).max(1000),
+  }).strict(),
+]);
 
 export function ensureWorkerRelayTables(db: BetterSqliteDatabase) {
   db.exec(`CREATE TABLE IF NOT EXISTS ai_boss_worker_relay_claims (
@@ -86,10 +108,19 @@ export function reportWorkerResult(db: BetterSqliteDatabase, actionId: number, r
       throw new Error("Missing or expired dispatch lease");
     }
     beginExecutiveActionExecution(db,actionId,"verified-mac-worker-relay");
+    if (input.outcome === "blocked") {
+      const reason = "Worker could not deliver requested outcome: " + input.explanation + " Next: " + input.next_step;
+      const updated = failExecutiveActionExecution(db,actionId,reason,"verified-mac-worker-relay");
+      return { id: actionId, status: updated?.status, result: "needs_attention" };
+    }
+    // Proof is supplied by the authenticated Mac runner and must describe concrete work;
+    // never infer that an action was completed just from its role or task registration.
     const updated = completeExecutiveActionExecution(db,actionId,
-      "Worker " + safe.role + " completed an approved local read-only review for " + safe.project,
+      input.summary,
       "verified-mac-worker-relay",
-      { role: safe.role, project: safe.project, read_only: true, remote_receipt_id: actionId });
-    return { id: actionId, status: updated?.status };
+      { role: safe.role, project: safe.project, read_only: true,
+        verified_deliverable: true, evidence: input.evidence,
+        remote_receipt_id: actionId });
+    return { id: actionId, status: updated?.status, result: "verified_deliverable" };
   })();
 }

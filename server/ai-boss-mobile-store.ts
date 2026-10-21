@@ -102,6 +102,42 @@ function getPendingApprovals(db: BetterSqliteDatabase, macOnline: boolean): Pend
   }));
 }
 
+export function getRecentWorkerReceipts(db: BetterSqliteDatabase) {
+  const rows = db.prepare(`
+    SELECT id, status, project_key, result_summary, result_json, error_summary,
+      action_payload_json, updated_at
+    FROM executive_actions WHERE source_conversation_ref LIKE 'mobile-worker-%'
+    ORDER BY id DESC LIMIT 20
+  `).all() as Array<Record<string, unknown>>;
+  return rows.map((row) => {
+    let details: any = null; let payload: any = null;
+    try { details = JSON.parse(String(row.result_json || "null")); } catch { /* old record */ }
+    try { payload = JSON.parse(String(row.action_payload_json || "null")); } catch { /* old record */ }
+    const evidence = details?.verified_deliverable === true && Array.isArray(details?.evidence)
+      ? details.evidence.slice(0, 15).filter((entry: any) =>
+          entry && typeof entry.description === "string" && typeof entry.reference === "string")
+        .map((entry: any) => ({
+          kind: String(entry.kind || "").slice(0, 45),
+          description: entry.description.slice(0, 500),
+          reference: entry.reference.slice(0, 1000),
+        }))
+      : [];
+    const status = String(row.status);
+    return {
+      id: Number(row.id),
+      project: String(row.project_key || ""),
+      role: String(payload?.role || "unknown"),
+      status,
+      delivery: status === "completed" ? (evidence.length ? "verified" : "review_only")
+        : status === "failed" ? "needs_attention" : status,
+      summary: status === "failed" ? String(row.error_summary || "Worker failed to deliver requested outcome").slice(0, 900)
+        : String(row.result_summary || "").slice(0, 900),
+      evidence,
+      updated_at: String(row.updated_at),
+    };
+  });
+}
+
 export function getAiBossMissionControl(db: BetterSqliteDatabase) {
   const counts = db.prepare(`
     SELECT
@@ -124,6 +160,7 @@ export function getAiBossMissionControl(db: BetterSqliteDatabase) {
     android_online: androidOnline,
     active_companion: androidOnline ? "android" : macOnline ? "mac" : null,
     pending_approvals: getPendingApprovals(db, macOnline),
+    worker_receipts: getRecentWorkerReceipts(db),
     queue: {
       awaiting_approval: counts.awaiting_approval || 0,
       approved: counts.approved || 0,

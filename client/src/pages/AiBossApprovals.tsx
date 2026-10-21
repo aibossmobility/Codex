@@ -18,7 +18,19 @@ type PendingApproval = {
   waits_for_mac: boolean;
 };
 
+type WorkerReceipt = {
+  id: number;
+  role: string;
+  project: string;
+  status: string;
+  delivery: "verified" | "review_only" | "needs_attention" | string;
+  summary: string;
+  evidence: Array<{ kind: string; description: string; reference: string }>;
+  updated_at: string;
+};
+
 type Mission = {
+  worker_receipts?: WorkerReceipt[];
   mac_online: boolean;
   android_online: boolean;
   active_companion: "android" | "mac" | null;
@@ -132,6 +144,46 @@ export default function AiBossApprovals() {
             </CardContent>
           </Card>
         ))}
+        <Card className="border-white/15 bg-[#111]">
+          <CardHeader>
+            <CardTitle className="text-white">Worker results & evidence</CardTitle>
+            <p className="text-sm text-white/60">
+              A worker can finish a reference review without finishing the requested task.
+              Only results with concrete evidence are marked verified.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {(mission?.worker_receipts || []).length === 0 ? (
+              <p className="text-sm text-gray-400">No worker assignment receipts recorded yet.</p>
+            ) : (mission?.worker_receipts || []).map((item) => (
+              <div key={item.id} className="rounded-xl border border-white/15 bg-black/30 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-semibold">Assignment #{item.id} · {item.role}</span>
+                  <span className={item.delivery === "verified"
+                    ? "rounded bg-green-600/20 px-2 py-1 text-xs text-green-300"
+                    : "rounded bg-yellow-600/20 px-2 py-1 text-xs text-yellow-200"}>
+                    {item.delivery === "verified" ? "Deliverable verified"
+                    : item.delivery === "review_only" ? "Review only — deliverable unverified"
+                    : item.delivery === "needs_attention" ? "Needs follow-up" : item.status.replace(/_/g, " ")}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-gray-400">{item.project} · Updated {item.updated_at}</p>
+                {item.summary && <p className="mt-2 whitespace-pre-wrap text-sm text-white/75">{item.summary}</p>}
+                {item.evidence.length > 0 && (
+                  <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-brand-yellow">Evidence</p>
+                    {item.evidence.map((proof, index) => (
+                      <div key={index} className="text-xs text-white/70">
+                        <p>{proof.description}</p>
+                        <p className="mt-1 break-all font-mono text-white/50">{proof.reference}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

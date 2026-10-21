@@ -4,7 +4,7 @@ export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Papa Life Coach",
-  alternateName: ["Papa Life", "Papa Life Coach", "Boss Mobility Life Coach Services", "Boss Mobility"],
+  alternateName: ["Papa Life"],
   url: SITE,
   logo: `${SITE}/images/papa-life-logo.png`,
   description:
@@ -32,16 +32,12 @@ export const BRIAN_PERSON_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Brian Keith Hill",
-  jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach",
-  worksFor: {
-    "@type": "Organization",
-    name: "Boss Mobility",
-    alternateName: "Papa Life Coach",
-  },
+  jobTitle: "Founder of AI Boss Mobility Consulting; Creator of Papa Life; Life Coach and Leadership Advisor",
+  knowsAbout: ["Boss Mobility Life Coach Services", "Papa Life", "fatherhood coaching", "leadership", "AI strategy", "organizational consulting"],
   url: `${SITE}/about-brian-keith-hill`,
   image: `${SITE}/images/brian-keith-hill.png`,
   description:
-    "Founder of Boss Mobility and Papa Life, a Scripture-centered fatherhood coaching movement helping fathers of adult children become safer, more present, and better prepared for healthy reconnection.",
+    "Brian Keith Hill brings a longstanding Boss Mobility Life Coach Services history to Papa Life fatherhood coaching and AI Boss Mobility Consulting. His work emphasizes trust, wisdom, independent critical thinking, and human connection.",
   sameAs: [
     "https://www.linkedin.com/in/brian-hill-bossmobility",
     "https://briankeithhill.com",

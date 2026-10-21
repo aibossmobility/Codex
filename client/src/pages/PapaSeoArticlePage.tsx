@@ -36,7 +36,7 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
             {isBrianProfile ? (
               <img
                 src={brianKeithHillHeadshot}
-                alt="Brian Keith Hill, founder of Boss Mobility and Papa Life"
+                alt="Brian Keith Hill, creator of Papa Life and founder of AI Boss Mobility Consulting"
                 className="aspect-square w-full rounded-2xl border border-white/10 object-cover object-top shadow-2xl"
               />
             ) : null}
@@ -62,6 +62,17 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
             ))}
           </div>
 
+          {isBrianProfile ? (
+            <nav aria-label="Brian Keith Hill's services" className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-3">
+              <h2 className="text-xl font-bold text-white">Explore Brian's services</h2>
+              <p className="text-sm text-gray-300">His years with Boss Mobility Life Coach Services connect the two service paths below.</p>
+              <div className="flex flex-wrap gap-4">
+                <a href="/" className="font-semibold text-brand-yellow underline hover:text-white">Papa Life — Fatherhood</a>
+                <a href="https://ai.bossmobilelifecoach.com/meet-brian" className="font-semibold text-brand-yellow underline hover:text-white">AI Boss Mobility Consulting — AI &amp; Leadership</a>
+              </div>
+            </nav>
+          ) : null}
+
           <div className="pt-4 border-t border-white/10">
             <Button
               asChild
@@ -78,7 +89,7 @@ export default function PapaSeoArticlePage({ page }: PapaSeoArticlePageProps) {
 
       <footer className="border-t border-white/10 bg-black/50">
         <div className="container mx-auto flex max-w-3xl flex-col gap-3 px-4 py-8 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>Papa Life was founded by Brian Keith Hill through Boss Mobility.</p>
+          <p>Papa Life is a fatherhood service developed by Brian Keith Hill, drawing on his Boss Mobility Life Coach Services history.</p>
           <a href="/" className="font-semibold text-brand-yellow hover:text-white">Return to Papa Life</a>
         </div>
       </footer>

@@ -36,8 +36,11 @@ function validateClaim(raw: unknown): Claim {
     request_id:item.request_id,lease:item.lease};
 }
 function ensureMap(db: Database.Database) {
-  db.exec(`CREATE TABLE IF NOT EXISTS ai_boss_worker_remote_map (
-    remote_action_id INTEGER PRIMARY KEY,
+  // Cloud SQLite IDs may be reused after deployment. Request UUIDs are stable.
+  // Keep the legacy remote-ID history without using those IDs for new work.
+  db.exec(`CREATE TABLE IF NOT EXISTS ai_boss_worker_request_map (
+    request_id TEXT PRIMARY KEY,
+    remote_action_id INTEGER NOT NULL,
     local_action_id INTEGER NOT NULL UNIQUE,
     project TEXT NOT NULL,
     role TEXT NOT NULL,
@@ -49,9 +52,9 @@ export function acceptVerifiedClaim(db:Database.Database, raw:unknown) {
   const claim=validateClaim(raw);
   ensureMap(db);
   return db.transaction(()=>{
-    const prior=db.prepare("SELECT * FROM ai_boss_worker_remote_map WHERE remote_action_id=?").get(claim.action_id) as any;
+    const prior=db.prepare("SELECT * FROM ai_boss_worker_request_map WHERE request_id=?").get(claim.request_id) as any;
     if(prior){
-      if(prior.project!==claim.project||prior.role!==claim.role||prior.instruction!==claim.instruction)
+      if(prior.remote_action_id!==claim.action_id||prior.project!==claim.project||prior.role!==claim.role||prior.instruction!==claim.instruction)
         throw Error("Remote identity changed on retry");
       return {local_action_id:Number(prior.local_action_id),reused:true,claim};
     }
@@ -60,7 +63,7 @@ export function acceptVerifiedClaim(db:Database.Database, raw:unknown) {
       requested_outcome:"Papa Life OS approved worker: "+claim.role+" — "+claim.instruction,
       authority_level:"observe",execution_route:"local",approval_required:true,
       estimated_external_ai_cost_micros:0,project_key:claim.project,work_kind:"task",
-      source_conversation_ref:"verified-cloud-worker-"+claim.action_id,
+      source_conversation_ref:"verified-cloud-worker-"+claim.request_id,
       action_payload:{worker:"agent-team-v1",role:claim.role,project:claim.project,
         instruction:claim.instruction,mode:"read_only",no_writes:true,no_outreach:true,no_purchases:true}
     });
@@ -69,8 +72,8 @@ export function acceptVerifiedClaim(db:Database.Database, raw:unknown) {
     decideExecutiveAction(db,Number(local.id),{
       decision:"approve",note:"Copied the owner's already-approved Papa Life OS assignment #"+claim.action_id+" over the authenticated outbound Mac relay."
     });
-    db.prepare("INSERT INTO ai_boss_worker_remote_map(remote_action_id,local_action_id,project,role,instruction) VALUES(?,?,?,?,?)")
-      .run(claim.action_id,local.id,claim.project,claim.role,claim.instruction);
+    db.prepare("INSERT INTO ai_boss_worker_request_map(request_id,remote_action_id,local_action_id,project,role,instruction) VALUES(?,?,?,?,?,?)")
+      .run(claim.request_id,claim.action_id,local.id,claim.project,claim.role,claim.instruction);
     return {local_action_id:Number(local.id),reused:false,claim};
   })();
 }
@@ -94,7 +97,8 @@ async function call(pathname:string, token:string,body:unknown={}) {
   });
   if(!response.ok)throw Error("Authenticated worker relay unavailable: HTTP "+response.status);
   const text=await response.text();
-  if(Buffer.byteLength(text)>4096)throw Error("Worker relay response too large");
+  // Result receipts can include many per-URL evidence records; still enforce a bounded response.
+  if(Buffer.byteLength(text)>65_536)throw Error("Worker relay response too large");
   return JSON.parse(text);
 }
 export async function pollOnce() {

@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import Database from "better-sqlite3";
+import { resolvePapaDbDirectory } from "./papa-db-location";
 import session from "express-session";
 import bcrypt from "bcryptjs";
 import connectSqlite3 from "connect-sqlite3";
@@ -217,7 +218,8 @@ const mediaUpload = multer({
 
 // ─── Database ─────────────────────────────────────────────────────────────────
 
-const dbPath = path.resolve(__dirname, "..", "leads.db");
+const dbDirectory = resolvePapaDbDirectory(path.resolve(__dirname, ".."));
+const dbPath = path.join(dbDirectory, "leads.db");
 const db = new Database(dbPath);
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
 const PAPA_LIFE_MEMBERSHIP_COURSE_ID = Number(process.env.PAPA_LIFE_MEMBERSHIP_COURSE_ID || "11");
@@ -3193,7 +3195,7 @@ async function startServer() {
 
   app.use(
     session({
-      store: new (SQLiteStore as any)({ db: "sessions.db", dir: path.resolve(__dirname, "..") }),
+      store: new (SQLiteStore as any)({ db: "sessions.db", dir: dbDirectory }),
       secret: "papalife-secret-2026",
       resave: false,
       saveUninitialized: false,

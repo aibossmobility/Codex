@@ -10,6 +10,7 @@ import { BrianDigitalTwin } from "./components/BrianDigitalTwin";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import PapaHouse from "./pages/PapaHouse";
+import MusicRoom from "./pages/MusicRoom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import MemberLogin from "./pages/MemberLogin";
@@ -62,6 +63,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path="/house/:room" component={PapaHouse} />
       <Route path="/house" component={PapaHouse} />
+      <Route path="/music-room" component={MusicRoom} />
       <Route path="/media-library"><Redirect to="/courses" /></Route>
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses" component={Courses} />

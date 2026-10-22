@@ -3027,12 +3027,30 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     };
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
+  // The Music Room is a first-class public React page. Give direct links a
+  // successful, indexable server response instead of the generic 404 shell.
+  if (pathname === "/music-room") {
+    const page: StaticServerPage = {
+      title: "The Music Room | Original Songs, Lyrics & Stories | Papa Life",
+      description: "Listen free to original songs and spoken-word recordings by Brian Keith Hill, read the lyric guide, and discover his community contributions.",
+      eyebrow: "Papa Life · Music & Spoken Word",
+      headline: "Welcome to the Music Room.",
+      intro: "Come in, listen to Fathers of Adult Children and its alternate arrangement, read along, and explore the stories behind Brian Keith Hill’s music.",
+      sections: [
+        { heading: "Listen and read along", body: "Two Fathers of Adult Children recordings are available to play without charge. The working lyric guide is displayed beside the music." },
+        { heading: "My Community Contributions", body: "Explore the community service, teaching, creative work and Black Men Speak history that shaped the songs and Papa Life." },
+      ],
+      cta: { label: "Start listening free", href: "/music-room#listen" },
+    };
+    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
+  }
+
   // Direct room links must return a usable public 200 response, not a 404.
   if (pathname === "/house" || pathname.startsWith("/house/")) {
     const roomPages: Record<string, {name: string; description: string; destination: string}> = {
       "living-room": { name: "The Living Room", description: "Welcome to Papa Life. Begin with the Awareness Wheel and explore fatherhood resources.", destination: "/#fatherhood-wheel" },
       library: { name: "The Reading Nook", description: "Explore written resources by Brian Keith Hill, including Run Your Own Race.", destination: "/shop" },
-      "listening-room": { name: "The Listening Room", description: "Find Papa Life audio lessons and reflections for fathers of adult children.", destination: "/shop" },
+      "listening-room": { name: "The Listening Room", description: "Find Papa Life songs, original music, audio lessons and reflections for fathers of adult children.", destination: "/music-room" },
       theater: { name: "The Theater", description: "Discover self-guided Papa Life videos and lessons in the resource shop.", destination: "/shop" },
       "dad-cave": { name: "The Dad Cave", description: "Reflect on Presence, Authority, Purpose, and Alignment. Explore your fatherhood journey.", destination: "/my-journey" },
       resources: { name: "The Resource Room", description: "Explore useful tools, written resources, audio lessons, and digital products.", destination: "/shop" },
@@ -6978,7 +6996,7 @@ async function startServer() {
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
       "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
       "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
-      "/house", "/house/living-room", "/house/library", "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources", "/house/sky-room",
+      "/music-room", "/house", "/house/living-room", "/house/library", "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources", "/house/sky-room",
     ];
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
     const today = new Date().toISOString().slice(0, 10);

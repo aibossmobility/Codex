@@ -13,6 +13,7 @@ const pages = [
   ["/house/living-room", "monthly", "0.78"],
   ["/house/library", "monthly", "0.80"],
   ["/house/listening-room", "monthly", "0.80"],
+  ["/music-room", "monthly", "0.85"],
   ["/house/theater", "monthly", "0.80"],
   ["/house/dad-cave", "monthly", "0.80"],
   ["/house/resources", "monthly", "0.80"],

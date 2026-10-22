@@ -14,6 +14,7 @@ const navigation = [
   { label: "Come Inside", href: "/house" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
+  { label: "Music Room", href: "/music-room" },
   { label: "Explore Courses", href: "/shop" },
 ];
 

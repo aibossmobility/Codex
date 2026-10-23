@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#151c17">
+<meta name="robots" content="noindex,nofollow">
+<title>Come On Up | Papa Life Porch Preview</title>
+<meta name="description" content="Take a moment on Papa Life's digital porch. Pull up a chair, look at the next play, or take a step toward what matters. You decide when to enter.">
+<style>
+:root{color-scheme:dark;--gold:#f0bf52;--cream:#f4e8d1;--pale:#cfcbbf;--green:#183b2a;--line:rgba(243,219,160,.26);--ink:#111912;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--cream);background:#151c17;line-height:1.45}
+a{color:inherit}button{font:inherit;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.skip{position:absolute;left:-9999px;top:1rem;background:#fff;color:#111;padding:.7rem;z-index:99}.skip:focus{left:1rem}
+header{position:relative;z-index:2;padding:1rem max(1rem,calc((100vw - 1240px)/2));display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#111912}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-weight:900;letter-spacing:.055em}.brand img{width:52px;height:52px;object-fit:contain}.brand small{display:block;color:#dfc38e;font-weight:500;font-size:.73rem;letter-spacing:.04em}
+.outside{font-size:.9rem;text-decoration:none;padding:.6rem .9rem;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+.outside:hover{background:#293929}
+.top-stripe{height:5px;background:linear-gradient(90deg,#c83b30 0 30%,#e6b43a 30% 67%,#377a48 67%)}
+.hero{position:relative;min-height:min(680px,85vh);display:grid;align-items:end;isolation:isolate;overflow:hidden;background:#1d2a22}
+.hero:before{content:"";position:absolute;inset:0;background:url('/images/brian-green-sweater-live.jpg') center 29%/cover no-repeat;z-index:-2}
+.hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(10,19,13,.94) 0%,rgba(12,26,19,.79) 38%,rgba(12,24,18,.12) 90%),linear-gradient(0deg,rgba(17,25,19,.9),transparent 42%)}
+.hero-inner{width:min(1200px,calc(100% - 2.25rem));margin:0 auto;padding:5.5rem 0 4rem}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;color:#ffe1a3;font-size:.82rem;text-transform:uppercase;letter-spacing:.19em;font-weight:800}
+.eyebrow:before{content:"";display:block;width:25px;height:2px;background:var(--gold)}
+h1{font-family:Georgia,serif;font-weight:600;font-size:clamp(3.4rem,8vw,7.1rem);line-height:.98;letter-spacing:-.04em;margin:1rem 0 1.25rem;max-width:720px;text-wrap:balance}
+.hero-copy{max-width:545px;font-size:clamp(1.05rem,1.7vw,1.36rem);color:#f0ebe0;line-height:1.6;margin:0 0 2rem}
+.hero-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+.primary,.secondary{display:inline-flex;justify-content:center;align-items:center;gap:.65rem;border-radius:999px;min-height:50px;padding:.8rem 1.3rem;text-decoration:none;font-weight:800;font-size:.98rem}
+.primary{background:var(--gold);color:var(--ink);border:2px solid var(--gold)}
+.primary:hover{background:#ffe09b}.secondary{background:rgba(17,25,19,.62);border:1px solid rgba(255,255,255,.52);color:#fff}.secondary:hover{background:#2b382d}
+.caption{margin-top:1.3rem;font-size:.84rem;color:#ddd2bd;max-width:580px}
+main{overflow:hidden}
+.porch{position:relative;background:radial-gradient(ellipse at top right,rgba(133,86,45,.17),transparent 50%),linear-gradient(155deg,#18291f,#22231b);padding:4.5rem max(1rem,calc((100vw - 1160px)/2)) 5.3rem}
+.porch:before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:repeating-linear-gradient(90deg,rgba(200,148,74,.28),rgba(200,148,74,.28) 1px,transparent 1px,transparent 12vw);border-top:4px solid #b08952}
+.section-intro{max-width:750px}
+.overline{color:#e9bd68;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;font-weight:800}
+h2{font-family:Georgia,serif;font-size:clamp(2rem,4.2vw,3.65rem);font-weight:500;line-height:1.13;margin:.5rem 0 1rem;letter-spacing:-.025em}
+.section-intro>p:last-child{color:#d8d5c9;max-width:600px;font-size:1.08rem}
+.porch-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;margin:2.5rem 0}
+.activity{position:relative;min-height:225px;padding:1.75rem 1.5rem;text-align:left;border-radius:23px;border:1px solid rgba(250,217,155,.24);background:rgba(248,225,176,.06);color:#fff;display:flex;flex-direction:column;align-items:flex-start;transition:background .2s,border .2s,transform .2s}
+.activity:hover,.activity[aria-pressed="true"]{border-color:#e2b65b;background:#304532;transform:translateY(-3px)}
+.activity[aria-pressed="true"]:after{content:"Chosen";position:absolute;right:1rem;top:1rem;font-size:.76rem;font-weight:800;color:#ffdc90}
+.symbol{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;border:1px solid #e7c78d;font-size:1.85rem;background:rgba(225,186,114,.12);margin-bottom:auto}
+.activity strong{font-size:1.37rem;margin-top:1.35rem;letter-spacing:-.02em}
+.activity .sub{color:#d9d0be;font-size:.94rem;margin-top:.4rem}
+.respond{display:none;margin-top:.5rem;padding:2rem;border-left:4px solid var(--gold);background:#f3e7d0;color:#1c241c;border-radius:0 20px 20px 0;max-width:850px}
+.respond.active{display:block}
+.respond .step{font-weight:900;letter-spacing:.12em;color:#5a562e;font-size:.77rem;text-transform:uppercase}
+.respond h3{font-family:Georgia,serif;font-size:clamp(1.6rem,3vw,2.15rem);font-weight:500;margin:.35rem 0 .65rem}
+.respond p{font-size:1.09rem;margin:0 0 1.2rem;max-width:650px}
+.respond .primary{border:none}
+.path{display:flex;align-items:center;gap:.55rem;margin:2.7rem 0 0;color:#d1bc94;font-size:.84rem;font-weight:700;letter-spacing:.04em}
+.path span{height:1px;background:var(--line);flex:1}
+.door-section{background:#ede1c8;color:#17251b;padding:4.5rem max(1rem,calc((100vw - 1160px)/2))}
+.door-layout{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.15fr);gap:clamp(1.5rem,5vw,5rem);align-items:center}
+.door-art{min-height:390px;display:flex;justify-content:center;align-items:flex-end;padding:1.2rem 2rem 0;background:radial-gradient(circle at 50% 20%,#fff7e2,transparent 73%)}
+.door{display:flex;align-items:center;justify-content:center;position:relative;width:min(250px,100%);height:348px;border:14px solid #4d4434;border-bottom:0;border-radius:117px 117px 0 0;background:linear-gradient(95deg,#69543b,#8a6344 22%,#533d2e 58%,#765035);box-shadow:inset 0 0 0 5px rgba(234,189,107,.22),10px 13px 0 rgba(14,26,17,.12);text-decoration:none;transition:transform .2s}
+.door:hover{transform:perspective(750px) rotateY(-5deg)}
+.door-panels{position:absolute;inset:62px 30px 32px;border-top:5px double rgba(240,206,133,.36);border-bottom:5px double rgba(240,206,133,.36);box-shadow:inset 0 0 0 2px rgba(240,206,133,.25)}
+.knob{position:absolute;right:24px;top:56%;width:19px;height:19px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff1af,#bb842c 72%);box-shadow:0 0 0 4px rgba(40,26,10,.23)}
+.door-label{position:relative;z-index:1;color:#fff1cc;background:rgba(36,26,17,.67);border:1px solid rgba(255,225,174,.4);padding:.8rem 1.1rem;border-radius:999px;font-weight:800}
+.door-copy .overline{color:#77572a}.door-copy p{font-size:1.13rem;max-width:575px;line-height:1.65}.door-copy .primary{background:#1d412c;color:#fff;border-color:#1d412c}.door-copy .primary:hover{background:#315f3b}
+.door-copy .muted{font-size:.88rem;color:#685e50}
+footer{background:#111912;color:#c8c1af;padding:1.4rem max(1rem,calc((100vw - 1160px)/2));display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:.85rem}
+footer a:hover{text-decoration:none}
+@media(max-width:800px){.hero{min-height:580px}.hero:before{background-position:64% 22%}.hero:after{background:linear-gradient(90deg,rgba(10,19,13,.89),rgba(10,19,13,.43)),linear-gradient(0deg,#17221a,transparent 55%)}.hero-inner{padding:4rem 0 3rem}.porch-options{grid-template-columns:1fr}.activity{min-height:130px;padding:1.1rem 1.25rem}.symbol{width:46px;height:46px;font-size:1.5rem}.activity strong{margin-top:.45rem}.door-layout{grid-template-columns:1fr}.door-art{min-height:320px;order:2}.door{height:310px}.door-copy{order:1}h1{font-size:clamp(3.4rem,14vw,5.2rem)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#porch">Skip to the porch</a>
+<header>
+  <a class="brand" href="https://papalifecoach.com/" aria-label="Papa Life outside homepage">
+    <img src="/images/papa-life-logo.png" width="52" height="52" alt="">
+    <span>PAPA LIFE<small>Fathers of Adult Children</small></span>
+  </a>
+  <a class="outside" href="https://papalifecoach.com/">← Back outside</a>
+</header>
+<div class="top-stripe" aria-hidden="true"></div>
+<main>
+<section class="hero" aria-labelledby="hello-title">
+ <div class="hero-inner">
+  <div class="eyebrow">The porch · A place before the house</div>
+  <h1 id="hello-title">Come on up.<br>Take your time.</h1>
+  <p class="hero-copy">Some conversations need a little room. You can sit for a minute, think through your next move, or just look around. You're in charge of what happens next.</p>
+  <div class="hero-actions">
+   <a class="primary" href="#porch">Spend a moment on the porch <span aria-hidden="true">↓</span></a>
+   <a class="secondary" href="https://papalifecoach.com/house">I'd rather go inside <span aria-hidden="true">↗</span></a>
+  </div>
+  <p class="caption">I'm Brian's digital counterpart, not Brian personally. This page offers free prepared guidance. No voice session, account, or purchase is needed.</p>
+ </div>
+</section>
+<section class="porch" id="porch" aria-labelledby="porch-title">
+ <div class="section-intro">
+  <div class="overline">You set the pace</div>
+  <h2 id="porch-title">What would help right now?</h2>
+  <p>There's no wrong starting point. Pick whatever feels most useful. You can change your mind.</p>
+ </div>
+ <div class="porch-options" role="group" aria-label="Choose a porch activity">
+  <button type="button" class="activity" data-choice="chair" aria-pressed="false">
+   <span class="symbol" aria-hidden="true">☕</span><strong>Pull up a chair</strong><span class="sub">I need a minute to think.</span>
+  </button>
+  <button type="button" class="activity" data-choice="game" aria-pressed="false">
+   <span class="symbol" aria-hidden="true">🏀</span><strong>Look at the next play</strong><span class="sub">Help me work through the situation.</span>
+  </button>
+  <button type="button" class="activity" data-choice="walk" aria-pressed="false">
+   <span class="symbol" aria-hidden="true">🚶</span><strong>Walk a little further</strong><span class="sub">I'm ready for one small step.</span>
+  </button>
+ </div>
+ <section id="response" class="respond" tabindex="-1" aria-live="polite" aria-label="Your chosen reflection">
+  <div class="step">A thought for the road</div><h3 id="response-title"></h3>
+  <p id="response-text"></p>
+  <a id="response-link" class="primary" href="https://papalifecoach.com/assessment">Try this next <span aria-hidden="true">↗</span></a>
+ </section>
+ <div class="path"><span aria-hidden="true"></span> NOTICE WHAT MATTERS · CONSIDER A STEP · YOU DECIDE <span aria-hidden="true"></span></div>
+</section>
+<section class="door-section" aria-labelledby="door-title">
+ <div class="door-layout">
+  <div class="door-art" aria-hidden="true"><a class="door" tabindex="-1" href="https://papalifecoach.com/house"><span class="door-panels"></span><span class="knob"></span><span class="door-label">Step inside ↗</span></a></div>
+  <div class="door-copy">
+   <div class="overline">The next door is yours to open</div>
+   <h2 id="door-title">Whenever you're ready, there's more inside.</h2>
+   <p>Explore the Papa Life house at your own pace. The lessons, the conversations, the resources—they'll be there when you choose them.</p>
+   <a class="primary" href="https://papalifecoach.com/house">Open the door to Papa Life <span aria-hidden="true">→</span></a>
+   <p class="muted">Or stay here a while. No form to fill out. No appointment to make.</p>
+  </div>
+ </div>
+</section>
+</main>
+<footer><span>© Papa Life · Brian Keith Hill</span><span>“As long as you're both alive, it's never too late.”</span><a href="https://papalifecoach.com/">Back to Papa Life outside</a></footer>
+<script>
+(function(){
+ const responses={
+ chair:{title:"What's weighing on you?",text:"You don't have to explain it all. Try naming one thing that matters to you, and one thing you cannot control. That difference can change how you approach the next conversation.",href:"https://papalifecoach.com/assessment",cta:"Take a two-minute check-in"},
+ game:{title:"You don't control every move.",text:"A good game plan starts with what is yours to do. You can listen, own your part, and offer consistency. You cannot decide how another adult will respond. What's your one respectful next play?",href:"https://papalifecoach.com/papa-framework",cta:"See the PAPA framework"},
+ walk:{title:"One step is enough for today.",text:"Choose something small that doesn't pressure another person: listen before advising, acknowledge impact without defending, or follow through on what you promised. Let actions speak over time.",href:"https://papalifecoach.com/papa-first-lesson",cta:"Explore the first lesson"}
+ };
+ const panel=document.getElementById('response');
+ document.querySelectorAll('[data-choice]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+   document.querySelectorAll('[data-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
+   const r=responses[btn.dataset.choice];
+   document.getElementById('response-title').textContent=r.title;
+   document.getElementById('response-text').textContent=r.text;
+   const link=document.getElementById('response-link');link.href=r.href;link.firstChild.textContent=r.cta+' ';
+   panel.classList.add('active');
+   panel.focus({preventScroll:true});
+   panel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
+  });
+ });
+})();
+</script>
+</body>
+</html>

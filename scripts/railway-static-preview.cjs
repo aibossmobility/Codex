@@ -76,7 +76,9 @@ const server = http.createServer((req, res) => {
   catch { res.writeHead(400); return res.end('Bad request'); }
   if (requestPath === '/_health') { res.writeHead(200, {'content-type':'application/json','cache-control':'no-store'}); return res.end(JSON.stringify({ok:true,service:'papa-life-digital-twin-preview',mode:'static-isolated',ai_backend:false,guided_chat:true,conversation_storage:false,voice_session_enabled:false})); }
   if (requestPath === '/api' || requestPath.startsWith('/api/')) { res.writeHead(503, {'content-type':'application/json','cache-control':'no-store'}); return res.end(JSON.stringify({ok:false,reason:'This preview is frontend-only; AI APIs are not enabled.'})); }
-  const rel = requestPath.replace(/^\/+/, '');
+  // The isolated preview uses a purpose-built porch as the Digital Twin entrance.
+  // This does NOT change the live Papa Life homepage or its /digital-twin deployment.
+  const rel = requestPath === '/digital-twin' || requestPath === '/digital-twin/' ? 'porch/index.html' : requestPath.replace(/^\/+/, '');
   const abs = path.resolve(base, rel);
   if (abs !== base && !abs.startsWith(base + path.sep)) { res.writeHead(403); return res.end('Forbidden'); }
   let filePath = abs;

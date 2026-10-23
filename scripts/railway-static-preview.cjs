@@ -95,6 +95,16 @@ const server = http.createServer((req, res) => {
   res.setHeader('cache-control',filePath === indexFile ? 'no-store' : 'public,max-age=300');
   res.writeHead(200);
   if (req.method === 'HEAD') return res.end();
+  // Make the familiar, compact Digital Brian phone control available across
+  // isolated preview HTML pages; never auto-open or start a paid voice session.
+  // Frontend assets are unchanged and production Papa Life is not modified.
+  if (path.extname(filePath).toLowerCase() === '.html') {
+    let page = fs.readFileSync(filePath, 'utf8');
+    if (page.includes('</body>') && !page.includes('src="/phone-widget.js"')) {
+      page = page.replace('</body>', '<script src="/phone-widget.js" defer></script></body>');
+    }
+    return res.end(page);
+  }
   fs.createReadStream(filePath).on('error', () => res.destroy()).pipe(res);
 });
 const port = Number(process.env.PORT || 8080);

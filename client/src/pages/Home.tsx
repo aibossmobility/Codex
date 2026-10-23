@@ -10,8 +10,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+// The approved Digital Porch sits between the outside homepage and Papa Life house.
+// Keep this direct link until the main-domain /porch route is separately deployed and tested.
+const approvedPorchUrl = "https://papa-life-digital-twin-preview-production.up.railway.app/digital-twin";
+
 const navigation = [
-  { label: "Come Inside", href: "/house" },
+  { label: "The Porch", href: approvedPorchUrl },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
   { label: "Music Room", href: "/music-room" },
@@ -63,7 +67,7 @@ export default function Home() {
   const wheelHref = "/#fatherhood-wheel";
 
   function openPapaAiCoach() {
-    window.location.assign("/digital-twin");
+    window.location.assign(approvedPorchUrl);
   }
 
   return (
@@ -95,7 +99,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 rounded-md border border-[#17231c]/35 px-4 py-3 text-sm font-extrabold text-[#17231c] hover:border-[#145b35] hover:bg-[#145b35] hover:text-white"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              1-Minute AI Experience
+              Talk with Digital Brian
             </button>
             <a
               href={shopHref}
@@ -136,7 +140,7 @@ export default function Home() {
                 className="flex items-center gap-2 rounded-md px-4 py-3 text-left font-bold hover:bg-[#145b35] hover:text-white"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                1-Minute AI Experience
+                Talk with Digital Brian
               </button>
               <a
                 href={shopHref}
@@ -156,12 +160,12 @@ export default function Home() {
           <h1 id="welcome-home-heading">Your journey has a place to <em>begin.</em></h1>
           <p>Welcome. Step out of the noise and into a place built for reflection, wisdom, and the courage to reconnect. Come inside, make yourself comfortable, and discover what speaks to you.</p>
           <div className="papa-house-outdoor-actions">
-            <a href="/house" className="papa-house-button">Come Inside <ArrowRight size={20} aria-hidden="true"/></a>
-            <a href="/shop" className="papa-house-button-outline">Browse Resources <ArrowRight size={18} aria-hidden="true"/></a>
+            <a href={approvedPorchUrl} className="papa-house-button">Step onto the porch <ArrowRight size={20} aria-hidden="true"/></a>
+            <a href="/house" className="papa-house-button-outline">Go straight inside <ArrowRight size={18} aria-hidden="true"/></a>
           </div>
         </div>
       </section>
-      <div className="papa-house-outdoor-note">A welcoming home for fathers to <strong>read, listen, reflect, and grow</strong>. <a href="/house">Explore the rooms</a> at your own pace.</div>
+      <div className="papa-house-outdoor-note">Take the porch at your own pace before going inside. <a href={approvedPorchUrl}>Spend a moment on the porch</a> or <a href="/house">explore the rooms</a> directly.</div>
       <HouseTrail current="Outside" />
 
       <section id="fatherhood-wheel" className="border-y border-[#17231c]/15 bg-[#fffaf0] py-12 md:py-16" aria-labelledby="fatherhood-wheel-heading">

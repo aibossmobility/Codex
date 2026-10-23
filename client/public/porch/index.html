@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#F5EDE0">
 <meta name="robots" content="noindex,nofollow">
 <title>Come On Up | Papa Life Porch Preview</title>
 <meta name="description" content="Take a moment on Papa Life's digital porch. Pull up a chair, look at the next play, or take a step toward what matters. You decide when to enter.">
@@ -71,6 +71,132 @@ footer a:hover{text-decoration:none}
 @media(max-width:800px){.hero{min-height:490px}.hero:before{width:68px;height:68px;right:8%;top:24px;opacity:.28}.hero-inner{padding:2.8rem 0 2.2rem}h1{font-size:clamp(2.8rem,10vw,4.7rem)}.porch-options{grid-template-columns:1fr}.activity{min-height:130px;padding:1.1rem 1.3rem}.activity strong{padding-top:.9rem}.symbol{height:42px;width:42px;font-size:1.25rem}.door-layout{grid-template-columns:1fr}.door-art{order:2;min-height:280px}.door{height:275px;width:220px}.door-copy{order:1}.path{line-height:1.5;text-align:center}}
 @media(max-width:420px){header{padding:1rem}.brand{font-size:.95rem}.brand img{width:43px;height:43px}.brand small{font-size:.67rem}.outside{font-size:.77rem;padding:.55rem .7rem}.hero{min-height:0;padding:1.4rem 0 2rem}.hero-inner{width:calc(100% - 2rem)}h1{font-size:clamp(2.5rem,11vw,3.7rem)}.hero-actions{flex-direction:column;align-items:stretch}.primary,.secondary{width:100%}.porch,.door-section{padding:3rem 1rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* HOME FOR FATHERS · PORCH VISUAL TREATMENT
+   Warm materials sourced from previously approved Papa Life: A Home for Fathers /
+   Welcome Home reference artwork. This deliberately does NOT reuse the AI Boss or
+   TV/live-show all-black graphic color treatment.
+   Sampled source swatches: parchment #F5EDE0, golden light #F6B21D, walnut
+   #8A4921, dark wood #271A13, deep leaf #1E3F21, clay #9C4A2E, leather #6A4D41.
+   No Brian portrait; no stock imagery; preserve official logo and visitor control.
+*/
+:root{
+  color-scheme:light;
+  --home-parchment:#F5EDE0;
+  --home-gold:#F6B21D;
+  --home-wood:#8A4921;
+  --home-walnut:#271A13;
+  --home-leaf:#1E3F21;
+  --home-clay:#9C4A2E;
+  --home-leather:#6A4D41;
+}
+body{background:var(--home-parchment);color:var(--home-walnut)}
+header{
+  background:var(--home-parchment);
+  border-bottom:1px solid rgba(138,73,33,.24);
+  color:var(--home-walnut);
+  box-shadow:0 5px 25px rgba(39,26,19,.10);
+}
+.brand small{color:var(--home-leather);opacity:1}
+.outside{color:var(--home-walnut);border:1px solid var(--home-leather);background:rgba(255,255,255,.32)}
+.outside:hover{background:rgba(138,73,33,.10)}
+.top-stripe{height:4px;background:linear-gradient(90deg,var(--home-wood),var(--home-gold) 42%,var(--home-leaf))}
+.hero{
+  min-height:540px;
+  background:
+     radial-gradient(ellipse at 80% 25%,rgba(255,249,225,.84) 0%,transparent 46%),
+     radial-gradient(ellipse at 2% 90%,rgba(165,89,29,.18) 0%,transparent 48%),
+     linear-gradient(110deg,#F5EDE0 0%,#FDEDD4 50%,#DAB689 100%);
+  color:var(--home-walnut);
+  border-bottom:16px solid var(--home-wood);
+  box-shadow:inset 0 -4px 0 rgba(39,26,19,.26);
+}
+.hero:before{
+  top:68px;right:8%;width:165px;height:165px;
+  border-top:4px solid rgba(138,73,33,.5);
+  border-right:4px solid rgba(138,73,33,.5);
+  border-radius:0 100px 0 0;opacity:.7;
+}
+.eyebrow{color:var(--home-leaf)}
+.eyebrow:before{background:var(--home-gold);width:34px;height:3px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(3rem,6.4vw,5.85rem);font-weight:600;letter-spacing:-.045em;max-width:900px}
+.hero-copy{color:var(--home-walnut);opacity:1;font-size:clamp(1.07rem,1.8vw,1.29rem)}
+.primary{background:var(--home-gold);border-color:var(--home-gold);color:var(--home-walnut);box-shadow:0 5px 15px rgba(138,73,33,.14)}
+.primary:hover{background:#FDEDD4;border-color:var(--home-wood);color:var(--home-walnut)}
+.secondary{background:transparent;border-color:var(--home-wood);color:var(--home-walnut)}
+.secondary:hover{background:rgba(138,73,33,.1)}
+.caption{color:var(--home-leather)}
+.porch{
+  color:var(--home-parchment);
+  border-top:0;
+  background:
+    radial-gradient(ellipse at 86% 3%,rgba(246,178,29,.25),transparent 44%),
+    repeating-linear-gradient(90deg,transparent,transparent 110px,rgba(255,232,188,.045) 112px,transparent 114px),
+    linear-gradient(155deg,var(--home-leather),var(--home-walnut) 80%);
+}
+.overline{color:var(--home-gold)}
+.section-intro>p:last-child{color:var(--home-parchment);opacity:1}
+.porch-options{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1.05rem}
+.activity{
+  color:var(--home-walnut);
+  background:linear-gradient(165deg,#FDEDD4,#F5EDE0);
+  border:1px solid rgba(246,178,29,.3);
+  border-top:0;
+  border-radius:17px;
+  box-shadow:0 11px 30px rgba(15,7,2,.21);
+  min-height:205px;
+  padding:1.55rem;
+}
+.activity:nth-child(2),.activity:nth-child(3){border-top:0}
+.activity:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--home-gold);border-radius:17px 0 0 17px}
+.activity:hover,.activity[aria-pressed="true"]{outline:3px solid var(--home-gold);outline-offset:-3px;background:#F5EDE0}
+.activity[aria-pressed="true"]:after{color:var(--home-leaf)}
+.symbol,.activity:nth-child(2) .symbol,.activity:nth-child(3) .symbol{
+  background:rgba(246,178,29,.14);
+  color:var(--home-walnut);
+  border:1px solid rgba(138,73,33,.40)
+}
+.activity .sub{opacity:1;color:var(--home-leather)}
+.respond{background:var(--home-parchment);color:var(--home-walnut);border-left-color:var(--home-gold)}
+.respond .step{color:var(--home-wood)}
+.path{color:var(--home-parchment);font-size:.85rem}
+.path span{background:rgba(245,237,224,.24)}
+.door-section{
+  color:var(--home-walnut);
+  background:
+    radial-gradient(ellipse at 10% 20%,rgba(246,178,29,.18),transparent 57%),
+    linear-gradient(135deg,#FDEDD4,#F5EDE0);
+}
+.door{
+  background:
+    repeating-linear-gradient(90deg,rgba(39,26,19,.07) 0,rgba(39,26,19,.07) 2px,transparent 2px,transparent 26px),
+    linear-gradient(90deg,#6A4D41,#8A4921,#6A4D41);
+  border:11px solid var(--home-wood);
+  box-shadow:8px 10px 0 rgba(106,77,65,.15),inset 0 0 0 2px rgba(253,237,212,.25);
+}
+.door:hover{background:linear-gradient(90deg,#8A4921,#A5591D)}
+.door-panels{border-color:rgba(246,178,29,.7)}
+.knob{background:var(--home-gold)}
+.door-label{background:var(--home-gold);color:var(--home-walnut)}
+.door-copy .overline{color:var(--home-wood)}
+.door-copy .primary{background:var(--home-leaf);border-color:var(--home-leaf);color:var(--home-parchment)}
+.door-copy .primary:hover{background:var(--home-wood);border-color:var(--home-wood);color:var(--home-parchment)}
+.door-copy .muted{color:var(--home-leather)}
+footer{background:var(--home-walnut);color:var(--home-parchment);border-top:4px solid var(--home-gold)}
+@media(max-width:800px){
+  .hero{min-height:0;padding:2rem 0 2.25rem}
+  .hero-inner{padding:2rem 0}
+  .hero:before{opacity:.28;top:22px}
+  .porch-options{grid-template-columns:1fr}
+  .activity{min-height:148px}
+}
+@media(max-width:420px){
+  .hero{padding:1.1rem 0 1.9rem}
+  .hero-inner{padding:1.2rem 0}
+  .brand small{color:var(--home-leather)}
+  .path{line-height:1.55}
+}
+
 </style>
 </head>
 <body>

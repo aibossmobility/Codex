@@ -10,7 +10,7 @@
 
   /* Coordinate the small optional Digital Brian control with approved Papa Life
      "A Home for Fathers" interior reference rather than the black promo theme. */
-  style.textContent += \`
+  style.textContent += `
 #papa-phone{background:#6A4D41;color:#F5EDE0;border-color:#F6B21D;box-shadow:0 8px 28px rgba(39,26,19,.37)}
 #papa-phone:hover,#papa-phone[aria-expanded="true"]{background:#8A4921}
 #papa-phone svg{color:#F6B21D}
@@ -27,7 +27,7 @@
 #papa-phone-conversation .reply{background:#FDEDD4;color:#271A13;border-left-color:#8A4921}
 #papa-phone-conversation a{color:#1E3F21}
 #papa-phone:focus-visible,#papa-phone-conversation :focus-visible{outline-color:#F6B21D}
-\`;
+`;
 
   document.head.appendChild(style);
   const btn=document.createElement('button');

@@ -7,6 +7,28 @@
   // Small modern mobile-phone silhouette, not a vintage handset.
   // The control remains compact until a person deliberately opens it.
   style.textContent += '#papa-phone{right:16px;bottom:16px;width:70px;height:80px;min-height:0;padding:7px 5px;display:flex;flex-direction:column;justify-content:center;gap:3px;border-radius:21px;background:#000000;text-align:center;line-height:1.1}#papa-phone svg{width:32px;height:41px;border-radius:0;padding:0;background:none;color:#FFD60A;flex-shrink:0}#papa-phone span{font-size:12px;line-height:1;font-weight:850;letter-spacing:.045em}#papa-phone-conversation{bottom:105px}#papa-phone[aria-expanded="true"]{background:#111111}#papa-phone:focus-visible{outline:3px solid #FFD60A;outline-offset:3px}@media(max-width:480px){#papa-phone{width:65px;height:73px;min-height:0;padding:4px;right:12px;bottom:max(12px,env(safe-area-inset-bottom))}#papa-phone svg{width:29px;height:36px}#papa-phone-conversation{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 83px);max-height:calc(100dvh - 109px)}}';
+
+  /* Coordinate the small optional Digital Brian control with approved Papa Life
+     "A Home for Fathers" interior reference rather than the black promo theme. */
+  style.textContent += \`
+#papa-phone{background:#6A4D41;color:#F5EDE0;border-color:#F6B21D;box-shadow:0 8px 28px rgba(39,26,19,.37)}
+#papa-phone:hover,#papa-phone[aria-expanded="true"]{background:#8A4921}
+#papa-phone svg{color:#F6B21D}
+#papa-phone-conversation{background:#F5EDE0;color:#271A13;border-color:#8A4921;box-shadow:0 14px 46px rgba(39,26,19,.35)}
+#papa-phone-conversation header{background:#6A4D41;color:#F5EDE0;border-bottom:2px solid #F6B21D}
+#papa-phone-conversation header strong,#papa-phone-conversation header small{color:#F5EDE0}
+#papa-phone-conversation header img{border-color:#F6B21D}
+#papa-phone-conversation header button{color:#F5EDE0;border-color:#F6B21D}
+#papa-phone-conversation .clarify{color:#6A4D41}
+#papa-phone-conversation textarea{background:#FDEDD4;color:#271A13;border-color:#8A4921}
+#papa-phone-conversation textarea::placeholder{color:#6A4D41;opacity:1}
+#papa-phone-conversation .submit{background:#F6B21D;color:#271A13}
+#papa-phone-conversation .submit:hover{background:#FDEDD4}
+#papa-phone-conversation .reply{background:#FDEDD4;color:#271A13;border-left-color:#8A4921}
+#papa-phone-conversation a{color:#1E3F21}
+#papa-phone:focus-visible,#papa-phone-conversation :focus-visible{outline-color:#F6B21D}
+\`;
+
   document.head.appendChild(style);
   const btn=document.createElement('button');
   btn.id='papa-phone';btn.type='button';btn.setAttribute('aria-controls','papa-phone-conversation');btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label','Talk with Digital Brian — open free prepared text guidance');

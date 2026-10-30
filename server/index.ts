@@ -6788,6 +6788,7 @@ async function startServer() {
         // A defined worker is not proof of an operational executor.
         operational:s.operational
       })),
+      elevenlabs_included_builders: audit.providers.filter(p=>p.provider==="elevenlabs-included").map(p=>({id:p.id,verified_in_account:false,description:p.limitations})),
       free_highlevel_builder: audit.providers.filter(p=>p.provider==="gohighlevel-included").map(p=>({
         id:p.id,verified_in_account:false,description:p.limitations
       })),

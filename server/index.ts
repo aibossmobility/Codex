@@ -1,3 +1,4 @@
+import { installGhlDigitalSales } from "./ghl-digital-sales";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -3768,7 +3769,7 @@ async function startServer() {
     if (!token) return res.status(400).json({ ok: false, error: "Activation token is required" });
     const activation = memberActivationByToken(token);
     const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
-    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || (activation.payment_status !== "paid" && !memberHasAnyCurriculumEntitlement(db, Number(activation.member_id)))) {
       return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
     }
     return res.json({
@@ -3789,7 +3790,7 @@ async function startServer() {
 
     const activation = memberActivationByToken(token);
     const expiresAt = activation?.expires_at ? new Date(activation.expires_at).getTime() : 0;
-    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || activation.payment_status !== "paid") {
+    if (!activation || activation.used_at || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || activation.status !== "active" || (activation.payment_status !== "paid" && !memberHasAnyCurriculumEntitlement(db, Number(activation.member_id)))) {
       return res.status(400).json({ ok: false, error: "This activation link is invalid or has expired" });
     }
 
@@ -4000,6 +4001,11 @@ async function startServer() {
     } catch (error: any) {
       return res.status(500).json({ ok: false, error: error?.message || "Unable to record paid membership" });
     }
+  });
+
+  installGhlDigitalSales(app, db, appRoot, {
+    account: (email, name) => findOrCreatePaidMembershipMember({ email, displayName: name }),
+    activation: issueMemberAccountActivation,
   });
 
   app.post("/api/webhooks/commerce-paid", (_req, res) => {

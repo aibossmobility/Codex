@@ -1,5 +1,7 @@
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
+import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
+import { inspectCustomerDraft } from "./fixed-service-draft-quality";
 import { buildCustomerJourney } from "./customer-journey-worker-routing";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
@@ -4018,6 +4020,34 @@ async function startServer() {
       ok: false,
       error: "New product-sales provisioning is paused pending verified GoHighLevel integration.",
     });
+  });
+
+  // Safe local-only AI Boss draft worker. A GoHighLevel-verified paid job must already exist.
+  // This never invokes AI services, activates checkout, sends email or marks an order delivered.
+  // Restrict to authenticated owner until a separately reviewed worker service identity is installed.
+  function fixedServicePrivateDir() {
+    const mount=String(process.env.RAILWAY_VOLUME_MOUNT_PATH||"");
+    if(process.env.NODE_ENV==="production"&&!mount)throw new Error("Persistent private storage not configured");
+    const dir=path.join(mount||path.join(appRoot,"data"),"private-fulfillment");
+    fs.mkdirSync(dir,{recursive:true,mode:0o700});
+    return dir;
+  }
+  app.post("/api/admin/ai-boss/production/working-draft",requireAuth,(req,res)=>{
+    if(req.get("origin")!=="https://papalifecoach.com")return res.status(403).json({ok:false,error:"Request origin rejected"});
+    try{
+      const jobId=String(req.body?.jobId||"");
+      if(!/^[0-9a-f-]{36}$/i.test(jobId))return res.status(400).json({ok:false,error:"Invalid job reference"});
+      const result=saveFixedServiceWorkingDraft(db,jobId,req.body?.brief,fixedServicePrivateDir());
+      res.status(201).json({ok:true,jobId:result.jobId,state:"production_ready",quality:"not_verified",delivery:"not_sent",new_cost_usd:0});
+    }catch(error:any){res.status(422).json({ok:false,error:String(error?.message||"Cannot prepare draft").slice(0,220)});}
+  });
+  app.get("/api/admin/ai-boss/production/working-draft/:id/quality",requireAuth,(req,res)=>{
+    try{
+      const jobId=String(req.params.id||"");
+      if(!/^[0-9a-f-]{36}$/i.test(jobId))return res.status(400).json({ok:false});
+      const review=inspectCustomerDraft(db,jobId,path.join(fixedServicePrivateDir(),jobId+".md"));
+      res.set("Cache-Control","no-store").json({ok:true,...review,new_cost_usd:0});
+    }catch(error:any){res.status(422).json({ok:false,error:String(error?.message||"Not available").slice(0,220)});}
   });
 
   // ── Admin: member management ──────────────────────────────────────────────

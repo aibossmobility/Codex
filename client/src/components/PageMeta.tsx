@@ -31,11 +31,11 @@ export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }
     const canonicalUrl = canonicalPath ? new URL(canonicalPath, "https://papalifecoach.com").toString() : window.location.href;
     upsertMeta("og:url", canonicalUrl, "property");
     upsertMeta("og:site_name", "Papa Life Coach", "property");
-    upsertMeta("og:image", "https://papalifecoach.com/images/papa-life-logo.png", "property");
+    upsertMeta("og:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp", "property");
     upsertMeta("twitter:card", "summary_large_image");
     upsertMeta("twitter:title", title);
     upsertMeta("twitter:description", description);
-    upsertMeta("twitter:image", "https://papalifecoach.com/images/papa-life-logo.png");
+    upsertMeta("twitter:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp");
 
     if (canonicalPath) {
       let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;

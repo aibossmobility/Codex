@@ -91,7 +91,7 @@ export default function AllPages() {
     <div className="min-h-screen bg-[#090909] text-white">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
-          <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-10 w-10 rounded-lg object-contain bg-white" />
+          <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life" className="h-10 w-10 rounded-lg object-contain bg-white" />
           <div><h1 className="font-bold">All Papa Life Pages</h1><p className="text-xs text-gray-500">One-tap access to the full site</p></div>
           <Button size="sm" variant="ghost" className="ml-auto" onClick={() => navigate("/papa-life-os")}><ArrowLeft className="mr-2 h-4 w-4" />Papa Life OS</Button>
         </div>

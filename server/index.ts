@@ -1,5 +1,7 @@
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
+import { installAiBossCustomerIntakeRoutes } from "./ai-boss-customer-intake-routes";
+import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-ghl-verified-purchase";
 import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
 import { inspectCustomerDraft } from "./fixed-service-draft-quality";
 import { buildCustomerJourney } from "./customer-journey-worker-routing";
@@ -4007,6 +4009,8 @@ async function startServer() {
     }
   });
 
+  installAiBossCustomerIntakeRoutes(app, db, fixedServicePrivateDir);
+
   installGhlDigitalSales(app, db, appRoot, {
     account: (email, name) => findOrCreatePaidMembershipMember({ email, displayName: name }),
     activation: issueMemberAccountActivation,
@@ -4020,6 +4024,32 @@ async function startServer() {
       ok: false,
       error: "New product-sales provisioning is paused pending verified GoHighLevel integration.",
     });
+  });
+
+  // Dedicated AI Boss GHL verification: completely separate from Papa Life credentials.
+  // Owner-only while the AI Boss-specific payment feed is being configured.
+  app.get("/api/public/ai-boss/payment-verification-status",(_req,res)=>{
+    let mapReady=false;
+    try{mapReady=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||"")).length===5;}catch{}
+    const credentialsReady=Boolean(process.env.AI_BOSS_GHL_API_TOKEN&&String(process.env.AI_BOSS_GHL_LOCATION_ID||"")==="qJ83IIaK5y2ZPHzLfGG1");
+    res.set("Cache-Control","no-store").json({ok:true,brand:"ai-boss-mobility",
+      credentialsReady,priceMappingsReady:mapReady,
+      customerPurchasingReady:false,automaticDispatchEnabled:false,
+      liveVerificationReady:credentialsReady&&mapReady});
+  });
+  app.post("/api/admin/ai-boss/verify-and-dispatch",requireAuth,async(req,res)=>{
+    if(req.get("origin")!=="https://papalifecoach.com")return res.status(403).json({ok:false,error:"Origin denied"});
+    const token=String(process.env.AI_BOSS_GHL_API_TOKEN||"");
+    if(String(process.env.AI_BOSS_GHL_LOCATION_ID||"")!=="qJ83IIaK5y2ZPHzLfGG1"||!token)
+      return res.status(503).json({ok:false,error:"AI Boss location-specific GoHighLevel authorization is not configured"});
+    try{
+      const prices=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));
+      const result=await verifyAndPrepareAiBossPurchase({db,
+        intakeId:String(req.body?.intakeId||""),
+        transactionId:String(req.body?.transactionId||""),
+        apiToken:token,approvedPrices:prices,privateDir:fixedServicePrivateDir()});
+      res.set("Cache-Control","no-store").json({ok:true,...result});
+    }catch(error:any){res.status(422).json({ok:false,error:String(error?.message||"Payment verification not completed").slice(0,200)});}
   });
 
   // Safe local-only AI Boss draft worker. A GoHighLevel-verified paid job must already exist.

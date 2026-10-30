@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {AI_BOSS_LOCATION,verifyAiBossPaidOrder} from "./ai-boss-ghl-verifier";
+const prices=[{productId:"product350",priceId:"price350",productCode:"ai.feasibility.readiness",cents:35000}];
+const intake={email:"customer@example.com",code:"ai.feasibility.readiness",cents:35000,createdAt:"2026-10-30T09:00:00Z"};
+const tx={_id:"tx",altId:AI_BOSS_LOCATION,altType:"location",liveMode:true,status:"succeeded",entityType:"order",entityId:"order",amount:350,currency:"USD",contactId:"contact",createdAt:"2026-10-30T09:10:00Z"};
+const order={_id:"order",altId:AI_BOSS_LOCATION,altType:"location",liveMode:true,status:"completed",amount:350,currency:"USD",contactId:"contact",contactSnapshot:{email:"customer@example.com"},amountSummary:{subtotal:350},items:[{product:{_id:"product350"},price:{_id:"price350",type:"one_time",amount:350},qty:1}]};
+const found=verifyAiBossPaidOrder(tx,order,prices,intake);
+assert.equal(found.cents,35000);
+const fail=(t:any,o:any,m:any=prices,b:any=intake)=>assert.throws(()=>verifyAiBossPaidOrder(t,o,m,b));
+for(const patch of [{altId:"BYx4g32AidgEkTBg7nLQ"},{status:"pending"},{liveMode:false},{amountRefunded:10},{subscriptionId:"recurring"},{contactId:"wrong"},{createdAt:"2026-10-28T09:00:00Z"},{amount:300}])fail({...tx,...patch},order);
+for(const patch of [{altId:"BYx4g32AidgEkTBg7nLQ"},{status:"pending"},{liveMode:false},{amount:250},{items:[]},{contactSnapshot:{email:"other@example.com"}},{items:[{product:{_id:"product350"},price:{_id:"wrong",type:"one_time",amount:350},qty:1}]},{items:[{product:{_id:"product350"},price:{_id:"price350",type:"recurring",amount:350},qty:1}]}])fail(tx,{...order,...patch});
+fail(tx,order,prices,{...intake,cents:75000});
+console.log("PASS: AI Boss location-locked, exact-price, single-item, one-time, live paid-order verification and negative guards");

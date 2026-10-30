@@ -1,4 +1,6 @@
 import { installGhlDigitalSales } from "./ghl-digital-sales";
+import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
+import { buildCustomerJourney } from "./customer-journey-worker-routing";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -6770,6 +6772,37 @@ async function startServer() {
     }
   });
 
+  // Read-only discovery for Brian's digital twin and both public sites.
+  // No client records, payment access, model calls, external writes, or billable agents.
+  app.get("/api/public/digital-brian/free-worker-capabilities", (req, res) => {
+    const brand = String(req.query.brand || "");
+    if (brand !== "papa-life" && brand !== "ai-boss-mobility")
+      return res.status(400).json({ ok: false, error: "Known business selection required." });
+    const audit = getFreeAgentAudit();
+    res.set("Cache-Control", "public, max-age=60").json({
+      ok: true, brand, guide: "Brian's Digital Twin",
+      execution_policy: "zero-new-cost; no paid models or external writes",
+      verified_local_agents: audit.providers.filter(p => p.status === "verified-local").map(p=>({id:p.id,tasks:p.tasks})),
+      workflow: buildCustomerJourney(brand).map(s=>({
+        stage:s.stage,worker:s.worker,description:s.operation,
+        // A defined worker is not proof of an operational executor.
+        operational:s.operational
+      })),
+      elevenlabs_included_builders: audit.providers.filter(p=>p.provider==="elevenlabs-included").map(p=>({id:p.id,verified_in_account:false,description:p.limitations})),
+      free_highlevel_builder: audit.providers.filter(p=>p.provider==="gohighlevel-included").map(p=>({
+        id:p.id,verified_in_account:false,description:p.limitations
+      })),
+      real_customer_order_execution_ready:false
+    });
+  });
+  app.get("/api/public/digital-brian/free-worker-for-task", (req, res) => {
+    const brand = String(req.query.brand || "");
+    if (brand !== "papa-life" && brand !== "ai-boss-mobility")
+      return res.status(400).json({ok:false,error:"Known business selection required."});
+    const task=String(req.query.task||"").slice(0,120);
+    const result=selectVerifiedFreeAgent(task);
+    res.set("Cache-Control", "public, max-age=60").json({ok:true,brand,task,...result,customer_order_execution_ready:false});
+  });
   app.get("/api/public/pricing", (_req, res) => {
     const pricing = getPricingSettings(db);
     res.json({

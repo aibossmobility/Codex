@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { freeAgentCapabilities,selectVerifiedFreeAgent,getFreeAgentAudit } from "./free-agent-capability-catalog";
+const audit=getFreeAgentAudit();
+assert.equal(audit.reviewed,11);
+assert.equal(audit.verified,2);
+assert.equal(audit.activeExternalWrites,0);
+assert.equal(audit.paidAgentsEnabled,0);
+assert.equal(selectVerifiedFreeAgent("static-quality-test").ready,true);
+assert.equal(selectVerifiedFreeAgent("fixed-quote-draft").ready,true);
+assert.equal(selectVerifiedFreeAgent("draft-report").ready,false);
+assert.equal(selectVerifiedFreeAgent("customer-email-send").ready,false);
+assert.equal(selectVerifiedFreeAgent("digital-twin-conversation-workflow-design").ready,false);
+assert.equal(selectVerifiedFreeAgent("create-specialist-agent-configuration").ready,false);
+assert.equal(selectVerifiedFreeAgent("gohighlevel-agent-studio").ready,false);
+assert(freeAgentCapabilities.every(c=>c.costPolicy==="zero-only"&&!c.externalWrites));
+console.log("PASS: only verified local zero-cost executors are routed; unverified AI and paid GHL actions remain disabled");

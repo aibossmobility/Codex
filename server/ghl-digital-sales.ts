@@ -5,6 +5,11 @@ import path from 'node:path';
 import { resolveGhlCredentials } from './ghl-integration-store';
 import { getCommerceProductByCode, grantMemberProductEntitlement, listCommerceProducts } from './commerce-entitlements';
 
+export function singleGhlRecord(payload:any) {
+  const value=Array.isArray(payload)?payload[0]:Array.isArray(payload?.data)?payload.data[0]:payload?.data||payload;
+  if(!value || typeof value!=='object' || !value._id)throw new Error('Missing authoritative payment record');
+  return value;
+}
 export const SALES_LOCATION = 'BYx4g32AidgEkTBg7nLQ';
 export function targetForGhlProduct(name: string) {
   let match = /^Papa Life Member Audio Lesson (\d{2}) — /.exec(name);
@@ -57,7 +62,8 @@ export function installGhlDigitalSales(app:Express, db:Database.Database, root:s
     if(method==='GET') {url.searchParams.set('locationId',SALES_LOCATION); url.searchParams.set('altId',SALES_LOCATION); url.searchParams.set('altType','location');}
     const response=await fetch(url,{method,headers:{Authorization:`Bearer ${credentials.token}`,Version:'v3','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});
     if(!response.ok) throw new Error(`HighLevel ${method} ${url.pathname}: ${response.status}`);
-    return response.json();
+    const payload=await response.json();
+    return /^\/payments\/(transactions|orders)\/[^/?]+/.test(route)?singleGhlRecord(payload):payload;
   }
   async function preflight() {
     if(Date.now()-checkedAt<300000) return ready;
@@ -100,8 +106,8 @@ export function installGhlDigitalSales(app:Express, db:Database.Database, root:s
       const tx=await api(`/payments/transactions/${id}`);
       const order=tx.entityId?await api(`/payments/orders/${encodeURIComponent(tx.entityId)}`):null;
       const list=await api('/payments/transactions?limit=5');
-      const pick=(v:any)=>Object.fromEntries(Object.entries(v||{}).filter(([k])=>!['chargeSnapshot','paymentMethod','paymentProvider','ipAddress','meta','contactSnapshot'].includes(k)));
-      res.set('Cache-Control','no-store').json({transaction:pick(tx),buyer_email:tx.contactSnapshot?.email,order:pick(order),order_contact:order?.contactSnapshot,list_keys:Object.keys(list),listed_ids:(list.data||list.transactions||[]).map((v:any)=>({id:v._id||v.id,entityType:v.entityType,status:v.status,createdAt:v.createdAt}))});
+      const pick=(v:any,keys:string[])=>Object.fromEntries(keys.filter(k=>v?.[k]!==undefined).map(k=>[k,v[k]]));
+      res.set('Cache-Control','no-store').json({transaction:pick(tx,['_id','altId','altType','entityId','entityType','status','amount','currency','liveMode','createdAt','amountRefunded','subscriptionId']),order:pick(order,['_id','altId','altType','status','amount','currency','liveMode','createdAt','amountSummary','items']),list_keys:Object.keys(list),listed_ids:(list.data||list.transactions||[]).map((v:any)=>({id:v._id||v.id,entityType:v.entityType,status:v.status,createdAt:v.createdAt}))});
     }catch(error:any){res.status(502).json({error:error.message});}
   });
   async function fulfill(id:string) {

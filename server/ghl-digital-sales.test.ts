@@ -12,3 +12,10 @@ assert.equal(targetForGhlProduct('Papa Life Membership'),null);
 assert.equal(targetForGhlProduct('ARCHIVED SERVICE 01 — DO NOT USE'),null);
 assert.equal(targetForGhlProduct('Papa Life Lesson 01 — Listening Without Defending — Manuscript PDF')?.cents,1499);
 console.log('Payment verification rejects wrong business, unpaid, test, partial, refunded, recurring, unknown and discounted purchases; valid tax-inclusive payment grants only the purchased product.');
+
+import { singleGhlRecord } from './ghl-digital-sales';
+assert.deepEqual(singleGhlRecord([{_id:'tx',status:'succeeded'}]),{_id:'tx',status:'succeeded'});
+assert.deepEqual(singleGhlRecord({data:[{_id:'order'}]}),{_id:'order'});
+assert.deepEqual(singleGhlRecord({_id:'order'}),{_id:'order'});
+assert.throws(()=>singleGhlRecord([]));
+console.log('Single-record endpoints normalize observed HighLevel array responses and reject empty records.');

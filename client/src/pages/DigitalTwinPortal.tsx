@@ -28,7 +28,7 @@ export default function DigitalTwinPortal() {
     <div className="min-h-screen bg-black text-white">
       <header className="border-b border-white/10 bg-black px-3 py-3">
         <div className="mx-auto flex max-w-4xl items-center gap-3">
-          <img src="/images/papa-life-logo.png" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain" />
+          <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain" />
           <div className="min-w-0 flex-1">
             <h1 className="font-bold">Digital Brian inside Papa Life OS</h1>
             <p className="text-xs text-gray-400">No-cost navigation first • voice only by choice</p>

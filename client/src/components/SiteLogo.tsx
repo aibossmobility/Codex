@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 export const SITE_NAME = "Papa Life";
 export const SITE_NAME_SHORT = "Papa Life";
 
-/** Official PAPA / Boss Mobile Life Coach mark (Brian's brand asset in `public/images`). */
-export const SITE_LOGO_SRC = "/images/papa-life-logo.png";
+/** Approved October 16 Papa Life brand artwork (Brian's brand asset in `public/images`). */
+export const SITE_LOGO_SRC = "/images/papa-life-approved-20261016.webp";
 
 type SiteLogoProps = {
   className?: string;
@@ -27,8 +27,8 @@ export function SiteLogo({ className, size = "md", compact }: SiteLogoProps) {
       <img
         src={SITE_LOGO_SRC}
         alt="Papa Life logo"
-        width={900}
-        height={900}
+        width={1536}
+        height={1024}
         className={cn("w-auto shrink-0 object-contain object-left", h)}
         decoding="async"
       />
@@ -51,8 +51,8 @@ export function SiteLogoStacked({ className, size = "md" }: { className?: string
       <img
         src={SITE_LOGO_SRC}
         alt="Papa Life logo"
-        width={900}
-        height={900}
+        width={1536}
+        height={1024}
         className={cn("object-contain", box)}
         decoding="async"
       />

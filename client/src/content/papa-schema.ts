@@ -6,7 +6,7 @@ export const ORGANIZATION_SCHEMA = {
   name: "Papa Life Coach",
   alternateName: ["Papa Life"],
   url: SITE,
-  logo: `${SITE}/images/papa-life-logo.png`,
+  logo: `${SITE}/images/papa-life-approved-20261016.webp`,
   description:
     "Faith-informed life coaching for fathers of adult children — helping men rebuild connection, presence, and legacy through the PAPA framework.",
   founder: {
@@ -120,7 +120,7 @@ export function articleSchema(slug: string, headline: string, description: strin
       name: "Papa Life Coach",
       logo: {
         "@type": "ImageObject",
-        url: `${SITE}/images/papa-life-logo.png`,
+        url: `${SITE}/images/papa-life-approved-20261016.webp`,
       },
     },
     mainEntityOfPage: `${SITE}${slug}`,

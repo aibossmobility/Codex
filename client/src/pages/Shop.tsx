@@ -33,6 +33,24 @@ const PAPA_LIVE_COURSE_OFFERS: Record<number, string> = {
   12: "https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/offers/a0464514-e9f5-4e45-aaa1-ed2262c4387f",
 };
 
+// Reconciled public one-time offers in the Papa Life location only.
+const PAPA_RESOURCE_CHECKOUTS: Record<string, string> = {
+  "curriculum.manuscript.module.01": "https://link.fastpaydirect.com/payment-link/6a5acf797b99151a5403f3de",
+  "curriculum.manuscript.module.02": "https://link.fastpaydirect.com/payment-link/6a5acf807b99151a5403f3e0",
+  "curriculum.manuscript.module.03": "https://link.fastpaydirect.com/payment-link/6a5acf877b99151a5403f3e1",
+  "curriculum.manuscript.module.04": "https://link.fastpaydirect.com/payment-link/6a5acf8ea655fa0b802a4eca",
+  "curriculum.manuscript.module.05": "https://link.fastpaydirect.com/payment-link/6a5acf957b99151a5403f3e2",
+  "curriculum.manuscript.module.06": "https://link.fastpaydirect.com/payment-link/6a5acf9c7b99151a5403f3e3",
+  "curriculum.manuscript.module.07": "https://link.fastpaydirect.com/payment-link/6a5acfa37b99151a5403f3e4",
+  "curriculum.manuscript.module.08": "https://link.fastpaydirect.com/payment-link/6a5acfaa7b99151a5403f3e5",
+  "curriculum.manuscript.module.09": "https://link.fastpaydirect.com/payment-link/6a5acfb1a655fa0b802a4ecb",
+  "curriculum.manuscript.module.10": "https://link.fastpaydirect.com/payment-link/6a5acfb87b99151a5403f3e6",
+  "curriculum.manuscript.module.11": "https://link.fastpaydirect.com/payment-link/6a5acfc0a655fa0b802a4ecc",
+  "curriculum.manuscript.module.12": "https://link.fastpaydirect.com/payment-link/6a5acfc7a655fa0b802a4ece",
+  "curriculum.digital.complete": "https://link.fastpaydirect.com/payment-link/6a5acfce7b99151a5403f3e7",
+  "curriculum.bundle.complete": "https://link.fastpaydirect.com/payment-link/6a5acfd6a655fa0b802a4ecf",
+};
+
 // Keep public shop labels aligned with the published GoHighLevel checkout titles.
 // Only the verified lessons with outdated catalog titles are overridden.
 const PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES: Record<number, string> = {
@@ -44,6 +62,10 @@ const PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES: Record<number, string> = {
 export default function Shop() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState("digital");
+  const [deliveryReady, setDeliveryReady] = useState(false);
+  useEffect(() => {
+    fetch("/api/public/digital-sales-status").then(r => r.json()).then(data => setDeliveryReady(data.available === true)).catch(() => setDeliveryReady(false));
+  }, []);
 
   useEffect(() => {
     fetch("/api/public/commerce-catalog")
@@ -188,6 +210,13 @@ export default function Shop() {
                   </a>
                   <a href="/refund-policy" className="mt-3 text-sm font-semibold text-[#145b35] underline">7-day refund policy — read before purchase</a>
                 </>
+              ) : deliveryReady && PAPA_RESOURCE_CHECKOUTS[offer.code] ? (
+                <>
+                  <p className="mt-5 text-2xl font-extrabold">{offer.public_price_display} <span className="text-sm font-medium">one-time</span></p>
+                  <p className="mt-3 text-sm text-[#5b655e]">{offer.format === "manuscript" ? "Download the purchased manuscript PDF from your protected learning library." : offer.code === "curriculum.bundle.complete" ? "All 12 audio lessons and all 12 manuscript PDFs in your protected learning library." : "All 12 audio lessons in your protected learning library."} After payment, check your checkout email for access. No paid membership or subscription required.</p>
+                  <a href={PAPA_RESOURCE_CHECKOUTS[offer.code]} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-5 font-extrabold text-white">Purchase — {offer.public_price_display} <ArrowRight className="ml-2 h-4 w-4" /></a>
+                  <a href="/refund-policy" className="mt-3 text-sm font-semibold text-[#145b35] underline">7-day refund policy — read before purchase</a>
+                </>
               ) : (
                 <>
                   <p className="mt-5 text-sm text-[#5b655e]">This format is available to explore. Checkout is not currently enabled for this item.</p>
@@ -197,7 +226,7 @@ export default function Shop() {
             </article>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Manuscripts and bundles remain preview-only until their purchase and fulfillment are ready. Previous purchases retain their original terms.</p></div></div></div>
+        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Audio lessons and the video series open their GoHighLevel course checkouts. Manuscripts and bundles use one-time GoHighLevel payment links; after verified payment, access instructions are emailed to your checkout address. Previous purchases retain their original terms.</p></div></div></div>
       </main>
     </div>
   );

@@ -1055,33 +1055,14 @@ function LibraryView({ user, access }: { user: MemberUser | null; access: Portal
     <div className="space-y-8">
       <div>
         <h2 className="text-xl font-bold text-white">My Manuscripts and Resources</h2>
-        <p className="text-sm text-gray-500 mt-1">Secure access to purchased manuscript PDFs and membership resources.</p>
+        <p className="text-sm text-gray-500 mt-1">Secure access to purchased manuscript PDFs and your existing resources.</p>
       </div>
       <SiteCtaBlocks placement="member_library" />
 
-      <section className="space-y-4">
-        <div>
-          <h3 className="text-white font-semibold">Member Purchase Options</h3>
-          <p className="text-xs text-gray-500 mt-1">Existing member access depends on prior purchases. Current optional resources are listed separately.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {offers.filter((offer) => offer.code !== "membership.community.monthly").map((offer) => (
-            <div key={offer.code} className="bg-[#111] border border-white/10 rounded-xl p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-brand-yellow">{offer.format === "manuscript" ? "Manuscript PDF" : offer.format === "bundle" ? "Complete Bundle" : "Permanent Digital Lesson"}</p>
-                  <h4 className="text-white font-semibold text-sm mt-1">{offer.canonical_name}</h4>
-                </div>
-                <span className="text-brand-yellow font-bold whitespace-nowrap">{offer.price_display}</span>
-              </div>
-              {offer.checkout_url ? (
-                <a href={offer.checkout_url} className="inline-flex mt-4 px-3 py-2 rounded-md bg-brand-yellow text-black text-xs font-bold hover:bg-brand-yellow/90">Purchase</a>
-              ) : (
-                <p className="text-xs text-gray-500 mt-4">Member checkout link is being connected.</p>
-              )}
-            </div>
-          ))}
-        </div>
+      <section className="space-y-4 rounded-xl border border-white/10 bg-[#111] p-5">
+        <h3 className="text-white font-semibold">Explore More Papa Life Resources</h3>
+        <p className="text-sm text-gray-400">Browse the current one-time audio lessons, manuscript PDFs, and complete bundles. No paid membership or subscription is required. Your purchased files remain available below.</p>
+        <a href="/shop" className="inline-flex rounded-md bg-brand-yellow px-4 py-2 text-sm font-bold text-black">Browse Resources and Prices</a>
       </section>
 
       <section className="space-y-3">

@@ -486,6 +486,7 @@ export default function AiBossMobile() {
 
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickLink icon={Brain} label="Executive Memory" onClick={() => navigate("/executive-memory")} />
+          <QuickLink icon={ClipboardList} label="AI Boss Work Review" onClick={() => { window.location.href = "/ai-boss-delivery-review"; }} />
           <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />
           <QuickLink icon={Mail} label="Gmail Operations" onClick={() => navigate("/executive-memory")} />
           <QuickLink icon={CalendarDays} label="Daily Work Reports" onClick={() => navigate("/papa-daily-work-report")} />

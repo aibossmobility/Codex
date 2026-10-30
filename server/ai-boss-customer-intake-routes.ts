@@ -1,3 +1,4 @@
+import { customerReleasedArtifact } from "./ai-boss-reviewed-delivery";
 /** Public AI Boss project-brief intake for Papa Life OS.
  * Unauthenticated, rate-limited, no payment, model execution, or customer data exposure.
  */
@@ -78,7 +79,8 @@ export function installAiBossCustomerIntakeRoutes(app:Express,db:Database.Databa
   const token=String(req.get("x-order-status-token")||req.query.token||"");
   const status=findCustomerIntakeByToken(db,String(req.params.id),token);
   if(!status)return res.status(404).json({ok:false,error:"Order reference unavailable"});
-  res.json({ok:true,...status,notice:status.delivered?"Delivery recorded.":"Your selection is saved. A payment redirect is not proof of payment."});
+  const released=customerReleasedArtifact(db,String(req.params.id),token);
+  res.json({ok:true,...status,deliveryReady:Boolean(released),deliveryUrl:released?"https://papalifecoach.com/ai-boss-project-delivery":null,notice:status.delivered?"Delivery recorded.":"Your selection is saved. A payment redirect is not proof of payment."});
  });
  app.get("/api/public/ai-boss/fixed-services",(req,res)=>{
   const origin=req.get("origin")||"";if(allowedOrigins.has(origin)){res.set("Access-Control-Allow-Origin",origin);res.set("Vary","Origin");}

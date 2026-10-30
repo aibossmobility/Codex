@@ -5,7 +5,8 @@ import type {Express} from "express";
 import type Database from "better-sqlite3";
 import {createCustomerIntake,findCustomerIntakeByToken,initializeCustomerIntake} from "./ai-boss-customer-intake";
 import {fixedServiceTemplates} from "./fixed-service-draft-worker";
-import {parseAiBossPriceMap,verifyAndPrepareAiBossPurchase} from "./ai-boss-ghl-verified-purchase";
+import {verifyAndPrepareAiBossPurchase} from "./ai-boss-ghl-verified-purchase";
+import {getApprovedAiBossPrices} from "./ai-boss-ghl-price-discovery";
 const allowedOrigins=new Set(["https://ai.bossmobilelifecoach.com","https://papalifecoach.com"]);
 export function installAiBossCustomerIntakeRoutes(app:Express,db:Database.Database,privateDir:()=>string){
  initializeCustomerIntake(db);
@@ -61,7 +62,7 @@ export function installAiBossCustomerIntakeRoutes(app:Express,db:Database.Databa
    if(!credential||process.env.AI_BOSS_GHL_LOCATION_ID!=="qJ83IIaK5y2ZPHzLfGG1")
      return res.status(503).json({ok:false,error:"AI Boss payment verification is not connected yet. Do not pay again."});
    try{
-    const prices=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));
+    const prices=await getApprovedAiBossPrices(credential,String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));
     const result=await verifyAndPrepareAiBossPurchase({db,intakeId:id,
       transactionId:String(req.body?.transactionId||""),apiToken:credential,
       approvedPrices:prices,privateDir:privateDir()});

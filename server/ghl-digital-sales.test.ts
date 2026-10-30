@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { SALES_LOCATION as location, targetForGhlProduct, verifyDigitalOrder } from './ghl-digital-sales';
+const mapping=new Map([['pdf',{code:'curriculum.manuscript.module.01',cents:1499,priceId:'regular'}]]);
+const tx={_id:'tx',altId:location,altType:'location',liveMode:true,status:'succeeded',entityType:'order',entityId:'order',amount:14.99,currency:'USD',contactId:'buyer'};
+const order={_id:'order',altId:location,altType:'location',liveMode:true,status:'completed',amount:14.99,currency:'USD',contactId:'buyer',contactSnapshot:{email:'buyer@example.com'},amountSummary:{subtotal:14.99},items:[{product:{_id:'pdf'},price:{_id:'regular',type:'one_time',amount:14.99},qty:1}]};
+assert.equal(verifyDigitalOrder(tx,order,mapping).products[0].code,'curriculum.manuscript.module.01');
+for(const patch of [{altId:'AI-BOSS'},{status:'pending'},{liveMode:false},{amountRefunded:1},{subscriptionId:'sub'},{amount:7.495},{contactId:'someone-else'}]) assert.throws(()=>verifyDigitalOrder({...tx,...patch},order,mapping));
+for(const patch of [{status:'pending'},{liveMode:false},{altId:'wrong'},{amountSummary:{subtotal:9.99}},{items:[{product:{_id:'book'},price:{_id:'regular',amount:14.99}}]},{items:[{product:{_id:'pdf'},price:{_id:'member',amount:9.99}}]}]) assert.throws(()=>verifyDigitalOrder(tx,{...order,...patch},mapping));
+assert.equal(verifyDigitalOrder({...tx,amount:16.49},{...order,amount:16.49,amountSummary:{subtotal:14.99,tax:1.5}},mapping).email,'buyer@example.com');
+assert.equal(targetForGhlProduct('Run Your Own Race'),null);
+assert.equal(targetForGhlProduct('Papa Life Membership'),null);
+assert.equal(targetForGhlProduct('ARCHIVED SERVICE 01 — DO NOT USE'),null);
+assert.equal(targetForGhlProduct('Papa Life Lesson 01 — Listening Without Defending — Manuscript PDF')?.cents,1499);
+console.log('Payment verification rejects wrong business, unpaid, test, partial, refunded, recurring, unknown and discounted purchases; valid tax-inclusive payment grants only the purchased product.');

@@ -105,7 +105,7 @@ export default function MemberActivate() {
               <p className="text-gray-400 text-sm text-center mb-6">Your existing Papa Life access is active. Set a password to enter your learning library.</p>
               <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-gray-400 text-sm">Member</Label>
+                  <Label className="text-gray-400 text-sm">Customer</Label>
                   <Input value={`${firstName}${email ? ` — ${email}` : ""}`} readOnly className="bg-white/5 border-white/10 text-gray-300" />
                 </div>
                 <div className="space-y-1.5">
@@ -118,7 +118,7 @@ export default function MemberActivate() {
                 </div>
                 {error && <p className="text-red-400 text-sm text-center bg-red-400/10 py-2 px-3 rounded-lg">{error}</p>}
                 <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-5 rounded-xl text-sm mt-2">
-                  {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Activating…</> : "Enter Course 11"}
+                  {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Activating…</> : "Open My Learning Library"}
                 </Button>
               </form>
             </>

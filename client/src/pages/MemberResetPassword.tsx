@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { KeyRound, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { SiteLogoStacked } from "@/components/SiteLogo";
 
 export default function MemberResetPassword() {
-  const [location, navigate] = useLocation();
-  const token = useMemo(() => new URLSearchParams(location.split("?")[1] || "").get("token") || "", [location]);
+  const [, navigate] = useLocation();
+  const search = useSearch();
+  const token = useMemo(() => new URLSearchParams(search).get("token") || "", [search]);
   const [valid, setValid] = useState<boolean | null>(null); const [password, setPassword] = useState(""); const [confirm, setConfirm] = useState(""); const [error, setError] = useState(""); const [loading, setLoading] = useState(false);
   useEffect(() => { fetch(`/api/member/auth/reset-password?token=${encodeURIComponent(token)}`).then((r)=>r.json().then((data)=>({ok:r.ok,data}))).then(({ok,data})=>{setValid(ok); if(!ok)setError(data.error);}).catch(()=>{setValid(false);setError("We could not verify this link.");}); }, [token]);
   const submit = async (event: React.FormEvent) => { event.preventDefault(); setError(""); if(password.length<8){setError("Password must be at least 8 characters.");return;} if(password!==confirm){setError("Passwords do not match.");return;} setLoading(true); try { const res=await fetch("/api/member/auth/reset-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,password,confirm_password:confirm})}); const data=await res.json(); if(!res.ok){setError(data.error);return;} navigate(data.redirect||"/portal"); } finally {setLoading(false);} };

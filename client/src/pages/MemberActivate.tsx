@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +9,9 @@ import { SiteLogoStacked } from "@/components/SiteLogo";
 type ActivationState = "checking" | "ready" | "invalid";
 
 export default function MemberActivate() {
-  const [location, navigate] = useLocation();
-  const token = useMemo(() => new URLSearchParams(location.split("?")[1] || "").get("token") || "", [location]);
+  const [, navigate] = useLocation();
+  const search = useSearch();
+  const token = useMemo(() => new URLSearchParams(search).get("token") || "", [search]);
   const [state, setState] = useState<ActivationState>("checking");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");

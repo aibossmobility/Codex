@@ -1,3 +1,4 @@
+import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-routes";
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
 import { installAiBossCustomerIntakeRoutes } from "./ai-boss-customer-intake-routes";
@@ -4081,6 +4082,8 @@ async function startServer() {
       res.set("Cache-Control","no-store").json({ok:true,...result});
     }catch(error:any){res.status(422).json({ok:false,error:String(error?.message||"Payment verification not completed").slice(0,200)});}
   });
+
+  installReviewedDeliveryRoutes(app,db,requireAuth);
 
   // Safe local-only AI Boss draft worker. A GoHighLevel-verified paid job must already exist.
   // This never invokes AI services, activates checkout, sends email or marks an order delivered.

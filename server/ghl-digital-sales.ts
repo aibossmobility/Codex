@@ -92,6 +92,18 @@ export function installGhlDigitalSales(app:Express, db:Database.Database, root:s
     if(!(req.session as any)?.user && !(req.session as any)?.adminId) return res.status(401).json({ok:false});
     await preflight();res.json({ready,error:lastError,started_at:started,mapped_products:mappings.size,recent:db.prepare('SELECT status,error,attempts,updated_at FROM ghl_digital_delivery ORDER BY updated_at DESC LIMIT 10').all()});
   });
+  // Authenticated, read-only inspection of a post-launch purchase. Never exposes provider/card credentials.
+  app.get('/api/admin/digital-sales-inspect/:id',async(req,res)=>{
+    if(!(req.session as any)?.adminId)return res.status(401).json({ok:false});
+    try {
+      const id=String(req.params.id); if(!/^[a-f0-9]{24}$/.test(id))return res.status(400).json({ok:false});
+      const tx=await api(`/payments/transactions/${id}`);
+      const order=tx.entityId?await api(`/payments/orders/${encodeURIComponent(tx.entityId)}`):null;
+      const list=await api('/payments/transactions?limit=5');
+      const pick=(v:any)=>Object.fromEntries(Object.entries(v||{}).filter(([k])=>!['chargeSnapshot','paymentMethod','paymentProvider','ipAddress','meta','contactSnapshot'].includes(k)));
+      res.set('Cache-Control','no-store').json({transaction:pick(tx),buyer_email:tx.contactSnapshot?.email,order:pick(order),order_contact:order?.contactSnapshot,list_keys:Object.keys(list),listed_ids:(list.data||list.transactions||[]).map((v:any)=>({id:v._id||v.id,entityType:v.entityType,status:v.status,createdAt:v.createdAt}))});
+    }catch(error:any){res.status(502).json({error:error.message});}
+  });
   async function fulfill(id:string) {
     const previous=db.prepare('SELECT status,attempts FROM ghl_digital_delivery WHERE transaction_id=?').get(id) as any;
     if(previous?.status==='sent'||previous?.status==='ignored'||previous?.attempts>=10)return;

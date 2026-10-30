@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { freeAgentCapabilities,selectVerifiedFreeAgent,getFreeAgentAudit } from "./free-agent-capability-catalog";
 const audit=getFreeAgentAudit();
-assert.equal(audit.reviewed,7);
+assert.equal(audit.reviewed,9);
 assert.equal(audit.verified,2);
 assert.equal(audit.activeExternalWrites,0);
 assert.equal(audit.paidAgentsEnabled,0);

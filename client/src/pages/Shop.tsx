@@ -226,7 +226,8 @@ export default function Shop() {
             </article>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Audio lessons and the video series open their GoHighLevel course checkouts. Manuscripts and bundles use one-time GoHighLevel payment links; after verified payment, access instructions are emailed to your checkout address. Previous purchases retain their original terms.</p></div></div></div>
+        <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2>
+          <p className="mt-3"><a href="/purchase-help" className="underline font-semibold">Paid but cannot access your purchase? Get purchase help — do not pay again.</a></p><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Audio lessons and the video series open their GoHighLevel course checkouts. Manuscripts and bundles use one-time GoHighLevel payment links; after verified payment, access instructions are emailed to your checkout address. Previous purchases retain their original terms.</p></div></div></div>
       </main>
     </div>
   );

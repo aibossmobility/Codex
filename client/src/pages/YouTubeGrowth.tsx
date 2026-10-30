@@ -74,7 +74,7 @@ export default function YouTubeGrowth() {
     <main className="min-h-screen bg-zinc-950 text-white">
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Link href="/ai-boss" className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white"><ArrowLeft className="h-4 w-4" /> AI Boss OS</Link>
+          <Link href="/ai-boss" className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white"><ArrowLeft className="h-4 w-4" /> Papa Life OS</Link>
           <span className="rounded-full border border-yellow-400/40 bg-yellow-400/10 px-3 py-1 text-xs font-semibold text-yellow-300">YouTube Growth Engine v1</span>
         </div>
 
@@ -93,7 +93,7 @@ export default function YouTubeGrowth() {
 
         <section className="mt-8">
           <div className="mb-4 flex items-center gap-2"><Eye className="h-5 w-5 text-yellow-300" /><h2 className="text-xl font-bold">First 3-video experiment</h2></div>
-          {!connected ? <p className="text-zinc-400">Connect YouTube above. AI Boss OS will then select the three strongest optimization opportunities from the last 28 days of real channel data.</p> : null}
+          {!connected ? <p className="text-zinc-400">Connect YouTube above. Papa Life OS will then select the three strongest optimization opportunities from the last 28 days of real channel data.</p> : null}
           {connected && !pilot.length && !error ? <p className="text-zinc-400">Connected. No qualifying pilot data was returned yet.</p> : null}
           <div className="grid gap-4 lg:grid-cols-3">
             {pilot.map(({ recommendation, metrics }) => <article key={recommendation.videoId} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">

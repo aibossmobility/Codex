@@ -64,14 +64,6 @@ const actionLinks: ActionLink[] = [
     icon: CalendarCheck,
     primary: false,
   },
-  {
-    href: "/tuesday-live",
-    label: "Join Tuesday Live",
-    detail: "Learn with other fathers",
-    interest: "Tuesday Live",
-    icon: Users,
-    primary: false,
-  },
 ];
 
 const PAPA_LIFE_VOICE_AGENT_URL = "/papa-agent.html";

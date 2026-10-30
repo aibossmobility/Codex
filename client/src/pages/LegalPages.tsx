@@ -82,7 +82,6 @@ export function PrivacyPage() {
       <ul>
         <li>Fill out a lead form (name, email, phone number, age range, and answers about your relationship with your adult child)</li>
         <li>Choose courses or self-guided coaching resources</li>
-        <li>Register for Tuesday Live sessions</li>
         <li>Purchase an available self-paced course or service after reviewing current terms</li>
         <li>Send a message through our contact page or Papa Life AI Coach, including the content you choose to enter</li>
         <li>Take an assessment or reflection tool, including the answers and scores you choose to submit</li>

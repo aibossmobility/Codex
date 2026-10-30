@@ -16,7 +16,6 @@ const groups: PageGroup[] = [
       { label: "Papa First Lesson", path: "/papa-first-lesson" },
       { label: "Papa Daily Work Report", path: "/papa-daily-work-report" },
       { label: "AI Coach", path: "/ai-coach" },
-      { label: "Tuesday Live", path: "/tuesday-live" },
       { label: "Papa Life House", path: "/house" },
       { label: "House Resources", path: "/house/resources" },
       { label: "Shop Digital Products", path: "/shop" },
@@ -56,7 +55,6 @@ const groups: PageGroup[] = [
       { label: "YouTube Growth", path: "/papa-life-os/youtube-growth" },
       { label: "Approvals & Queue", path: "/papa-life-os/approvals" },
       { label: "Takeover", path: "/papa-life-os/takeover" },
-      { label: "Tuesday Live Fallback", path: "/papa-life-os/tuesday-live" },
     ],
   },
   {

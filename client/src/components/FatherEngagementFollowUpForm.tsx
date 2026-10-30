@@ -7,7 +7,7 @@ import { getFirstTouchAttribution } from "@/lib/attribution";
 
 const relationshipOptions = ["Close—strengthen", "Communication difficult", "Limited contact", "Disconnected", "Unsure"];
 const concernOptions = ["I feel judged", "I feel shut out", "I don’t know what to say", "I’m afraid of making it worse", "I’m not sure"];
-const nextStepOptions = ["Watch Tuesday Live", "Get weekly email", "Personal conversation", "I’ll think about it"];
+const nextStepOptions = ["Get weekly email", "Personal conversation", "I’ll think about it"];
 
 export function FatherEngagementFollowUpForm() {
   const [form, setForm] = useState({ first_name: "", email: "", phone: "", relationship_status: "", fathers_stated_hope: "", primary_concern: "", preferred_next_step: "" });

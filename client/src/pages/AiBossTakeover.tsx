@@ -92,12 +92,12 @@ export default function AiBossTakeover() {
           channel: "other",
           summary: clean,
           user_intent: clean,
-          next_action: "Route through AI Boss OS authority controls. Execute cloud/direct work now, require explicit approval for consequential work, and hold Mac-local work safely until the Mac returns.",
+          next_action: "Route through Papa Life OS authority controls. Execute cloud/direct work now, require explicit approval for consequential work, and hold Mac-local work safely until the Mac returns.",
           status: "active",
         }),
       });
       setInstruction("");
-      toast.success("Instruction sent to AI Boss OS.");
+      toast.success("Instruction sent to Papa Life OS.");
       await load();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Instruction could not be sent.");
@@ -116,7 +116,7 @@ export default function AiBossTakeover() {
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <Button size="icon" variant="ghost" onClick={() => navigate("/ai-boss")} aria-label="Back to AI Boss"><ArrowLeft className="h-4 w-4" /></Button>
           <Smartphone className="h-6 w-6 text-brand-yellow" />
-          <div><h1 className="font-bold">Phone Takeover</h1><p className="text-xs text-gray-500">AI Boss OS companion control</p></div>
+          <div><h1 className="font-bold">Phone Takeover</h1><p className="text-xs text-gray-500">Papa Life OS companion control</p></div>
           <Button size="icon" variant="ghost" className="ml-auto" onClick={() => void load()} aria-label="Refresh"><RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /></Button>
         </div>
       </header>

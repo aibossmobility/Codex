@@ -2986,11 +2986,11 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
 
 function aiBossServerPage(): ServerRenderedPage {
   const page: StaticServerPage = {
-    title: "AI Boss OS | Papa Life Coach",
-    description: "Private AI Boss OS workspace for Papa Life operations.",
-    eyebrow: "AI Boss OS",
+    title: "Papa Life OS | Papa Life Coach",
+    description: "Private Papa Life OS workspace for Papa Life operations.",
+    eyebrow: "Papa Life OS",
     headline: "Private operations workspace",
-    intro: "Please sign in to continue to AI Boss OS.",
+    intro: "Please sign in to continue to Papa Life OS.",
     sections: [],
     noindex: true,
   };
@@ -3008,9 +3008,9 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   if (pathname.startsWith("/papa-life-os") || pathname.startsWith("/ai-boss")) return aiBossServerPage();
   if (pathname === "/executive-memory") {
     const page: StaticServerPage = {
-      title: "Executive Memory | AI Boss OS",
+      title: "Executive Memory | Papa Life OS",
       description: "Private executive memory workspace for Papa Life operations.",
-      eyebrow: "AI Boss OS",
+      eyebrow: "Papa Life OS",
       headline: "Executive Memory",
       intro: "Please sign in to continue to the private executive memory workspace.",
       sections: [],
@@ -3107,14 +3107,14 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   if (/^\/(?:papa-life-os|ai-boss)(?:\/|$)/.test(pathname)) {
     return {
       status: 200,
-      title: "AI Boss OS | Papa Life",
-      description: "Authenticated AI Boss OS operations for Papa Life.",
+      title: "Papa Life OS | Papa Life",
+      description: "Authenticated Papa Life OS operations for Papa Life.",
       noindex: true,
       bodyHtml: serverPageShell({
-        title: "AI Boss OS | Papa Life",
-        description: "Authenticated AI Boss OS operations for Papa Life.",
+        title: "Papa Life OS | Papa Life",
+        description: "Authenticated Papa Life OS operations for Papa Life.",
         eyebrow: "Papa Life",
-        headline: "AI Boss OS",
+        headline: "Papa Life OS",
         intro: "Sign in to access the protected AI Boss companion and operations console.",
         sections: [],
         cta: { label: "Sign In", href: "/login" },
@@ -3174,11 +3174,11 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage, canonica
     `    <meta property="og:type" content="website" />\n` +
     `    <meta property="og:url" content="${canonicalUrl}" />\n` +
     `    <meta property="og:site_name" content="Papa Life Coach" />\n` +
-    `    <meta property="og:image" content="https://papalifecoach.com/images/papa-life-logo.png" />\n` +
+    `    <meta property="og:image" content="https://papalifecoach.com/images/papa-life-approved-20261016.webp" />\n` +
     `    <meta name="twitter:card" content="summary_large_image" />\n` +
     `    <meta name="twitter:title" content="${escapeHtml(page.title)}" />\n` +
     `    <meta name="twitter:description" content="${escapeHtml(page.description)}" />\n` +
-    `    <meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`;
+    `    <meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-approved-20261016.webp" />`;
   html = html.replace("</head>", `${socialMeta}\n  </head>`);
 
   // The SEO generator writes a prerendered homepage into dist/public/index.html.
@@ -6484,7 +6484,7 @@ async function startServer() {
     }
   });
 
-  // AI Boss OS executive continuity. These routes are private and use the
+  // Papa Life OS executive continuity. These routes are private and use the
   // existing Brian-only Research Lab authorization boundary.
   app.get("/api/admin/executive-memory", requireAuth, (req, res) => {
     try {
@@ -6596,7 +6596,7 @@ async function startServer() {
         channel: "other",
         summary: instruction,
         user_intent: instruction,
-        next_action: "Review and route through AI Boss OS authority controls.",
+        next_action: "Review and route through Papa Life OS authority controls.",
         status: "active",
       });
       const routed = routeAiBossInstruction(instruction);

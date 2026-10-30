@@ -1,11 +1,10 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, ClipboardList, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, Play, RefreshCw, Send, ShieldCheck, Smartphone, Users, Volume2 } from "lucide-react";
+import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, ClipboardList, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, RefreshCw, Send, ShieldCheck, Smartphone, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { TUESDAY_LIVE_SESSION } from "@/lib/tuesday-live-session";
 
 type Mission = {
   mac_online: boolean;
@@ -34,9 +33,6 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const liveUrl = TUESDAY_LIVE_SESSION.liveHostUrl;
-const youtubeStudioUrl = TUESDAY_LIVE_SESSION.youtubeStudioUrl;
-const todayTopic = TUESDAY_LIVE_SESSION.topic;
 const androidCompanionStorageKey = "ai-boss-android-companion-id";
 
 function androidCompanionId() {
@@ -488,14 +484,6 @@ export default function AiBossMobile() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#111] border-brand-yellow/30">
-          <CardHeader><div className="flex items-center justify-between gap-3"><div><p className="text-xs uppercase tracking-widest text-brand-yellow">Tuesday Live</p><CardTitle className="mt-1 text-white">{todayTopic}</CardTitle></div><Mic2 className="w-8 h-8 text-brand-yellow" /></div></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-3 text-sm"><Checklist items={["Open Google Meet and confirm camera/microphone", "Confirm the correct Google Meet live room is open", "Start the Google Meet recording before the teaching", "Keep Scripture and the main question visible", "Confirm attendees can join from the shared Google Meet link", "After the session, verify the recording is saved to Google Drive"]} /><div className="rounded-lg bg-black/40 p-4"><p className="font-semibold">45-minute cue</p><ol className="mt-2 space-y-1 text-gray-400">{TUESDAY_LIVE_SESSION.cue.map((item) => <li key={item}>{item}</li>)}</ol></div></div>
-            <div className="grid sm:grid-cols-3 gap-3"><a href={liveUrl} target="_blank" rel="noopener noreferrer"><Button className="w-full bg-brand-red hover:bg-brand-red/90 text-white"><Play className="w-4 h-4 mr-2" />Open Tuesday Live</Button></a><Button variant="outline" className="w-full border-primary/40 text-primary hover:bg-primary/10" onClick={() => navigate("/ai-boss/tuesday-live")}><Volume2 className="w-4 h-4 mr-2" />Narrated fallback</Button><a href={youtubeStudioUrl} target="_blank" rel="noopener noreferrer"><Button variant="outline" className="w-full border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10"><Play className="w-4 h-4 mr-2" />Open YouTube Studio</Button></a></div>
-          </CardContent>
-        </Card>
-
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickLink icon={Brain} label="Executive Memory" onClick={() => navigate("/executive-memory")} />
           <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />
@@ -512,4 +500,3 @@ export default function AiBossMobile() {
 function StatusCard({ icon: Icon, label, value, tone }: { icon: typeof Activity; label: string; value: string; tone: "good" | "waiting" | "neutral" }) { const color = tone === "good" ? "text-primary" : tone === "waiting" ? "text-brand-yellow" : "text-gray-300"; return <div className="rounded-xl border border-white/10 bg-[#111] p-3"><Icon className={`w-4 h-4 ${color}`} /><p className="mt-3 text-xs text-gray-500">{label}</p><p className={`text-lg font-bold ${color}`}>{value}</p></div>; }
 function QuickLink({ icon: Icon, label, onClick }: { icon: typeof Brain; label: string; onClick: () => void }) { return <button onClick={onClick} className="rounded-xl border border-white/10 bg-[#111] p-4 text-left hover:border-primary/40"><Icon className="w-5 h-5 text-primary" /><p className="mt-3 text-sm font-medium">{label}</p></button>; }
 function Metric({ label, value }: { label: string; value: number }) { return <div className="rounded-lg border border-white/10 bg-[#111] p-3"><p className="text-xs text-gray-500">{label}</p><p className="mt-1 text-lg font-bold text-white">{value}</p></div>; }
-function Checklist({ items }: { items: string[] }) { return <div className="rounded-lg bg-black/40 p-4"><p className="font-semibold">Go-live checklist</p><ul className="mt-2 space-y-2">{items.map((item) => <li key={item} className="flex gap-2 text-gray-400"><CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />{item}</li>)}</ul></div>; }

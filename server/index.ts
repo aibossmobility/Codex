@@ -2,6 +2,7 @@ import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
 import { installAiBossCustomerIntakeRoutes } from "./ai-boss-customer-intake-routes";
 import { pollAiBossPaidOrders } from "./ai-boss-paid-order-poller";
+import { getApprovedAiBossPrices } from "./ai-boss-ghl-price-discovery";
 import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-ghl-verified-purchase";
 import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
 import { inspectCustomerDraft } from "./fixed-service-draft-quality";
@@ -4021,7 +4022,7 @@ async function startServer() {
     const token=String(process.env.AI_BOSS_GHL_API_TOKEN||"");
     if(!token||process.env.AI_BOSS_GHL_LOCATION_ID!=="qJ83IIaK5y2ZPHzLfGG1")return;
     let prices;
-    try{prices=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));}
+    try{prices=await getApprovedAiBossPrices(token,String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));}
     catch{return;}
     aiBossPollInFlight=true;
     try{
@@ -4058,8 +4059,7 @@ async function startServer() {
   // Dedicated AI Boss GHL verification: completely separate from Papa Life credentials.
   // Owner-only while the AI Boss-specific payment feed is being configured.
   app.get("/api/public/ai-boss/payment-verification-status",(_req,res)=>{
-    let mapReady=false;
-    try{mapReady=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||"")).length===5;}catch{}
+    const mapReady=Boolean(aiBossPollState.lastResult?.enabled&&!aiBossPollState.lastError);
     const credentialsReady=Boolean(process.env.AI_BOSS_GHL_API_TOKEN&&String(process.env.AI_BOSS_GHL_LOCATION_ID||"")==="qJ83IIaK5y2ZPHzLfGG1");
     res.set("Cache-Control","no-store").json({ok:true,brand:"ai-boss-mobility",
       credentialsReady,priceMappingsReady:mapReady,
@@ -4073,7 +4073,7 @@ async function startServer() {
     if(String(process.env.AI_BOSS_GHL_LOCATION_ID||"")!=="qJ83IIaK5y2ZPHzLfGG1"||!token)
       return res.status(503).json({ok:false,error:"AI Boss location-specific GoHighLevel authorization is not configured"});
     try{
-      const prices=parseAiBossPriceMap(String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));
+      const prices=await getApprovedAiBossPrices(token,String(process.env.AI_BOSS_GHL_PRICE_MAP_JSON||""));
       const result=await verifyAndPrepareAiBossPurchase({db,
         intakeId:String(req.body?.intakeId||""),
         transactionId:String(req.body?.transactionId||""),

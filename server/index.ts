@@ -2271,7 +2271,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
       { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment." },
-      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, Tuesday Live support, and practical exercises." },
+      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
   },
@@ -2291,7 +2291,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore self-paced courses", href: "/courses" },
   },
   "/tuesday-live": {
     title: "Papa Life Tuesday Live | August 25, 2026 Replay",
@@ -2309,7 +2309,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore self-paced courses", href: "/courses" },
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",
@@ -2317,7 +2317,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
     intro:
-      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books, podcast material, and Tuesday Live support.",
+      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books and podcast material.",
     sections: [
       { heading: "Free starting points", body: "Begin with the assessment, Papa Life AI Coach, and the free workshop for fathers of adult children." },
       { heading: "Member path", body: "Members continue into guided lessons, reflection tools, and support organized around the PAPA Framework." },
@@ -7126,7 +7126,7 @@ async function startServer() {
       "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
       "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
-      "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
+      "/ai-coach", "/resources", "/books", "/podcast", "/shop",
       "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
       "/music-room", "/house", "/house/living-room", "/house/library", "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources", "/house/sky-room",
     ];
@@ -7143,8 +7143,8 @@ async function startServer() {
     "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
-    "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
-    "/tuesday-live", "/shop", "/papa-journey", "/contact",
+    "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast",
+    "/shop", "/papa-journey", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
   ]);
   app.use((req, res, next) => {

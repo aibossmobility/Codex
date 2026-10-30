@@ -156,14 +156,6 @@ export const papaAiResources: ResourceItem[] = [
     keywords: ["assessment", "score", "clarity", "purpose", "authority", "presence", "alignment"],
   },
   {
-    title: "Papa Life Tuesday Live",
-    type: "Video",
-    pillar: "General",
-    description: "Live coaching and teaching for fathers of adult children.",
-    path: "/tuesday",
-    keywords: ["tuesday", "live", "questions", "show", "episode", "coaching"],
-  },
-  {
     title: "Papa Life Membership",
     type: "Course",
     pillar: "General",

@@ -136,13 +136,6 @@ const localResources: ResourceItem[] = [
     description: "Score the relationship across the PAPA pillars and find the first place to focus.",
     path: "/assessment",
   },
-  {
-    title: "Papa Life Tuesday Live",
-    type: "Live Show",
-    pillar: "General",
-    description: "Bring a question into Tuesday Live and receive follow-up resources.",
-    path: "/tuesday",
-  },
 ];
 
 const fallbackQuestions: AssessmentQuestion[] = [
@@ -188,12 +181,6 @@ const relatedLinks: Array<{ title: string; copy: string; Icon: LucideIcon; href:
     href: "/audio.html",
   },
   {
-    title: "Tuesday Live",
-    copy: "Ask before Tuesday or submit during the live show.",
-    Icon: CalendarDays,
-    href: "/tuesday-live",
-  },
-  {
     title: "Courses",
     copy: "Move from one answer into a guided Papa Life path.",
     Icon: Users,
@@ -213,8 +200,8 @@ const modeCopy: Record<Mode, { title: string; prompt: string; icon: typeof Bot }
     icon: Search,
   },
   tuesday: {
-    title: "Tuesday Live",
-    prompt: "What question should Brian answer before or during Tuesday Live?",
+    title: "Self-Paced Reflection",
+    prompt: "What fatherhood question would you like to reflect on today?",
     icon: CalendarDays,
   },
   membership: {
@@ -259,7 +246,7 @@ function localReply(mode: Mode, text: string) {
     return "Papa Life courses help fathers move beyond one emotional moment. It gives you structure, lessons, reflection, and brotherhood around Presence, Authority, Purpose, and Alignment. Start with the free assessment, then move into membership when you are ready for steady practice.";
   }
   if (mode === "tuesday") {
-    return "That is a strong Tuesday Live question. Bring it as one clear sentence: what should a father do when he wants repair, but his adult child is not ready? The teaching should start with humility, move through Presence, and end with one practical step.";
+    return "That is a strong reflection question. Consider this: what should a father do when he wants repair, but his adult child is not ready? The teaching should start with humility, move through Presence, and end with one practical step.";
   }
   if (mode === "resource") {
     return "Start with one resource, not ten. If the issue is distance, begin with Presence. If the issue is control or respect, begin with Authority. If the issue is apology or values, begin with Alignment. A strong first step is Give. Listen. Love. Serve. or the PAPA Framework Guide.";
@@ -704,7 +691,7 @@ function LeadOffer({ lead, setLead }: {
             so Brian's team can follow up. Do not submit private crisis, medical, legal, or emergency information here.
           </p>
           <div className="flex flex-wrap gap-2">
-            {["Free Assessment", "Give Listen Love Serve", "Tuesday Live Show", "Newsletter", "Courses", "Free Chapter"].map((item) => (
+            {["Free Assessment", "Give Listen Love Serve", "Newsletter", "Courses", "Free Chapter"].map((item) => (
               <button
                 key={item}
                 type="button"
@@ -827,7 +814,7 @@ export default function PapaAiExperience() {
     <div className="papa-house-ai min-h-screen bg-[#261f19] text-white">
       <PageMeta
         title="Papa Life AI Coach | Biblical Fatherhood Coaching"
-        description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance."
+        description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, and course guidance."
         keywords="Papa Life AI Coach, fathers of adult children, biblical fatherhood coaching, PAPA Framework, fatherhood assessment"
       />
 
@@ -855,7 +842,7 @@ export default function PapaAiExperience() {
                   Coaching, assessment, prayer, and resources in Brian Keith Hill's Papa Life voice.
                 </h1>
                 <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/68 md:text-xl">
-                  Fathers can ask real questions, find the next resource, prepare for Tuesday Live, receive
+                  Fathers can ask real questions, find the next resource, explore self-paced resources, receive
                   biblical encouragement, and take the PAPA assessment without getting lost.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">

@@ -80,8 +80,8 @@ function Router() {
       <Route path="/resources" component={PapaAiExperience} />
       <Route path="/books" component={PapaAiExperience} />
       <Route path="/podcast" component={PapaAiExperience} />
-      <Route path="/tuesday" component={TuesdayLive} />
-      <Route path="/tuesday-live" component={TuesdayLive} />
+      <Route path="/tuesday"><Redirect to="/courses" /></Route>
+      <Route path="/tuesday-live"><Redirect to="/courses" /></Route>
       <Route path="/membership"><Redirect to="/courses" /></Route>
       <Route path="/contact" component={PapaAiExperience} />
       <Route path="/privacy-policy" component={PrivacyPage} />
@@ -125,7 +125,7 @@ function Router() {
       <Route path={"/papa-life-os/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/papa-life-os/approvals"} component={AiBossApprovals} />
       <Route path={"/papa-life-os/takeover"} component={AiBossTakeover} />
-      <Route path={"/papa-life-os/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/papa-life-os/tuesday-live"} ><Redirect to="/courses" /></Route>
       <Route path={"/papa-life-os/all-pages"} component={AllPages} />
       <Route path={"/papa-life-os/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/papa-life-os"} component={AiBossMobile} />
@@ -134,7 +134,7 @@ function Router() {
       <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
-      <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/ai-boss/tuesday-live"} ><Redirect to="/courses" /></Route>
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/ai-boss"} component={AiBossMobile} />

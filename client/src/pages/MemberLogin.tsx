@@ -109,6 +109,7 @@ export default function MemberLogin() {
                 Forgot password?
               </a>
             </p>
+            <p className="text-center text-sm"><a href="/purchase-help" className="text-yellow-400 underline">Paid but cannot access your purchase? Get help</a></p>
           </form>
         </div>
 

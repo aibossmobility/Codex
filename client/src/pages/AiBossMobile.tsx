@@ -374,6 +374,116 @@ export default function AiBossMobile() {
             </Button>
           </CardContent>
         </Card>
+        <Card className="bg-[#111] border-brand-yellow/30">
+          <CardContent className="p-5 sm:p-7">
+            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life OS — Worker Command Center</p>
+            <button
+              type="button"
+              onClick={() => setAssignmentOpen((open) => !open)}
+              className="mx-auto mt-5 flex aspect-square w-[min(72vw,320px)] max-w-full flex-col items-center justify-center rounded-full border-[10px] border-[#f2cb58] bg-[#d9aa21] px-6 text-center text-black transition active:scale-[0.98]"
+              aria-expanded={assignmentOpen}
+              aria-controls="assign-worker-form"
+            >
+              <ClipboardList className="mb-3 h-12 w-12" aria-hidden="true" />
+              <span className="text-sm font-black tracking-[0.14em]">PAPA LIFE OS</span>
+              <span className="mt-3 text-[clamp(1.65rem,6vw,2.5rem)] font-black leading-tight">GIVE ASSIGNMENT TO WORKERS</span>
+              <span className="mt-4 text-base font-semibold">{assignmentOpen ? "Tap to close assignment form" : "Tap to choose a worker"}</span>
+            </button>
+            {assignmentOpen && (
+              <form id="assign-worker-form" onSubmit={submitWorkerAssignment} className="mt-5 space-y-3 rounded-xl border border-brand-yellow/30 bg-black/40 p-4">
+                <label htmlFor="worker-project" className="block text-sm font-semibold text-white">Business</label>
+                <select id="worker-project" value={assignmentProject} onChange={(event) => {
+                  const project = event.target.value as "papa-life" | "ai-boss-mobility";
+                  setAssignmentProject(project);
+                  if (assignmentRole === "papa-life-director" && project !== "papa-life" || assignmentRole === "ai-boss-mobility-director" && project !== "ai-boss-mobility") setAssignmentRole("seo-website");
+                }} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
+                  <option value="papa-life">Papa Life</option>
+                  <option value="ai-boss-mobility">AI Boss Mobility Consulting</option>
+                </select>
+                <label htmlFor="worker-role" className="block text-sm font-semibold text-white">Assigned worker</label>
+                <select id="worker-role" value={assignmentRole} onChange={(event) => setAssignmentRole(event.target.value)} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
+                  <option value="seo-website">SEO & Website Worker</option>
+                  <option value="crm-sales">CRM & Sales Worker</option>
+                  <option value="ghl-customer-service">GoHighLevel Customer Service Worker — No-cost first</option>
+                  <option value="quality-compliance">Quality & Compliance Worker</option>
+                  <option value="outreach-followup">Outreach & Follow-up Worker (draft review only)</option>
+                  <option value="content-distribution">Content & Distribution Worker (planning only)</option>
+                  <option value="scheduling-communications">Scheduling & Communications Worker</option>
+                  <option value="finance-records">Finance Records Worker</option>
+                  <option value="financial-director">Financial Director</option>
+                  <option value="marketing-revenue-director">Marketing & Revenue Director</option>
+                  {assignmentProject === "papa-life" && <option value="papa-life-director">Papa Life Director</option>}
+                  {assignmentProject === "ai-boss-mobility" && <option value="ai-boss-mobility-director">AI Boss Mobility Director</option>}
+                </select>
+                <label htmlFor="worker-instruction" className="block text-sm font-semibold text-white">What should the worker review?</label>
+                <Textarea id="worker-instruction" minLength={12} maxLength={2000} required value={assignmentText} onChange={(event) => setAssignmentText(event.target.value)} placeholder="Review broken links on my Papa Life website and prepare a report. No purchases, messages, or edits." className="min-h-28 border-white/20 bg-[#181818] text-base" />
+                <Button type="button" variant="outline" disabled={assignmentSaving} onClick={dictateWorkerAssignment} className="w-full border-brand-yellow/40 text-brand-yellow">
+                  <Mic2 className="mr-2 h-4 w-4" />{assignmentListening ? "Finish speaking" : "Speak assignment instead of typing"}
+                </Button>
+                <p className="text-xs text-gray-400">Read-only worker assignments. The GoHighLevel Customer Service Worker diagnoses customer, CRM, estimate, agreement, workflow and account issues using existing no-cost methods first. Sending or changing records requires separate permission. No purchases or model credits requested.</p>
+                <Button type="submit" disabled={assignmentSaving || assignmentText.trim().length < 12} className="w-full bg-brand-yellow text-black hover:bg-brand-yellow/90">
+                  {assignmentSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ClipboardList className="mr-2 h-4 w-4" />}
+                  Queue Worker Assignment
+                </Button>
+                {lastAssignmentId !== null && <p className="text-sm text-brand-yellow">Assignment #{lastAssignmentId} saved for approval. This does not mean the Mac worker has started.</p>}
+                <Button type="button" variant="outline" className="w-full border-white/30" onClick={() => navigate("/papa-life-os/approvals")}>
+                  <ShieldCheck className="mr-2 h-4 w-4" />Review Approvals &amp; Queue
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#111] border-white/10">
+          <CardHeader>
+            <CardTitle className="text-white">Talk to Papa Life OS</CardTitle>
+            <p className="text-sm text-gray-500">Tell Papa Life OS what you want done from your Android phone. It can store the instruction immediately and route it through the operating system.</p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={captureInstruction} className="space-y-3">
+              <Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="Check my Gmail, review my calendar, prepare a follow-up, remember something, or queue work for my Mac…" className="min-h-28 bg-black/50 border-white/10 text-base" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Button type="button" variant="outline" disabled={saving} onClick={() => (listening && captureMode === "boss" ? stopVoice() : startVoice("boss"))} className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10">
+                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "boss" ? "Finish speaking" : "Speak to Papa Life OS"}
+                </Button>
+                <Button type="submit" disabled={saving || !instruction.trim()}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to Papa Life OS</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#111] border-white/10">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-3">
+              <div><p className="text-xs uppercase tracking-widest text-primary">Campaigns & Analytics</p><CardTitle className="mt-1 text-white">Managed by Papa Life OS</CardTitle></div>
+              <BarChart3 className="w-8 h-8 text-primary" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {(mission?.campaigns || []).map((campaign) => (
+              <div key={`${campaign.source}-${campaign.campaign_key}`} className="rounded-xl border border-white/10 bg-black/40 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-white">{campaign.display_name}</p>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${campaign.status === "connected" ? "bg-primary/15 text-primary" : campaign.status === "attention" ? "bg-brand-red/15 text-brand-red" : "bg-brand-yellow/15 text-brand-yellow"}`}>{campaign.status}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">{campaign.campaign_key} · Last sync {campaign.last_synced_at}</p>
+                  </div>
+                  {campaign.tracking_url ? <a href={campaign.tracking_url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${campaign.display_name}`}><ExternalLink className="h-4 w-4 text-gray-400" /></a> : null}
+                </div>
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <Metric label="Clicks" value={campaign.clicks} />
+                  <Metric label="Enrollments" value={campaign.enrollments} />
+                  <Metric label="Posts" value={campaign.posts_distributed} />
+                  <Metric label="Follow-ups" value={campaign.follow_ups_needed} />
+                </div>
+                {campaign.latest_activity ? <p className="mt-3 text-sm text-gray-400">{campaign.latest_activity}</p> : null}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickLink icon={Brain} label="Executive Memory" onClick={() => navigate("/executive-memory")} />
           <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />

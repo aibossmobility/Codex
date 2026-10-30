@@ -3174,11 +3174,11 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage, canonica
     `    <meta property="og:type" content="website" />\n` +
     `    <meta property="og:url" content="${canonicalUrl}" />\n` +
     `    <meta property="og:site_name" content="Papa Life Coach" />\n` +
-    `    <meta property="og:image" content="https://papalifecoach.com/images/papa-life-logo.png" />\n` +
+    `    <meta property="og:image" content="https://papalifecoach.com/images/papa-life-approved-20261016.webp" />\n` +
     `    <meta name="twitter:card" content="summary_large_image" />\n` +
     `    <meta name="twitter:title" content="${escapeHtml(page.title)}" />\n` +
     `    <meta name="twitter:description" content="${escapeHtml(page.description)}" />\n` +
-    `    <meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-logo.png" />`;
+    `    <meta name="twitter:image" content="https://papalifecoach.com/images/papa-life-approved-20261016.webp" />`;
   html = html.replace("</head>", `${socialMeta}\n  </head>`);
 
   // The SEO generator writes a prerendered homepage into dist/public/index.html.

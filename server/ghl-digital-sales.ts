@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveGhlCredentials } from './ghl-integration-store';
 import { getCommerceProductByCode, grantMemberProductEntitlement, listCommerceProducts } from './commerce-entitlements';
+import { registerVerifiedCustomerOrder, advanceCustomerJob, customerJobSummary } from './customer-fulfillment-ledger';
 
 export function singleGhlRecord(payload:any) {
   const value=Array.isArray(payload)?payload[0]:Array.isArray(payload?.data)?payload.data[0]:payload?.data||payload;
@@ -98,6 +99,10 @@ export function installGhlDigitalSales(app:Express, db:Database.Database, root:s
     if(!(req.session as any)?.user && !(req.session as any)?.adminId) return res.status(401).json({ok:false});
     await preflight();res.json({ready,error:lastError,started_at:started,mapped_products:mappings.size,recent:db.prepare('SELECT status,error,attempts,updated_at FROM ghl_digital_delivery ORDER BY updated_at DESC LIMIT 10').all()});
   });
+  app.get('/api/admin/digital-fulfillment-jobs',(req,res)=>{
+    if(!(req.session as any)?.adminId)return res.status(401).json({ok:false});
+    res.set('Cache-Control','no-store').json({ok:true,brand:'papa-life',jobs:customerJobSummary(db,'papa-life')});
+  });
   // Authenticated, read-only inspection of a post-launch purchase. Never exposes provider/card credentials.
   app.get('/api/admin/digital-sales-inspect/:id',async(req,res)=>{
     if(!(req.session as any)?.adminId)return res.status(401).json({ok:false});
@@ -122,16 +127,27 @@ export function installGhlDigitalSales(app:Express, db:Database.Database, root:s
     db.prepare("INSERT INTO ghl_digital_delivery(transaction_id,order_id,status) VALUES(?,?,'pending') ON CONFLICT(transaction_id) DO NOTHING").run(id,tx.entityId);
     try {
       const buyer=verifyDigitalOrder(tx,order,mappings);
+      const jobs=buyer.products.map((p:{code:string;cents:number})=>registerVerifiedCustomerOrder(db,{
+        brand:'papa-life',transactionId:String(tx._id||id),orderId:String(order._id),productCode:p.code,priceCents:p.cents,
+        email:buyer.email,paymentVerified:true,paymentEvidence:'verified_ghl:'+String(tx._id||id)+':'+String(order._id)
+      }));
       const account=callbacks.account(buyer.email,String(order.contactSnapshot?.name||order.contactSnapshot?.firstName||'Papa Life customer'));
       for(const p of buyer.products){
         if(!getCommerceProductByCode(db,p.code))throw new Error('Canonical product not found');
         const existing=db.prepare('SELECT 1 FROM member_product_entitlements e JOIN commerce_products p ON p.id=e.product_id WHERE e.member_id=? AND p.code=? AND e.revoked_at IS NULL').get(account.member.id,p.code);
         if(!existing)grantMemberProductEntitlement(db,{memberId:account.member.id,productCode:p.code,source:'verified_ghl_public_purchase',externalOrderId:order._id});
       }
+      for(const job of jobs){
+        if(job.state==='payment_verified'||job.state==='needs_attention')
+          advanceCustomerJob(db,job.id,'production_ready','Verified purchased library entitlement created or already present');
+        if(job.state==='payment_verified'||job.state==='needs_attention'||job.state==='production_ready')
+          advanceCustomerJob(db,job.id,'quality_passed','Authorized product entitlement and canonical library resources checked by fulfillment path');
+      }
       const activation=resend || account.created || previous?.status==='pending' ? callbacks.activation(account.member.id) : null;
       const accessUrl=activation?`https://papalifecoach.com/member-activate?token=${encodeURIComponent(activation.rawToken)}`:'https://papalifecoach.com/member-login';
       const message=`Thank you for your Papa Life purchase. Your purchased resources are ready in your learning library.\n\n${activation?'Set your password using this secure link':'Sign in with your existing password'}:\n${accessUrl}\n\nOpen Manuscripts for your PDFs or Courses for your audio lessons. No paid membership or subscription is required. Your purchase includes only the resources you selected.\n\nFor access help or a new secure access email, visit https://papalifecoach.com/purchase-help. Never pay again to restore a purchase. For personal help, reply to brian@papalifecoach.com.\nPapa Life`;
       await api('/conversations/messages','POST',{type:'Email',contactId:buyer.contactId,emailFrom:'brian@papalifecoach.com',emailTo:buyer.email,subject:'Your Papa Life resources are ready',message,html:message.split('\n').map(line=>line.startsWith('https://')?`<p><a href="${line}">Open your Papa Life library</a></p>`:`<p>${line}</p>`).join('')});
+      for(const job of jobs)if(job.state!=='delivered')advanceCustomerJob(db,job.id,'delivered','GoHighLevel conversations email endpoint accepted secure access message');
       db.prepare("UPDATE ghl_digital_delivery SET status='sent',error=NULL,attempts=attempts+1,updated_at=datetime('now') WHERE transaction_id=?").run(id);
     }catch(error:any){db.prepare("UPDATE ghl_digital_delivery SET status='pending',error=?,attempts=attempts+1,updated_at=datetime('now') WHERE transaction_id=?").run(String(error.message).slice(0,300),id);console.warn('[digital-sales] delivery pending:',error.message);}
   }

@@ -3,12 +3,12 @@ const SITE = "https://papalifecoach.com";
 export const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Papa Life Coach",
+  name: "Papa Life",
   alternateName: ["Papa Life"],
   url: SITE,
   logo: `${SITE}/images/papa-life-approved-20261016.webp`,
   description:
-    "Faith-informed life coaching for fathers of adult children — helping men rebuild connection, presence, and legacy through the PAPA framework.",
+    "Faith-informed self-paced fatherhood lessons, audio, manuscripts and practical educational resources for fathers of adult children, grounded in the PAPA framework.",
   founder: {
     "@type": "Person",
     name: "Brian Keith Hill",
@@ -32,12 +32,12 @@ export const BRIAN_PERSON_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Brian Keith Hill",
-  jobTitle: "Founder of AI Boss Mobility Consulting; Creator of Papa Life; Life Coach and Leadership Advisor",
-  knowsAbout: ["Boss Mobility Life Coach Services", "Papa Life", "fatherhood coaching", "leadership", "AI strategy", "organizational consulting"],
+  jobTitle: "Founder of AI Boss Mobility Consulting; Creator of Papa Life; Leadership and Organizational Advisor",
+  knowsAbout: ["Papa Life", "fatherhood education", "leadership", "AI strategy", "organizational consulting"],
   url: `${SITE}/about-brian-keith-hill`,
   image: `${SITE}/images/brian-keith-hill.png`,
   description:
-    "Brian Keith Hill brings a longstanding Boss Mobility Life Coach Services history to Papa Life fatherhood coaching and AI Boss Mobility Consulting. His work emphasizes trust, wisdom, independent critical thinking, and human connection.",
+    "Brian Keith Hill creates self-paced fatherhood educational resources through Papa Life and offers AI strategy and organizational consulting separately through AI Boss Mobility. His work emphasizes trust, wisdom, and human connection.",
   sameAs: [
     "https://www.linkedin.com/in/brian-hill-bossmobility",
     "https://briankeithhill.com",
@@ -50,10 +50,10 @@ export const HOMEPAGE_FAQ_SCHEMA = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "What is Papa Life Coach?",
+      name: "What is Papa Life?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Papa Life Coach (Papa Life) provides coaching and resources for fathers navigating relationships with adult children — with clarity, presence, and care for mental health.",
+        text: "Papa Life provides original self-paced audio lessons, written resources, and faith-informed fatherhood education for fathers of adult children.",
       },
     },
     {
@@ -74,10 +74,10 @@ export const HOMEPAGE_FAQ_SCHEMA = {
     },
     {
       "@type": "Question",
-      name: "What is the free relationship assessment?",
+      name: "How can I begin exploring Papa Life?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "A short, free assessment that helps you see where your relationship stands today and identifies your first step toward closing the gap with your adult child.",
+        text: "Explore the available self-paced lessons, original audio, manuscripts, and fatherhood learning resources.",
       },
     },
   ],
@@ -141,6 +141,6 @@ export const HOMEPAGE_WEB_APP_SCHEMA = webApplicationSchema(
 
 export const HOMEPAGE_ARTICLE_SCHEMA = articleSchema(
   "/",
-  "Papa Life Coach — Fatherhood & Adult-Child Relationship Coaching",
-  "Supportive coaching for fathers ready for a clearer mental-health journey with adult children."
+  "Papa Life — Fatherhood Lessons and Educational Resources",
+  "Faith-informed self-paced fatherhood lessons and resources for fathers of adult children."
 );

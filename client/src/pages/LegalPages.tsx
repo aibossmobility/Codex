@@ -80,9 +80,9 @@ export function PrivacyPage() {
         We collect information you give us directly, such as when you:
       </p>
       <ul>
-        <li>Fill out a lead form (name, email, phone number, age range, and answers about your relationship with your adult child)</li>
-        <li>Choose courses or self-guided coaching resources</li>
-        <li>Register for Tuesday Live sessions</li>
+        <li>Submit an optional contact or resource-access form</li>
+        <li>Choose self-paced educational resources</li>
+        <li>Explore archived educational recordings</li>
         <li>Purchase an available self-paced course or service after reviewing current terms</li>
         <li>Send a message through our contact page or Papa Life AI Coach, including the content you choose to enter</li>
         <li>Take an assessment or reflection tool, including the answers and scores you choose to submit</li>
@@ -214,15 +214,15 @@ export function TermsPage() {
         <strong>Last Updated:</strong> October 13, 2026
       </p>
       <p>
-        Welcome to Papa Life, a fatherhood coaching service owned and operated by{" "}
+        Welcome to Papa Life, a fatherhood educational resource center owned and operated by{" "}
         <strong>Brian Keith Hill</strong> (&quot;Papa Life,&quot; &quot;we,&quot; &quot;us&quot;). By using
         PapaLifeCoach.com, our AI coach (Papa Life AI Coach), our courses, or purchasing currently available services,
         you agree to these terms.
       </p>
       <h2>1. Who We Are</h2>
       <p>
-        Papa Life is a coaching and education platform built for fathers of adult children. Our founder,
-        Brian Keith Hill, is a Certified Peer Support Specialist. Papa Life is a coaching and educational
+        Papa Life is a self-paced education and digital resource platform for fathers of adult children. Our founder,
+        Brian Keith Hill, is a Certified Peer Support Specialist. Papa Life is an educational
         service — it is not therapy, counseling, or a licensed mental health service, and it does not
         replace professional medical, legal, or mental health care.
       </p>
@@ -266,7 +266,7 @@ New monthly membership enrollment is closed. Any currently offered course or ser
       <h2>8. Limitation of Liability</h2>
       <p>
         To the fullest extent allowed by law, Papa Life and Brian Keith Hill are not responsible for
-        indirect, incidental, or consequential damages related to your use of the site or coaching services.
+        indirect, incidental, or consequential damages related to your use of the site or digital resources.
         Our total liability to you will never be more than the amount you paid us in the past 12 months.
       </p>
       <h2>9. Changes to These Terms</h2>

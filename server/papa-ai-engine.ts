@@ -156,20 +156,20 @@ export const papaAiResources: ResourceItem[] = [
     keywords: ["assessment", "score", "clarity", "purpose", "authority", "presence", "alignment"],
   },
   {
-    title: "Papa Life Tuesday Live",
-    type: "Video",
-    pillar: "General",
-    description: "Live coaching and teaching for fathers of adult children.",
-    path: "/tuesday",
-    keywords: ["tuesday", "live", "questions", "show", "episode", "coaching"],
-  },
-  {
-    title: "Papa Life Membership",
+    title: "Papa Life Self-Paced Audio Lessons",
     type: "Course",
     pillar: "General",
-    description: "Guided lessons, reflection tools, community, and continued growth.",
-    path: "/go/join",
-    keywords: ["membership", "community", "pricing", "subscription", "join", "courses"],
+    description: "Explore recorded, self-paced fatherhood lessons. Recurring Tuesday Live coaching has ended.",
+    path: "/shop#audio-lessons",
+    keywords: ["audio", "lessons", "recorded", "teachings", "tuesday", "archive", "self-paced"],
+  },
+  {
+    title: "Papa Life Self-Paced Resources",
+    type: "Course",
+    pillar: "General",
+    description: "Explore current courses and recordings in the shop; the retired monthly membership is not open to new buyers.",
+    path: "/shop",
+    keywords: ["membership", "subscription", "courses", "resources", "pricing", "catalog", "lessons"],
   },
   {
     title: "About Brian Keith Hill",
@@ -229,6 +229,36 @@ function buildRuntimeSystemPrompt(message: string) {
   return `${loadPapaLifeSystemPrompt()}\n\n---\n\n${kbContext}`;
 }
 
+/**
+ * Product/service availability is deterministic in the free local provider.
+ * Retrieval context is available to paid models, but the local fallback must
+ * answer current catalog questions without turning them into relationship advice.
+ * Keep these decisions aligned with the approved customer-safe V3.2.2 extract.
+ */
+function currentPapaLifeOfferReply(message: string, mode: PapaAiMode): string | null {
+  const text = message.toLowerCase();
+  const liveQuestion =
+    mode === "tuesday" ||
+    /\b(?:tuesday\s+live|monday\s+live|tuesday\s+(?:coaching|shows?|sessions?|classes?|meetings?)|live\s+(?:coaching|sessions?|classes?|events?|shows?|meetings?)|(?:weekly|recurring)\s+(?:live\s+)?coaching)\b/.test(text);
+
+  if (liveQuestion) {
+    return "No. Papa Life no longer holds recurring Tuesday Live sessions or regular Monday live coaching. Earlier recordings and teachings are historical educational content, not invitations to a new live event. You can explore current self-paced Papa Life resources at https://papalifecoach.com/shop.";
+  }
+
+  const membershipQuestion =
+    mode === "membership" ||
+    /\b(?:memberships?|subscriptions?|monthly\s+(?:plans?|payments?|fees?|charges?))\b|\$\s*4\.99\b|\b4\.99\b/.test(text);
+
+  if (membershipQuestion) {
+    const existingBilling = /\b(?:cancell?ation|cancel|stop\s+(?:my\s+)?(?:payment|subscription|billing)|refund|charged|charging|existing|current\s+member|already\s+(?:pay|joined|subscribe))\b/.test(text);
+    return existingBilling
+      ? "The former $4.99/month Papa Life membership is not offered to new buyers. Existing subscriptions are a separate billing matter; I cannot check or cancel yours from this conversation. For a verified review or cancellation, contact Papa Life support at brian@papalifecoach.com. No cancellation or refund has been performed here."
+      : "No. The former $4.99/month Papa Life membership is not a current public offer for new buyers. Papa Life now focuses on self-paced fatherhood resources and recorded lessons. View the current catalog at https://papalifecoach.com/shop; verify each product's live price and checkout before purchasing.";
+  }
+
+  return null;
+}
+
 export function buildPapaAiLocalReply(input: {
   message: string;
   mode?: PapaAiMode;
@@ -259,6 +289,15 @@ export function buildPapaAiLocalReply(input: {
     };
   }
 
+  const currentOfferReply = currentPapaLifeOfferReply(message, mode);
+  if (currentOfferReply) {
+    return {
+      provider: "local" as PapaAiProvider,
+      reply: currentOfferReply,
+      resources: findPapaResources("self-paced fatherhood lessons catalog", 3),
+    };
+  }
+
   if (mode === "prayer") {
     return {
       provider: "local" as PapaAiProvider,
@@ -280,24 +319,6 @@ export function buildPapaAiLocalReply(input: {
       provider: "local" as PapaAiProvider,
       reply: `Here is where I would start based on what you shared: ${resources[0]?.title || "The PAPA Framework Guide"}.\n\nLook for the resource that helps you take one next faithful step, not the one that gives you the most information. The father changes first, and small consistent action rebuilds more trust than a large emotional speech.`,
       resources,
-    };
-  }
-
-  if (mode === "tuesday") {
-    return {
-      provider: "local" as PapaAiProvider,
-      reply:
-        "That is a strong Tuesday Live question. I would frame it this way for the show: what does a father do when he wants repair, but his adult child is not ready for the conversation?\n\nStart with humility, then move to one practical action. Ask the question before Tuesday, bring one real example, and the follow-up resource should point back to Presence and Alignment.",
-      resources: findPapaResources(`${message} Tuesday live`, 3),
-    };
-  }
-
-  if (mode === "membership") {
-    return {
-      provider: "local" as PapaAiProvider,
-      reply:
-        "Papa Life now offers digital courses and services rather than new recurring memberships. Start with the available first lesson, then explore the current course catalog for a guided path through Presence, Authority, Purpose, and Alignment.",
-      resources: findPapaResources("digital courses learning PAPA", 3),
     };
   }
 

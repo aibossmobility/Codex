@@ -8,6 +8,7 @@ import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-g
 import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
 import { inspectCustomerDraft } from "./fixed-service-draft-quality";
 import { buildCustomerJourney } from "./customer-journey-worker-routing";
+import { registerDailyReportMacRelayRoutes } from "./private-daily-report-relay";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -484,6 +485,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     report_date TEXT NOT NULL,
     title TEXT NOT NULL,
+    brand TEXT NOT NULL DEFAULT 'papa-life',
     outreach TEXT,
     content_creation TEXT,
     scheduling TEXT,
@@ -572,6 +574,10 @@ db.exec(`
 
 // Guarded migrations
 try { db.exec("ALTER TABLE leads ADD COLUMN status TEXT NOT NULL DEFAULT 'New'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN brand TEXT NOT NULL DEFAULT 'papa-life'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_sync_status TEXT NOT NULL DEFAULT 'not_attempted'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_sync_error TEXT"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_synced_at TEXT"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN adult_children_count INTEGER DEFAULT 0"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN emotional_state TEXT"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN primary_pillar TEXT DEFAULT 'Purpose'"); } catch {}
@@ -864,9 +870,16 @@ try {
 // Seed default admin if not exists
 const existingAdmin = db.prepare("SELECT id FROM admin_users WHERE username = ?").get("papalife");
 if (!existingAdmin) {
-  const hash = bcrypt.hashSync("PaPaLife123!@", 10);
-  db.prepare("INSERT INTO admin_users (username, password_hash, display_name, email) VALUES (?, ?, ?, ?)")
-    .run("papalife", hash, "PAPA Life Admin", "brian@bossmobility.net");
+  // No known public default password for a new installation. Existing user
+  // credentials remain unchanged on a production database.
+  const initialPassword = String(process.env.PAPA_ADMIN_BOOTSTRAP_PASSWORD || "");
+  if (initialPassword.length >= 16) {
+    const hash = bcrypt.hashSync(initialPassword, 12);
+    db.prepare("INSERT INTO admin_users (username, password_hash, display_name, email) VALUES (?, ?, ?, ?)")
+      .run("papalife", hash, "PAPA Life Admin", "brian@bossmobility.net");
+  } else {
+    console.warn("[admin] no owner exists; configure a private bootstrap password before first sign-in");
+  }
 }
 // Ensure admin email is up-to-date
 db.prepare("UPDATE admin_users SET email = ? WHERE username = ? AND email != ?")
@@ -1017,6 +1030,12 @@ const SQLiteStore = connectSqlite3(session);
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   if ((req.session as any).adminId) return next();
   res.status(401).json({ ok: false, error: "Unauthorized" });
+}
+
+function requireDailyReportOwner(req: Request, res: Response, next: NextFunction) {
+  const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
+  if (user?.username === "papalife" && user?.email?.toLowerCase() === "brian@bossmobility.net") return next();
+  return res.status(403).json({ ok: false, error: "Owner account required" });
 }
 
 function addHours(iso: string, hours: number) {
@@ -3573,67 +3592,65 @@ async function startServer() {
 
   registerSmsCampaignRoutes(app, db, requireAuth);
   registerYouTubeIntegrationRoutes(app, db, requireAuth, requireResearchLabAccess);
+  registerDailyReportMacRelayRoutes(app, db);
 
   // ── Protected: Papa Life daily work reports ───────────────────────────────
 
-  app.get("/api/admin/papa-daily-work-reports", requireAuth, (_req, res) => {
+  app.get("/api/admin/papa-daily-work-reports", requireAuth, requireDailyReportOwner, (req, res) => {
+    const brand = req.query.brand === "ai-boss-mobility" ? "ai-boss-mobility" : "papa-life";
     const reports = db
       .prepare(
-        `SELECT id, report_date, title, outcomes, win, ventures_saved, created_at
-         FROM papa_daily_work_reports
-         ORDER BY report_date DESC, created_at DESC
-         LIMIT 30`
+        `SELECT id, report_date, title, brand, outcomes, win, ventures_saved,
+                sheets_sync_status, sheets_synced_at, created_at
+         FROM papa_daily_work_reports WHERE brand = ?
+         ORDER BY report_date DESC, created_at DESC LIMIT 30`
       )
-      .all();
+      .all(brand);
     res.json({ ok: true, reports });
   });
 
-  app.post("/api/admin/papa-daily-work-reports", requireAuth, async (req, res) => {
+  app.post("/api/admin/papa-daily-work-reports", requireAuth, requireDailyReportOwner, async (req, res) => {
     try {
+      const brand = req.body?.brand === "ai-boss-mobility" ? "ai-boss-mobility" : "papa-life";
       const date = normalizeReportDate(req.body?.reportDate);
       const fields = normalizeReportFields(req.body?.fields);
       const outcomes = normalizeOutcomes(req.body?.outcomes);
-      const markdown = String(req.body?.markdown || "").trim() || buildPapaDailyReportMarkdown(date, fields, outcomes);
-      const title = `Papa Life Daily Work Report - ${date}`;
+      const prefix = brand === "papa-life" ? "Papa Life" : "AI Boss Mobility";
+      const markdown = buildPapaDailyReportMarkdown(date, fields, outcomes)
+        .replace("Papa Life Daily Work Report", prefix + " Daily Work Report");
+      const title = `${prefix} Daily Work Report - ${date}`;
       const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
 
       const result = db
         .prepare(
           `INSERT INTO papa_daily_work_reports (
-            report_date, title, outreach, content_creation, scheduling, automation,
+            report_date, title, brand, outreach, content_creation, scheduling, automation,
             coaching, pipeline, revenue, research, outcomes, win, markdown,
             ventures_saved, ventures_error, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .run(
-          date,
-          title,
-          fields.outreach || null,
-          fields.contentCreation || null,
-          fields.scheduling || null,
-          fields.automation || null,
-          fields.coaching || null,
-          fields.pipeline || null,
-          fields.revenue || null,
-          fields.research || null,
-          JSON.stringify(outcomes),
-          fields.win || null,
-          markdown,
-          0,
-          null,
-          user?.email || user?.username || null
+          date, title, brand,
+          fields.outreach || null, fields.contentCreation || null, fields.scheduling || null,
+          fields.automation || null, fields.coaching || null, fields.pipeline || null,
+          fields.revenue || null, fields.research || null, JSON.stringify(outcomes),
+          fields.win || null, markdown, 0, null, user?.email || user?.username || null
         );
-
+      const id = Number(result.lastInsertRowid);
+      // Local database is authoritative for manual submissions. A Sheets outage
+      // must never delete or silently mark the owner's local report as synced.
+      // No credentials on Railway: the Mac will pull and verify this
+      // authenticated submission before marking it as delivered.
+      db.prepare(
+        "UPDATE papa_daily_work_reports SET sheets_sync_status = 'pending_mac', sheets_sync_error = NULL WHERE id = ?"
+      ).run(id);
       res.json({
-        ok: true,
-        id: result.lastInsertRowid,
-        venturesSaved: false,
-        venturesError: null,
-        storage: "papa-life-os",
+        ok: true, id, storage: "papa-life-os", brand,
+        googleSheetsSynced: false, googleSheetsSyncStatus: "pending_mac",
       });
     } catch (e: any) {
       console.error("[papa-daily-work-report] save failed:", e);
-      res.status(500).json({ ok: false, error: e?.message || "Failed to save report" });
+      res.status(500).json({ ok: false, error: "Failed to save report" });
     }
   });
 

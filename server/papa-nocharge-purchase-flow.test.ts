@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import Database from "better-sqlite3";
+import { SALES_LOCATION, verifyDigitalOrder } from "./ghl-digital-sales";
+import { ensureCommerceEntitlementTables, getCommerceProductByCode, grantMemberProductEntitlement, memberCanAccessManuscript } from "./commerce-entitlements";
+import { registerVerifiedCustomerOrder, advanceCustomerJob, customerJobSummary } from "./customer-fulfillment-ledger";
+
+// In-memory demonstration only: no network, no email, no charge, no production database.
+const db = new Database(":memory:");
+db.pragma("foreign_keys = ON");
+db.exec("CREATE TABLE members (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE); CREATE TABLE lessons (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL)");
+ensureCommerceEntitlementTables(db);
+const sku = "curriculum.manuscript.module.01";
+assert(getCommerceProductByCode(db, sku));
+const mapping = new Map([["fixture-product", { code: sku, cents:1499, priceId:"fixture-price" }]]);
+const order = {_id:"fixture-order",altId:SALES_LOCATION,altType:"location",liveMode:true,status:"completed",amount:14.99,currency:"USD",contactId:"fixture-contact",contactSnapshot:{email:"fixture-buyer@example.invalid"},amountSummary:{subtotal:14.99},items:[{product:{_id:"fixture-product"},price:{_id:"fixture-price",type:"one_time",amount:14.99},qty:1}]};
+const tx = {_id:"fixture-transaction",altId:SALES_LOCATION,altType:"location",liveMode:true,status:"succeeded",entityType:"order",entityId:"fixture-order",amount:14.99,currency:"USD",contactId:"fixture-contact"};
+assert.throws(()=>verifyDigitalOrder({...tx,liveMode:false},order,mapping),/Test payment/);
+const verified = verifyDigitalOrder(tx,order,mapping);
+assert.equal(verified.products[0].code,sku);
+const input = {brand:"papa-life" as const,transactionId:tx._id,orderId:order._id,productCode:sku,priceCents:1499,email:verified.email,paymentVerified:true,paymentEvidence:"fixture from verified provider fields; NO REAL PAYMENT"};
+const job = registerVerifiedCustomerOrder(db,input);
+const again = registerVerifiedCustomerOrder(db,input);
+assert.equal(job.id,again.id);assert.equal(again.reused,true);
+const memberId=Number(db.prepare("INSERT INTO members (email) VALUES (?)").run(verified.email).lastInsertRowid);
+grantMemberProductEntitlement(db,{memberId,productCode:sku,source:"verified_ghl_public_purchase",externalOrderId:order._id});
+assert(memberCanAccessManuscript(db,memberId,sku));
+assert(!memberCanAccessManuscript(db,memberId,"curriculum.manuscript.module.02"));
+advanceCustomerJob(db,job.id,"production_ready","Simulated validated manuscript entitlement present");
+advanceCustomerJob(db,job.id,"quality_passed","Simulated authorized matching manuscript");
+assert.throws(()=>advanceCustomerJob(db,job.id,"delivered",""),/./);
+advanceCustomerJob(db,job.id,"delivered","SIMULATED: email provider accepted access message (no actual email sent)");
+const final=customerJobSummary(db,"papa-life");
+assert.equal(final.length,1);assert.equal(final[0].state,"delivered");
+assert.equal(customerJobSummary(db,"ai-boss-mobility").length,0);
+console.log("NO_CHARGE_FIXTURE_PASS: verified matching order -> idempotent job -> one matching entitlement -> quality gate -> simulated delivery state; no external send");
+db.close();

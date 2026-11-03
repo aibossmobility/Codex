@@ -143,40 +143,6 @@ def append_executive_rollups(token, entries, dry):
         if missing: raise RuntimeError("Executive dashboard readback mismatch")
     return {"eligible_dates": len(dates), "new": len(new), "verified": not dry}
 
-def append_executive_rollups(token, entries, dry=False):
-    """Backfill per-date executive history with source-labelled Mac proof evidence."""
-    source = "Mac worker-proof daily rollup"
-    by_date = defaultdict(lambda: defaultdict(list))
-    for brand, records in entries.items():
-        for row in records:
-            by_date[row[0]][brand].append(row)
-    existing = sheet(token, "'Executive Dashboard'!A1:H5000").get("values", [])
-    seen = {(str(row[0]), str(row[6])) for row in existing[1:] if len(row) > 6}
-    new = []
-    for day in sorted(by_date):
-        if (day, source) in seen:
-            continue
-        groups = by_date[day]
-        papa = groups["Papa Life"]
-        ai = groups["AI Boss Mobility"]
-        def status(rows):
-            passed = sum("QA passed" in r[3] for r in rows)
-            pending = sum("pending" in r[3].lower() for r in rows)
-            failed = sum("Failed" in r[3] for r in rows)
-            return f"{len(rows)} Mac proof records; {passed} local QA passed, {pending} pending, {failed} failed"
-        # These are Mac-local evidence only, never customer-facing completion.
-        new.append([day, status(papa), status(ai),
-                    f"{len(papa) + len(ai)} historical local proof records, not independently verified external results",
-                    "External outcomes not checked; some local QA records may be pending or failed",
-                    "Review evidence and verify customer-facing outcomes before marking complete",
-                    source, "Historical Mac worker evidence"])
-    if new and not dry:
-        sheet(token, "'Executive Dashboard'!A:H", {"values": new}, append=True)
-        check = sheet(token, "'Executive Dashboard'!A1:H5000").get("values", [])
-        after = {(str(r[0]), str(r[6])) for r in check[1:] if len(r) > 6}
-        if any((row[0], source) not in after for row in new):
-            raise RuntimeError("Executive rollup readback failed")
-    return len(new)
 
 def main():
     dry = "--dry-run" in sys.argv
@@ -201,7 +167,6 @@ def main():
             if missing:
                 raise RuntimeError(f"Google Sheets readback did not verify {len(missing)} rows for {brand}")
     rollups = append_executive_rollups(token, entries, dry)
-    rollups = append_executive_rollups(token, entries, dry=dry)
     print(json.dumps({"status": "dry-run" if dry else "verified",
         "source": "accepted Mac worker proof outbox",
         "counts": counts, "executive_rollups": rollups, "separate_business_tabs": True, "readback": not dry,

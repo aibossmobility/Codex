@@ -967,15 +967,8 @@ for (const resource of resourceLibraryFileUrls) {
   updateResourceLibraryFileUrl.run(resource.fileUrl, resource.title);
 }
 
-// Seed platform events
-const eventCount = (db.prepare("SELECT COUNT(*) as c FROM platform_events").get() as { c: number }).c;
-if (eventCount === 0) {
-  const iev = db.prepare("INSERT INTO platform_events (title, description, event_date, event_time, format, is_free, is_members_only, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-  iev.run("Brotherhood Power Hour", "Weekly live call — share wins, get coaching, build brotherhood.", "2026-04-02", "7:00 PM EST", "zoom", 0, 1, 1);
-  iev.run("Purpose Deep Dive Workshop", "3-hour intensive on discovering and living your fatherhood purpose.", "2026-04-12", "10:00 AM EST", "zoom", 0, 1, 2);
-  iev.run("New Member Orientation", "Get oriented to the PAPA Life platform and community.", "2026-04-05", "6:00 PM EST", "zoom", 1, 0, 3);
-  iev.run("Fathers & Sons Strategy Day", "In-person day of strategy, bonding, and breakthrough.", "2026-04-26", "9:00 AM EST", "in-person", 0, 1, 4);
-}
+// Retired live coaching: never seed historical or recurring example events.
+// Existing event and RSVP records are preserved pending an audited database review.
 
 const insertLead = db.prepare(`
   INSERT INTO leads (
@@ -7109,9 +7102,9 @@ async function startServer() {
     res.sendFile(masterKnowledgeCenterPage);
   });
 
-  const tuesdayHostControlRoomPage = path.join(staticPath, "tuesday-host-control-room", "index.html");
-  app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
-    res.sendFile(tuesdayHostControlRoomPage);
+  // The former Tuesday live host room has been retired; do not expose its controls.
+  app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], (_req, res) => {
+    res.redirect(302, "/resources");
   });
 
   app.get("/sitemap.xml", (_req, res) => {

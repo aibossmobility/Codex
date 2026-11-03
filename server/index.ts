@@ -967,15 +967,8 @@ for (const resource of resourceLibraryFileUrls) {
   updateResourceLibraryFileUrl.run(resource.fileUrl, resource.title);
 }
 
-// Seed platform events
-const eventCount = (db.prepare("SELECT COUNT(*) as c FROM platform_events").get() as { c: number }).c;
-if (eventCount === 0) {
-  const iev = db.prepare("INSERT INTO platform_events (title, description, event_date, event_time, format, is_free, is_members_only, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-  iev.run("Brotherhood Power Hour", "Weekly live call — share wins, get coaching, build brotherhood.", "2026-04-02", "7:00 PM EST", "zoom", 0, 1, 1);
-  iev.run("Purpose Deep Dive Workshop", "3-hour intensive on discovering and living your fatherhood purpose.", "2026-04-12", "10:00 AM EST", "zoom", 0, 1, 2);
-  iev.run("New Member Orientation", "Get oriented to the PAPA Life platform and community.", "2026-04-05", "6:00 PM EST", "zoom", 1, 0, 3);
-  iev.run("Fathers & Sons Strategy Day", "In-person day of strategy, bonding, and breakthrough.", "2026-04-26", "9:00 AM EST", "in-person", 0, 1, 4);
-}
+// Retired live coaching: never seed historical or recurring example events.
+// Existing event and RSVP records are preserved pending an audited database review.
 
 const insertLead = db.prepare(`
   INSERT INTO leads (
@@ -2264,14 +2257,14 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
     description:
-      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance.",
+      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, archived teachings, and course guidance.",
     eyebrow: "AI Coach",
     headline: "Ask for guidance when you need words, next steps, or perspective.",
     intro:
       "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
       { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment." },
-      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, Tuesday Live support, and practical exercises." },
+      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, historical teaching archives, and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
   },
@@ -2291,7 +2284,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore Fatherhood Resources", href: "/resources" },
   },
   "/tuesday-live": {
     title: "Papa Life Tuesday Live | August 25, 2026 Replay",
@@ -2309,7 +2302,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore Fatherhood Resources", href: "/resources" },
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",
@@ -2317,7 +2310,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
     intro:
-      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books, podcast material, and Tuesday Live support.",
+      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books, podcast material, and historical teaching archives.",
     sections: [
       { heading: "Free starting points", body: "Begin with the assessment, Papa Life AI Coach, and the free workshop for fathers of adult children." },
       { heading: "Member path", body: "Members continue into guided lessons, reflection tools, and support organized around the PAPA Framework." },
@@ -7109,9 +7102,9 @@ async function startServer() {
     res.sendFile(masterKnowledgeCenterPage);
   });
 
-  const tuesdayHostControlRoomPage = path.join(staticPath, "tuesday-host-control-room", "index.html");
-  app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], requireAuth, (_req, res) => {
-    res.sendFile(tuesdayHostControlRoomPage);
+  // The former Tuesday live host room has been retired; do not expose its controls.
+  app.get(["/tuesday-host-control-room", "/tuesday-host-control-room/", "/tuesday-host-control-room/index.html"], (_req, res) => {
+    res.redirect(302, "/resources");
   });
 
   app.get("/sitemap.xml", (_req, res) => {

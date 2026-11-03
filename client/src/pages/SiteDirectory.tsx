@@ -31,7 +31,7 @@ const groups = [
       ["Papa First Lesson", "/papa-first-lesson"],
       ["Papa Intro", "/papa-intro"],
       ["Papa Life AI Coach", "/ai-coach"],
-      ["Tuesday Live", "/tuesday-live"],
+      ["Historical Fatherhood Teachings", "/tuesday-live"],
       ["Papa Life House", "/house"],
       ["House Resources", "/house/resources"],
       ["Shop Digital Products", "/shop"],

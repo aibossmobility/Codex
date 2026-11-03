@@ -7109,9 +7109,12 @@ async function startServer() {
       ? path.resolve(__dirname, "public")
       : path.resolve(__dirname, "..", "dist", "public");
 
+  // Legacy Master Knowledge Center is an owner-only entry point.
+  // Never expose the old full Master Skill (or its /index.html alias) publicly.
   const masterKnowledgeCenterPage = path.join(staticPath, "papa-life-master-knowledge-center", "index.html");
-  app.get(["/papa-life-master-knowledge-center", "/papa-life-master-knowledge-center/"], (req, res) => {
-    if (req.path.endsWith("/")) return res.redirect(301, "/papa-life-master-knowledge-center" + (req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : ""));
+  app.get(["/papa-life-master-knowledge-center", "/papa-life-master-knowledge-center/", "/papa-life-master-knowledge-center/index.html"], requireAuth, (_req, res) => {
+    res.set("Cache-Control", "private, no-store");
+    res.set("X-Robots-Tag", "noindex, nofollow");
     res.sendFile(masterKnowledgeCenterPage);
   });
 
@@ -7123,17 +7126,19 @@ async function startServer() {
   app.get("/sitemap.xml", (_req, res) => {
     const base = "https://papalifecoach.com";
     const staticPaths = [
-      "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
-      "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship", "/why-adult-children-pull-away",
-      "/father-child-estrangement", "/about-brian-keith-hill", "/courses", "/start", "/papa-first-lesson", "/papa-intro",
-      "/ai-coach", "/resources", "/books", "/podcast", "/tuesday", "/tuesday-live", "/shop",
-      "/papa-journey", "/courses", "/contact", "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
-      "/music-room", "/house", "/house/living-room", "/house/library", "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources", "/house/sky-room",
+      "/", "/site-directory", "/welcome-to-papa-life", "/marlee-assessment", "/my-journey",
+      "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
+      "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill",
+      "/courses", "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/digital-twin",
+      "/resources", "/books", "/podcast", "/shop", "/papa-journey", "/contact",
+      "/privacy-policy", "/terms-of-service", "/refund-policy", "/music-room", "/house",
+      "/house/living-room", "/house/library", "/house/listening-room", "/house/theater",
+      "/house/dad-cave", "/house/resources", "/house/sky-room",
     ];
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
-    const today = new Date().toISOString().slice(0, 10);
-    const urls = [...staticPaths, ...coursePaths];
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((pathname) => `  <url><loc>${base}${pathname === "/" ? "/" : pathname}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`;
+    // Unique canonical URLs; don't claim every page changed today.
+    const urls = Array.from(new Set([...staticPaths, ...coursePaths]));
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((pathname) => `  <url><loc>${base}${pathname}</loc></url>`).join("\n")}\n</urlset>\n`;
     res.type("application/xml").send(xml);
   });
 

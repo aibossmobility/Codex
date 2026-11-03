@@ -4,6 +4,7 @@ https://papalifecoach.com/house
 https://papalifecoach.com/house/living-room
 https://papalifecoach.com/house/library
 https://papalifecoach.com/house/listening-room
+https://papalifecoach.com/music-room
 https://papalifecoach.com/house/theater
 https://papalifecoach.com/house/dad-cave
 https://papalifecoach.com/house/resources
@@ -22,6 +23,8 @@ https://papalifecoach.com/papa-first-lesson
 https://papalifecoach.com/papa-intro
 https://papalifecoach.com/ai-coach
 https://papalifecoach.com/shop
-https://papalifecoach.com/papa-life-master-knowledge-center
+https://papalifecoach.com/digital-twin
+https://papalifecoach.com/marlee-assessment
+https://papalifecoach.com/start
 https://papalifecoach.com/privacy-policy
 https://papalifecoach.com/terms-of-service

@@ -31,11 +31,17 @@ assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),
 assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),unauthorized:true}));
 assert.throws(()=>queueWorkerAssignment(db,{...original,request_id:randomUUID(),instruction:"send money"}));
 assert.equal(db.prepare("select count(*) as n from executive_actions").get()!.n,1);
-const ghl = queueWorkerAssignment(db,{...original,role:"ghl-customer-service",project:"ai-boss-mobility",request_id:randomUUID(),instruction:"Review customer estimate and pipeline concerns without modifying GHL."});
-assert.equal(ghl.status,"awaiting_approval");
-const ghlRow = db.prepare("select * from executive_actions where id=?").get(ghl.id) as any;
-assert.equal(ghlRow.project_key,"ai-boss-mobility");
-assert.equal(ghlRow.estimated_external_ai_cost_micros,0);
-assert.equal(JSON.parse(ghlRow.action_payload_json).no_writes,true);
+// Unsupported roles and write requests must not create misleading failed jobs.
+const unsupported = [
+  { project:"ai-boss-mobility", role:"ghl-customer-service", instruction:"Review customer estimate and pipeline concerns without modifying GHL." },
+  { project:"papa-life", role:"papa-life-director", instruction:"Update the Papa Life GoHighLevel email signature." },
+  { project:"ai-boss-mobility", role:"seo-website", instruction:"Check the website pages and deploy the updates." },
+  { project:"ai-boss-mobility", role:"seo-website", instruction:"Test URLs only, without further context." },
+  { project:"ai-boss-mobility", role:"seo-website", instruction:"Review website pages and grant admin access." },
+] as const;
+for(const item of unsupported) {
+  assert.throws(() => queueWorkerAssignment(db, { ...item, request_id:randomUUID() }), /Not queued/);
+}
+assert.equal(db.prepare("select count(*) as n from executive_actions").get()!.n,1);
 db.close();
 console.log("Worker assignment intake safety: passed, approval required, duplicate safe, no model/provider cost");

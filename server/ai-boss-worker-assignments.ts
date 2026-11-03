@@ -22,8 +22,17 @@ export function queueWorkerAssignment(db: BetterSqliteDatabase, body: unknown) {
       input.role === "ai-boss-mobility-director" && input.project !== "ai-boss-mobility") {
     throw new Error("Worker belongs to the other business");
   }
-  // Strictly review-only until a separately verified worker capability contract exists.
-  // An instruction containing a command is never executable code or permission.
+  // The local agent-team-v1 worker produces verifiable deliverables only for
+  // read-only website HTTP audits. Other roles have no supported result contract.
+  // Reject mismatched capabilities before creating an approval-queue item.
+  const websiteAudit = input.role === "seo-website" &&
+    /^(?:check|review|audit|inspect|verify|monitor|test)\b/i.test(input.instruction) &&
+    /\b(?:websites?|homepages?|pages?|links?|seo|routes?|health|audit)\b/i.test(input.instruction);
+  const requestsWrite = /\b(?:send|email|upload|publish|broadcast|stream|record|edit|change|delete|update|save|configure|fix|repair|post|invoice|charge|buy|pay|deploy|create|submit|restore|add|remove|move|write|grant|revoke|reset)\b/i.test(input.instruction);
+  if (!websiteAudit || requestsWrite) {
+    throw new Error("Not queued: this mobile worker can only verify read-only website HTTP checks. Administrative changes, CRM edits, publishing and other roles require a separately approved execution-capable tool and verifiable results.");
+  }
+  // Instruction text alone is never executable code or permission.
   return db.transaction(() => {
     const existing = db.prepare(
       "SELECT id, status, project_key, action_payload_json FROM executive_actions WHERE source_conversation_ref=? ORDER BY id DESC LIMIT 1"

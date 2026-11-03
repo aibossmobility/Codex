@@ -2264,14 +2264,14 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
   "/ai-coach": {
     title: "Papa Life AI Coach | Biblical Fatherhood Coaching",
     description:
-      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance.",
+      "Ask the Papa Life AI Coach for practical guidance for fathers of adult children, including assessment, resources, prayer, Bible study, archived teachings, and course guidance.",
     eyebrow: "AI Coach",
     headline: "Ask for guidance when you need words, next steps, or perspective.",
     intro:
       "The Papa Life AI Coach helps fathers think through distance, tension, faith, repair, and practical next steps with adult children.",
     sections: [
       { heading: "Assessment help", body: "Use the coach to understand your PAPA scores and what they suggest about Presence, Authority, Purpose, and Alignment." },
-      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, Tuesday Live support, and practical exercises." },
+      { heading: "Resource guidance", body: "Get pointed toward lessons, guided course resources, historical teaching archives, and practical exercises." },
     ],
     cta: { label: "Start the AI Coach", href: "/ai-coach" },
   },
@@ -2291,7 +2291,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore Fatherhood Resources", href: "/resources" },
   },
   "/tuesday-live": {
     title: "Papa Life Tuesday Live | August 25, 2026 Replay",
@@ -2309,7 +2309,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
           "The goal is not one perfect conversation. Stay humble. Stay present. Keep showing up. As long as you are both alive, it is not too late.",
       },
     ],
-    cta: { label: "Join Tuesday Live on Google Meet", href: "https://meet.google.com/ohx-nvaf-stt" },
+    cta: { label: "Explore Fatherhood Resources", href: "/resources" },
   },
   "/resources": {
     title: "Papa Life Resources | Papa Life Coach",
@@ -2317,7 +2317,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     eyebrow: "Resources",
     headline: "Find tools for reflection, repair, and relationship growth.",
     intro:
-      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books, podcast material, and Tuesday Live support.",
+      "Papa Life resources include the free relationship assessment, the first workshop lesson, AI coaching, course previews, books, podcast material, and historical teaching archives.",
     sections: [
       { heading: "Free starting points", body: "Begin with the assessment, Papa Life AI Coach, and the free workshop for fathers of adult children." },
       { heading: "Member path", body: "Members continue into guided lessons, reflection tools, and support organized around the PAPA Framework." },

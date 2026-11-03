@@ -126,7 +126,7 @@ function seedPapaLeadCheckIn(db: BetterSqliteDatabase): void {
       required: 1,
       order: 7,
       placeholder: null,
-      options: ["Watch Tuesday Live", "Get weekly email", "Personal conversation", "I’ll think about it"],
+      options: ["Explore self-paced resources", "Get weekly email", "Personal conversation", "I’ll think about it"],
     },
     {
       key: "father_of_adult_child",

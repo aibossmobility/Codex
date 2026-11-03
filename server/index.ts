@@ -8,6 +8,7 @@ import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-g
 import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
 import { inspectCustomerDraft } from "./fixed-service-draft-quality";
 import { buildCustomerJourney } from "./customer-journey-worker-routing";
+import { reportBrand, syncDailyReportToGoogleSheets, readOwnerTwinBrief } from "./private-daily-report-sync";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -484,6 +485,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     report_date TEXT NOT NULL,
     title TEXT NOT NULL,
+    brand TEXT NOT NULL DEFAULT 'papa-life',
     outreach TEXT,
     content_creation TEXT,
     scheduling TEXT,
@@ -572,6 +574,10 @@ db.exec(`
 
 // Guarded migrations
 try { db.exec("ALTER TABLE leads ADD COLUMN status TEXT NOT NULL DEFAULT 'New'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN brand TEXT NOT NULL DEFAULT 'papa-life'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_sync_status TEXT NOT NULL DEFAULT 'not_attempted'"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_sync_error TEXT"); } catch {}
+try { db.exec("ALTER TABLE papa_daily_work_reports ADD COLUMN sheets_synced_at TEXT"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN adult_children_count INTEGER DEFAULT 0"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN emotional_state TEXT"); } catch {}
 try { db.exec("ALTER TABLE members ADD COLUMN primary_pillar TEXT DEFAULT 'Purpose'"); } catch {}
@@ -3576,64 +3582,76 @@ async function startServer() {
 
   // ── Protected: Papa Life daily work reports ───────────────────────────────
 
-  app.get("/api/admin/papa-daily-work-reports", requireAuth, (_req, res) => {
+  app.get("/api/admin/papa-daily-work-reports", requireAuth, (req, res) => {
+    const brand = reportBrand(req.query.brand);
     const reports = db
       .prepare(
-        `SELECT id, report_date, title, outcomes, win, ventures_saved, created_at
-         FROM papa_daily_work_reports
-         ORDER BY report_date DESC, created_at DESC
-         LIMIT 30`
+        `SELECT id, report_date, title, brand, outcomes, win, ventures_saved,
+                sheets_sync_status, sheets_synced_at, created_at
+         FROM papa_daily_work_reports WHERE brand = ?
+         ORDER BY report_date DESC, created_at DESC LIMIT 30`
       )
-      .all();
+      .all(brand);
     res.json({ ok: true, reports });
+  });
+
+  // Owner-only read route: never attach this data to the publicly accessible twin.
+  app.get("/api/admin/daily-report-twin-brief", requireAuth, async (req, res) => {
+    const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
+    // Extra owner check beyond generic admin session; not a public ElevenLabs tool.
+    if (user?.username !== "papalife" || user?.email?.toLowerCase() !== "brian@bossmobility.net") {
+      return res.status(403).json({ ok: false, error: "Owner account required" });
+    }
+    const result = await readOwnerTwinBrief();
+    if (!result.ok) return res.status(result.status === "not_configured" ? 503 : 502).json(result);
+    res.setHeader("Cache-Control", "private, no-store");
+    res.json(result);
   });
 
   app.post("/api/admin/papa-daily-work-reports", requireAuth, async (req, res) => {
     try {
+      const brand = reportBrand(req.body?.brand);
       const date = normalizeReportDate(req.body?.reportDate);
       const fields = normalizeReportFields(req.body?.fields);
       const outcomes = normalizeOutcomes(req.body?.outcomes);
-      const markdown = String(req.body?.markdown || "").trim() || buildPapaDailyReportMarkdown(date, fields, outcomes);
-      const title = `Papa Life Daily Work Report - ${date}`;
+      const prefix = brand === "papa-life" ? "Papa Life" : "AI Boss Mobility";
+      const markdown = buildPapaDailyReportMarkdown(date, fields, outcomes)
+        .replace("Papa Life Daily Work Report", prefix + " Daily Work Report");
+      const title = `${prefix} Daily Work Report - ${date}`;
       const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
 
       const result = db
         .prepare(
           `INSERT INTO papa_daily_work_reports (
-            report_date, title, outreach, content_creation, scheduling, automation,
+            report_date, title, brand, outreach, content_creation, scheduling, automation,
             coaching, pipeline, revenue, research, outcomes, win, markdown,
             ventures_saved, ventures_error, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .run(
-          date,
-          title,
-          fields.outreach || null,
-          fields.contentCreation || null,
-          fields.scheduling || null,
-          fields.automation || null,
-          fields.coaching || null,
-          fields.pipeline || null,
-          fields.revenue || null,
-          fields.research || null,
-          JSON.stringify(outcomes),
-          fields.win || null,
-          markdown,
-          0,
-          null,
-          user?.email || user?.username || null
+          date, title, brand,
+          fields.outreach || null, fields.contentCreation || null, fields.scheduling || null,
+          fields.automation || null, fields.coaching || null, fields.pipeline || null,
+          fields.revenue || null, fields.research || null, JSON.stringify(outcomes),
+          fields.win || null, markdown, 0, null, user?.email || user?.username || null
         );
-
+      const id = Number(result.lastInsertRowid);
+      // Local database is authoritative for manual submissions. A Sheets outage
+      // must never delete or silently mark the owner's local report as synced.
+      const sync = await syncDailyReportToGoogleSheets({
+        id, brand, date, fields, markdown, createdBy: user?.email || user?.username
+      });
+      db.prepare(
+        "UPDATE papa_daily_work_reports SET sheets_sync_status = ?, sheets_sync_error = ?, sheets_synced_at = ? WHERE id = ?"
+      ).run(sync.status, sync.error || null, sync.ok ? new Date().toISOString() : null, id);
       res.json({
-        ok: true,
-        id: result.lastInsertRowid,
-        venturesSaved: false,
-        venturesError: null,
-        storage: "papa-life-os",
+        ok: true, id, storage: "papa-life-os", brand,
+        googleSheetsSynced: sync.ok, googleSheetsSyncStatus: sync.status,
+        googleSheetsError: sync.error || null,
       });
     } catch (e: any) {
       console.error("[papa-daily-work-report] save failed:", e);
-      res.status(500).json({ ok: false, error: e?.message || "Failed to save report" });
+      res.status(500).json({ ok: false, error: "Failed to save report" });
     }
   });
 

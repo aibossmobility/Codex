@@ -123,7 +123,7 @@ import { registerSmsCampaignRoutes } from "./sms-campaigns";
 import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration";
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
-import { queueWorkerAssignment } from "./ai-boss-worker-assignments";
+import { registerWorkerAssignmentEndpoint } from "./ai-boss-worker-assignment-endpoint";
 import { claimApprovedWorkerAssignment, reportWorkerResult } from "./ai-boss-worker-relay";
 import {
   ensureGhlIntegrationTable,
@@ -6578,16 +6578,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/ai-boss/worker-assignments", requireAuth, (req, res) => {
-    try {
-      const assignment = queueWorkerAssignment(db, req.body);
-      res.status(201).json({ ok: true, assignment,
-        message: "Assignment queued for independent approval. Not yet dispatched to Mac.",
-        external_ai_cost_micros: 0 });
-    } catch (e) {
-      res.status(400).json({ ok: false, error: e instanceof Error ? e.message : "Invalid assignment" });
-    }
-  });
+  registerWorkerAssignmentEndpoint(app, db, requireAuth);
 
   app.post("/api/admin/ai-boss/instructions", requireAuth, async (req, res) => {
     try {

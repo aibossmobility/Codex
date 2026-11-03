@@ -8,7 +8,7 @@ import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-g
 import { saveFixedServiceWorkingDraft } from "./fixed-service-draft-worker";
 import { inspectCustomerDraft } from "./fixed-service-draft-quality";
 import { buildCustomerJourney } from "./customer-journey-worker-routing";
-import { reportBrand, syncDailyReportToGoogleSheets, readOwnerTwinBrief } from "./private-daily-report-sync";
+import { registerDailyReportMacRelayRoutes } from "./private-daily-report-relay";
 import express, { Request, Response, NextFunction } from "express";
 import { createServer, type IncomingMessage } from "http";
 import type { Socket } from "net";
@@ -870,9 +870,16 @@ try {
 // Seed default admin if not exists
 const existingAdmin = db.prepare("SELECT id FROM admin_users WHERE username = ?").get("papalife");
 if (!existingAdmin) {
-  const hash = bcrypt.hashSync("PaPaLife123!@", 10);
-  db.prepare("INSERT INTO admin_users (username, password_hash, display_name, email) VALUES (?, ?, ?, ?)")
-    .run("papalife", hash, "PAPA Life Admin", "brian@bossmobility.net");
+  // No known public default password for a new installation. Existing user
+  // credentials remain unchanged on a production database.
+  const initialPassword = String(process.env.PAPA_ADMIN_BOOTSTRAP_PASSWORD || "");
+  if (initialPassword.length >= 16) {
+    const hash = bcrypt.hashSync(initialPassword, 12);
+    db.prepare("INSERT INTO admin_users (username, password_hash, display_name, email) VALUES (?, ?, ?, ?)")
+      .run("papalife", hash, "PAPA Life Admin", "brian@bossmobility.net");
+  } else {
+    console.warn("[admin] no owner exists; configure a private bootstrap password before first sign-in");
+  }
 }
 // Ensure admin email is up-to-date
 db.prepare("UPDATE admin_users SET email = ? WHERE username = ? AND email != ?")
@@ -1023,6 +1030,12 @@ const SQLiteStore = connectSqlite3(session);
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   if ((req.session as any).adminId) return next();
   res.status(401).json({ ok: false, error: "Unauthorized" });
+}
+
+function requireDailyReportOwner(req: Request, res: Response, next: NextFunction) {
+  const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
+  if (user?.username === "papalife" && user?.email?.toLowerCase() === "brian@bossmobility.net") return next();
+  return res.status(403).json({ ok: false, error: "Owner account required" });
 }
 
 function addHours(iso: string, hours: number) {
@@ -3579,11 +3592,12 @@ async function startServer() {
 
   registerSmsCampaignRoutes(app, db, requireAuth);
   registerYouTubeIntegrationRoutes(app, db, requireAuth, requireResearchLabAccess);
+  registerDailyReportMacRelayRoutes(app, db);
 
   // ── Protected: Papa Life daily work reports ───────────────────────────────
 
-  app.get("/api/admin/papa-daily-work-reports", requireAuth, (req, res) => {
-    const brand = reportBrand(req.query.brand);
+  app.get("/api/admin/papa-daily-work-reports", requireAuth, requireDailyReportOwner, (req, res) => {
+    const brand = req.query.brand === "ai-boss-mobility" ? "ai-boss-mobility" : "papa-life";
     const reports = db
       .prepare(
         `SELECT id, report_date, title, brand, outcomes, win, ventures_saved,
@@ -3595,22 +3609,9 @@ async function startServer() {
     res.json({ ok: true, reports });
   });
 
-  // Owner-only read route: never attach this data to the publicly accessible twin.
-  app.get("/api/admin/daily-report-twin-brief", requireAuth, async (req, res) => {
-    const user = (req.session as any).adminUser as { username?: string; email?: string } | undefined;
-    // Extra owner check beyond generic admin session; not a public ElevenLabs tool.
-    if (user?.username !== "papalife" || user?.email?.toLowerCase() !== "brian@bossmobility.net") {
-      return res.status(403).json({ ok: false, error: "Owner account required" });
-    }
-    const result = await readOwnerTwinBrief();
-    if (!result.ok) return res.status(result.status === "not_configured" ? 503 : 502).json(result);
-    res.setHeader("Cache-Control", "private, no-store");
-    res.json(result);
-  });
-
-  app.post("/api/admin/papa-daily-work-reports", requireAuth, async (req, res) => {
+  app.post("/api/admin/papa-daily-work-reports", requireAuth, requireDailyReportOwner, async (req, res) => {
     try {
-      const brand = reportBrand(req.body?.brand);
+      const brand = req.body?.brand === "ai-boss-mobility" ? "ai-boss-mobility" : "papa-life";
       const date = normalizeReportDate(req.body?.reportDate);
       const fields = normalizeReportFields(req.body?.fields);
       const outcomes = normalizeOutcomes(req.body?.outcomes);
@@ -3638,16 +3639,14 @@ async function startServer() {
       const id = Number(result.lastInsertRowid);
       // Local database is authoritative for manual submissions. A Sheets outage
       // must never delete or silently mark the owner's local report as synced.
-      const sync = await syncDailyReportToGoogleSheets({
-        id, brand, date, fields, markdown, createdBy: user?.email || user?.username
-      });
+      // No credentials on Railway: the Mac will pull and verify this
+      // authenticated submission before marking it as delivered.
       db.prepare(
-        "UPDATE papa_daily_work_reports SET sheets_sync_status = ?, sheets_sync_error = ?, sheets_synced_at = ? WHERE id = ?"
-      ).run(sync.status, sync.error || null, sync.ok ? new Date().toISOString() : null, id);
+        "UPDATE papa_daily_work_reports SET sheets_sync_status = 'pending_mac', sheets_sync_error = NULL WHERE id = ?"
+      ).run(id);
       res.json({
         ok: true, id, storage: "papa-life-os", brand,
-        googleSheetsSynced: sync.ok, googleSheetsSyncStatus: sync.status,
-        googleSheetsError: sync.error || null,
+        googleSheetsSynced: false, googleSheetsSyncStatus: "pending_mac",
       });
     } catch (e: any) {
       console.error("[papa-daily-work-report] save failed:", e);

@@ -81,7 +81,7 @@ const sections = [
     accent: "bg-[#e53935]",
     label: "What did you build, fix, or configure in your tech stack?",
     placeholder:
-      "Fixed Make.com scenario, updated GHL pipeline stage, configured ElevenLabs agent with the latest knowledge base...",
+      "Fixed Make.com scenario, updated GHL pipeline stage, updated local reporting automation with the latest knowledge base...",
   },
   {
     key: "coaching",
@@ -113,7 +113,7 @@ const outcomeLabels = [
   "Video / audio content created",
   "Course lesson updated",
   "Master KB updated",
-  "ORACLE / ElevenLabs agent updated",
+  "Mac-based reporting automation verified",
   "Outreach emails / SMS sent",
   "Work report saved to Papa Life OS",
 ];
@@ -198,8 +198,6 @@ export default function PapaDailyWorkReport() {
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [privateBrief, setPrivateBrief] = useState<{ date: string; ownerSummary: string; papa: string; aiBoss: string; attention: string } | null>(null);
-  const [briefStatus, setBriefStatus] = useState("");
 
   const reportMarkdown = useMemo(
     () => buildReportMarkdown(date, fields, outcomes, brand),
@@ -248,20 +246,6 @@ async function loadReports() {
     );
   }
 
-  async function openPrivateBrief() {
-    setBriefStatus("Loading private brief...");
-    try {
-      const res = await fetch("/api/admin/daily-report-twin-brief", { credentials: "same-origin" });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(res.status === 401 ? "Owner sign-in required" : "Private Google Sheets connection not configured or unavailable");
-      setPrivateBrief(data.brief || null);
-      setBriefStatus("");
-    } catch (error) {
-      setBriefStatus(error instanceof Error ? error.message : "Unable to retrieve private brief");
-      setPrivateBrief(null);
-    }
-  }
-
   function clearForm() {
     setDate(todayInputValue());
     setFields(blankFields);
@@ -294,7 +278,7 @@ async function loadReports() {
       if (!res.ok || !json.ok) throw new Error(json.error || "Unable to save report.");
       setMessage(json.googleSheetsSynced
         ? "Saved to Papa Life OS and verified in Google Sheets."
-        : "Saved to Papa Life OS. Google Sheets sync: " + (json.googleSheetsSyncStatus || "not configured") + ".");
+        : "Saved privately to Papa Life OS; queued for the Mac to copy to Google Sheets.");
       await loadReports();
     } catch (e: any) {
       if (String(e?.message || "").toLowerCase().includes("log in")) {
@@ -499,20 +483,12 @@ async function loadReports() {
           <h2 className="text-xl font-black">Private Executive Reporting Hub</h2>
           <p className="mt-2 text-sm text-white/70">
             Papa Life and AI Boss Mobility records are separate. Private briefings require your authenticated admin session.
-            They are not shared with the public Digital Twin.
+            They are not shared with public AI services.
           </p>
-          <button type="button" onClick={openPrivateBrief}
-            className="mt-4 rounded bg-[#f9a825] px-4 py-2 font-bold text-black">
-            View Latest Owner Brief
-          </button>
-          {briefStatus && <p className="mt-3 text-sm" role="status">{briefStatus}</p>}
-          {privateBrief && <div className="mt-4 space-y-2 text-sm">
-            <p><strong>Date:</strong> {privateBrief.date}</p>
-            <p><strong>Overview:</strong> {privateBrief.ownerSummary}</p>
-            <p><strong>Papa Life:</strong> {privateBrief.papa}</p>
-            <p><strong>AI Boss Mobility:</strong> {privateBrief.aiBoss}</p>
-            <p><strong>Needs attention:</strong> {privateBrief.attention}</p>
-          </div>}
+          <p className="mt-3 text-sm font-medium">
+            Website reports are synced to the private Google workbook by your Mac after it connects.
+            No private Google tokens are stored on this website.
+          </p>
         </section>
 
         <section className="mt-8 rounded-sm bg-white p-5 shadow-lg shadow-black/30">
@@ -545,7 +521,7 @@ async function loadReports() {
                   <article key={report.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h3 className="font-black text-black">{report.title}</h3>
-                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">{report.sheets_sync_status === "synced" ? "Google Sheets verified" : "Saved to site"}</span>
+                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">{["synced_mac", "synced"].includes(report.sheets_sync_status || "") ? "Google Sheets verified" : "Saved to site; awaiting Mac"}</span>
                     </div>
                     {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
                     {reportOutcomes.length > 0 && (

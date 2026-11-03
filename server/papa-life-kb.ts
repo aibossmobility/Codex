@@ -32,7 +32,6 @@ function defaultKbCandidates() {
   return [
     path.resolve(process.cwd(), "server", "papa-life-system-prompt.md"),
     path.resolve(process.cwd(), "data", "papa-life-customer-safe-knowledge-v3.2.2.txt"),
-    path.resolve(process.cwd(), "data", "Papa_Life_Master_Skill.md"),
   ];
 }
 

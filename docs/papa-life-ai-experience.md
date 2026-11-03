@@ -153,7 +153,7 @@ Add future books, courses, podcast episodes, Bible studies, videos, and workshee
 - Automatic paid-status reconciliation can now use `POST /api/webhooks/member-paid` with `PAYMENT_WEBHOOK_SECRET`. Until FastPay/agent is configured to call that webhook, admins can still mark a member paid from CRM Console → Members after confirming external checkout.
 - Admins can review recent payment reconciliation activity through CRM Console → Members and `GET /api/admin/payment-events`.
 - The AI is grounded in `server/papa-life-system-prompt.md`, curated resources, and any master files configured through `PAPA_LIFE_KB_PATHS`. This is file-backed retrieval, not a full vector database yet.
-- Default deployable master files now live at `data/papa-life-master-kb.txt` and `data/Papa_Life_Master_Skill.md`, so the KB can load even if `PAPA_LIFE_KB_PATHS` is not set.
+- The approved customer-safe V3.2.2 extract at `data/papa-life-customer-safe-knowledge-v3.2.2.txt` is the default knowledge source. Historical full Master Skills are owner-only and must not be committed to public repositories or copied into the website build. An explicitly authorized private `PAPA_LIFE_KB_PATHS` may supply additional approved content.
 - CRM/email verification still requires production credentials and a confirmed destination service. The app attempts CRM sync from AI assessment submissions when lead details are present.
 - Admin email alerts now log every attempt to `notification_events`. Resend and SendGrid are supported through `RESEND_API_KEY` or `SENDGRID_API_KEY`.
 - CRM Console → Settings now includes a production-readiness panel for AI, payment, CRM, and email configuration.
@@ -186,7 +186,7 @@ ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
 DEFAULT_AI_PROVIDER=openai
 PAPA_LIFE_SYSTEM_PROMPT_PATH=/var/www/html/bossmobilelifecoach.com/server/papa-life-system-prompt.md
-PAPA_LIFE_KB_PATHS=/var/www/html/bossmobilelifecoach.com/data/papa-life-master-kb.txt
+PAPA_LIFE_KB_PATHS=/secure/approved/papa-life-public-safe-v3.2.2.txt
 DATABASE_URL=
 ADMIN_NOTIFICATION_EMAIL=
 ADMIN_NOTIFICATION_FROM=Papa Life <notifications@bossmobilelifecoach.com>

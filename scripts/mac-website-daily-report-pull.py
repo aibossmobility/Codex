@@ -75,7 +75,7 @@ def report_row(report):
     date = str(report.get("report_date") or "")[:10]
     if len(date) != 10 or date[4] != "-" or date[7] != "-":
         raise RuntimeError("Report has invalid date")
-    return [date, "Website owner submission", safe_cell(report.get("markdown")), 
+    return [date, "Website owner submission", safe_cell(report.get("markdown")),
             "Submitted by website owner (external outcomes not verified)",
             "Website daily report #" + str(report_id), safe_cell(report.get("created_by"), 100),
             "Verify report details and any claimed outcomes", safe_cell(report.get("created_at"), 70)]

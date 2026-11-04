@@ -16,7 +16,21 @@ const pillars = [
 ] as const;
 
 export default function DigitalTwinDemo() {
-  const [voiceOpen, setVoiceOpen] = useState(false);
+  // The optional voice panel may be deep-linked, but a voice call never autostarts.
+  const [voiceOpen, setVoiceOpen] = useState(() => new URLSearchParams(window.location.search).get("voice") === "1");
+
+  function openVoicePanel() {
+    setVoiceOpen(true);
+    window.requestAnimationFrame(() => {
+      const panel = document.getElementById("papa-voice-panel");
+      panel?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "center",
+      });
+      panel?.focus({ preventScroll: true });
+    });
+  }
+
   return (
     <div className="papa-house-digital min-h-screen bg-[#2b211b] text-white">
       <PageMeta
@@ -81,7 +95,7 @@ export default function DigitalTwinDemo() {
             </div>
 
             <div className="md:sticky md:top-4">
-              <div className="space-y-4">
+              <div id="papa-voice-panel" tabIndex={-1} className="space-y-4 focus:outline-none">
                 <DigitalBrianGuide mode="visitor" />
                 {!voiceOpen ? (
                   <div className="rounded-2xl border border-[#f2c230]/30 bg-black/60 p-5">
@@ -93,7 +107,7 @@ export default function DigitalTwinDemo() {
                     <p className="mt-2 text-xs text-white/50">Recorded introduction — no AI conversation is started.</p>
                     <h2 className="mt-4 text-xl font-bold">Optional conversation in Brian's AI voice</h2>
                     <p className="mt-2 text-sm text-white/70">This uses ElevenLabs and may consume paid credits. You can use the guide above without starting a voice call.</p>
-                    <button type="button" className="mt-4 rounded-lg bg-[#f2c230] px-5 py-3 font-bold text-black" onClick={() => setVoiceOpen(true)}>Load optional live voice</button>
+                    <button type="button" className="mt-4 rounded-lg bg-[#f2c230] px-5 py-3 font-bold text-black" onClick={openVoicePanel} aria-controls="papa-voice-panel">Load optional live voice</button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -115,7 +129,7 @@ export default function DigitalTwinDemo() {
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   Start with a practical next step, without pressure.
                 </p>
-                <a href="/assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                <a href="/marlee-assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Start the Check-In
                 </a>
               </div>
@@ -124,11 +138,11 @@ export default function DigitalTwinDemo() {
                 <CalendarCheck className="h-7 w-7 text-[#16853b]" />
                 <h2 className="mt-4 text-xl font-extrabold">Human Connection</h2>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  Explore Papa Life courses and digital coaching resources.
+                  Open an optional conversation with Brian's digital voice. This is AI, not a scheduled call with Brian personally.
                 </p>
-                <a href="/courses" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
-                  Talk with Brian
-                </a>
+                <button type="button" onClick={openVoicePanel} aria-controls="papa-voice-panel" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                  Talk with Brian's Digital Voice
+                </button>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">

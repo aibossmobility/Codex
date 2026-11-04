@@ -14,7 +14,7 @@ export default function PapaStart() {
    </section>
    <section className="rounded-3xl border border-emerald-500 bg-gradient-to-br from-emerald-950 to-black p-8 text-center sm:p-12"><div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-amber-400 text-5xl text-amber-300">✓</div><h2 className="text-5xl font-black md:text-6xl">Explore <span className="text-amber-300">Your Options</span></h2><p className="mt-5 text-xl text-gray-300">Choose a course. Start investing in your growth today.</p>
     <Link href="/courses"><a className="mt-10 flex min-h-16 items-center justify-center gap-3 rounded-full bg-amber-400 px-6 text-lg font-extrabold text-black hover:bg-amber-300">Click Here to Choose a Course <ArrowRight/></a></Link>
-    <Link href="/ai-coach"><a className="mt-5 flex min-h-14 items-center justify-center gap-3 rounded-full border border-emerald-400 px-6 text-lg font-bold hover:bg-emerald-950">Talk with Brian's Digital AI <ArrowRight size={19}/></a></Link>
+    <Link href="/digital-twin"><a className="mt-5 flex min-h-14 items-center justify-center gap-3 rounded-full border border-emerald-400 px-6 text-lg font-bold hover:bg-emerald-950">Talk with Brian's Digital AI <ArrowRight size={19}/></a></Link>
     <p className="mt-8 text-sm text-gray-400">Review each course's details and price before purchase. Growth takes sustained effort, and your adult child's response cannot be guaranteed.</p>
    </section>
   </main>

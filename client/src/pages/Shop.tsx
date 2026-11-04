@@ -62,16 +62,35 @@ const PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES: Record<number, string> = {
 export default function Shop() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState("digital");
+  const [catalogError, setCatalogError] = useState(false);
+  const [catalogRetry, setCatalogRetry] = useState(0);
   const [deliveryReady, setDeliveryReady] = useState(false);
   useEffect(() => {
     fetch("/api/public/digital-sales-status").then(r => r.json()).then(data => setDeliveryReady(data.available === true)).catch(() => setDeliveryReady(false));
   }, []);
 
   useEffect(() => {
+    setCatalogError(false);
     fetch("/api/public/commerce-catalog")
-      .then((r) => r.json())
-      .then((data) => setOffers((data.products || []).filter((offer: Offer) => offer.code !== "membership.community.monthly")));
-  }, []);
+      .then((r) => {
+        if (!r.ok) throw new Error("Catalog unavailable");
+        return r.json();
+      })
+      .then((data) => setOffers((data.products || []).filter((offer: Offer) => offer.code !== "membership.community.monthly")))
+      .catch(() => setCatalogError(true));
+  }, [catalogRetry]);
+
+  function chooseFilter(value: string) {
+    setFilter(value);
+    window.requestAnimationFrame(() => {
+      const results = document.getElementById("shop-catalog-results");
+      results?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "start",
+      });
+      results?.focus({ preventScroll: true });
+    });
+  }
 
   const visible = useMemo(() => offers.filter((offer) => filter === "all" || offer.format === filter), [offers, filter]);
 
@@ -195,9 +214,10 @@ export default function Shop() {
         </div>
         <div className="mx-auto mb-8 max-w-3xl rounded-xl border-2 border-[#145b35] bg-[#fffdf4] p-5 text-center"><p className="font-bold">Know your rights before enrolling: digital-product refund requests are accepted within 7 calendar days after purchase.</p><a href="/refund-policy" className="mt-2 inline-block font-extrabold text-[#145b35] underline">Read the Refund &amp; Cancellation Policy →</a></div>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
-          {[['all','All Products'],['digital','Audio Lessons'],['manuscript','Manuscripts'],['bundle','Bundles']].map(([value,label]) => <button key={value} onClick={() => setFilter(value)} className={`rounded-full px-5 py-2 text-sm font-bold ${filter === value ? 'bg-[#145b35] text-white' : 'bg-[#f8f0db] text-[#145b35]'}`}>{label}</button>)}
+          {[['all','All Products'],['digital','Audio Lessons'],['manuscript','Manuscripts'],['bundle','Bundles']].map(([value,label]) => <button type="button" key={value} onClick={() => chooseFilter(value)} aria-pressed={filter === value} aria-controls="shop-catalog-results" className={`rounded-full px-5 py-2 text-sm font-bold ${filter === value ? 'bg-[#145b35] text-white' : 'bg-[#f8f0db] text-[#145b35]'}`}>{label}</button>)}
         </div>
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {catalogError && <div role="alert" className="mb-6 rounded-xl border border-[#b33a32] bg-white p-5 text-center"><p className="font-bold">The product list could not load. Please try again.</p><button type="button" onClick={() => setCatalogRetry((attempt) => attempt + 1)} className="mt-3 rounded-lg bg-[#145b35] px-4 py-2 font-bold text-white">Retry loading products</button></div>}
+        <div id="shop-catalog-results" tabIndex={-1} aria-label="Filtered Papa Life products" className="scroll-mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3 focus:outline-none">
           {visible.map((offer) => (
             <article key={offer.code} className="flex flex-col rounded-xl border-4 border-[#145b35] bg-[#f8f0db] p-6 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-[#b33a32]">{offer.format === 'digital' ? 'Audio Lesson' : offer.format === 'manuscript' ? 'Manuscript PDF' : 'Complete Bundle'}</p>

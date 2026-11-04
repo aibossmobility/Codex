@@ -100,8 +100,8 @@ function Router() {
       <Route path="/join"><Redirect to="/courses" /></Route>
       <Route path={"/papa-journey"}><Redirect to="/" /></Route>
       <Route path="/my-journey" component={FatherJourney} />
-      <Route path="/assessment"><Redirect to="/" /></Route>
-      <Route path="/relationship-assessment"><Redirect to="/" /></Route>
+      <Route path="/assessment"><Redirect to="/marlee-assessment" /></Route>
+      <Route path="/relationship-assessment"><Redirect to="/marlee-assessment" /></Route>
       <Route path="/marlee-assessment" component={MarleeAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />
       <Route path="/adult-daughter-relationship" component={AdultDaughterRelationshipPage} />

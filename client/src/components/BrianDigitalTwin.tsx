@@ -272,11 +272,11 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
                 {relationship.commercial ? (
                   <div className="grid gap-2 sm:grid-cols-2">
-                    <a href="/assessment" className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-yellow px-3 py-2 text-xs font-extrabold text-black hover:bg-white"><HeartHandshake className="h-4 w-4" />2-Minute Fatherhood Check-In</a>
-                    <a href="/courses" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-extrabold text-white hover:border-brand-yellow hover:text-brand-yellow"><CalendarCheck className="h-4 w-4" />Talk with Brian</a>
+                    <a href="/marlee-assessment" className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-yellow px-3 py-2 text-xs font-extrabold text-black hover:bg-white"><HeartHandshake className="h-4 w-4" />2-Minute Fatherhood Check-In</a>
+                    <a href="/digital-twin?voice=1" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-extrabold text-white hover:border-brand-yellow hover:text-brand-yellow"><CalendarCheck className="h-4 w-4" />Open AI Voice Conversation</a>
                   </div>
                 ) : (
-                  <a href="/courses" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-yellow/45 px-3 py-2 text-xs font-extrabold text-brand-yellow hover:bg-brand-yellow hover:text-black"><CalendarCheck className="h-4 w-4" />Connect with Brian personally</a>
+                  <a href="/courses" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-yellow/45 px-3 py-2 text-xs font-extrabold text-brand-yellow hover:bg-brand-yellow hover:text-black"><CalendarCheck className="h-4 w-4" />Explore Papa Life Courses</a>
                 )}
                 <p className="mt-3 flex items-start gap-2 text-[11px] leading-relaxed text-white/45"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />This twin reflects Brian's approved values and knowledge. It does not pretend Brian personally read a message he has not seen.</p>
               </div>
@@ -284,11 +284,11 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
           )}
         </section>
       ) : (
-        <button type="button" onClick={() => setOpen(true)} className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
+        <a href="/digital-twin?voice=1" className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
           <img src="/images/brian-keith-hill.png" alt="" className="h-10 w-10 rounded-full border border-brand-yellow/45 object-cover" />
           <span><span className="block text-sm font-extrabold text-white">Talk with Brian's Twin</span><span className="block text-xs font-semibold text-white/55">I'll meet you where you know Brian</span></span>
           <MessageCircle className="h-4 w-4 text-brand-yellow" />
-        </button>
+        </a>
       )}
     </div>
   );

@@ -62,8 +62,18 @@ export default function Home() {
   const shopHref = "/shop";
   const wheelHref = "/#fatherhood-wheel";
 
-  function openPapaAiCoach() {
-    window.location.assign("/digital-twin");
+  function showRecommendations(signal: "red" | "yellow" | "green") {
+    setRelationshipSignal(signal);
+    // Changing a color must visibly take the visitor to its updated guidance,
+    // including when the visitor selects the already-active color.
+    window.requestAnimationFrame(() => {
+      const recommendations = document.getElementById("fatherhood-recommendations");
+      recommendations?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "center",
+      });
+      recommendations?.focus({ preventScroll: true });
+    });
   }
 
   return (
@@ -89,14 +99,13 @@ export default function Home() {
                 {item.label}
               </a>
             ))}
-            <button
-              type="button"
-              onClick={openPapaAiCoach}
+            <a
+              href="/digital-twin"
               className="inline-flex items-center gap-2 rounded-md border border-[#17231c]/35 px-4 py-3 text-sm font-extrabold text-[#17231c] hover:border-[#145b35] hover:bg-[#145b35] hover:text-white"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
               1-Minute AI Experience
-            </button>
+            </a>
             <a
               href={shopHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
@@ -127,17 +136,14 @@ export default function Home() {
                   {item.label}
                 </a>
               ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openPapaAiCoach();
-                }}
+              <a
+                href="/digital-twin"
+                onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 rounded-md px-4 py-3 text-left font-bold hover:bg-[#145b35] hover:text-white"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 1-Minute AI Experience
-              </button>
+              </a>
               <a
                 href={shopHref}
                 onClick={() => setMobileMenuOpen(false)}
@@ -189,7 +195,8 @@ export default function Home() {
                   <button
                     type="button"
                     key={step.label}
-                    onClick={() => setRelationshipSignal(step.signal)}
+                    onClick={() => showRecommendations(step.signal)}
+                    aria-controls="fatherhood-recommendations"
                     style={{top: step.top, left: step.left}}
                     className="absolute z-10 flex min-h-10 w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg border-2 border-[#f2c230] bg-[#17231c] px-1 py-2 text-center text-white shadow-lg hover:bg-[#145b35] focus:outline-none focus:ring-4 focus:ring-[#f2c230]"
                     aria-label={"Step " + (index + 1) + ": " + step.label + ". View suggested products"}
@@ -206,7 +213,8 @@ export default function Home() {
                     <button
                       key={signal.key}
                       type="button"
-                      onClick={() => setRelationshipSignal(signal.key)}
+                      onClick={() => showRecommendations(signal.key)}
+                      aria-controls="fatherhood-recommendations"
                       aria-pressed={active}
                       className={`rounded-xl border-2 px-4 py-4 text-left transition-all ${signal.buttonClass} ${
                         active ? "scale-[1.02] shadow-lg ring-4 ring-black/10" : "opacity-80 hover:opacity-100"
@@ -228,7 +236,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-[#17231c]/15 bg-[#17231c] text-white shadow-xl">
+            <div id="fatherhood-recommendations" tabIndex={-1} aria-live="polite" aria-label="Recommended Papa Life resources" className="scroll-mt-6 overflow-hidden rounded-2xl border border-[#17231c]/15 bg-[#17231c] text-white shadow-xl focus:outline-none">
               <div className="p-6 md:p-8">
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Your Papa Life Options</p>
                 <h3 className="mt-2 text-2xl font-extrabold md:text-3xl">Choose What Helps You Take the Next Step.</h3>
@@ -255,10 +263,10 @@ export default function Home() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </a>
                   <a href="/my-journey" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">Explore the Five-Step Journey</a>
-                  <button type="button" onClick={openPapaAiCoach} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">
+                  <a href="/digital-twin" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">
                     <MessageCircle className="h-4 w-4" aria-hidden="true" />
                     Ask Brian’s Digital AI About the Options
-                  </button>
+                  </a>
                 </div>
                 <p className="mt-5 text-xs leading-relaxed text-white/65">This website helps you choose. Approved product terms, agreements, and payments are handled in the separate GoHighLevel sales process.</p>
               </div>
@@ -305,9 +313,9 @@ export default function Home() {
             <div className="rounded-xl border border-[#f2c230]/40 bg-white/10 p-6 text-center">
               <p className="text-lg font-extrabold text-[#f2c230]">Not sure which product fits?</p>
               <p className="mt-2 text-sm text-white/80">Brian's Digital AI can explain the resources, answer product questions, and help you decide what to explore.</p>
-              <button type="button" onClick={openPapaAiCoach} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#f2c230] px-5 py-3 font-extrabold text-[#17231c]">
+              <a href="/digital-twin" className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#f2c230] px-5 py-3 font-extrabold text-[#17231c]">
                 <MessageCircle className="h-5 w-5" aria-hidden="true"/> Ask Brian's Digital AI
-              </button>
+              </a>
             </div>
           </div>
         </section>

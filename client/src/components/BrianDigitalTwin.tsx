@@ -284,7 +284,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
           )}
         </section>
       ) : (
-        <a href="/digital-twin" onClick={(event) => { event.preventDefault(); setOpen(true); }} className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
+        <a href="/digital-twin?voice=1" className="ml-auto flex min-h-14 items-center gap-3 rounded-full border border-brand-yellow/45 bg-black px-5 py-3 text-left shadow-2xl hover:bg-[#111]">
           <img src="/images/brian-keith-hill.png" alt="" className="h-10 w-10 rounded-full border border-brand-yellow/45 object-cover" />
           <span><span className="block text-sm font-extrabold text-white">Talk with Brian's Twin</span><span className="block text-xs font-semibold text-white/55">I'll meet you where you know Brian</span></span>
           <MessageCircle className="h-4 w-4 text-brand-yellow" />

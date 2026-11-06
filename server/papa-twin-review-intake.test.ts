@@ -1,0 +1,41 @@
+import assert from "node:assert/strict";
+import Database from "better-sqlite3";
+import { ensureExecutiveActionQueueTables } from "./executive-action-queue-store";
+import { evaluateTwinRequest } from "./papa-twin-review-intake";
+
+const db = new Database(":memory:");
+db.pragma("foreign_keys=OFF");
+ensureExecutiveActionQueueTables(db);
+const token = "test-only-".repeat(8);
+const env = {enabled: "true", token};
+const safe = {task: "papa_public_website_audit"};
+const queryCount = () => (db.prepare("SELECT COUNT(*) AS n FROM executive_actions").get() as {n:number}).n;
+assert.equal(evaluateTwinRequest(db, safe, token, {...env, enabled:"false"}).status,503);
+assert.equal(evaluateTwinRequest(db, safe, "wrong-secret", env).status,401);
+assert.equal(evaluateTwinRequest(db, safe, "☃".repeat(token.length), env).status,401);
+for(const task of [undefined, null, {}, [], {task:"financial_record"}, {task:safe.task, instruction:"send emails"}, {task:safe.task, approved:true}]) {
+  assert.equal(evaluateTwinRequest(db,task,token,env).status,400);
+}
+assert.equal(queryCount(),0);
+const first=evaluateTwinRequest(db,safe,token,env);
+assert.equal(first.status,202);
+assert.equal((first.body as any).status,"awaiting_approval");
+const row=db.prepare("SELECT * FROM executive_actions LIMIT 1").get() as any;
+assert.equal(row.project_key,"papa-life");
+assert.equal(row.status,"awaiting_approval");
+assert.equal(row.approval_required,1);
+assert.equal(row.estimated_external_ai_cost_micros,0);
+assert.equal(row.provider_id,null);
+const payload=JSON.parse(row.action_payload_json);
+assert.equal(payload.no_writes,true);
+assert.equal(payload.no_outreach,true);
+assert.equal(payload.no_purchases,true);
+assert.equal(payload.role,"seo-website");
+assert.equal(payload.instruction,"Check website health and public pages and routes for Papa Life. Report HTTP evidence for owner review.");
+assert.equal(evaluateTwinRequest(db,safe,token,env).status,202);
+assert.equal(evaluateTwinRequest(db,safe,token,env).status,202);
+assert.equal(evaluateTwinRequest(db,safe,token,env).status,429);
+assert.equal(queryCount(),3);
+assert.equal(db.prepare("SELECT COUNT(*) AS n FROM executive_actions WHERE status != 'awaiting_approval'").get()!.n,0);
+db.close();
+console.log("PASS: Twin request intake authenticated, closed by default, fixed scope, capped, and owner approval required");

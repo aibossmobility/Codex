@@ -124,6 +124,7 @@ import { registerYouTubeIntegrationRoutes } from "./ai-boss-youtube-integration"
 import { registerPapaLiveAvatarRoutes } from "./liveavatar-elevenlabs";
 import { routeAiBossInstruction } from "./ai-boss-instruction-router";
 import { registerWorkerAssignmentEndpoint } from "./ai-boss-worker-assignment-endpoint";
+import { papaTwinReviewIntakeRoute } from "./papa-twin-review-intake";
 import { claimApprovedWorkerAssignment, reportWorkerResult } from "./ai-boss-worker-relay";
 import {
   ensureGhlIntegrationTable,
@@ -6579,6 +6580,9 @@ async function startServer() {
   });
 
   registerWorkerAssignmentEndpoint(app, db, requireAuth);
+  // Secret-authenticated, fixed-scope request-only integration for ElevenLabs.
+  // Disabled unless explicitly configured. Never permits approval or execution.
+  app.post("/api/papa-life/twin/review-request", papaTwinReviewIntakeRoute(db));
 
   app.post("/api/admin/ai-boss/instructions", requireAuth, async (req, res) => {
     try {

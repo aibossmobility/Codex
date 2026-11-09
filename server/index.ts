@@ -1,5 +1,6 @@
 import { installPapaConversationRoutes } from "./papa-conversations";
 import { installPapaOutreachDailyRoutes } from "./papa-outreach-daily";
+import { installPapaAiBossOwnerSso } from "./papa-ai-boss-sso";
 import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-routes";
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
@@ -3251,6 +3252,11 @@ async function startServer() {
 
   installPapaConversationRoutes(app, db, requireAuth);
   installPapaOutreachDailyRoutes(app, db, requireAuth);
+  installPapaAiBossOwnerSso(app, {
+    directory: dbDirectory,
+    getAdminById: (id: number) => db.prepare("SELECT id, username, email FROM admin_users WHERE id = ?").get(id) as
+      { id: number; username: string; email: string } | undefined,
+  });
 
   // ── Auth routes ────────────────────────────────────────────────────────────
 

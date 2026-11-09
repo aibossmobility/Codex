@@ -23,7 +23,7 @@ import path from "node:path";
 import os from "node:os";
 
 const endpoint = "https://papalifecoach.com/api/papa-life/mac-voice/outreach";
-const tokenFile = path.join(os.homedir(), ".config", "papa-life-os", "papa-report-mac-relay.token");
+const tokenFile = path.join(os.homedir(), ".config", "papa-life-os", "papa-mac-voice-relay.token");
 const pending = path.join(os.homedir(), ".ai-boss-os", "voice-outreach", "pending");
 const delivered = path.join(os.homedir(), ".ai-boss-os", "voice-outreach", "delivered");
 

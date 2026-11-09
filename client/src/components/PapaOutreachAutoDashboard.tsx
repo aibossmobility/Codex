@@ -103,7 +103,7 @@ export default function PapaOutreachAutoDashboard() {
       <p className="mt-1">Brian Keith Hill voice ID: HeyGen voice identity selected for supported playback. ElevenLabs is not the first responder.</p>
       <p className="mt-1 font-semibold">{voiceStatus ? (voiceStatus.macHeartbeatOnline ? "Mac heartbeat online" : "Mac heartbeat offline") : "Mac connection not yet verified"} · {voiceStatus?.macRelayReady ? "Private Mac transcript relay configured" : "Mac transcript relay not fully configured"}</p>
       <p className="mt-1 text-xs text-gray-600">A Mac heartbeat does not establish live microphone capture. Unconnected sources are never reported as collected.</p>
-      <a href="/papa-life-os/digital-brian" className="mt-2 inline-block font-bold text-[#145b35] underline">Open Mac-first Digital Brian control</a>
+      <a href="/papa-life-os/digital-twin" className="mt-2 inline-block font-bold text-[#145b35] underline">Open Mac-first Digital Brian control</a>
     </div>
     {loading && <p className="mt-5 flex items-center gap-2 text-sm"><Loader2 className="h-4 w-4 animate-spin"/> Reading saved activity…</p>}
     {error && <p role="alert" className="mt-4 text-sm font-semibold text-[#ac3030]">{error}</p>}

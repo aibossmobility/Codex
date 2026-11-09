@@ -1,7 +1,7 @@
 import type { Database } from "better-sqlite3";
 import type { Express, RequestHandler } from "express";
 import { randomUUID, timingSafeEqual } from "node:crypto";
-import { getAiBossNodes } from "./ai-boss-mobile-store";
+import { ensureAiBossMobileTables, getAiBossNodes } from "./ai-boss-mobile-store";
 
 // Read-only daily reporting over records already persisted by Papa Life.
 // No scraping private messages, inferred diagnoses, or automatic outreach.
@@ -145,6 +145,7 @@ export function getPapaOutreachDaily(db: Database, ownerId: number, day: string)
 
 export function installPapaOutreachDailyRoutes(app: Express, db: Database, requireAuth: RequestHandler): void {
   ensurePapaOutreachCapture(db);
+  ensureAiBossMobileTables(db);
   app.get("/api/admin/papa-outreach/daily", requireAuth, (req, res) => {
     res.setHeader("Cache-Control", "private, no-store");
     const day = String(req.query.date || new Intl.DateTimeFormat("en-CA", {

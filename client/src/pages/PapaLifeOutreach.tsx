@@ -1,4 +1,5 @@
 import PapaConversationWorkspace from "@/components/PapaConversationWorkspace";
+import PapaOutreachAutoDashboard from "@/components/PapaOutreachAutoDashboard";
 import { SiteLogo } from "@/components/SiteLogo";
 import { Check, Loader2, LogOut, Printer } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +35,7 @@ export default function PapaLifeOutreach() {
     <nav className="bg-[#17231c] text-white"><div className="container flex min-h-20 items-center justify-between gap-4 py-3"><a href="/"><SiteLogo size="md" /></a><div className="flex gap-3"><button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md bg-[#f2c230] px-4 py-3 font-extrabold text-[#17231c]"><Printer className="h-4 w-4"/> Print Daily Blueprint</button><button onClick={logout} aria-label="Sign out" className="rounded-md border border-white/30 p-3"><LogOut className="h-4 w-4"/></button></div></div></nav>
     <header className="bg-[#145b35] py-12 text-white print:bg-white print:py-4 print:text-black"><div className="container"><p className="text-sm font-black uppercase tracking-[.18em] text-[#f2c230] print:text-black">Owner resource · Private</p><h1 className="mt-3 text-4xl font-extrabold md:text-5xl">Papa Life Conversations & Outreach</h1><p className="mt-4 max-w-3xl text-lg text-white/80 print:text-black">Prepare for a short conversation, explore one topic together, and remember what was useful. Your outreach guide stays below.</p></div></header>
     <main className="container grid gap-6 py-10 print:px-0 print:py-3">
+      <PapaOutreachAutoDashboard/>
       <PapaConversationWorkspace/>
       <section className="rounded-xl bg-[#f2c230] p-7 print:border print:border-black print:bg-white"><p className="text-sm font-black uppercase tracking-[.18em] text-[#b33a32] print:text-black">Today’s Mission</p><p className="mt-3 text-2xl font-extrabold leading-relaxed">Find one father carrying silent pain. Listen to his story. Help him see that change is still possible. Invite him to take one next step.</p></section>
       <div className="print-grid-one grid gap-6 lg:grid-cols-2"><Section title="Who to Look For"><Checklist items={signals}/></Section><Section title="Daily Outreach Channels"><Checklist items={channels}/></Section></div>

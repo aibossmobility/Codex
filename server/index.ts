@@ -1,4 +1,5 @@
 import { installPapaConversationRoutes } from "./papa-conversations";
+import { installPapaOutreachDailyRoutes } from "./papa-outreach-daily";
 import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-routes";
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
@@ -3249,6 +3250,7 @@ async function startServer() {
   });
 
   installPapaConversationRoutes(app, db, requireAuth);
+  installPapaOutreachDailyRoutes(app, db, requireAuth);
 
   // ── Auth routes ────────────────────────────────────────────────────────────
 

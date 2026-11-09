@@ -126,9 +126,9 @@ export function getPapaOutreachDaily(db: Database, ownerId: number, day: string)
       socialNetworks: "Not connected to this report",
       goHighLevel: "Not connected to this report",
     },
-    websiteActivity: [...sourcePages].map(([page, messages]) => ({ page, messages }))
+    websiteActivity: Array.from(sourcePages.entries()).map(([page, messages]) => ({ page, messages }))
       .sort((a, b) => b.messages - a.messages).slice(0, 10),
-    submittedContacts: [...contactEntries.values()].slice(0, 12),
+    submittedContacts: Array.from(contactEntries.values()).slice(0, 12),
     ownerConversations: recordsForDay.slice(0, 20),
     nextStepsForReview: reviewedNextSteps.map(r => ({ person: r.person, steps: r.steps, date: r.date })),
     dictatedNotes: notes,

@@ -126,7 +126,7 @@ export function getPapaOutreachDaily(db: Database, ownerId: number, day: string)
       websiteAi: "Connected: saved Papa Life AI interactions",
       privateWorkspace: "Connected: Brian's owner-only conversation records",
       ownerDictation: "Connected: private owner dictation and authenticated Mac voice recaps (when delivered)",
-      macVoice: process.env.PAPA_REPORT_MAC_RELAY_TOKEN && process.env.PAPA_MAC_OWNER_EMAIL ? "Configured: authenticated Mac voice relay" : "Mac voice relay awaits connection and owner binding",
+      macVoice: process.env.PAPA_MAC_VOICE_RELAY_TOKEN && process.env.PAPA_MAC_OWNER_EMAIL ? "Configured: authenticated Mac voice relay" : "Mac voice relay awaits connection and owner binding",
       email: "Not connected to this report",
       calendar: "Not connected to this report",
       phoneAndVoice: "Direct phone call recording is not connected",
@@ -166,7 +166,7 @@ export function installPapaOutreachDailyRoutes(app: Express, db: Database, requi
     res.setHeader("Cache-Control", "private, no-store");
     try {
       const mac = getAiBossNodes(db, 90).find(node => node.node_id === "brian-mac-mini" && node.node_kind === "mac");
-      const tokenConfigured = String(process.env.PAPA_REPORT_MAC_RELAY_TOKEN || "").length >= 32;
+      const tokenConfigured = String(process.env.PAPA_MAC_VOICE_RELAY_TOKEN || "").length >= 32;
       const ownerConfigured = Boolean(String(process.env.PAPA_MAC_OWNER_EMAIL || "").trim());
       res.json({
         ok: true,
@@ -191,7 +191,7 @@ export function installPapaOutreachDailyRoutes(app: Express, db: Database, requi
   // Never accepts audio, reads the microphone, runs tasks, or messages a father.
   app.post("/api/papa-life/mac-voice/outreach", (req, res) => {
     res.setHeader("Cache-Control", "no-store");
-    const secret = String(process.env.PAPA_REPORT_MAC_RELAY_TOKEN || "");
+    const secret = String(process.env.PAPA_MAC_VOICE_RELAY_TOKEN || "");
     const ownerEmail = String(process.env.PAPA_MAC_OWNER_EMAIL || "").trim();
     if (secret.length < 32 || !ownerEmail) {
       res.status(503).json({ ok: false, error: "Mac voice relay is not configured" });

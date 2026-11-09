@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import type {} from "express-session";
 import fs from "node:fs";
 import path from "node:path";
 import {

@@ -7,11 +7,12 @@ import { randomUUID } from "node:crypto";
 function pacificBounds(day: string): [string, string] {
   const midnight = (isoDay: string) => {
     const candidate = Date.parse(isoDay + "T00:00:00.000Z");
-    const noon = new Date(candidate + 12 * 60 * 60 * 1000);
+    // The preceding Pacific afternoon has the offset active at local midnight, even on DST-change days.
+    const precedingEvening = new Date(candidate);
     const label = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Los_Angeles",
       timeZoneName: "shortOffset",
-    }).formatToParts(noon).find(part => part.type === "timeZoneName")?.value || "GMT-8";
+    }).formatToParts(precedingEvening).find(part => part.type === "timeZoneName")?.value || "GMT-8";
     const match = label.match(/^GMT([+-])(\d{1,2})(?::(\d{2}))?$/);
     const minutes = match ? (match[1] === "+" ? 1 : -1) * (Number(match[2]) * 60 + Number(match[3] || 0)) : -480;
     return new Date(candidate - minutes * 60000).toISOString().replace("T", " ").slice(0, 19);

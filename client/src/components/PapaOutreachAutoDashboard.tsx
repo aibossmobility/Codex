@@ -7,7 +7,7 @@ type Report = {
   summary: {
     websiteAiSessions: number; websiteAiMessages: number; twinRelatedMessages: number;
     submittedContactDetails: number; completedOwnerReflections: number;
-    scheduledOwnerRecords: number; ownerDictationNotes: number; pendingReviewItems: number;
+    scheduledOwnerRecords: number; ownerDictationNotes: number; macVoiceNotes: number; pendingReviewItems: number;
   };
   sources: Record<string, string>;
   websiteActivity: Array<{ page: string; messages: number }>;
@@ -18,6 +18,8 @@ type Report = {
   note: string;
 };
 
+type VoiceStatus = { ok: boolean; primary: string; macHeartbeatOnline: boolean; macRelayReady: boolean; voiceIdentity: string; selectedVoiceProvider: string; voiceIdConfigured: boolean; };
+
 const metricLabels: Array<[keyof Report["summary"], string]> = [
   ["websiteAiSessions", "AI conversation sessions"],
   ["websiteAiMessages", "Website AI messages"],
@@ -25,10 +27,12 @@ const metricLabels: Array<[keyof Report["summary"], string]> = [
   ["completedOwnerReflections", "Completed owner reflections"],
   ["scheduledOwnerRecords", "Owner records dated today"],
   ["ownerDictationNotes", "Private dictated notes"],
+  ["macVoiceNotes", "Mac voice recaps"],
 ];
 
 export default function PapaOutreachAutoDashboard() {
   const [date, setDate] = useState(pacificToday());
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus | null>(null);
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -37,6 +41,12 @@ export default function PapaOutreachAutoDashboard() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [refreshIndex, setRefreshIndex] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/admin/papa-outreach/voice-status", { credentials: "include", cache: "no-store" })
+      .then(async response => { const info = await response.json(); if (response.ok && info.ok) setVoiceStatus(info as VoiceStatus); })
+      .catch(() => { /* Do not infer that a disconnected Mac is online. */ });
+  }, [refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -88,6 +98,13 @@ export default function PapaOutreachAutoDashboard() {
           onClick={() => setRefreshIndex(i => i + 1)}><RefreshCw className="h-4 w-4"/> Refresh</button>
       </div>
     </div>
+    <div className="mt-4 rounded-lg border border-[#145b35]/25 bg-[#f8f0db] p-4 text-sm">
+      <strong>Primary voice and data path: Mac mini + Desktop Commander</strong>
+      <p className="mt-1">Brian Keith Hill voice ID: HeyGen voice identity selected for supported playback. ElevenLabs is not the first responder.</p>
+      <p className="mt-1 font-semibold">{voiceStatus ? (voiceStatus.macHeartbeatOnline ? "Mac heartbeat online" : "Mac heartbeat offline") : "Mac connection not yet verified"} · {voiceStatus?.macRelayReady ? "Private Mac transcript relay configured" : "Mac transcript relay not fully configured"}</p>
+      <p className="mt-1 text-xs text-gray-600">A Mac heartbeat does not establish live microphone capture. Unconnected sources are never reported as collected.</p>
+      <a href="/papa-life-os/digital-brian" className="mt-2 inline-block font-bold text-[#145b35] underline">Open Mac-first Digital Brian control</a>
+    </div>
     {loading && <p className="mt-5 flex items-center gap-2 text-sm"><Loader2 className="h-4 w-4 animate-spin"/> Reading saved activity…</p>}
     {error && <p role="alert" className="mt-4 text-sm font-semibold text-[#ac3030]">{error}</p>}
     {report && !loading && <>
@@ -128,7 +145,7 @@ export default function PapaOutreachAutoDashboard() {
       <div className="mt-5 rounded-lg bg-[#f7f7f2] p-4 text-sm">
         <h3 className="flex items-center gap-2 font-bold text-[#145b35]"><ShieldCheck className="h-4 w-4"/> Coverage and privacy</h3>
         <p className="mt-1">{report.note}</p>
-        <p className="mt-2 text-xs text-gray-600">Connected: site AI interactions, private conversation records, and dictated notes. Not connected here: Gmail, Google Calendar, phone calls, ElevenLabs voice transcripts, social media, and GoHighLevel. Nothing is sent to contacts by this dashboard.</p>
+        <p className="mt-2 text-xs text-gray-600">Connected: site AI interactions, private conversation records, and dictated notes. Authenticated Mac voice recaps will appear when the Mac relay is connected. Gmail, Calendar, phone calls, social media, and GoHighLevel need their own verified data feeds. Nothing is sent to contacts by this dashboard.</p>
       </div>
     </>}
     <div className="mt-5 border-t pt-4">

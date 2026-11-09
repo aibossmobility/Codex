@@ -197,7 +197,7 @@ export function installPapaOutreachDailyRoutes(app: Express, db: Database, requi
       res.status(503).json({ ok: false, error: "Mac voice relay is not configured" });
       return;
     }
-    const supplied = String(req.headers.authorization || "").replace(/^Bearer\\s+/i, "").trim();
+    const supplied = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "").trim();
     const expectedBytes = Buffer.from(secret, "utf8");
     const actualBytes = Buffer.from(supplied, "utf8");
     if (actualBytes.length !== expectedBytes.length || !timingSafeEqual(expectedBytes, actualBytes)) {

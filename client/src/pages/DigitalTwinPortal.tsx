@@ -21,7 +21,7 @@ export default function DigitalTwinPortal() {
   const [, navigate] = useLocation();
   const [authChecked, setAuthChecked] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
-  const [macVoice, setMacVoice] = useState<MacVoice | null>(null);
+  const [macVoice, setMacVoice] = useState<MacVoiceStatus | null>(null);
   const [statusError, setStatusError] = useState("");
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function DigitalTwinPortal() {
       .then(async response => {
         const data = await response.json();
         if (!response.ok || !data.ok) throw new Error(data.error || "Mac status unavailable.");
-        setMacVoice(data as MacVoice);
+        setMacVoice(data as MacVoiceStatus);
       })
       .catch(e => setStatusError((e as Error).message));
   }, []);

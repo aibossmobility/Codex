@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
+import { pacificToday } from "../shared/papa-conversations";
 import Database from "better-sqlite3";
 import express from "express";
 import { ensurePapaConversations, savePapaConversation } from "./papa-conversations";
@@ -64,8 +65,8 @@ try {
     body: JSON.stringify({note: "Spoke to a pastor. Will follow up personally."})
   });
   assert.equal(saved.status, 200);
-  assert.equal(getPapaOutreachDaily(db, 1, "2026-11-09").summary.ownerDictationNotes, 1);
-  assert.equal(getPapaOutreachDaily(db, 2, "2026-11-09").summary.ownerDictationNotes, 0);
+  assert.equal(getPapaOutreachDaily(db, 1, pacificToday()).summary.ownerDictationNotes, 1);
+  assert.equal(getPapaOutreachDaily(db, 2, pacificToday()).summary.ownerDictationNotes, 0);
 } finally {
   await new Promise<void>((resolve, reject) => server.close(e => e ? reject(e) : resolve()));
   db.close();

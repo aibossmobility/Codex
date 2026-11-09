@@ -10,12 +10,12 @@ Status: integration code added; Mac runtime activation requires the REAL Mac min
 
 ## Website endpoints
 - GET /api/admin/papa-outreach/voice-status — session-authenticated, displays Mac heartbeat, relay readiness, selected voice family. A heartbeat is NOT proof of microphone or Desktop Commander connectivity.
-- POST /api/papa-life/mac-voice/outreach — dedicated bearer-authenticated transcript-summary ingest; status 503 without a long PAPA_REPORT_MAC_RELAY_TOKEN and uniquely verified owner binding (PAPA_MAC_OWNER_EMAIL). Accepts only source `mac_desktop_commander`, unique source_ref, explicit authorized_to_store and a 2–6000 character summary. Deduplicates exactly once by owner/source_ref. Does not accept raw audio.
+- POST /api/papa-life/mac-voice/outreach — dedicated bearer-authenticated transcript-summary ingest; status 503 without a long PAPA_MAC_VOICE_RELAY_TOKEN and uniquely verified owner binding (PAPA_MAC_OWNER_EMAIL). Accepts only source `mac_desktop_commander`, unique source_ref, explicit authorized_to_store and a 2–6000 character summary. Deduplicates exactly once by owner/source_ref. Does not accept raw audio.
 - GET /api/admin/papa-outreach/daily — owner-only, now separately counts authenticated Mac voice recaps. Existing owner browser dictation and saved website AI records continue to work.
 
 ## Mac outbound relay
 - Code: scripts/papa-mac-voice-outreach-relay.mjs
-- Mac-only; token must be a private mode 0600 file at ~/.config/papa-life-os/papa-report-mac-relay.token.
+- Mac-only; token must be a private mode 0600 file at ~/.config/papa-life-os/papa-mac-voice-relay.token.
 - Input is a pre-existing transcribed, authorized JSON recap, written by the trusted Mac voice workflow into ~/.ai-boss-os/voice-outreach/pending/<stable-id>.json.
 - Execution: node scripts/papa-mac-voice-outreach-relay.mjs --activate
 - On success the source file is moved to delivered/; failure leaves it for idempotent retry. Transcript text/token is not logged.
@@ -24,7 +24,7 @@ Status: integration code added; Mac runtime activation requires the REAL Mac min
 ## Mac/owner activation blockers
 1. Verify **Brians-Mac-mini.local** is actually online in Desktop Commander. Do not use Android or a similarly named cloud node as a substitute.
 2. Verify the chosen HeyGen voice ID in the existing Mac voice app, not just the website environment variable. Do not overwrite a working voice ID or incur voice generation costs for a test without explicit authorization.
-3. Inspect the existing staged Railway patch. The PAPA_REPORT_MAC_RELAY_TOKEN exists in a staged patch alongside an unrelated Sheets setting; do not blindly deploy that whole patch. Bind the Mac relay to the unique website administrator via PAPA_MAC_OWNER_EMAIL after verifying the actual private admin login.
+3. Inspect the existing staged Railway patch. The PAPA_MAC_VOICE_RELAY_TOKEN exists in a staged patch alongside an unrelated Sheets setting; do not blindly deploy that whole patch. Bind the Mac relay to the unique website administrator via PAPA_MAC_OWNER_EMAIL after verifying the actual private admin login.
 4. Store matching token on Mac with permissions 0600, never in source control, public markup or chat. Run an authenticated one-record test, verify in dashboard, then schedule a low-frequency outbound job if wanted.
 5. Gmail, Google Calendar, GoHighLevel, and personal phone conversations require separate verified, consent-respecting sources. Do not count them merely because the Mac is connected.
 6. Preserve the existing approval-before-outreach rules. Capturing a note does not send any message, edit a calendar event, make a purchase, or initiate a voice call.

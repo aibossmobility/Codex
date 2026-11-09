@@ -1,3 +1,4 @@
+import { installPapaConversationRoutes } from "./papa-conversations";
 import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-routes";
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
@@ -3246,6 +3247,8 @@ async function startServer() {
       database: "sqlite",
     });
   });
+
+  installPapaConversationRoutes(app, db, requireAuth);
 
   // ── Auth routes ────────────────────────────────────────────────────────────
 
@@ -7167,8 +7170,10 @@ async function startServer() {
 
   app.use(express.static(staticPath, { redirect: false }));
 
-  app.get(["/admin/papa-life-outreach", "/admin/papa-life-outreach/"], (req, res, next) => {
-    if ((req.session as any).adminId) return next();
+  app.get(["/admin/papa-life-outreach", "/admin/papa-life-outreach/"], (req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.set("X-Robots-Tag", "noindex, nofollow");
+    if ((req.session as any).adminId) return res.sendFile(path.join(staticPath, "index.html"));
     res.redirect(302, "/login?returnTo=%2Fadmin%2Fpapa-life-outreach");
   });
 

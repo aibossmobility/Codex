@@ -28,6 +28,11 @@ export default function Login() {
         setError(data.error || "Login failed");
       } else {
         const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+        // Complete an owner SSO handoff with a real server GET, not a client-side route.
+        if (returnTo?.startsWith("/api/auth/ai-boss-sso/authorize?state=")) {
+          window.location.assign(returnTo);
+          return;
+        }
         navigate(returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/crm-console");
       }
     } catch {

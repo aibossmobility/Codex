@@ -971,6 +971,7 @@ function Sidebar({
           </button>
         ))}
 
+        <a href="/admin/papa-life-outreach#conversations" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400 hover:bg-white/5 hover:text-white"><MessageSquare className="h-4 w-4"/>Papa Life Conversations</a>
       </nav>
 
       <div className="px-4 py-4 border-t border-white/10 space-y-3">

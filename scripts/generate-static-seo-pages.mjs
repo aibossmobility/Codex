@@ -31,6 +31,24 @@ const pages = [
     ],
   },
   {
+    path: "/start",
+    title: "Start Your Fatherhood Journey | Papa Life",
+    description: "Begin Papa Life with the Awareness Wheel, the PAPA Framework, and original learning resources for fathers of adult children.",
+    eyebrow: "Start Your Fatherhood Journey",
+    headline: "Begin where you are today.",
+    intro: "Explore Papa Life's existing starting points for fathers of adult sons and daughters. Discover the Awareness Wheel, reflect on Presence, Authority, Purpose, and Alignment, and choose a practical next step.",
+    sections: [
+      ["Notice your starting point", "Use the Awareness Wheel or the 2-Minute Fatherhood Check-In to identify the patterns you want to change."],
+      ["Explore the PAPA Framework", "Presence, Authority, Purpose, and Alignment offer a practical path toward more thoughtful fatherhood."],
+      ["Choose what is useful", "Explore original audio lessons and learning resources before deciding what fits your situation."]
+    ],
+    relatedLinks: [
+      ["Begin the Awareness Wheel", "/my-journey"],
+      ["Learn the PAPA Framework", "/papa-framework"],
+      ["Explore courses and resources", "/courses"]
+    ]
+  },
+  {
     path: "/assessment",
     title: "Free PAPA Fatherhood Assessment | Papa Life",
     description:

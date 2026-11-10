@@ -240,10 +240,7 @@ const pages = [
       ["Why the work is personal", "Brian's own fatherhood story, nearly twenty years of silence with his oldest daughter, and eventual reconciliation shape the practical, honest way Papa Life supports fathers."],
       ["What he brings", "Scripture-centered coaching, clear language, responsible technology, and the PAPA Framework turn good intentions into daily practice without promising or forcing reconciliation."],
     ],
-    jsonLd: [
-      { "@context": "https://schema.org", "@type": "Person", name: "Brian Keith Hill", jobTitle: "Founder of Boss Mobility and Papa Life; Fatherhood Coach", url: "https://papalifecoach.com/about-brian-keith-hill", image: "https://papalifecoach.com/images/brian-keith-hill.png", worksFor: { "@type": "Organization", name: "Boss Mobility", alternateName: "Papa Life Coach" }, sameAs: ["https://www.linkedin.com/in/brian-hill-bossmobility", "https://briankeithhill.com"] },
-      { "@context": "https://schema.org", "@type": "Organization", name: "Papa Life Coach", alternateName: ["Boss Mobility", "Papa Life Coach", "Papa Life"], url: "https://papalifecoach.com", founder: { "@type": "Person", name: "Brian Keith Hill", url: "https://papalifecoach.com/about-brian-keith-hill" } },
-    ],
+
   },
   {
     path: "/courses",

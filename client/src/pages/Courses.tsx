@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -364,6 +365,7 @@ export default function Courses() {
           </div>
         </section>
       </main>
+      <CurriculumUseNotice />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -178,6 +179,7 @@ export default function PapaFirstLesson() {
           </a>
         </p>
       </main>
+      <CurriculumUseNotice />
     </div>
   );
 }

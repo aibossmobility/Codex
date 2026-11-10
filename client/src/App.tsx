@@ -5,6 +5,7 @@ import { Route, Switch, Redirect, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { captureFirstTouchAttribution } from "./lib/attribution";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { PublicCopyrightStrip } from "./components/CopyrightNotices";
 import { GlobalBookingButton } from "./components/GlobalBookingButton";
 import { BrianDigitalTwin } from "./components/BrianDigitalTwin";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -191,6 +192,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <PublicCopyrightStrip />
           <GlobalBookingButton />
           <GlobalAllPagesButton />
           <GlobalPapaAiWidget />

@@ -1,4 +1,5 @@
 import { HouseTrail } from "./PapaHouse";
+import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 import { ArrowLeft, Clock, GraduationCap, Loader2, Play } from "lucide-react";
@@ -146,6 +147,7 @@ export default function CourseDetail() {
           </>
         )}
       </main>
+      <CurriculumUseNotice />
     </div>
   );
 }

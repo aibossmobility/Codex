@@ -1,4 +1,5 @@
 import { installPapaConversationRoutes } from "./papa-conversations";
+import { withPapaPageSchema } from "../shared/papa-structured-data.mjs";
 import { installPapaOutreachDailyRoutes } from "./papa-outreach-daily";
 import { installPapaAiBossOwnerSso } from "./papa-ai-boss-sso";
 import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-routes";
@@ -2222,6 +2223,7 @@ type ServerRenderedPage = {
   keywords?: string;
   bodyHtml: string;
   noindex?: boolean;
+  courseSchema?: { name: string; description: string };
 };
 
 type StaticServerPage = {
@@ -2986,6 +2988,10 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     title: page.title,
     description: page.description,
     bodyHtml: serverPageShell(page, lessonHtml),
+    courseSchema: {
+      name: course.title,
+      description: course.description || `Preview the ${course.title} Papa Life course and its lesson plan for fathers of adult children.`,
+    },
   };
 }
 
@@ -3189,10 +3195,18 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage, canonica
   // The SEO generator writes a prerendered homepage into dist/public/index.html.
   // Replace that complete root payload so every server-rendered route exposes
   // its own meaningful content before the client application hydrates.
-  return html.replace(
+  const rendered = html.replace(
     /<div id="root">[\s\S]*?<\/body>/i,
     `<div id="root">${page.bodyHtml}</div>\n  </body>`
   );
+  return withPapaPageSchema(rendered, {
+    pathname: canonicalPath,
+    canonicalPath,
+    title: page.title,
+    description: page.description,
+    indexable: page.status === 200 && !page.noindex,
+    course: page.courseSchema,
+  });
 }
 
 function sendServerRenderedApp(req: Request, res: Response, staticPath: string) {

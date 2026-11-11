@@ -104,7 +104,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 rounded-md border border-[#17231c]/35 px-4 py-3 text-sm font-extrabold text-[#17231c] hover:border-[#145b35] hover:bg-[#145b35] hover:text-white"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              1-Minute AI Experience
+              Talk with Brian’s Digital AI
             </a>
             <a
               href={shopHref}
@@ -142,7 +142,7 @@ export default function Home() {
                 className="flex items-center gap-2 rounded-md px-4 py-3 text-left font-bold hover:bg-[#145b35] hover:text-white"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                1-Minute AI Experience
+                Talk with Brian’s Digital AI
               </a>
               <a
                 href={shopHref}
@@ -265,7 +265,7 @@ export default function Home() {
                   <a href="/my-journey" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">Explore the Five-Step Journey</a>
                   <a href="/digital-twin" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-5 py-3 text-sm font-extrabold text-white hover:border-[#f2c230]">
                     <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                    Ask Brian’s Digital AI About the Options
+                    Talk with Brian’s Digital AI
                   </a>
                 </div>
                 <p className="mt-5 text-xs leading-relaxed text-white/65">This website helps you choose. Approved product terms, agreements, and payments are handled in the separate GoHighLevel sales process.</p>
@@ -314,7 +314,7 @@ export default function Home() {
               <p className="text-lg font-extrabold text-[#f2c230]">Not sure which product fits?</p>
               <p className="mt-2 text-sm text-white/80">Brian's Digital AI can explain the resources, answer product questions, and help you decide what to explore.</p>
               <a href="/digital-twin" className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#f2c230] px-5 py-3 font-extrabold text-[#17231c]">
-                <MessageCircle className="h-5 w-5" aria-hidden="true"/> Ask Brian's Digital AI
+                <MessageCircle className="h-5 w-5" aria-hidden="true"/> Talk with Brian’s Digital AI
               </a>
             </div>
           </div>

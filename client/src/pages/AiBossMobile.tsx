@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import PapaReadAloud from "@/components/PapaReadAloud";
 
 type Mission = {
   mac_online: boolean;
@@ -346,6 +347,7 @@ export default function AiBossMobile() {
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
+        <PapaReadAloud />
         <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
           <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life logo" className="h-44 w-full bg-white object-contain p-4 opacity-95 sm:h-56" />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">

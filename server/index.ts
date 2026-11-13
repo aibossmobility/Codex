@@ -7148,6 +7148,7 @@ async function startServer() {
     const staticPaths = [
       "/", "/site-directory", "/welcome-to-papa-life", "/marlee-assessment", "/my-journey",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
+      "/parents-of-adult-children", "/adult-children",
       "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill",
       "/courses", "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/digital-twin",
       "/resources", "/books", "/podcast", "/shop", "/papa-journey", "/contact",
@@ -7167,6 +7168,7 @@ async function startServer() {
   const publicSeoPaths = new Set([
     "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
+    "/parents-of-adult-children", "/adult-children",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
     "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/shop", "/papa-journey", "/contact",

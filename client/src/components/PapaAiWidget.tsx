@@ -30,7 +30,7 @@ type ActionLink = {
   href: string;
   label: string;
   detail: string;
-  interest: "Reconnection Assessment" | "Private Conversation" | "Tuesday Live";
+  interest: "Reconnection Assessment" | "Private Conversation" | "Educational Resources";
   icon: typeof ClipboardCheck;
   primary: boolean;
 };
@@ -65,10 +65,10 @@ const actionLinks: ActionLink[] = [
     primary: false,
   },
   {
-    href: "/tuesday-live",
-    label: "Join Tuesday Live",
-    detail: "Learn with other fathers",
-    interest: "Tuesday Live",
+    href: "/resources",
+    label: "Explore Fatherhood Resources",
+    detail: "Learn at your own pace",
+    interest: "Educational Resources",
     icon: Users,
     primary: false,
   },

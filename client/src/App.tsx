@@ -32,7 +32,6 @@ import DigitalTwinPortal from "./pages/DigitalTwinPortal";
 import SiteDirectory from "./pages/SiteDirectory";
 import AiBossApprovals from "./pages/AiBossApprovals";
 import AiBossTakeover from "./pages/AiBossTakeover";
-import TuesdayLiveFallback from "./pages/TuesdayLiveFallback";
 import YouTubeGrowth from "./pages/YouTubeGrowth";
 import Courses from "./pages/Courses";
 import PapaStart from "./pages/PapaStart";
@@ -126,7 +125,7 @@ function Router() {
       <Route path={"/papa-life-os/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/papa-life-os/approvals"} component={AiBossApprovals} />
       <Route path={"/papa-life-os/takeover"} component={AiBossTakeover} />
-      <Route path={"/papa-life-os/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/papa-life-os/tuesday-live"}><Redirect to="/resources" /></Route>
       <Route path={"/papa-life-os/all-pages"} component={AllPages} />
       <Route path={"/papa-life-os/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/papa-life-os"} component={AiBossMobile} />
@@ -135,7 +134,7 @@ function Router() {
       <Route path={"/ai-boss/youtube-growth"} component={YouTubeGrowth} />
       <Route path={"/ai-boss/approvals"} component={AiBossApprovals} />
       <Route path={"/ai-boss/takeover"} component={AiBossTakeover} />
-      <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
+      <Route path={"/ai-boss/tuesday-live"}><Redirect to="/resources" /></Route>
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss/digital-twin"} component={DigitalTwinPortal} />
       <Route path={"/ai-boss"} component={AiBossMobile} />

@@ -64,7 +64,7 @@ For every visitor interaction:
 # Skill Instructions
 ---
 name: papa-life-master
-description: Papa Life operating-system skill for creating faith-based fatherhood content, Tuesday Live shows, podcasts, videos, books, coaching sessions, marketing assets, community engagement, outreach drafts, and AI operations with consistent Brian Keith Hill / Papa Life voice. Use when Codex needs to generate, review, adapt, or maintain Papa Life material for fathers of adult children, the PAPA Framework, reconciliation, biblical encouragement, emotional awareness, or Papa Life brand consistency.
+description: Papa Life operating-system skill for creating faith-based fatherhood content, historical teaching archives, podcasts, videos, books, coaching sessions, marketing assets, community engagement, outreach drafts, and AI operations with consistent Brian Keith Hill / Papa Life voice. Use when Codex needs to generate, review, adapt, or maintain Papa Life material for fathers of adult children, the PAPA Framework, reconciliation, biblical encouragement, emotional awareness, or Papa Life brand consistency.
 ---
 
 # Papa Life Master
@@ -77,7 +77,7 @@ Every output must help fathers of adult children rebuild connection, restore tru
 
 ## Workflow
 
-1. Identify the requested asset type: social content, Tuesday Live, podcast, video, book, coaching, marketing, community, outreach, or operations.
+1. Identify the requested asset type: social content, teaching archives, podcast, video, book, coaching, marketing, community, outreach, or operations.
 2. Read the matching module in `modules/` when the request needs that asset type.
 3. Apply `references/brand-voice.md` for tone, theology, and safety.
 4. Use `templates/` for repeatable structure.
@@ -106,7 +106,7 @@ Connect naturally to at least one PAPA pillar when relevant:
 - `references/brand-voice.md`: Papa Life mission, audience, voice, scripture posture, and guardrails.
 - `modules/`: 11 operating modules for repeatable production.
 - `templates/`: reusable templates for every required asset type.
-- `examples/`: complete examples for social, coaching, podcast, Tuesday Live, workshops, assessments, landing pages, and email sequences.
+- `examples/`: complete examples for social, coaching, podcast, historical teaching archives, workshops, assessments, landing pages, and email sequences.
 - `prompts/`: reusable starting prompts for other LLMs.
 - `docs/`: cross-platform documentation requested for upload workflows.
 
@@ -197,21 +197,9 @@ Platform notes:
 - Blog/website: structured, searchable, practical.
 
 
-# Module 3 - Tuesday Live Show Producer
+# Module 3 - Historical Teaching Archive
 
-Create 30-minute and 45-minute show outlines, openings, teaching segments, questions, stories, scripture moments, calls to action, and closing prayers.
-
-Recommended flow:
-1. Welcome and grounding.
-2. One main question.
-3. Papa Life teaching.
-4. Reflection moment.
-5. Practical exercise.
-6. PAPA Framework connection.
-7. Invitation and prayer.
-
-Screen rule:
-Keep one main question and one current section visible. Direct the eyes, mind, and heart.
+Preserve and organize existing fatherhood teaching recordings, show notes, and transcripts as historical, self-paced resources. Do not schedule or promote recurring Monday or Tuesday live coaching.
 
 
 # Module 4 - Podcast Producer
@@ -478,7 +466,7 @@ One next step:
 Use $papa-life-master to create a Papa Life [asset type] for [audience] on [topic]. Keep the voice warm, biblical, direct, practical, and connected to [PAPA pillar].
 
 ## Tuesday Live
-Use $papa-life-master to create a 45-minute Tuesday Live show on [topic] with one main question, Scripture, reflection prompts, coaching guidance, and a closing prayer.
+Use $papa-life-master to summarize an existing archived fatherhood lesson on [topic], with Scripture, reflection prompts, and practical next steps. Do not advertise a new live session.
 
 ## Coaching Session
 Use $papa-life-master to create a coaching session for a father of an adult child who is facing [situation]. Include reflection, communication practice, homework, and prayer.

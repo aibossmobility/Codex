@@ -441,6 +441,32 @@ const pages = [
   },
 ];
 
+const audienceGuidance = JSON.parse(fs.readFileSync(path.resolve("client/src/content/family-guidance.json"), "utf8"));
+for (const [audience, publicPath] of [
+  ["parents", "/parents-of-adult-children"],
+  ["children", "/adult-children"],
+]) {
+  const guide = audienceGuidance[audience];
+  pages.push({
+    path: publicPath,
+    title: guide.pageTitle,
+    description: guide.description,
+    eyebrow: guide.eyebrow,
+    headline: guide.headline,
+    intro: guide.intro,
+    sections: guide.questions.map((item) => [item.question, item.answer]),
+    relatedLinks: [...guide.related.map((link) => [link.label, link.href]),
+      ["Meet Brian's Digital Twin (optional AI experience)", "/digital-twin"],
+      ["Return to Papa Life home", "/"]],
+  });
+}
+const homepage = pages.find((page) => page.path === "/");
+homepage.relatedLinks = [
+  ["Guidance for Parents of Adult Children", "/parents-of-adult-children"],
+  ["Guidance for Adult Children", "/adult-children"],
+  ...(homepage.relatedLinks || []),
+];
+
 const defaultLinks = [
   ["Papa Life home", "/"], ["Start with Awareness Wheel", "/my-journey"],
   ["The PAPA Framework", "/papa-framework"], ["Course catalog", "/courses"],

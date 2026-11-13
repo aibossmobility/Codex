@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 
 const navigation = [
+  { label: "Find Your Guide", href: "/#family-guidance" },
   { label: "Come Inside", href: "/house" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
@@ -169,6 +170,43 @@ export default function Home() {
       </section>
       <div className="papa-house-outdoor-note">A welcoming home for fathers to <strong>read, listen, reflect, and grow</strong>. <a href="/house">Explore the rooms</a> at your own pace.</div>
       <HouseTrail current="Outside" />
+
+      <section id="family-guidance" className="scroll-mt-8 border-y border-[#145b35]/20 bg-[#f3ead5] py-12 md:py-16" aria-labelledby="family-guidance-heading">
+        <div className="container">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#b33a32]">Start with who you are</p>
+            <h2 id="family-guidance-heading" className="mt-3 text-3xl font-extrabold leading-tight md:text-5xl">Are you a parent of an adult child—or an adult child yourself?</h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-[#314239]">
+              Choose the guidance that fits your experience. Find answers to common relationship questions, communication challenges, and boundaries without having to start a paid AI conversation.
+            </p>
+          </div>
+          <div className="mx-auto mt-9 grid max-w-5xl gap-5 md:grid-cols-2">
+            <article className="flex flex-col rounded-2xl border-2 border-[#145b35] bg-white p-7 shadow-sm md:p-9">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#145b35]">I'm a parent</p>
+              <h3 className="mt-2 text-2xl font-extrabold">Parents of Adult Children</h3>
+              <p className="mt-3 flex-1 leading-relaxed text-[#425047]">
+                My adult son or daughter is distant, and I want to understand how to listen, rebuild trust, or communicate without pressure.
+              </p>
+              <a href="/parents-of-adult-children" className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#0c452a]">
+                Explore Parent Guidance <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </a>
+            </article>
+            <article className="flex flex-col rounded-2xl border-2 border-[#145b35] bg-white p-7 shadow-sm md:p-9">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#145b35]">I'm an adult son or daughter</p>
+              <h3 className="mt-2 text-2xl font-extrabold">Adult Children</h3>
+              <p className="mt-3 flex-1 leading-relaxed text-[#425047]">
+                My relationship with a parent is complicated, and I want help thinking about communication, my choices, and healthy boundaries.
+              </p>
+              <a href="/adult-children" className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#0c452a]">
+                Explore Adult Child Guidance <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </a>
+            </article>
+          </div>
+          <p className="mt-7 text-center text-sm font-semibold text-[#425047]">
+            Prefer an AI conversation? <a href="/digital-twin" className="font-extrabold text-[#145b35] underline underline-offset-4">Meet Brian's Digital Twin</a> as a separate, optional experience.
+          </p>
+        </div>
+      </section>
 
       <section id="fatherhood-wheel" className="border-y border-[#17231c]/15 bg-[#fffaf0] py-12 md:py-16" aria-labelledby="fatherhood-wheel-heading">
         <div className="container">

@@ -7,6 +7,8 @@ const indexNowKey = "7d6b5b72f4c14f6eb9d9e58c4cc21f73";
 
 const pages = [
   ["/", "weekly", "1.0"],
+  ["/parents-of-adult-children", "monthly", "0.95"],
+  ["/adult-children", "monthly", "0.95"],
   ["/my-journey", "weekly", "0.95"],
   ["/house", "weekly", "0.90"],
   ["/house/living-room", "monthly", "0.78"],
@@ -49,6 +51,8 @@ const llms = `# Papa Life Fatherhood Resource Center\n\n> Original digital learn
 
 const directoryLabels = new Map([
   ["/", "Papa Life Home"], ["/my-journey", "My Fatherhood Journey"],
+  ["/parents-of-adult-children", "Parents of Adult Children Guidance"],
+  ["/adult-children", "Adult Children Guidance"],
   ["/house", "Explore Papa Life House"], ["/marlee-assessment", "2-Minute Fatherhood Check-In"],
   ["/start", "Start Your Fatherhood Journey"], ["/digital-twin", "Talk with Digital Brian"],
   ["/papa-framework", "PAPA Framework"], ["/shop", "Shop and Approved Resources"],

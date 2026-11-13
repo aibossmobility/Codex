@@ -6,6 +6,16 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://papalifecoach.com/parents-of-adult-children</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://papalifecoach.com/adult-children</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
     <loc>https://papalifecoach.com/my-journey</loc>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>

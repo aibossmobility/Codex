@@ -107,25 +107,25 @@ const archiveSongs = [
     title: "Dream and Pray",
     detail: "Original lyrics by Brian Keith Hill · Music by William (Bill) Whitley",
     note: "Original archive recording: First Mix. The studio-master and lyric-sheet verification remain separate from this listening copy.",
-    audioSrc: "/music-room/audio/dream-and-pray-first-mix.mp3",
+    audioSrc: "/music-room/audio/dream-and-pray-first-mix.mp3?v=20261113-live1",
   },
   {
     title: "Black Men Speak",
     detail: "Bill Whitley & Brian Hill · Black Men Speak community and concert years",
     note: "Original archive track: Black Men Speak v02.",
-    audioSrc: "/music-room/audio/black-men-speak-v02.mp3",
+    audioSrc: "/music-room/audio/black-men-speak-v02.mp3?v=20261113-live1",
   },
   {
     title: "More Than You Know",
     detail: "Written and performed by Brian Keith Hill · Recorded live in Ohio",
     note: "Original live recording, titled “More Than You'll Ever Know” in the audio metadata.",
-    audioSrc: "/music-room/audio/more-than-you-know.mp3",
+    audioSrc: "/music-room/audio/more-than-you-know.mp3?v=20261113-live1",
   },
   {
     title: "Do You Want to Find Your GPS?",
     detail: "Original song by Brian Keith Hill · Includes the words “Let Him In”",
     note: "Archive performance: “Do I want to find My GPS” · December 13, 2013.",
-    audioSrc: "/music-room/audio/do-you-want-to-find-your-gps.mp3",
+    audioSrc: "/music-room/audio/do-you-want-to-find-your-gps.mp3?v=20261113-live1",
   },
 ] as const;
 

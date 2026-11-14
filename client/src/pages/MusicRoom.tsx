@@ -102,11 +102,31 @@ const lyricSections = [
   }
 ] as const;
 
-const recovering = [
-  { title: "Dream and Pray", detail: "Original lyrics by Brian Keith Hill · Music by William (Bill) Whitley", note: "The original studio master and lyric sheet are being recovered. This recording is not yet available to stream." },
-  { title: "Black Men Speak", detail: "From the Black Men Speak community and concert years", note: "Archival performances and collaborator credits are being verified before public listening." },
-  { title: "More Than You Know", detail: "Written and performed by Brian Keith Hill · Recorded live in Ohio", note: "The shared live MP3 has been identified; its verified lyrics and publishing copy are still being prepared." },
-  { title: "Do You Want to Find Your GPS?", detail: "Original song by Brian Keith Hill · Includes the words “Let Him In”", note: "The original lyric sheet and master are being matched; “Let Him In” is not a separate song." },
+const archiveSongs = [
+  {
+    title: "Dream and Pray",
+    detail: "Original lyrics by Brian Keith Hill · Music by William (Bill) Whitley",
+    note: "Original archive recording: First Mix. The studio-master and lyric-sheet verification remain separate from this listening copy.",
+    audioSrc: "/music-room/audio/dream-and-pray-first-mix.mp3",
+  },
+  {
+    title: "Black Men Speak",
+    detail: "Bill Whitley & Brian Hill · Black Men Speak community and concert years",
+    note: "Original archive track: Black Men Speak v02.",
+    audioSrc: "/music-room/audio/black-men-speak-v02.mp3",
+  },
+  {
+    title: "More Than You Know",
+    detail: "Written and performed by Brian Keith Hill · Recorded live in Ohio",
+    note: "Original live recording, titled “More Than You'll Ever Know” in the audio metadata.",
+    audioSrc: "/music-room/audio/more-than-you-know.mp3",
+  },
+  {
+    title: "Do You Want to Find Your GPS?",
+    detail: "Original song by Brian Keith Hill · Includes the words “Let Him In”",
+    note: "Archive performance: “Do I want to find My GPS” · December 13, 2013.",
+    audioSrc: "/music-room/audio/do-you-want-to-find-your-gps.mp3",
+  },
 ] as const;
 
 export default function MusicRoom() {
@@ -216,15 +236,21 @@ export default function MusicRoom() {
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">
               <h2 id="archive-heading" className="font-serif text-4xl font-bold text-[#213c29]">More songs from the journey</h2>
-              <p className="mt-4 text-lg text-[#546155]">These original works belong in the Music Room. Their recordings and verified lyrics are being prepared before free public playback is activated.</p>
+              <p className="mt-4 text-lg text-[#546155]">Listen free to these original recordings from the journey. Each song has its own player, and original recording titles and collaborators are preserved below.</p>
             </div>
             <div className="mt-9 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {recovering.map((song) => <article key={song.title} className="rounded-xl border-t-[5px] border-[#b4372f] bg-white p-6 shadow-sm">
-                <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#8d512f]">Archive entry</span>
+              {archiveSongs.map((song) => <article key={song.title} className="flex min-w-0 flex-col rounded-xl border-t-[5px] border-[#b4372f] bg-white p-6 shadow-sm">
+                <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#8d512f]">Original recording · Listen free</span>
                 <h3 className="mt-3 font-serif text-2xl font-bold text-[#1a3b25]">{song.title}</h3>
                 <p className="mt-3 text-sm font-semibold text-[#53624f]">{song.detail}</p>
                 <p className="mt-4 text-sm leading-relaxed text-[#65665c]">{song.note}</p>
-                <span className="mt-5 inline-flex rounded-full bg-[#f4ecdf] px-3 py-2 text-xs font-semibold text-[#675947]">Recording / lyrics in restoration</span>
+                <div className="mt-auto pt-6">
+                  <audio className="w-full" controls preload="metadata" aria-label={`Play ${song.title}`}>
+                    <source src={song.audioSrc} type="audio/mpeg" />
+                    Your browser does not support audio playback.
+                  </audio>
+                  <p className="mt-2 text-xs text-[#696a5b]">Press play to listen here. No sign-in required.</p>
+                </div>
               </article>)}
             </div>
           </div>

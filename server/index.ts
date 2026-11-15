@@ -7146,7 +7146,7 @@ async function startServer() {
   app.get("/sitemap.xml", (_req, res) => {
     const base = "https://papalifecoach.com";
     const staticPaths = [
-      "/", "/site-directory", "/welcome-to-papa-life", "/marlee-assessment", "/my-journey",
+      "/", "/site-directory", "/welcome-to-papa-life", "/marlee-assessment",
       "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
       "/parents-of-adult-children", "/adult-children",
       "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill",

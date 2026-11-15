@@ -99,13 +99,21 @@ export default function DigitalTwinDemo() {
                 <DigitalBrianGuide mode="visitor" />
                 {!voiceOpen ? (
                   <div className="rounded-2xl border border-[#f2c230]/30 bg-black/60 p-5">
+                    <div className="mb-5 rounded-xl border border-[#f2c230]/50 bg-[#f2c230]/[0.08] p-4">
+                      <p className="text-xs font-black uppercase tracking-widest text-[#f2c230]">First: Brian's Mac mini selected voice</p>
+                      <p className="mt-2 text-sm text-white/80">Hear the owner-selected Brian Keith Hill voice recording first. Playback starts only when you press Play; this recording does not start an AI conversation.</p>
+                      <audio controls preload="metadata" className="mt-3 w-full" aria-label="Brian Keith Hill owner-selected Mac mini voice recording">
+                        <source src="/audio/brian-mac-selected-voice.m4a" type="audio/mp4" />
+                        Your browser does not support audio playback.
+                      </audio>
+                    </div>
                     <video controls playsInline preload="metadata" poster="/videos/brian-green-sweater-papa-life-clean.jpg"
                       className="aspect-video w-full rounded-lg bg-black object-cover"
                       aria-label="Recorded Papa Life welcome video from Brian">
                       <source src="/videos/brian-green-sweater-papa-life-clean.mp4" type="video/mp4" />
                     </video>
                     <p className="mt-2 text-xs text-white/50">Recorded introduction — no AI conversation is started.</p>
-                    <h2 className="mt-4 text-xl font-bold">Optional conversation in Brian's AI voice</h2>
+                    <h2 className="mt-4 text-xl font-bold">Second: optional ElevenLabs AI conversation</h2>
                     <p className="mt-2 text-sm text-white/70">This uses ElevenLabs and may consume paid credits. You can use the guide above without starting a voice call.</p>
                     <button type="button" className="mt-4 rounded-lg bg-[#f2c230] px-5 py-3 font-bold text-black" onClick={openVoicePanel} aria-controls="papa-voice-panel">Load optional live voice</button>
                   </div>

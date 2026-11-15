@@ -246,6 +246,14 @@ export default function Shop() {
             </article>
           ))}
         </div>
+        <section aria-labelledby="digital-purchase-license" className="mt-10 rounded-xl border-2 border-[#145b35]/40 bg-[#fffdf4] p-6 text-sm leading-relaxed text-[#17231c]">
+          <h2 id="digital-purchase-license" className="text-xl font-extrabold">Copyright &amp; Your Personal-Use License</h2>
+          <p className="mt-3 font-semibold">© 2026 Brian Keith Hill. All rights reserved.</p>
+          <p className="mt-2">Each one-time purchase gives the original purchaser personal, noncommercial access to the specific Papa Life video, audio lesson, manuscript PDF, or bundle purchased, subject to the access and delivery terms shown at checkout. Copyright ownership is not transferred by the purchase.</p>
+          <p className="mt-2">Please do not resell, redistribute, upload publicly, share paid access credentials, or reproduce substantial portions of purchased materials without written permission, except as permitted by applicable law. This notice does not limit fair use or other statutory rights, or override terms that applied to earlier purchases.</p>
+          <p className="mt-2">For permission to use original Papa Life materials in a church, school, group, or paid program, contact <a className="font-bold underline" href="mailto:brian@bossmobility.net">brian@bossmobility.net</a>. Any third-party material remains subject to its owner's rights.</p>
+          <p className="mt-2"><a className="font-bold underline" href="/refund-policy">Refund policy</a> · <a className="font-bold underline" href="/purchase-help">Purchase/access help</a></p>
+        </section>
         <div className="mt-12 rounded-xl bg-[#145b35] p-7 text-white"><div className="flex items-start gap-4"><CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#f2c230]" /><div><h2 className="text-2xl font-extrabold">Secure checkout for Papa Life lessons</h2>
           <p className="mt-3"><a href="/purchase-help" className="underline font-semibold">Paid but cannot access your purchase? Get purchase help — do not pay again.</a></p><p className="mt-2 text-white/80">Select the video-series purchase link above or Enroll Now on an individual audio lesson to open its corresponding GoHighLevel checkout. Audio lessons and the video series open their GoHighLevel course checkouts. Manuscripts and bundles use one-time GoHighLevel payment links; after verified payment, access instructions are emailed to your checkout address. Previous purchases retain their original terms.</p></div></div></div>
       </main>

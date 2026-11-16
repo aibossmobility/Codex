@@ -11,24 +11,58 @@ const enrichment = JSON.parse(fs.readFileSync(path.resolve("scripts/seo-page-enr
 const pages = [
   {
     path: "/",
-    title: "Papa Life Fatherhood Resource Center | Original Courses & Resources",
+    title: "Papa Life Fatherhood Resource Center | Courses & Original Resources",
     description:
-      "Explore original Papa Life audio lessons, manuscripts and complete programs created by Brian Keith Hill. Start with the Awareness Wheel and choose the resources that fit your next step.",
+      "Self-paced audio lessons for fathers of adult children. Listen without defending, apologize without explaining, rebuild trust in small steps.",
     eyebrow: "Papa Life Fatherhood Resource Center",
-    headline: "Where Are You With Your Adult Child—and What Can Help?",
+    headline: "Audio Lessons for Fathers Whose Adult Child Has Gone Quiet.",
     intro:
-      "Explore original self-paced audio lessons, written manuscripts, and learning resources by Brian Keith Hill. Begin with the Awareness Wheel, select the support that matches your situation, and review products before continuing to the approved GoHighLevel sales process.",
+      "Self-paced lessons by Brian Keith Hill on what to say, what not to say, and how to rebuild trust one small step at a time. Lessons begin at $14.99 one-time. Reconciliation is never guaranteed.",
     sections: [
       ["Awareness First", "Use the five-step Awareness Wheel to recognize where you are: Awareness, Engage, Understand, Take Action, and Reconnection."],
-      ["Choose Original Resources", "Review individual audio lessons, manuscripts, and complete 12-lesson programs designed for fathers of adult children. Buy knowledge rather than appointments or membership access."],
+      ["Choose Original Resources", "Listening Without Defending audio lesson $14.99 one-time. All 12 audio lessons $79 one-time. Wrestling the Silence Away video collection $19.99 one-time. A complete audio and manuscript bundle is $129 one-time. Buy knowledge rather than appointments or membership access."],
       ["GoHighLevel Handles Purchasing", "PapaLifeCoach.com is for product discovery. Approved pricing, purchase terms, payment, and product access are handled separately by the current verified GoHighLevel sales system."],
-      ["Created by Brian Keith Hill", "Papa Life shares Brian Keith Hill's original learning materials and intellectual property. Books, original songs, and spoken-word offerings will be added when cleared and ready."],
+      ["Created by Brian Keith Hill", "Papa Life shares Brian Keith Hill's available original learning materials. Unfinished works are not offered for sale."],
     ],
     relatedLinks: [
       ["Start with the Awareness Wheel", "/my-journey"],
       ["Explore Papa Life Products", "/shop"],
       ["Browse All Course Details", "/courses"],
     ],
+  },
+  {
+    path: "/shop",
+    title: "Papa Life Products & Prices | Audio Lessons, Manuscripts & Video",
+    description: "Shop Papa Life audio lessons from $14.99, a $19.99 video collection, downloadable manuscripts and complete digital bundles.",
+    eyebrow: "Papa Life original digital resources",
+    headline: "Available Papa Life Lessons, Videos and Manuscripts",
+    intro: "Practical self-paced resources for fathers of adult children. One-time prices, no membership or appointment. Choose a lesson, pay through the verified existing checkout link and receive the product you bought.",
+    sections: [
+      ["Individual audio lessons — $14.99 one-time", "Twelve streaming audio lessons for listening without defending, preparing an apology, and becoming safer to talk to. Each lesson has its own secure, existing purchase link in the catalog."],
+      ["Wrestling the Silence Away videos — $19.99 one-time", "Ten prerecorded video reflections for fathers of adult sons and daughters; a separate purchase from the audio lessons."],
+      ["Downloadable manuscripts — $14.99 each", "Choose a lesson PDF to read at your own pace. Verified digital-payment links are listed in the live product catalog."],
+      ["Complete bundles — $79 or $129 one-time", "All 12 audio lessons cost $79; all 12 audio lessons plus 12 manuscript PDFs cost $129. Each bundle has an existing secure checkout link."],
+      ["Refund requests", "Customers may request a full refund within seven calendar days of purchase, subject to the published refund policy and applicable law."],
+      ["Scope and boundaries", "No purchase guarantees reconciliation. An adult son or daughter chooses whether and how to respond. Unfinished work is not offered for sale."]
+    ],
+    relatedLinks: [
+      ["Listen to the 12 audio lessons", "/courses"],
+      ["See the 7-day refund request policy", "/refund-policy"],
+      ["Meet Brian Keith Hill", "/about-brian-keith-hill"]
+    ]
+  },
+  {
+    path: "/changelog",
+    title: "Papa Life Updates | Brian Keith Hill",
+    description: "Dated changes to Papa Life learning resources and customer purchase information from Brian Keith Hill.",
+    eyebrow: "Papa Life updates",
+    headline: "What has changed at Papa Life",
+    intro: "A dated record of public learning-resource updates, maintained by Brian Keith Hill.",
+    sections: [
+      ["November 15, 2026", "Updated the Papa Life resource and buying paths to show verified audio, manuscript and video prices and clearly describe the seven-day digital-product refund request window."],
+      ["October 15, 2026", "The digital-product refund policy took effect: customers may request a full refund within seven calendar days after purchase, subject to the published terms and applicable law."]
+    ],
+    relatedLinks: [["Explore available learning resources", "/shop"], ["Read the refund policy", "/refund-policy"]]
   },
   {
     path: "/start",
@@ -530,6 +564,22 @@ function render(page) {
     )
     .replace('<div id="root"></div>', `<div id="root">${bodyHtml(page)}</div>`);
 
+  // Every prerendered page must describe itself to link previews and search crawlers.
+  html = html.replace(/<meta\s+(?:name|property)="(?:og:[^"]+|twitter:[^"]+)"[^>]*\/?>\s*/gi, "");
+  const canonicalShareUrl = "https://papalifecoach.com" + (page.path === "/" ? "/" : page.path);
+  const shareTags = [
+    ["property", "og:type", "website"],
+    ["property", "og:site_name", "Papa Life Coach"],
+    ["property", "og:title", page.title],
+    ["property", "og:description", page.description],
+    ["property", "og:url", canonicalShareUrl],
+    ["property", "og:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp"],
+    ["name", "twitter:card", "summary_large_image"],
+    ["name", "twitter:title", page.title],
+    ["name", "twitter:description", page.description],
+    ["name", "twitter:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp"]
+  ].map(([attr, key, val]) => '<meta ' + attr + '="' + key + '" content="' + escapeHtml(val) + '" />').join("\n    ");
+  html = html.replace("</head>", "    " + shareTags + "\n  </head>");
   html = html.replace(/<link\s+rel="canonical"[^>]*>/gi, "");
   const canonical = `<link rel="canonical" href="https://papalifecoach.com${({ "/privacy": "/privacy-policy", "/terms": "/terms-of-service" }[page.path] || page.path)}" />`;
   html = html.replace("</head>", `    ${canonical}\n  </head>`);
@@ -539,6 +589,24 @@ function render(page) {
     html = html.replace("</head>", `    ${scripts}\n  </head>`);
   }
   return html;
+}
+
+// Serve the same answers visible in the client pages for the two audited categories.
+const categoryFaqs = {
+  "/why-adult-children-pull-away": [
+    ["What should I say when my adult child pulls away?", "If contact is welcome, listen first. A brief acknowledgment can be more helpful than demanding an explanation: “I want to understand what this has felt like for you. I will listen without defending myself.”"],
+    ["What should I avoid saying?", "Avoid guilt, repeated messages, or trying to argue away an adult child’s boundaries. Do not ask another family member to pressure them on your behalf."],
+    ["Can I make my adult child reconnect?", "No. Reconciliation requires more than one person’s effort and cannot be forced. You can change how you listen, respect boundaries, and respond."],
+  ],
+  "/father-child-estrangement": [
+    ["What can a father do when an adult child has asked for space?", "Honor the request, including any no-contact boundary. Use the time to reflect on your own choices and seek appropriate support without treating contact as something you are owed."],
+    ["How do I apologize without explaining myself?", "Name the action and its impact without adding an excuse or a demand for forgiveness. Do not use the apology as a way to pressure your adult son or daughter for an immediate answer."],
+    ["Does Papa Life promise reconciliation?", "No. Reconciliation cannot be guaranteed and cannot be forced. Papa Life teaches practical reflection, listening, accountability, and consistency."],
+  ],
+};
+for (const page of pages) {
+  const questions = categoryFaqs[page.path];
+  if (questions) page.sections.push(...questions.map(([q, answer]) => [q, answer]));
 }
 
 const generatedPaths = new Set();

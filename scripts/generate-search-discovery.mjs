@@ -20,6 +20,7 @@ const pages = [
   ["/house/resources", "monthly", "0.80"],
   ["/house/sky-room", "monthly", "0.80"],
   ["/site-directory", "weekly", "0.9"],
+  ["/changelog", "monthly", "0.7"],
   ["/welcome-to-papa-life", "monthly", "0.95"],
   ["/papa-framework", "monthly", "0.9"],
   ["/father-friendly-practice", "monthly", "0.8"],

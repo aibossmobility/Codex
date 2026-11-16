@@ -40,6 +40,29 @@ export const ASSESSMENT_PAGE = {
   jsonLd: [ORGANIZATION_SCHEMA, ASSESSMENT_WEB_APP_SCHEMA],
 };
 
+// These FAQ answers are rendered on the page and match the publicly served FAQ schema.
+const faqSchema = (questions: ReadonlyArray<readonly [string, string]>) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: questions.map(([name, text]) => ({
+    "@type": "Question", name,
+    acceptedAnswer: { "@type": "Answer", text },
+  })),
+});
+
+const categoryFaqs = {
+  "why-adult-children-pull-away": [
+    ["What should I say when my adult child pulls away?", "If contact is welcome, listen first. A brief acknowledgment can be more helpful than demanding an explanation: “I want to understand what this has felt like for you. I will listen without defending myself.”"],
+    ["What should I avoid saying?", "Avoid guilt, repeated messages, or trying to argue away an adult child’s boundaries. Do not ask another family member to pressure them on your behalf."],
+    ["Can I make my adult child reconnect?", "No. Reconciliation requires more than one person’s effort and cannot be forced. You can change how you listen, respect boundaries, and respond."],
+  ],
+  "father-child-estrangement": [
+    ["What can a father do when an adult child has asked for space?", "Honor the request, including any no-contact boundary. Use the time to reflect on your own choices and seek appropriate support without treating contact as something you are owed."],
+    ["How do I apologize without explaining myself?", "Name the action and its impact without adding an excuse or a demand for forgiveness. Do not use the apology as a way to pressure your adult son or daughter for an immediate answer."],
+    ["Does Papa Life promise reconciliation?", "No. Reconciliation cannot be guaranteed and cannot be forced. Papa Life teaches practical reflection, listening, accountability, and consistency."],
+  ],
+} as const;
+
 export const SEO_PAGES: SeoArticle[] = [
   {
     slug: "/adult-son-relationship",
@@ -139,15 +162,23 @@ export const SEO_PAGES: SeoArticle[] = [
         heading: "What helps instead of chasing",
         paragraphs: [
           "Stop demanding closeness on your timeline. Start building safety in small moments.",
-          "The assessment on this site helps you map your relationship honestly — so you stop guessing and start moving with purpose.",
+          "The 2-Minute Fatherhood Check-In on this site helps you map your relationship honestly — so you stop guessing and start moving with purpose.",
+        ],
+      },
+      {
+        heading: "Common questions from fathers of adult children",
+        paragraphs: [
+          "What should I say when my adult child pulls away?: If contact is welcome, listen first. A brief acknowledgment can be more helpful than demanding an explanation: “I want to understand what this has felt like for you. I will listen without defending myself.”",
+          "What should I avoid saying?: Avoid guilt, repeated messages, or trying to argue away an adult child’s boundaries. Do not ask another family member to pressure them on your behalf.",
+          "Can I make my adult child reconnect?: No. Reconciliation requires more than one person’s effort and cannot be forced. You can change how you listen, respect boundaries, and respond.",
         ],
       },
     ],
-    jsonLd: articleSchema(
+    jsonLd: [articleSchema(
       "/why-adult-children-pull-away",
       "Why Adult Children Pull Away From Their Fathers",
       "Understand why grown children create distance and what fathers can do."
-    ),
+    ), faqSchema(categoryFaqs["why-adult-children-pull-away"])],
   },
   {
     slug: "/father-child-estrangement",
@@ -175,15 +206,23 @@ export const SEO_PAGES: SeoArticle[] = [
         heading: "Start where you are",
         paragraphs: [
           "Name the truth without drowning in blame. Get support so you're not navigating this alone.",
-          "Take the free assessment to understand your starting point — then use the resources on the PAPA Journey to build from there.",
+          "Start the 2-Minute Fatherhood Check-In to understand your starting point — then use the resources on the PAPA Journey to build from there.",
+        ],
+      },
+      {
+        heading: "Common questions from fathers of adult children",
+        paragraphs: [
+          "What can a father do when an adult child has asked for space?: Honor the request, including any no-contact boundary. Use the time to reflect on your own choices and seek appropriate support without treating contact as something you are owed.",
+          "How do I apologize without explaining myself?: Name the action and its impact without adding an excuse or a demand for forgiveness. Do not use the apology as a way to pressure your adult son or daughter for an immediate answer.",
+          "Does Papa Life promise reconciliation?: No. Reconciliation cannot be guaranteed and cannot be forced. Papa Life teaches practical reflection, listening, accountability, and consistency.",
         ],
       },
     ],
-    jsonLd: articleSchema(
+    jsonLd: [articleSchema(
       "/father-child-estrangement",
       "Father–Child Estrangement Help",
       "Practical hope and steps for fathers estranged from adult children."
-    ),
+    ), faqSchema(categoryFaqs["father-child-estrangement"])],
   },
   {
     slug: "/papa-framework",

@@ -3100,15 +3100,18 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();
   if (pathname === "/shop") {
     const page: StaticServerPage = {
-      title: "Papa Life Shop | Papa Life Coach",
-      description: "Papa Life resources and offers for fathers of adult children.",
-      eyebrow: "Papa Life",
-      headline: "Papa Life Shop",
-      intro: "Explore Papa Life resources, courses, books, and relationship-building tools.",
-      sections: [],
-      cta: { label: "Explore Papa Life", href: "/courses" },
+      title: "Papa Life Products & Prices | Audio Lessons, Manuscripts & Video",
+      description: "Shop Papa Life audio lessons from $14.99, a $19.99 video collection, downloadable manuscripts and complete digital bundles.",
+      eyebrow: "Papa Life original digital resources",
+      headline: "Available Papa Life Lessons, Videos and Manuscripts",
+      intro: "Self-paced digital lessons for fathers of adult children. One-time prices, no subscription. Individual streaming audio lessons cost $14.99, the video collection costs $19.99, the complete audio program costs $79, and the audio-and-manuscript bundle costs $129.",
+      sections: [
+        {heading: "Clear prices, no membership", body: "Use the existing verified secure checkout for the product you want. Each offer has its own approved terms and delivery."},
+        {heading: "Honest outcomes and refunds", body: "Reconciliation cannot be guaranteed. Papa Life digital purchases have a seven-calendar-day refund request window subject to the published terms and applicable law."}
+      ],
+      cta: { label: "Browse Available Lessons and Prices", href: "/courses" },
     };
-    return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
+    return {status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page)};
   }
 
   // AI Boss routes are authenticated client views. Serve the SPA shell with a
@@ -7170,7 +7173,7 @@ async function startServer() {
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/parents-of-adult-children", "/adult-children",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
-    "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
+    "/start", "/changelog", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/shop", "/papa-journey", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
   ]);

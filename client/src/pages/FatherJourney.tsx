@@ -26,11 +26,7 @@ const nextJourneyStep = (saved: Record<string, SavedStep>): StepKey =>
   steps.find((step) => saved[step.key]?.status !== "completed")?.key || "reconnection";
 
 const developmentStages = [
-  { key: "connection", ages: "0–5", title: "Emotional Connection", focus: "Build safety and bonding through touch, eye contact, affection, play, and dependable presence.", questions: ["Am I emotionally and physically present?", "Does my child experience warmth and safety from me?", "Am I building connection instead of leaving it to someone else?"] },
-  { key: "learning", ages: "5–10", title: "Intellectual Development", focus: "Encourage curiosity, education, confidence, and patient learning as your child enters the wider world.", questions: ["Do I show interest in how my child learns?", "Do I encourage questions without embarrassment?", "Am I building confidence instead of only correcting mistakes?"] },
-  { key: "guidance", ages: "10–15", title: "Maturing Guidance", focus: "Adjust your fathering as physical, intellectual, emotional, and spiritual needs become more complex.", questions: ["Am I changing my approach as my child matures?", "Can my child talk to me about difficult feelings?", "Do I guide character without controlling every choice?"] },
-  { key: "identity", ages: "15–20", title: "Identity & Independence", focus: "Shift from control to communication while your child forms an identity and begins pulling toward independence.", questions: ["Can I listen without immediately correcting?", "Do I ask what my child thinks, sees, and feels?", "Can I allow growing independence without treating it as rejection?"] },
-  { key: "adult", ages: "20–25+", title: "Adult-Child Transition", focus: "Move from authority over your child to wisdom, availability, respect, and relationship with your adult son or daughter.", questions: ["Have I changed from director to trusted advisor?", "Do I respect boundaries even when I disagree?", "Am I building character and connection instead of demanding compliance?"] },
+  { key: "adult", ages: "20+", title: "Fatherhood With an Adult Child", focus: "Relate to your adult son or daughter with humility, steady presence, wise guidance, and respect for their choices.", questions: ["Do I listen before correcting or explaining?", "Do I respect my adult child's stated boundaries?", "Am I choosing consistency rather than demanding an immediate response?"] },
 ] as const;
 
 type DevelopmentStageKey = typeof developmentStages[number]["key"];
@@ -83,7 +79,7 @@ export default function FatherJourney() {
     setActive(nextJourneyStep(local));
     setAlignment(JSON.parse(localStorage.getItem(alignmentKey) || "{}"));
     const development = JSON.parse(localStorage.getItem(developmentKey) || "{}");
-    setDevelopmentStage(development.stage || null);
+    setDevelopmentStage(development.stage === "adult" ? "adult" : null);
     setDevelopmentAnswers(development.answers || {});
     setFatherSeason((localStorage.getItem(fatherSeasonKey) as FatherSeasonKey | null) || null);
     fetch("/api/member/auth/me", { credentials: "include" }).then(async (res) => {
@@ -190,7 +186,7 @@ export default function FatherJourney() {
 
   return (
     <div className="papa-house-journey min-h-screen bg-[#f7edd9] text-[#17231c]">
-      <PageMeta title="My Fatherhood Journey | Papa Life" description="A private, guided relationship journey for fathers with children at every age and stage." />
+      <PageMeta title="My Fatherhood Journey | Papa Life" description="A private, guided five-step relationship journey for fathers of adult sons and daughters." />
       <header className="border-b border-[#d4a14e] bg-[#f5e0b9]">
         <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <a href="/"><SiteLogo size="md" /></a>
@@ -207,8 +203,8 @@ export default function FatherJourney() {
           <section>
             <div className="mb-6 max-w-xl">
               <h1 className="text-4xl font-black uppercase leading-none md:text-6xl">Life is a journey.<br/><span className="text-[#d51f26]">You're the driver.</span></h1>
-              <p className="mt-4 text-lg">Turn the wheel. Do the heart work. Take the next faithful step toward your child—at any age or stage.</p>
-              <p className="mt-3 text-sm font-bold text-[#168c3c]">For young fathers, growing fathers, mature fathers, legacy fathers, and sage fathers.</p>
+              <p className="mt-4 text-lg">Turn the wheel. Do the heart work. Take the next faithful step toward your adult son or daughter, respecting their choices and boundaries.</p>
+              <p className="mt-3 text-sm font-bold text-[#168c3c]">For fathers of adult children, including men becoming legacy and sage fathers.</p>
             </div>
 
             <div className="relative mx-auto aspect-square w-full max-w-[720px]">
@@ -251,9 +247,9 @@ export default function FatherJourney() {
           <p className="mt-3 text-lg">{activeStep.prompt}</p>
           {active === "awareness" && <div className="mt-6 rounded-2xl border border-[#17231c] bg-[#17231c] p-5 text-white">
             <p className="text-xs font-black uppercase tracking-widest text-[#f6c515]">Start with your child’s season</p>
-            <h3 className="mt-1 text-2xl font-black">Find Your Fatherhood Development Stage</h3>
-            <p className="mt-2 text-sm text-white/75">Choose the age range that best fits the child you are thinking about today.</p>
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <h3 className="mt-1 text-2xl font-black">Reflect on Your Relationship With an Adult Child</h3>
+            <p className="mt-2 text-sm text-white/75">Reflect on your adult son or daughter and the relationship as it is now.</p>
+            <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {developmentStages.map((stage) => <button type="button" key={stage.key} onClick={() => selectDevelopmentStage(stage.key)} className={`rounded-xl border p-3 text-left transition ${developmentStage === stage.key ? "border-[#f6c515] bg-[#f6c515] text-black" : "border-white/20 bg-white/5 hover:bg-white/10"}`}><strong className="block text-lg">{stage.ages}</strong><span className="text-xs font-bold leading-tight">{stage.title}</span></button>)}
             </div>
             {selectedDevelopment && <div className="mt-5 rounded-xl bg-white p-5 text-[#17231c]">

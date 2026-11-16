@@ -4,7 +4,7 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import { ArrowDown, ArrowRight, Check, HeartHandshake, ShieldCheck, X } from "lucide-react";
 
-const joinHref = "/go/join?src=welcome-to-papa-life";
+const joinHref = "/marlee-assessment";
 
 const fitStatements = [
   "My son or daughter rarely calls or responds.",
@@ -32,8 +32,8 @@ const isList = ["A Scripture-centered path toward humility.", "A practical proce
 const transformations = [["Defensiveness", "Listening"], ["Shame", "Healthy responsibility"], ["Control", "Presence"], ["Confusion", "Clarity"], ["Silence", "Safer conversation"], ["Isolation", "Community"], ["Fear", "Renewed hope"]];
 const framework = [
   ["Presence", "Learning to listen, remain emotionally available, and stay engaged without pressure."],
-  ["Purpose", "Remembering that fatherhood does not end when a child becomes an adult."],
   ["Authority", "Leading through character, wisdom, responsibility, and example—not control."],
+  ["Purpose", "Remembering that fatherhood does not end when a child becomes an adult."],
   ["Alignment", "Bringing words, choices, faith, and relationships into agreement."],
 ];
 
@@ -44,11 +44,11 @@ function Cta({ children }: { children: React.ReactNode }) {
 export default function WelcomeToPapaLife() {
   return <div className="min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
     <PageMeta title="Papa Life | Help for Fathers of Adult Children" description="Papa Life helps fathers of adult children move from distance, silence, and regret toward humility, safer communication, renewed hope, and the possibility of reconnection." keywords="help for fathers of adult children, family estrangement, reconnect with adult child, Papa Life" canonicalPath="/welcome-to-papa-life" />
-    <nav className="border-b border-[#17231c]/15 bg-[#f4dfb9]"><div className="container flex h-20 items-center justify-between"><a href="/" aria-label="Papa Life home"><SiteLogo size="md" /></a><a href={joinHref} className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#0f492a]">Join Papa Life</a></div></nav>
+    <nav className="border-b border-[#17231c]/15 bg-[#f4dfb9]"><div className="container flex h-20 items-center justify-between"><a href="/" aria-label="Papa Life home"><SiteLogo size="md" /></a><a href={joinHref} className="rounded-md bg-[#145b35] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#0f492a]">Start the 2-Minute Fatherhood Check-In</a></div></nav>
     <HouseTrail current="Welcome" />
 
     <header className="bg-[#17231c] text-white"><div className="container grid min-h-[620px] items-center gap-10 py-16 lg:grid-cols-[1.15fr_.85fr]">
-      <div><p className="text-sm font-black uppercase tracking-[.2em] text-[#f2c230]">From distance to reconnection</p><h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.</h1><p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">If silence, distance, regret, or unresolved hurt has come between you and your adult child, Papa Life was created with fathers like you in mind.</p><p className="mt-5 text-2xl font-extrabold text-[#f2c230]">As long as you’re both alive, it’s never too late.</p><div className="mt-8 flex flex-wrap gap-4"><Cta>Join Papa Life — Immediate Access</Cta><a href="#is-this-you" className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]">See If Papa Life Is for Me <ArrowDown className="h-4 w-4" /></a></div></div>
+      <div><p className="text-sm font-black uppercase tracking-[.2em] text-[#f2c230]">From distance to reconnection</p><h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">Your Adult Child May Be Grown, but Your Fatherhood Is Not Finished.</h1><p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/85 md:text-xl">If silence, distance, regret, or unresolved hurt has come between you and your adult child, Papa Life was created with fathers like you in mind.</p><p className="mt-5 text-2xl font-extrabold text-[#f2c230]">As long as you’re both alive, it’s never too late.</p><div className="mt-8 flex flex-wrap gap-4"><Cta>Start the 2-Minute Fatherhood Check-In</Cta><a href="#is-this-you" className="inline-flex min-h-12 items-center gap-2 rounded-md border border-white/40 px-6 py-3 font-extrabold text-white hover:border-[#f2c230] hover:text-[#f2c230]">See If Papa Life Is for Me <ArrowDown className="h-4 w-4" /></a></div></div>
       <aside className="rounded-xl border border-white/15 bg-white/5 p-7"><HeartHandshake className="h-11 w-11 text-[#f2c230]" /><p className="mt-5 text-2xl font-extrabold">We do not help fathers win arguments.</p><p className="mt-2 text-xl text-white/75">We help fathers rebuild relationships.</p></aside>
     </div></header>
 
@@ -67,7 +67,7 @@ export default function WelcomeToPapaLife() {
 
       <section className="bg-[#145b35] py-16 text-white"><div className="container grid items-center gap-9 md:grid-cols-[280px_1fr]"><img src={brianKeithHillHeadshot} alt="Brian Keith Hill, founder of Boss Mobility and Papa Life" className="aspect-square w-full rounded-xl object-cover object-top"/><div><p className="text-sm font-black uppercase tracking-[.18em] text-[#f2c230]">About the founder</p><h2 className="mt-3 text-4xl font-extrabold">Brian Keith Hill</h2><p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/85">Brian Keith Hill is the founder of Boss Mobility and Papa Life. He created Papa Life from lived experience, biblical conviction, and a lifelong commitment to fatherhood. As a father, grandfather, teacher, and mentor, Brian helps men face the places where pride, pain, misunderstanding, and silence have damaged family relationships. He approaches the work as a guide—not a guru—walking beside fathers as they learn to listen, accept responsibility, rebuild trust, and lead through presence.</p><a href="/about-brian-keith-hill" className="mt-6 inline-flex items-center gap-2 font-extrabold text-[#f2c230] hover:text-white">Learn more about Brian Keith Hill <ArrowRight className="h-4 w-4" aria-hidden="true" /></a></div></div></section>
 
-      <section className="bg-[#17231c] py-20 text-center text-white"><div className="container"><h2 className="text-4xl font-extrabold md:text-5xl">You Do Not Have to Carry This Alone.</h2><p className="mx-auto mt-5 max-w-2xl text-lg text-white/80">You may not be able to rewrite yesterday, but you can decide what kind of father you will be from this day forward.</p><div className="mt-8"><Cta>Join Papa Life — Immediate Access</Cta></div><p className="mt-5 text-white/75">Begin the work of becoming the father healthy reconnection may become possible with.</p><p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p></div></section>
+      <section className="bg-[#17231c] py-20 text-center text-white"><div className="container"><h2 className="text-4xl font-extrabold md:text-5xl">You Do Not Have to Carry This Alone.</h2><p className="mx-auto mt-5 max-w-2xl text-lg text-white/80">You may not be able to rewrite yesterday, but you can decide what kind of father you will be from this day forward.</p><div className="mt-8"><Cta>Start the 2-Minute Fatherhood Check-In</Cta></div><p className="mt-5 text-white/75">Begin the work of becoming the father healthy reconnection may become possible with.</p><p className="mt-8 text-2xl font-extrabold text-[#f2c230]">Father by title. Father by presence.</p></div></section>
     </main>
     <footer className="bg-[#f2c230] py-8"><div className="container flex flex-col items-center justify-between gap-4 sm:flex-row"><div><a href="/"><SiteLogo size="md" /></a><p className="mt-2 max-w-xl text-xs">Papa Life is a fatherhood initiative founded by <a href="/about-brian-keith-hill" className="underline">Brian Keith Hill</a> through Boss Mobility.</p></div><div className="flex gap-5 text-sm font-bold"><a href="/privacy-policy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/courses">Digital Courses</a></div></div></footer>
   </div>;

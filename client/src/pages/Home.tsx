@@ -9,15 +9,19 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { approvedStories, approvedProofCount, approvedExternalMentions } from "@/content/papa-trust-signals";
 
 const navigation = [
   { label: "Find Your Guide", href: "/#family-guidance" },
-  { label: "Come Inside", href: "/house" },
+  { label: "Why Adult Children Pull Away", href: "/why-adult-children-pull-away" },
   { label: "Brian’s Story", href: "#brian-story" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
-  { label: "Music Room", href: "/music-room" },
-  { label: "Explore Courses", href: "/shop" },
+  { label: "Estrangement Help", href: "/father-child-estrangement" },
+  { label: "Lessons & Prices", href: "/shop" },
 ];
+
+// Existing Papa Life checkout destinations; no new checkout or subscription is created here.
+const productCheckout = {'video': 'https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/checkout/d448db0d-ef3f-4740-aff8-38d037fa8aec', 'audio': 'https://byx4g32aidgektbg7nlq.app.clientclub.net/courses/offers/35a532f1-9717-442b-8b92-a3c63738e743', 'pdf': 'https://link.fastpaydirect.com/payment-link/6a5acf797b99151a5403f3de', 'fullAudio': 'https://link.fastpaydirect.com/payment-link/6a5acfce7b99151a5403f3e7', 'complete': 'https://link.fastpaydirect.com/payment-link/6a5acfd6a655fa0b802a4ecf'} as const;
 
 const relationshipSignals = [
   {
@@ -81,7 +85,8 @@ export default function Home() {
     <div className="papa-house-home min-h-screen overflow-x-hidden bg-[#f8f0db] text-[#17231c]">
       <PageMeta
         title="Papa Life Fatherhood Resource Center | Courses & Original Resources"
-        description="Explore original Papa Life audio lessons, manuscripts and learning resources for fathers of adult children. Find your next step with the Awareness Wheel."
+        description="Self-paced audio lessons for fathers of adult children. Listen without defending, apologize without explaining, rebuild trust in small steps."
+        canonicalPath="/"
         keywords="fathers of adult children, reconnect with adult child, Papa Life, fatherhood, relationship repair"
       />
 
@@ -111,7 +116,7 @@ export default function Home() {
               href={shopHref}
               className="rounded-md bg-[#b33a32] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#942e29]"
             >
-              Explore Courses &amp; Resources
+              Lessons &amp; Prices
             </a>
           </div>
           <button
@@ -150,7 +155,7 @@ export default function Home() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-md bg-[#b33a32] px-4 py-3 font-extrabold text-white"
               >
-                Explore Courses &amp; Resources
+                Lessons &amp; Prices
               </a>
             </div>
           </div>
@@ -160,12 +165,15 @@ export default function Home() {
       <section className="papa-house-outdoor-hero" aria-labelledby="welcome-home-heading">
         <div className="papa-house-outdoor-inner">
           <span className="papa-house-kicker">Papa Life · Fathers of Adult Children</span>
-          <h1 id="welcome-home-heading">Your journey has a place to <em>begin.</em></h1>
-          <p>Welcome. Step out of the noise and into a place built for reflection, wisdom, and the courage to reconnect. Come inside, make yourself comfortable, and discover what speaks to you.</p>
+          <h1 id="welcome-home-heading">Audio Lessons for Fathers Whose Adult Child Has Gone Quiet.</h1>
+          <p>Self-paced lessons by Brian Keith Hill on what to say, what not to say, and how to rebuild trust one small step at a time.</p>
+          <p className="mt-3 text-sm font-bold">My son or daughter rarely calls or responds. I want to apologize, but I do not know what to say.</p>
+          <p className="mt-3 font-semibold">Stronger fathers. Healthier relationships. Lasting legacy.</p>
           <div className="papa-house-outdoor-actions">
-            <a href="/house" className="papa-house-button">Come Inside <ArrowRight size={20} aria-hidden="true"/></a>
-            <a href="/shop" className="papa-house-button-outline">Browse Resources <ArrowRight size={18} aria-hidden="true"/></a>
+            <a href="/shop" className="papa-house-button">Explore the Lessons <ArrowRight size={20} aria-hidden="true"/></a>
+            <a href="/relationship-assessment" className="papa-house-button-outline">2-Minute Fatherhood Check-In <ArrowRight size={18} aria-hidden="true"/></a>
           </div>
+          <p className="mt-3 text-sm">Lessons begin at $14.99 one-time. No membership or appointment. Reconciliation is never guaranteed.</p>
         </div>
       </section>
       <div className="papa-house-outdoor-note">A welcoming home for fathers to <strong>read, listen, reflect, and grow</strong>. <a href="/house">Explore the rooms</a> at your own pace.</div>
@@ -293,7 +301,7 @@ export default function Home() {
                 </div>
                 <div className="mt-5 rounded-xl bg-white/10 p-5">
                   <h4 className="font-extrabold text-[#f2c230]">More Ways to Learn</h4>
-                  <p className="mt-2 text-sm text-white/85">Explore individual audio lessons, manuscripts and the complete 12-lesson program. Original books, music, and spoken-word offerings will be featured when ready and cleared for sale.</p>
+                  <p className="mt-2 text-sm text-white/85">Explore the 12 available audio lessons, written manuscripts, the complete bundles, or the separate video collection. Each has a one-time purchase price.</p>
                 </div>
                 <div className="mt-5 flex flex-col gap-3">
                   <a href="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#f2c230] px-5 py-3 text-sm font-extrabold text-[#17231c] hover:bg-white">
@@ -306,6 +314,8 @@ export default function Home() {
                     Talk with Brian’s Digital AI
                   </a>
                 </div>
+                <p className="mt-4 text-sm leading-relaxed text-white/80">No audio lesson can guarantee reconciliation. Your adult child decides whether and how to respond. The work you can choose is listening, accountability, and consistent respect for boundaries.</p>
+                <p className="mt-3 text-sm text-white/80">You may request a full digital-product refund within seven calendar days of purchase. <a href="/refund-policy" className="font-bold text-[#f2c230] underline">Read the refund policy.</a></p>
                 <p className="mt-5 text-xs leading-relaxed text-white/65">This website helps you choose. Approved product terms, agreements, and payments are handled in the separate GoHighLevel sales process.</p>
               </div>
             </div>
@@ -321,25 +331,46 @@ export default function Home() {
             <p className="mt-4 max-w-3xl text-lg text-[#314239]">Learn through original content created by Brian Keith Hill. Choose what helps you understand your circumstances, strengthen your decisions, and take the next step with greater wisdom.</p>
             <div className="mt-9 grid gap-6 lg:grid-cols-3">
               {[
-                { name: "Complete 12-Lesson Audio Program", detail: "A complete self-paced learning path covering listening, ownership, presence, healthy authority, apology, and rebuilding trust.", label: "View Complete Program", href: "/shop" },
-                { name: "Individual Audio Lessons", detail: "Choose the topic that fits your current situation. Learn and revisit insights at a pace that works for you.", label: "Explore All 12 Lessons", href: "/shop" },
-                { name: "Written Manuscripts & Bundles", detail: "Read the material on your own, take notes, and revisit the ideas that matter most to you.", label: "View Written Resources", href: "/shop" },
+                { name: "Listen without defending", detail: "When every conversation turns into an explanation, start with Lesson 01: Listening Without Defending.", format: "Individual streaming audio lesson", price: "$14.99 one-time", label: "Buy Lesson 01", href: productCheckout.audio },
+                { name: "Prepare for the next conversation", detail: "All 12 self-paced audio lessons: listening, responsibility, apology, presence, and rebuilding trust one step at a time.", format: "Complete 12-lesson audio program", price: "$79 one-time", label: "Buy All 12 Audio Lessons", href: productCheckout.fullAudio },
+                { name: "When silence is hard to face", detail: "Wrestling the Silence Away includes 10 short video reflections for fathers of adult children.", format: "10-video collection", price: "$19.99 one-time", label: "Buy the Video Series", href: productCheckout.video },
+                { name: "Read the first lesson at your own pace", detail: "Prefer written lessons? Begin with the Listening Without Defending manuscript PDF.", format: "Downloadable lesson PDF", price: "$14.99 one-time", label: "Buy the Lesson Manuscript", href: productCheckout.pdf },
+                { name: "Listen and read the whole program", detail: "The 12 streaming audio lessons plus all 12 downloadable manuscript PDFs in one purchase.", format: "Complete audio + manuscript bundle", price: "$129 one-time", label: "Buy the Complete Bundle", href: productCheckout.complete },
               ].map((offer) => (
                 <article key={offer.name} className="flex flex-col rounded-xl border-2 border-[#145b35] bg-white p-7 shadow-sm">
-                  <h3 className="text-2xl font-extrabold">{offer.name}</h3>
+                  <p className="text-sm font-black uppercase tracking-wide text-[#145b35]">{offer.format}</p>
+                  <h3 className="mt-2 text-2xl font-extrabold">{offer.name}</h3>
                   <p className="mt-3 flex-1 leading-relaxed text-[#425047]">{offer.detail}</p>
-                  <a href={offer.href} className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#114629]">
+                  <p className="mt-4 text-2xl font-black text-[#17231c]">{offer.price}</p>
+                  <a href={offer.href} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#114629]">
                     {offer.label} <ArrowRight className="h-4 w-4" aria-hidden="true"/>
                   </a>
+                  <p className="mt-3 text-xs text-[#425047]">One-time purchase. No appointment or membership required.</p>
                 </article>
               ))}
             </div>
+            <p className="mt-5 text-sm text-[#314239]">For digital purchases, request a full refund within seven calendar days. <a href="/refund-policy" className="font-bold text-[#145b35] underline">Read the refund policy.</a></p>
             <div className="mt-9 rounded-xl border border-[#e4c669] bg-[#fff8e0] p-6">
               <h3 className="text-xl font-extrabold">More Original Intellectual Property</h3>
-              <p className="mt-2 text-[#425047]">Books, original songs, spoken word, and additional learning products will join the catalog as rights, delivery formats, and GoHighLevel sales links are confirmed. They are not available for purchase here yet.</p>
+              <p className="mt-2 text-[#425047]">Only currently available, verified digital lessons, manuscripts, videos, and bundles are linked for purchase. Unfinished material is not offered for sale.</p>
             </div>
           </div>
         </section>
+
+        {(approvedStories.length > 0 || approvedProofCount !== null || approvedExternalMentions.length > 0) && (
+          <section aria-label="Verified Papa Life experiences and recognition" className="bg-[#fffaf0] py-10">
+            <div className="container">
+              <h2 className="text-2xl font-extrabold">Verified experiences</h2>
+              {approvedProofCount !== null && <p className="mt-3 font-bold">{approvedProofCount} fathers have completed the Check-In.</p>}
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {approvedStories.map((story) => <blockquote key={story.sourceId} className="rounded-xl border border-[#145b35]/25 p-5"><p>“{story.quote}”</p><cite className="mt-3 block text-sm font-bold">{story.firstName}</cite></blockquote>)}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-4">
+                {approvedExternalMentions.map((mention) => <a key={mention.url} href={mention.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[#145b35] underline">{mention.label} · {mention.date}</a>)}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="brian-story" aria-labelledby="creator-heading" className="bg-[#17231c] py-14 text-white md:py-18">
           <div className="container grid items-center gap-7 md:grid-cols-[1.5fr_1fr]">
@@ -347,6 +378,10 @@ export default function Home() {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet the Creator</p>
               <h2 id="creator-heading" className="mt-3 text-3xl font-extrabold md:text-4xl">Original Works by Brian Keith Hill</h2>
               <p className="mt-4 max-w-3xl text-lg leading-relaxed text-white/80">Papa Life is a fatherhood resource center sharing Brian's original ideas, teaching, audio lessons, and written works for fathers of adult children. The goal is to make his knowledge accessible without requiring an appointment or personal meeting.</p>
+              <div className="mt-4 flex flex-wrap gap-4 text-sm font-bold">
+                <a href="https://www.linkedin.com/in/brian-hill-bossmobility/" target="_blank" rel="noopener noreferrer" className="text-[#f2c230] underline">Brian on LinkedIn</a>
+                <a href="/changelog" className="text-[#f2c230] underline">Dated Papa Life updates</a>
+              </div>
             </div>
             <div className="rounded-xl border border-[#f2c230]/40 bg-white/10 p-6 text-center">
               <p className="text-lg font-extrabold text-[#f2c230]">Not sure which product fits?</p>
@@ -362,7 +397,8 @@ export default function Home() {
           <div className="container max-w-4xl text-center">
             <h2 id="how-to-purchase" className="text-3xl font-black md:text-4xl">Explore Here. Purchase Through GoHighLevel.</h2>
             <p className="mt-4 text-lg">PapaLifeCoach.com helps you discover and choose. Approved product details, agreement or terms, payment, and access are handled through the separate GoHighLevel sales process—not through checkout on this website.</p>
-            <a href="/shop" className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-8 py-3 font-extrabold text-white">Browse the Product Catalog <ArrowRight className="h-4 w-4"/></a>
+            <a href="/shop" className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-8 py-3 font-extrabold text-white">See Lessons and Prices <ArrowRight className="h-4 w-4"/></a>
+            <p className="mt-3 text-sm">You can request a digital-product refund within seven calendar days. <a href="/refund-policy" className="font-bold underline">Read the refund policy.</a></p>
           </div>
         </section>
       </main>
@@ -378,6 +414,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap justify-center gap-5 text-sm font-semibold text-white/75">
             <a href="/site-directory" className="hover:text-[#f2c230]">Site Directory</a>
+            <a href="/changelog" className="hover:text-[#f2c230]">Updates</a>
             <a href="/father-friendly-practice" className="hover:text-[#f2c230]">Father-Friendly Practice</a>
             <a href="/shop" className="hover:text-[#f2c230]">Explore Courses</a>
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>

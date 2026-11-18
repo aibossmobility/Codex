@@ -384,15 +384,15 @@ export default function Home() {
               controls
               playsInline
               preload="none"
-              poster="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose-poster.jpg"
+              poster="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose-poster.jpg?v=20261118-click-to-play"
               width={1280}
               height={720}
               aria-label="Two Learning Paths, One Purpose with Brian Keith Hill, captions and smooth-jazz music"
               className="mt-6 aspect-video w-full rounded-2xl bg-[#17231c] shadow-xl"
               style={{ objectFit: "contain" }}
             >
-              <source src="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4" type="video/mp4" />
-              Your browser does not support embedded video. <a href="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4" className="underline">Open the video</a>.
+              <source src="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4?v=20261118-click-to-play" type="video/mp4" />
+              Your browser does not support embedded video. <a href="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4?v=20261118-click-to-play" className="underline">Open the video</a>.
             </video>
             <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-base font-extrabold">
               <a href="/shop" className="text-[#145b35] underline">Explore Papa Life lessons</a>

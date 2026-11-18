@@ -372,6 +372,35 @@ export default function Home() {
           </section>
         )}
 
+
+        {/* Shared brand introduction, deliberately visitor-controlled with no autoplay. */}
+        <section id="two-learning-paths" aria-labelledby="two-learning-paths-heading" className="bg-[#fff8e6] py-12 text-[#17231c] md:py-16">
+          <div className="container max-w-5xl">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#145b35]">A 57-second introduction from Brian</p>
+            <h2 id="two-learning-paths-heading" className="mt-3 text-3xl font-extrabold leading-tight md:text-5xl">Two Learning Paths. One Purpose.</h2>
+            <p className="mt-4 max-w-3xl text-lg leading-relaxed">Papa Life helps fathers of adult children strengthen relationships. AI Boss Mobility helps entrepreneurs and community leaders use AI thoughtfully. Both start with people.</p>
+            <p className="mt-3 font-bold text-[#145b35]">Press Play to watch and listen. The narration and smooth-jazz music never start automatically.</p>
+            <video
+              controls
+              playsInline
+              preload="none"
+              poster="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose-poster.jpg"
+              width={1280}
+              height={720}
+              aria-label="Two Learning Paths, One Purpose with Brian Keith Hill, captions and smooth-jazz music"
+              className="mt-6 aspect-video w-full rounded-2xl bg-[#17231c] shadow-xl"
+              style={{ objectFit: "contain" }}
+            >
+              <source src="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4" type="video/mp4" />
+              Your browser does not support embedded video. <a href="https://ai.bossmobilelifecoach.com/videos/two-learning-paths-one-purpose.mp4" className="underline">Open the video</a>.
+            </video>
+            <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-base font-extrabold">
+              <a href="/shop" className="text-[#145b35] underline">Explore Papa Life lessons</a>
+              <a href="https://ai.bossmobilelifecoach.com/digital-courses" className="text-[#145b35] underline">Explore AI Boss Mobility courses</a>
+            </div>
+          </div>
+        </section>
+
         <section id="brian-story" aria-labelledby="creator-heading" className="bg-[#17231c] py-14 text-white md:py-18">
           <div className="container grid items-center gap-7 md:grid-cols-[1.5fr_1fr]">
             <div>

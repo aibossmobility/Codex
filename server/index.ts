@@ -6801,9 +6801,15 @@ async function startServer() {
     }
   });
 
-  app.get("/api/admin/ai-boss/mission-control", requireAuth, (_req, res) => {
+  app.get("/api/admin/ai-boss/mission-control", requireAuth, (req, res) => {
     try {
-      res.json({ ok: true, mission: { ...getAiBossMissionControl(db), campaigns: getAiBossCampaigns(db) } });
+      const rawProject = String(req.query.project || "").trim();
+      if (rawProject && rawProject !== "papa-life" && rawProject !== "ai-boss-mobility") {
+        res.status(400).json({ ok: false, error: "Invalid business scope." });
+        return;
+      }
+      const project = rawProject ? rawProject as "papa-life" | "ai-boss-mobility" : undefined;
+      res.json({ ok: true, mission: { ...getAiBossMissionControl(db, project), campaigns: project ? [] : getAiBossCampaigns(db) } });
     } catch (e) {
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }

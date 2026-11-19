@@ -30,6 +30,12 @@ const pages = [
   ["/father-child-estrangement", "monthly", "0.85"],
   ["/about-brian-keith-hill", "monthly", "0.8"],
   ["/courses", "weekly", "0.8"],
+  ["/books", "monthly", "0.7"],
+  ["/podcast", "monthly", "0.7"],
+  ["/courses/11", "monthly", "0.70"],
+  ["/resources", "monthly", "0.75"],
+  ["/contact", "monthly", "0.60"],
+  ["/refund-policy", "yearly", "0.35"],
   ["/papa-first-lesson", "monthly", "0.8"],
   ["/papa-intro", "monthly", "0.7"],
   ["/ai-coach", "monthly", "0.75"],
@@ -42,7 +48,28 @@ const pages = [
 ];
 
 const url = (pathname) => `${site}${pathname === "/" ? "/" : pathname}`;
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([pathname, changefreq, priority]) => `  <url>\n    <loc>${url(pathname)}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
+// Use actual committed source modification dates; never substitute today's build date.
+// Pages whose source history is unavailable intentionally have no lastmod.
+import { execFileSync } from "node:child_process";
+const sourceForPath = (pathname) => {
+  if (pathname === "/") return "client/src/pages/Home.tsx";
+  if (pathname.startsWith("/house")) return "client/src/pages/PapaHouse.tsx";
+  if (pathname === "/site-directory") return "client/src/pages/SiteDirectory.tsx";
+  if (pathname === "/shop") return "client/src/pages/Shop.tsx";
+  if (pathname === "/courses") return "client/src/pages/Courses.tsx";
+  if (pathname === "/welcome-to-papa-life") return "client/src/pages/WelcomeToPapaLife.tsx";
+  if (pathname === "/my-journey") return "client/src/pages/FatherJourney.tsx";
+  return null;
+};
+function lastModified(pathname) {
+  const source = sourceForPath(pathname);
+  const sources = source ? [source, "scripts/generate-static-seo-pages.mjs"] : ["scripts/generate-static-seo-pages.mjs"];
+  try {
+    // %cs comes from the commit touching the source, not the deployment time.
+    return execFileSync("git", ["log", "-1", "--format=%cs", "--", ...sources], { encoding: "utf8" }).trim();
+  } catch { return ""; }
+}
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([pathname, changefreq, priority]) => `  <url>\n    <loc>${url(pathname)}</loc>${lastModified(pathname) ? `\n    <lastmod>${lastModified(pathname)}</lastmod>` : ""}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
 
 const robots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${site}/sitemap.xml\n`;
 const plainSitemap = pages.map(([pathname]) => url(pathname)).join("\n") + "\n";

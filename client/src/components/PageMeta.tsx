@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
 
 type JsonLd = Record<string, unknown> | Record<string, unknown>[];
 
@@ -22,19 +23,23 @@ function upsertMeta(name: string, content: string, attr: "name" | "property" = "
 
 export function PageMeta({ title, description, keywords, jsonLd, canonicalPath }: PageMetaProps) {
   useEffect(() => {
-    document.title = title;
-    upsertMeta("description", description);
+    // Keep the visible browser metadata aligned with the server-rendered audit fixes.
+    const publicPath = canonicalPath || window.location.pathname;
+    const pageTitle = (auditSEO.titles as Record<string, string>)[publicPath] || title;
+    const pageDescription = (auditSEO.descriptions as Record<string, string>)[publicPath] || description;
+    document.title = pageTitle;
+    upsertMeta("description", pageDescription);
     if (keywords) upsertMeta("keywords", keywords);
-    upsertMeta("og:title", title, "property");
-    upsertMeta("og:description", description, "property");
+    upsertMeta("og:title", pageTitle, "property");
+    upsertMeta("og:description", pageDescription, "property");
     upsertMeta("og:type", "website", "property");
     const canonicalUrl = canonicalPath ? new URL(canonicalPath, "https://papalifecoach.com").toString() : window.location.href;
     upsertMeta("og:url", canonicalUrl, "property");
     upsertMeta("og:site_name", "Papa Life Coach", "property");
     upsertMeta("og:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp", "property");
     upsertMeta("twitter:card", "summary_large_image");
-    upsertMeta("twitter:title", title);
-    upsertMeta("twitter:description", description);
+    upsertMeta("twitter:title", pageTitle);
+    upsertMeta("twitter:description", pageDescription);
     upsertMeta("twitter:image", "https://papalifecoach.com/images/papa-life-approved-20261016.webp");
 
     if (canonicalPath) {

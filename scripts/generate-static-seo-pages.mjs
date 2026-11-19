@@ -501,6 +501,12 @@ homepage.relatedLinks = [
   ...(homepage.relatedLinks || []),
 ];
 
+// One shared source for server-rendered and browser-visible SEO copy.
+const auditSEO = JSON.parse(fs.readFileSync(path.resolve("client/src/content/papa-seo-audit-overrides.json"), "utf8"));
+const auditTitles = auditSEO.titles;
+const auditDescriptions = auditSEO.descriptions;
+const auditDefinitions = auditSEO.definitions;
+
 const defaultLinks = [
   ["Papa Life home", "/"], ["Start with Awareness Wheel", "/my-journey"],
   ["The PAPA Framework", "/papa-framework"], ["Course catalog", "/courses"],
@@ -516,6 +522,11 @@ for (const page of pages) {
     if (extra.relatedLinks) page.relatedLinks = extra.relatedLinks;
   }
   if (!page.relatedLinks?.length) page.relatedLinks = defaultLinks.filter(([, href]) => href !== page.path);
+  if (auditTitles[page.path]) page.title = auditTitles[page.path];
+  if (auditDescriptions[page.path]) page.description = auditDescriptions[page.path];
+  if (auditDefinitions[page.path] && !page.intro.startsWith(auditDefinitions[page.path])) {
+    page.intro = `${auditDefinitions[page.path]} ${page.intro}`;
+  }
   if (page.path === "/papa-framework") page.title = "The PAPA Framework for Fathers of Adult Children | Papa Life";
   if (page.path === "/relationship-assessment") page.title = "2-Minute Fatherhood Check-In | Papa Life";
 }

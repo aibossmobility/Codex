@@ -60,10 +60,28 @@ export default function AiBossBusinessOS() {
   }, []);
 
   useEffect(() => {
-    const manifest = document.createElement("link");
-    manifest.rel = "manifest";
-    manifest.href = "/ai-boss-manifest.webmanifest";
-    document.head.appendChild(manifest);
+    // The public website defaults to Papa Life metadata. Override the title,
+    // manifest and icons only while the separate AI Boss OS route is mounted.
+    const priorTitle = document.title;
+    document.title = "AI Boss Mobility OS | Technology & Business";
+    const restores: Array<() => void> = [];
+    const brandImage = businessSite + "/images/ai-boss-journey-logo.webp";
+    const apply = (selector: string, attribute: string, value: string) => {
+      const element = document.querySelector<HTMLElement>(selector);
+      if (!element) return;
+      const previous = element.getAttribute(attribute);
+      element.setAttribute(attribute, value);
+      restores.push(() => {
+        if (previous == null) element.removeAttribute(attribute);
+        else element.setAttribute(attribute, previous);
+      });
+    };
+    apply('link[rel="manifest"]', "href", "/ai-boss-manifest.webmanifest");
+    apply('link[rel="icon"]', "href", brandImage);
+    apply('link[rel="apple-touch-icon"]', "href", brandImage);
+    apply('meta[name="apple-mobile-web-app-title"]', "content", "AI Boss OS");
+    apply('meta[name="theme-color"]', "content", "#0e7490");
+    apply('meta[name="description"]', "content", "Private AI Boss Mobility technology and consulting operations.");
     const onPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallEvent);
@@ -112,7 +130,8 @@ export default function AiBossBusinessOS() {
       window.removeEventListener("beforeinstallprompt", onPrompt);
       window.removeEventListener("appinstalled", onInstalled);
       recognitionRef.current?.abort?.();
-      manifest.remove();
+      document.title = priorTitle;
+      restores.reverse().forEach(restore => restore());
     };
   }, [load, navigate]);
 

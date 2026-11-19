@@ -348,6 +348,22 @@ export default function AiBossMobile() {
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
         <PapaReadAloud />
+
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardHeader>
+            <CardTitle className="text-white">Recent Owner Updates</CardTitle>
+            <p className="text-sm text-gray-400">As of November 19, 2026 · Read-only briefing, not live support or sales verification. The canonical Google Hub remains the authority.</p>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-gray-200"><strong className="text-brand-yellow">Papa Life website:</strong> HeyCatch-driven SEO, navigation and product-clarity improvements have been committed. Live deployment and checkout-to-course access still require separate verification.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Two Learning Paths:</strong> The approved green-sweater introduction with captions and low-volume smooth jazz was added to the websites' code with visitor-controlled playback and no autoplay.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Free AI practice:</strong> Eight public presentation experiences welcome fathers and family allies or entrepreneurs and organization leaders. Keep Papa Life and AI Boss Mobility customer data separate; no mandatory payment, lead capture or sales pitch.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Support still open:</strong> Papa Life HighLevel case #6721620 concerns the blank Orders screen and unverified test purchase-to-access. AI Boss Mobility case #6676266 is separate. Hostinger domain-management review is pending; no DNS or payment changes authorized.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Work and meetings:</strong> Prioritize paid employment and contract opportunities. Elgin Rose meeting: November 19. San Leandro Adult School discussion: November 20. The separate City of San Leandro proposal remains paused.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Knowledge safeguards:</strong> PAPA = Presence → Authority → Purpose → Alignment. Run Your Own Race is an unfinished manuscript, not an active product. No new Papa Life course or pilot launches without a new owner decision.</p>
+            <a className="inline-flex items-center gap-1 text-brand-yellow underline underline-offset-4" href="https://docs.google.com/document/d/1TXkHlLDd-DzrSwF9JbcnK3mdDZw6fFehwgi1xZwDin4/edit" target="_blank" rel="noopener noreferrer">Open current canonical Google Hub <ExternalLink className="h-3.5 w-3.5" /></a>
+          </CardContent>
+        </Card>
         <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
           <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life logo" className="h-44 w-full bg-white object-contain p-4 opacity-95 sm:h-56" />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">

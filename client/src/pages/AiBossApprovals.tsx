@@ -31,6 +31,7 @@ type WorkerReceipt = {
 
 type Mission = {
   worker_receipts?: WorkerReceipt[];
+  queue?: { awaiting_approval: number; approved: number; executing: number; failed: number; waiting_for_mac: number };
   mac_online: boolean;
   android_online: boolean;
   active_companion: "android" | "mac" | null;
@@ -118,6 +119,21 @@ export default function AiBossApprovals() {
           </CardContent>
         </Card>
 
+        <section aria-label="Work queue status" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {([
+            ["Pending approval", mission?.queue?.awaiting_approval ?? 0],
+            ["Approved", mission?.queue?.approved ?? 0],
+            ["Waiting for Mac", mission?.queue?.waiting_for_mac ?? 0],
+            ["Executing", mission?.queue?.executing ?? 0],
+            ["Failed", mission?.queue?.failed ?? 0],
+            ["Recent receipts", mission?.worker_receipts?.filter((item) => item.status === "completed").length ?? 0],
+          ] as const).map(([label, count]) => (
+            <div key={label} className="rounded-xl border border-white/15 bg-[#111] p-3">
+              <p className="text-xs text-white/60">{label}</p>
+              <p className="mt-1 text-xl font-bold text-white">{count}</p>
+            </div>
+          ))}
+        </section>
         <Card className="border-brand-yellow/30 bg-[#111]">
           <CardContent className="p-4 text-sm text-white/80">
             <p className="font-semibold text-white">What happens to an assignment?</p>
@@ -172,9 +188,12 @@ export default function AiBossApprovals() {
                   <span className={item.delivery === "verified"
                     ? "rounded bg-green-600/20 px-2 py-1 text-xs text-green-300"
                     : "rounded bg-yellow-600/20 px-2 py-1 text-xs text-yellow-200"}>
-                    {item.delivery === "verified" ? "Deliverable verified"
-                    : item.delivery === "review_only" ? "Review only — deliverable unverified"
-                    : item.delivery === "needs_attention" ? "Needs follow-up" : item.status.replace(/_/g, " ")}
+                    {item.delivery === "verified" ? "Completed — evidence verified"
+                    : item.delivery === "review_only" ? "Completed — evidence needs review"
+                    : item.delivery === "needs_attention" ? "Failed — needs attention"
+                    : item.status === "awaiting_approval" ? "Pending approval"
+                    : item.status === "approved" ? mission?.mac_online ? "Approved — awaiting worker" : "Approved — waiting for Mac"
+                    : item.status === "executing" ? "Executing" : item.status.replace(/_/g, " ")}
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-gray-400">{item.project} · Updated {item.updated_at}</p>

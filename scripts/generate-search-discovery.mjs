@@ -61,13 +61,22 @@ const sourceForPath = (pathname) => {
   if (pathname === "/my-journey") return "client/src/pages/FatherJourney.tsx";
   return null;
 };
+// Railway's source archive may omit .git. Preserve genuine source-derived dates
+// already committed in the sitemap rather than replacing them with build dates.
+const committedSitemap = fs.existsSync(path.join(publicDir, "sitemap.xml"))
+  ? fs.readFileSync(path.join(publicDir, "sitemap.xml"), "utf8") : "";
+const preservedLastmod = new Map(
+  [...committedSitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/g)]
+    .map((match) => [match[1], match[2]])
+);
 function lastModified(pathname) {
   const source = sourceForPath(pathname);
   const sources = source ? [source, "scripts/generate-static-seo-pages.mjs"] : ["scripts/generate-static-seo-pages.mjs"];
   try {
     // %cs comes from the commit touching the source, not the deployment time.
-    return execFileSync("git", ["log", "-1", "--format=%cs", "--", ...sources], { encoding: "utf8" }).trim();
-  } catch { return ""; }
+    const sourceDate = execFileSync("git", ["log", "-1", "--format=%cs", "--", ...sources], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return sourceDate || preservedLastmod.get(url(pathname)) || "";
+  } catch { return preservedLastmod.get(url(pathname)) || ""; }
 }
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([pathname, changefreq, priority]) => `  <url>\n    <loc>${url(pathname)}</loc>${lastModified(pathname) ? `\n    <lastmod>${lastModified(pathname)}</lastmod>` : ""}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
 

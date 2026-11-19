@@ -350,7 +350,22 @@ export default function AiBossMobile() {
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
-        <PapaReadAloud />
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardContent className="space-y-3 p-4 sm:p-5">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Start here</p>
+            <h2 className="text-xl font-bold text-white">What do you need to do?</h2>
+            <p className="text-sm text-white/70">You can open this dashboard and review work from your phone or tablet with your Mac off. Only Mac-based workers need it online to finish an assignment.</p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Button className="min-h-12 bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => {
+                setAssignmentOpen(true);
+                window.setTimeout(() => document.getElementById("assign-worker-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
+              }}><ClipboardList className="mr-2 h-4 w-4" />Check a website</Button>
+              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Review work &amp; approvals</Button>
+              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => document.getElementById("papa-read-aloud")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Mic className="mr-2 h-4 w-4" />Read text aloud</Button>
+            </div>
+          </CardContent>
+        </Card>
+        <div id="papa-read-aloud"><PapaReadAloud /></div>
         {installHelpOpen && !isInstalled && (
           <Card className="border-brand-yellow/30 bg-[#111]">
             <CardContent className="p-4 text-sm text-white/85">

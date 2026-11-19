@@ -2,6 +2,7 @@ import { Link, useRoute } from "wouter";
 import { ArrowLeft, ArrowRight, BookOpen, Headphones, Home, MessageCircleHeart, Play, Sun, Compass, ShoppingBag } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { PageMeta } from "@/components/PageMeta";
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import "./PapaHouse.css";
 
 type Room = {
@@ -163,7 +164,7 @@ function HouseHall() {
           <div className="papa-house-hall-content">
             <span className="papa-house-kicker">Papa Life · Welcome inside</span>
             <h1 id="papa-house-hall-title">Make yourself <em>at home.</em></h1>
-            <p>There is room here to read, listen, reflect, and find something that speaks to your next chapter. Wander at your own pace.</p>
+            <p>{auditSEO.definitions["/house"]} There is room here to read, listen, reflect, and find something that speaks to your next chapter. Wander at your own pace.</p>
             <a href="#choose-room" className="papa-house-button">Choose a room <ArrowRight size={20} aria-hidden="true"/></a>
           </div>
         </section>
@@ -201,6 +202,9 @@ function RoomDetail({ room }: { room: Room }) {
           <div className="papa-house-detail-content">
             <span className="papa-house-kicker">{room.eyebrow}</span>
             <h1>{room.title}</h1>
+            {Object.prototype.hasOwnProperty.call(auditSEO.definitions, "/house/" + room.slug) && (
+              <p className="mb-3 font-medium">{(auditSEO.definitions as Record<string, string>)["/house/" + room.slug]}</p>
+            )}
             <p>{room.intro}</p>
             <div className="papa-house-detail-actions">
               <a className="papa-house-button" href={room.href}>{room.action} <ArrowRight size={19} aria-hidden="true"/></a>

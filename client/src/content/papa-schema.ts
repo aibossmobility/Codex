@@ -23,8 +23,8 @@ export const ORGANIZATION_SCHEMA = {
   },
   sameAs: [
     "https://www.linkedin.com/in/brian-hill-bossmobility",
-    "https://briankeithhill.com",
-    "https://www.alignable.com/san-leandro-ca/papa-life-fatherhood-life-coach-ambassador-of-the-east-bay-ca",
+    "https://www.youtube.com/@PapaLifeCoach",
+    "https://www.instagram.com/papalifecoach/",
   ],
 };
 

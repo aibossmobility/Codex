@@ -28,6 +28,9 @@ const groups = [
     title: "Learn & Connect",
     links: [
       ["Courses", "/courses"],
+      ["Books and written resources", "/books"],
+      ["Papa Life podcast", "/podcast"],
+      ["Lesson 11", "/courses/11"],
       ["Papa First Lesson", "/papa-first-lesson"],
       ["Papa Intro", "/papa-intro"],
       ["Papa Life AI Coach", "/ai-coach"],
@@ -59,7 +62,7 @@ export default function SiteDirectory() {
           <a href="/" aria-label="Papa Life home"><SiteLogoStacked size="sm" /></a>
           <div>
             <h1 className="text-2xl font-bold">Papa Life Site Directory</h1>
-            <p className="text-sm text-gray-400">All public Papa Life pages in one place.</p>
+            <p className="text-sm text-gray-400">The Papa Life Site Directory is a list of public resources and guidance pages.</p>
           </div>
         </div>
       </header>

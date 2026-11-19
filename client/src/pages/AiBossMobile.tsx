@@ -334,10 +334,10 @@ export default function AiBossMobile() {
   return (
     <div className="min-h-screen bg-[#090909] text-white pb-24">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
-        <div className="max-w-5xl mx-auto flex items-center gap-3">
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center gap-3">
           <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-brand-yellow/50" />
           <div><h1 className="font-bold leading-tight">Papa Life OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex flex-wrap items-center gap-2">
             {!isInstalled && (
               <Button size="sm" className="bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => void installAiBoss()}>
                 <Smartphone className="mr-2 h-4 w-4" />Install

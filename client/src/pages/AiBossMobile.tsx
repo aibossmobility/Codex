@@ -105,10 +105,12 @@ export default function AiBossMobile() {
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
     window.addEventListener("appinstalled", onAppInstalled);
 
-    const manifest = document.createElement("link");
+    const existingManifest = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    const previousManifestHref = existingManifest?.getAttribute("href") ?? null;
+    const manifest = existingManifest || document.createElement("link");
     manifest.rel = "manifest";
     manifest.href = "/papa-life-os-manifest.webmanifest";
-    document.head.appendChild(manifest);
+    if (!existingManifest) document.head.appendChild(manifest);
     let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" }).then((response) => response.json()).then((data) => {
       if (!data.ok) navigate("/login");
@@ -154,7 +156,8 @@ export default function AiBossMobile() {
       assignmentRecognitionRef.current?.abort?.();
       window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       window.removeEventListener("appinstalled", onAppInstalled);
-      manifest.remove();
+      if (existingManifest && previousManifestHref != null) manifest.setAttribute("href", previousManifestHref);
+      else manifest.remove();
     };
   }, [load, navigate]);
 
@@ -363,9 +366,9 @@ export default function AiBossMobile() {
             <h2 className="text-xl font-bold text-white">What do you need to do?</h2>
             <p className="text-sm text-white/70">You can open this dashboard and review work from your phone or tablet with your Mac off. Only Mac-based workers need it online to finish an assignment.</p>
             <div className="grid gap-2 sm:grid-cols-3">
-              <Button className="min-h-12 bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => document.getElementById("papa-capture")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Users className="mr-2 h-4 w-4" />Remember a fatherhood moment</Button>
-              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Papa Life approvals</Button>
-              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => document.getElementById("papa-read-aloud")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Mic className="mr-2 h-4 w-4" />Read text aloud</Button>
+              <Button className="min-h-12 w-full min-w-0 whitespace-normal bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => document.getElementById("papa-capture")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Users className="mr-2 h-4 w-4" />Remember a fatherhood moment</Button>
+              <Button variant="outline" className="min-h-12 w-full min-w-0 whitespace-normal border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Papa Life approvals</Button>
+              <Button variant="outline" className="min-h-12 w-full min-w-0 whitespace-normal border-white/30" onClick={() => document.getElementById("papa-read-aloud")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Mic className="mr-2 h-4 w-4" />Read text aloud</Button>
             </div>
           </CardContent>
         </Card>

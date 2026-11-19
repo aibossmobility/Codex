@@ -114,18 +114,14 @@ export default function AiBossMobile() {
       if (!data.ok) navigate("/login");
       else {
         if ("serviceWorker" in navigator) {
+          // Papa Life OS never installs the AI Boss Mobility service worker.
+          // Remove any obsolete root-scoped AI Boss worker from older shared dashboard installs.
           void navigator.serviceWorker.getRegistrations().then(async (registrations) => {
-            const aiBossScriptPath = "/ai-boss-sw.js";
-            await Promise.all(
-              registrations
-                .filter((registration) => {
-                  const scriptUrl = registration.active?.scriptURL || registration.waiting?.scriptURL || registration.installing?.scriptURL;
-                  return Boolean(scriptUrl && new URL(scriptUrl).pathname === aiBossScriptPath && new URL(registration.scope).pathname === "/");
-                })
-                .map((registration) => registration.unregister())
-            );
-            await navigator.serviceWorker.register(aiBossScriptPath, { scope: "/ai-boss" });
-          }).catch((error) => console.warn("Papa Life OS service worker registration failed", error));
+            await Promise.all(registrations.filter((registration) => {
+              const scriptUrl = registration.active?.scriptURL || registration.waiting?.scriptURL || registration.installing?.scriptURL;
+              return Boolean(scriptUrl && new URL(scriptUrl).pathname === "/ai-boss-sw.js" && new URL(registration.scope).pathname === "/");
+            }).map((registration) => registration.unregister()));
+          }).catch(() => {});
         }
         void load();
         if (/Android/i.test(window.navigator.userAgent)) {
@@ -181,7 +177,7 @@ export default function AiBossMobile() {
     if (!clean) return;
     setSaving(true);
     try {
-      const summary = mode === "father" ? `I just met a father. ${clean}` : clean;
+      const summary = mode === "father" ? "Papa Life fatherhood note: " + clean : clean;
       const result = await apiJson<{ routing: "workspace_completed" | "deterministic_workspace" | "captured_for_review"; execution_error?: string | null }>("/api/admin/ai-boss/instructions", {
         method: "POST",
         headers: { "content-type": "application/json" },

@@ -58,7 +58,7 @@ export default function AiBossMobile() {
   const [loading, setLoading] = useState(true);
   const [instruction, setInstruction] = useState("");
   const [assignmentOpen, setAssignmentOpen] = useState(false);
-  const [assignmentProject, setAssignmentProject] = useState<"papa-life" | "ai-boss-mobility">("papa-life");
+  const assignmentProject = "papa-life" as const;
   const [assignmentRole, setAssignmentRole] = useState("seo-website");
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
   const [assignmentText, setAssignmentText] = useState("");
@@ -81,7 +81,7 @@ export default function AiBossMobile() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiJson<{ mission: Mission }>("/api/admin/ai-boss/mission-control");
+      const data = await apiJson<{ mission: Mission }>("/api/admin/ai-boss/mission-control?project=papa-life");
       setMission(data.mission);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Mission Control could not be loaded.");
@@ -336,20 +336,31 @@ export default function AiBossMobile() {
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
         <div className="max-w-5xl mx-auto flex flex-wrap items-center gap-3">
           <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life" className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-brand-yellow/50" />
-          <div><h1 className="font-bold leading-tight">Papa Life OS</h1><p className="text-xs text-gray-500">Mobile Mission Control</p></div>
+          <div><h1 className="font-bold leading-tight">Papa Life OS</h1><p className="text-xs text-gray-500">People · Fatherhood · Relationships</p></div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {!isInstalled && (
               <Button size="sm" className="bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => void installAiBoss()}>
                 <Smartphone className="mr-2 h-4 w-4" />Install
               </Button>
             )}
-            <Button size="sm" variant="outline" className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => navigate("/papa-life-os/all-pages")}>All Pages</Button>
+            <Button size="sm" variant="outline" className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10" onClick={() => { window.location.href = "/papa-framework"; }}>PAPA Framework</Button>
             <Button size="icon" variant="ghost" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
           </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
+        <section aria-label="Papa Life brand banner" className="overflow-hidden rounded-2xl border border-brand-yellow/40 bg-[#111]">
+          <div className="bg-white p-3 sm:p-5">
+            <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life — fathers, family and relationship restoration" className="mx-auto max-h-64 w-full object-contain" />
+          </div>
+          <div className="p-5 sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-yellow">People · Fathers · Family Connection</p>
+            <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Papa Life OS</h2>
+            <p className="mt-2 max-w-2xl text-sm text-white/75">Your private home for fatherhood conversations, relationship follow-ups, and the PAPA journey: Presence → Authority → Purpose → Alignment.</p>
+            <a href="/ai-boss" className="mt-3 inline-block text-xs text-white/50 underline">Switch to AI Boss Mobility OS — separate technology dashboard</a>
+          </div>
+        </section>
         <Card className="border-brand-yellow/30 bg-[#111]">
           <CardContent className="space-y-3 p-4 sm:p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Start here</p>
@@ -403,14 +414,6 @@ export default function AiBossMobile() {
             <a className="inline-flex items-center gap-1 text-brand-yellow underline underline-offset-4" href="https://docs.google.com/document/d/1TXkHlLDd-DzrSwF9JbcnK3mdDZw6fFehwgi1xZwDin4/edit" target="_blank" rel="noopener noreferrer">Open current canonical Google Hub <ExternalLink className="h-3.5 w-3.5" /></a>
           </CardContent>
         </Card>
-        <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
-          <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life logo" className="h-44 w-full bg-white object-contain p-4 opacity-95 sm:h-56" />
-          <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">Powered by AI Boss Mobility</p>
-            <h2 className="mt-1 text-2xl font-black sm:text-3xl">Papa Life OS</h2>
-            <p className="mt-1 max-w-xl text-sm text-white/75">Your secure mobile command center for Papa Life, Google Workspace, approvals, and Android messaging.</p>
-          </div>
-        </section>
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <StatusCard icon={Laptop} label="Mac" value={mission?.mac_online ? "Online" : "Offline"} tone={mission?.mac_online ? "good" : "waiting"} />
           <StatusCard icon={Smartphone} label="Android companion" value={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "Online" : "Not reporting"} tone={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "good" : "neutral"} />
@@ -433,28 +436,13 @@ export default function AiBossMobile() {
         </Card>
         <Card className="bg-[#111] border-brand-yellow/30">
           <CardContent className="p-5 sm:p-7">
-            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life OS — Worker Command Center</p>
-            <button
-              type="button"
-              onClick={() => setAssignmentOpen((open) => !open)}
-              className="mx-auto mt-5 flex aspect-square w-[min(72vw,320px)] max-w-full flex-col items-center justify-center rounded-full border-[10px] border-[#f2cb58] bg-[#d9aa21] px-6 text-center text-black transition active:scale-[0.98]"
-              aria-expanded={assignmentOpen}
-              aria-controls="assign-worker-form"
-            >
-              <ClipboardList className="mb-3 h-12 w-12" aria-hidden="true" />
-              <span className="text-sm font-black tracking-[0.14em]">PAPA LIFE OS</span>
-              <span className="mt-3 text-[clamp(1.65rem,6vw,2.5rem)] font-black leading-tight">GIVE ASSIGNMENT TO WORKERS</span>
-              <span className="mt-4 text-base font-semibold">{assignmentOpen ? "Tap to close assignment form" : "Tap to choose a worker"}</span>
-            </button>
+            <p className="text-xs uppercase tracking-[0.2em] text-brand-yellow font-bold">Papa Life — optional website maintenance</p>
+            <Button type="button" variant="outline" className="mt-3 w-full border-brand-yellow/40 text-brand-yellow" aria-expanded={assignmentOpen} aria-controls="assign-worker-form" onClick={() => setAssignmentOpen(open => !open)}>
+              <ClipboardList className="mr-2 h-4 w-4" />{assignmentOpen ? "Close optional website audit" : "Open optional website audit"}
+            </Button>
             {assignmentOpen && (
               <form id="assign-worker-form" onSubmit={submitWorkerAssignment} className="mt-5 space-y-3 rounded-xl border border-brand-yellow/30 bg-black/40 p-4">
-                <label htmlFor="worker-project" className="block text-sm font-semibold text-white">Business</label>
-                <select id="worker-project" value={assignmentProject} onChange={(event) => {
-                  setAssignmentProject(event.target.value as "papa-life" | "ai-boss-mobility");
-                }} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
-                  <option value="papa-life">Papa Life</option>
-                  <option value="ai-boss-mobility">AI Boss Mobility Consulting</option>
-                </select>
+                <p className="text-sm text-brand-yellow">Business: Papa Life only. AI Boss Mobility has its own dashboard.</p>
                 <label htmlFor="worker-role" className="block text-sm font-semibold text-white">Available worker</label>
                 <select id="worker-role" value={assignmentRole} onChange={(event) => setAssignmentRole(event.target.value)} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
                   <option value="seo-website">Website &amp; SEO audit — read-only</option>

@@ -210,7 +210,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
                 <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill" className="h-12 w-12 rounded-full border border-brand-yellow/50 object-cover" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-extrabold text-white">Talk with Brian's Digital Twin</h2>
+                    <h2 className="text-base font-extrabold text-white">Talk with Brian's Digital AI</h2>
                     <Sparkles className="h-4 w-4 text-brand-yellow" aria-hidden="true" />
                   </div>
                   <p className="text-xs font-semibold text-white/60">Relationship-aware Papa Life guidance — Brian stays human.</p>

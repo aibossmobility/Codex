@@ -884,7 +884,7 @@ export default function PapaAiExperience() {
           <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,.72fr)_minmax(420px,1.28fr)]">
             <div className="pt-2">
               <Badge className="bg-brand-yellow text-black">Same Brain · Live Video</Badge>
-              <h2 className="mt-4 text-3xl font-extrabold md:text-4xl">Talk face-to-face with Brian’s Digital Twin.</h2>
+              <h2 className="mt-4 text-3xl font-extrabold md:text-4xl">Talk face-to-face with Brian’s Digital AI.</h2>
               <p className="mt-4 text-base leading-relaxed text-white/68">
                 This live Twin uses the same Papa Life framework and approved knowledge posture as the text AI Coach below.
               </p>

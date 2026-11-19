@@ -2160,7 +2160,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
   "connect-src 'self' https://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.elevenlabs.io wss://api.us.elevenlabs.io https://api.liveavatar.com wss://api.liveavatar.com https://*.livekit.cloud wss://*.livekit.cloud https://cloudflareinsights.com https://in.heycatch.ai https://www.google-analytics.com https://region1.google-analytics.com",
-  "media-src 'self' blob: data:",
+  "media-src 'self' blob: data: https://ai.bossmobilelifecoach.com",
   "frame-src 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",

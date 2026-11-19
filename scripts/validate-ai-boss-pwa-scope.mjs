@@ -16,6 +16,7 @@ assert.doesNotMatch(sharedHtml, /apple-mobile-web-app-title[^>]+AI Boss/, "Share
 assert.doesNotMatch(appEntry, /ai-boss-sw\.js/, "The shared application entry must not register the AI Boss service worker");
 
 assert.match(papaMobile, /papa-life-os-manifest\.webmanifest/, "Papa Life must use its own manifest");
+assert.doesNotMatch(papaMobile, /serviceWorker\.register\(aiBossScriptPath/, "Papa Life must not install an AI Boss worker");
 assert.match(bossMobile, /ai-boss-manifest\.webmanifest/, "AI Boss must use its own manifest");
 assert.match(bossMobile, /serviceWorker\.register\("\/ai-boss-sw\.js", \{ scope: "\/ai-boss" \}\)/, "AI Boss service worker must be scoped to /ai-boss");
 assert.match(bossMobile, /reg\.unregister\(\)/, "AI Boss must remove old root-scoped worker installations");

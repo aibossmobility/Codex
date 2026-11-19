@@ -31,6 +31,7 @@ type WorkerReceipt = {
 
 type Mission = {
   worker_receipts?: WorkerReceipt[];
+  queue?: { awaiting_approval: number; approved: number; executing: number; failed: number; waiting_for_mac: number };
   mac_online: boolean;
   android_online: boolean;
   active_companion: "android" | "mac" | null;
@@ -54,6 +55,7 @@ export default function AiBossApprovals() {
   const [mission, setMission] = useState<Mission | null>(null);
   const [loading, setLoading] = useState(true);
   const [decidingId, setDecidingId] = useState<number | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -103,7 +105,7 @@ export default function AiBossApprovals() {
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <Button size="icon" variant="ghost" onClick={() => navigate("/papa-life-os")} aria-label="Back to Papa Life OS"><ArrowLeft className="w-4 h-4" /></Button>
           <ShieldCheck className="w-6 h-6 text-primary" />
-          <div><h1 className="font-bold leading-tight">Approvals</h1><p className="text-xs text-gray-500">AI Boss Android Companion</p></div>
+          <div><h1 className="font-bold leading-tight">Approvals &amp; Worker Results</h1><p className="text-xs text-gray-500">Phone · tablet · desktop</p></div>
           <Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
         </div>
       </header>
@@ -117,6 +119,28 @@ export default function AiBossApprovals() {
           </CardContent>
         </Card>
 
+        <section aria-label="Work queue status" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {([
+            ["Pending approval", mission?.queue?.awaiting_approval ?? 0],
+            ["Approved", mission?.queue?.approved ?? 0],
+            ["Waiting for Mac", mission?.queue?.waiting_for_mac ?? 0],
+            ["Executing", mission?.queue?.executing ?? 0],
+            ["Failed", mission?.queue?.failed ?? 0],
+            ["Recent receipts", mission?.worker_receipts?.filter((item) => item.status === "completed").length ?? 0],
+          ] as const).map(([label, count]) => (
+            <div key={label} className="rounded-xl border border-white/15 bg-[#111] p-3">
+              <p className="text-xs text-white/60">{label}</p>
+              <p className="mt-1 text-xl font-bold text-white">{count}</p>
+            </div>
+          ))}
+        </section>
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardContent className="p-4 text-sm text-white/80">
+            <p className="font-semibold text-white">What happens to an assignment?</p>
+            <p className="mt-1">Pending: choose Approve or Decline. Approved: ready for dispatch. Waiting for Mac: your Mac must be online. Executing: worker is processing. Completed: review evidence. Failed: review the reason before retrying.</p>
+            <p className="mt-2 text-white/60">You can review and approve from a signed-in phone or tablet when your Mac is off. Local-only workers still require the Mac before they can complete the task.</p>
+          </CardContent>
+        </Card>
         {!loading && (mission?.pending_approvals.length || 0) === 0 ? (
           <Card className="bg-[#111] border-white/10"><CardContent className="p-8 text-center"><CheckCircle2 className="mx-auto h-9 w-9 text-green-400" /><p className="mt-3 font-semibold">Nothing needs your approval right now.</p></CardContent></Card>
         ) : null}
@@ -130,6 +154,7 @@ export default function AiBossApprovals() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-yellow">Pending approval — no worker has started</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-400">
                 <div>Authority: <span className="text-white">{action.authority_level}</span></div>
                 <div>Route: <span className="text-white">{action.execution_route}</span></div>
@@ -146,25 +171,29 @@ export default function AiBossApprovals() {
         ))}
         <Card className="border-white/15 bg-[#111]">
           <CardHeader>
-            <CardTitle className="text-white">Worker results & evidence</CardTitle>
+            <CardTitle className="text-white">Completed, waiting &amp; failed assignments</CardTitle>
             <p className="text-sm text-white/60">
               A worker can finish a reference review without finishing the requested task.
               Only results with concrete evidence are marked verified.
             </p>
           </CardHeader>
           <CardContent className="space-y-3">
+            {(mission?.worker_receipts || []).length > 0 && <Button type="button" size="sm" variant="outline" className="border-white/30" onClick={() => setShowHistory((value) => !value)}>{showHistory ? "Hide worker history" : "Show worker history (" + mission?.worker_receipts?.length + ")"}</Button>}
             {(mission?.worker_receipts || []).length === 0 ? (
               <p className="text-sm text-gray-400">No worker assignment receipts recorded yet.</p>
-            ) : (mission?.worker_receipts || []).map((item) => (
+            ) : showHistory ? (mission?.worker_receipts || []).map((item) => (
               <div key={item.id} className="rounded-xl border border-white/15 bg-black/30 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-semibold">Assignment #{item.id} · {item.role}</span>
                   <span className={item.delivery === "verified"
                     ? "rounded bg-green-600/20 px-2 py-1 text-xs text-green-300"
                     : "rounded bg-yellow-600/20 px-2 py-1 text-xs text-yellow-200"}>
-                    {item.delivery === "verified" ? "Deliverable verified"
-                    : item.delivery === "review_only" ? "Review only — deliverable unverified"
-                    : item.delivery === "needs_attention" ? "Needs follow-up" : item.status.replace(/_/g, " ")}
+                    {item.delivery === "verified" ? "Completed — evidence verified"
+                    : item.delivery === "review_only" ? "Completed — evidence needs review"
+                    : item.delivery === "needs_attention" ? "Failed — needs attention"
+                    : item.status === "awaiting_approval" ? "Pending approval"
+                    : item.status === "approved" ? mission?.mac_online ? "Approved — awaiting worker" : "Approved — waiting for Mac"
+                    : item.status === "executing" ? "Executing" : item.status.replace(/_/g, " ")}
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-gray-400">{item.project} · Updated {item.updated_at}</p>
@@ -181,7 +210,7 @@ export default function AiBossApprovals() {
                   </div>
                 )}
               </div>
-            ))}
+            )) : <p className="text-sm text-gray-400">Worker history is available. Open it to review receipts and evidence.</p>}
           </CardContent>
         </Card>
       </main>

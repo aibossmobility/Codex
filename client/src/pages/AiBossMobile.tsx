@@ -60,6 +60,7 @@ export default function AiBossMobile() {
   const [assignmentOpen, setAssignmentOpen] = useState(false);
   const [assignmentProject, setAssignmentProject] = useState<"papa-life" | "ai-boss-mobility">("papa-life");
   const [assignmentRole, setAssignmentRole] = useState("seo-website");
+  const [installHelpOpen, setInstallHelpOpen] = useState(false);
   const [assignmentText, setAssignmentText] = useState("");
   const [assignmentRequestId, setAssignmentRequestId] = useState(() => window.crypto.randomUUID());
   const [assignmentSaving, setAssignmentSaving] = useState(false);
@@ -72,6 +73,7 @@ export default function AiBossMobile() {
   const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const isAppleMobile = /iPad|iPhone|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef("");
   const saveVoiceOnEndRef = useRef(false);
@@ -105,7 +107,7 @@ export default function AiBossMobile() {
 
     const manifest = document.createElement("link");
     manifest.rel = "manifest";
-    manifest.href = "/ai-boss-manifest.webmanifest";
+    manifest.href = "/papa-life-os-manifest.webmanifest";
     document.head.appendChild(manifest);
     let companionTimer: number | undefined;
     fetch("/api/auth/me", { credentials: "include" }).then((response) => response.json()).then((data) => {
@@ -162,7 +164,8 @@ export default function AiBossMobile() {
 
   async function installAiBoss() {
     if (!installPrompt) {
-      toast.message("Use Chrome's Add to Home screen / Install app option on this device.");
+      setInstallHelpOpen(true);
+      toast.message("See the device-specific installation instructions below.");
       return;
     }
     await installPrompt.prompt();
@@ -347,7 +350,59 @@ export default function AiBossMobile() {
       </header>
 
       <main className="max-w-5xl mx-auto p-4 space-y-5">
-        <PapaReadAloud />
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardContent className="space-y-3 p-4 sm:p-5">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Start here</p>
+            <h2 className="text-xl font-bold text-white">What do you need to do?</h2>
+            <p className="text-sm text-white/70">You can open this dashboard and review work from your phone or tablet with your Mac off. Only Mac-based workers need it online to finish an assignment.</p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Button className="min-h-12 bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => {
+                setAssignmentOpen(true);
+                window.setTimeout(() => document.getElementById("assign-worker-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
+              }}><ClipboardList className="mr-2 h-4 w-4" />Check a website</Button>
+              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Review work &amp; approvals</Button>
+              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => document.getElementById("papa-read-aloud")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Mic className="mr-2 h-4 w-4" />Read text aloud</Button>
+            </div>
+          </CardContent>
+        </Card>
+        <div id="papa-read-aloud"><PapaReadAloud /></div>
+        {installHelpOpen && !isInstalled && (
+          <Card className="border-brand-yellow/30 bg-[#111]">
+            <CardContent className="p-4 text-sm text-white/85">
+              <p className="font-semibold text-brand-yellow">Add Papa Life OS to this device</p>
+              {isAppleMobile ? (
+                <p className="mt-2">On iPhone or iPad, open this page in Safari, tap Share, choose Add to Home Screen, then tap Add. If you use Chrome, open the same page in Safari first.</p>
+              ) : /Android/i.test(navigator.userAgent) ? (
+                <p className="mt-2">On Android Chrome, open the browser menu and choose Install app or Add to Home screen. Continue using the existing website if installation is unavailable.</p>
+              ) : (
+                <p className="mt-2">In your desktop browser, use the address bar Install app option or the browser menu. You can always use this page without installing it.</p>
+              )}
+              <Button type="button" size="sm" variant="outline" className="mt-3 border-white/30" onClick={() => setInstallHelpOpen(false)}>Close instructions</Button>
+            </CardContent>
+          </Card>
+        )}
+        <Card className="border-white/15 bg-[#111]">
+          <CardContent className="p-4 text-sm text-white/80">
+            <p className="font-semibold text-white">Your first assignment — three steps</p>
+            <p className="mt-1">1. Choose a business and check its website. 2. Review and approve the request. 3. Return to Approvals to see the worker's evidence. Nothing sends messages, spends money, or changes a site.</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-brand-yellow/30 bg-[#111]">
+          <CardHeader>
+            <CardTitle className="text-white">Recent Owner Updates</CardTitle>
+            <p className="text-sm text-gray-400">As of November 19, 2026 · Read-only briefing, not live support or sales verification. The canonical Google Hub remains the authority.</p>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-gray-200"><strong className="text-brand-yellow">Papa Life website:</strong> HeyCatch-driven SEO, navigation and product-clarity improvements have been committed. Live deployment and checkout-to-course access still require separate verification.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Two Learning Paths:</strong> The approved green-sweater introduction with captions and low-volume smooth jazz was added to the websites' code with visitor-controlled playback and no autoplay.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Free AI practice:</strong> Eight public presentation experiences welcome fathers and family allies or entrepreneurs and organization leaders. Keep Papa Life and AI Boss Mobility customer data separate; no mandatory payment, lead capture or sales pitch.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Support still open:</strong> Papa Life HighLevel case #6721620 concerns the blank Orders screen and unverified test purchase-to-access. AI Boss Mobility case #6676266 is separate. Hostinger domain-management review is pending; no DNS or payment changes authorized.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Work and meetings:</strong> Prioritize paid employment and contract opportunities. Elgin Rose meeting: November 19. San Leandro Adult School discussion: November 20. The separate City of San Leandro proposal remains paused.</p>
+            <p className="text-gray-200"><strong className="text-brand-yellow">Knowledge safeguards:</strong> PAPA = Presence → Authority → Purpose → Alignment. Run Your Own Race is an unfinished manuscript, not an active product. No new Papa Life course or pilot launches without a new owner decision.</p>
+            <a className="inline-flex items-center gap-1 text-brand-yellow underline underline-offset-4" href="https://docs.google.com/document/d/1TXkHlLDd-DzrSwF9JbcnK3mdDZw6fFehwgi1xZwDin4/edit" target="_blank" rel="noopener noreferrer">Open current canonical Google Hub <ExternalLink className="h-3.5 w-3.5" /></a>
+          </CardContent>
+        </Card>
         <section className="relative overflow-hidden rounded-2xl border border-brand-yellow/30 bg-[#111]">
           <img src="/images/papa-life-approved-20261016.webp" alt="Papa Life logo" className="h-44 w-full bg-white object-contain p-4 opacity-95 sm:h-56" />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/35 to-transparent p-5 sm:p-7">
@@ -358,7 +413,7 @@ export default function AiBossMobile() {
         </section>
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <StatusCard icon={Laptop} label="Mac" value={mission?.mac_online ? "Online" : "Offline"} tone={mission?.mac_online ? "good" : "waiting"} />
-          <StatusCard icon={Smartphone} label="Android" value={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "Online" : "Offline"} tone={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "good" : "waiting"} />
+          <StatusCard icon={Smartphone} label="Android companion" value={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "Online" : "Not reporting"} tone={mission?.nodes.some((node) => node.node_kind === "android" && node.online) ? "good" : "neutral"} />
           <StatusCard icon={CircleAlert} label="Approvals" value={String(mission?.queue.awaiting_approval || 0)} tone={(mission?.queue.awaiting_approval || 0) ? "waiting" : "good"} />
           <StatusCard icon={Activity} label="Running" value={String(mission?.queue.executing || 0)} tone="neutral" />
           <StatusCard icon={Clock3} label="Waiting for Mac" value={String(mission?.queue.waiting_for_mac || 0)} tone={(mission?.queue.waiting_for_mac || 0) ? "waiting" : "neutral"} />
@@ -395,34 +450,23 @@ export default function AiBossMobile() {
               <form id="assign-worker-form" onSubmit={submitWorkerAssignment} className="mt-5 space-y-3 rounded-xl border border-brand-yellow/30 bg-black/40 p-4">
                 <label htmlFor="worker-project" className="block text-sm font-semibold text-white">Business</label>
                 <select id="worker-project" value={assignmentProject} onChange={(event) => {
-                  const project = event.target.value as "papa-life" | "ai-boss-mobility";
-                  setAssignmentProject(project);
-                  if (assignmentRole === "papa-life-director" && project !== "papa-life" || assignmentRole === "ai-boss-mobility-director" && project !== "ai-boss-mobility") setAssignmentRole("seo-website");
+                  setAssignmentProject(event.target.value as "papa-life" | "ai-boss-mobility");
                 }} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
                   <option value="papa-life">Papa Life</option>
                   <option value="ai-boss-mobility">AI Boss Mobility Consulting</option>
                 </select>
-                <label htmlFor="worker-role" className="block text-sm font-semibold text-white">Assigned worker</label>
+                <label htmlFor="worker-role" className="block text-sm font-semibold text-white">Available worker</label>
                 <select id="worker-role" value={assignmentRole} onChange={(event) => setAssignmentRole(event.target.value)} className="w-full rounded-lg border border-white/20 bg-[#181818] p-3 text-white">
-                  <option value="seo-website">SEO & Website Worker</option>
-                  <option value="crm-sales">CRM & Sales Worker</option>
-                  <option value="ghl-customer-service">GoHighLevel Customer Service Worker — No-cost first</option>
-                  <option value="quality-compliance">Quality & Compliance Worker</option>
-                  <option value="outreach-followup">Outreach & Follow-up Worker (draft review only)</option>
-                  <option value="content-distribution">Content & Distribution Worker (planning only)</option>
-                  <option value="scheduling-communications">Scheduling & Communications Worker</option>
-                  <option value="finance-records">Finance Records Worker</option>
-                  <option value="financial-director">Financial Director</option>
-                  <option value="marketing-revenue-director">Marketing & Revenue Director</option>
-                  {assignmentProject === "papa-life" && <option value="papa-life-director">Papa Life Director</option>}
-                  {assignmentProject === "ai-boss-mobility" && <option value="ai-boss-mobility-director">AI Boss Mobility Director</option>}
+                  <option value="seo-website">Website &amp; SEO audit — read-only</option>
                 </select>
+                <p className="text-xs text-gray-400">Other worker roles are not enabled for mobile assignment yet. They will appear only after their execution and evidence checks are supported.</p>
                 <label htmlFor="worker-instruction" className="block text-sm font-semibold text-white">What should the worker review?</label>
-                <Textarea id="worker-instruction" minLength={12} maxLength={2000} required value={assignmentText} onChange={(event) => setAssignmentText(event.target.value)} placeholder="Review broken links on my Papa Life website and prepare a report. No purchases, messages, or edits." className="min-h-28 border-white/20 bg-[#181818] text-base" />
+                <Textarea id="worker-instruction" minLength={12} maxLength={2000} required value={assignmentText} onChange={(event) => setAssignmentText(event.target.value)} placeholder={assignmentProject === "papa-life" ? "Check website links on https://papalifecoach.com" : "Check website links on https://ai.bossmobilelifecoach.com"} className="min-h-28 border-white/20 bg-[#181818] text-base" />
+                <Button type="button" size="sm" variant="outline" className="border-white/30" onClick={() => setAssignmentText(assignmentProject === "papa-life" ? "Check website links on https://papalifecoach.com" : "Check website links on https://ai.bossmobilelifecoach.com")}>Use safe example</Button>
                 <Button type="button" variant="outline" disabled={assignmentSaving} onClick={dictateWorkerAssignment} className="w-full border-brand-yellow/40 text-brand-yellow">
                   <Mic2 className="mr-2 h-4 w-4" />{assignmentListening ? "Finish speaking" : "Speak assignment instead of typing"}
                 </Button>
-                <p className="text-xs text-gray-400">Read-only worker assignments. The GoHighLevel Customer Service Worker diagnoses customer, CRM, estimate, agreement, workflow and account issues using existing no-cost methods first. Sending or changing records requires separate permission. No purchases or model credits requested.</p>
+                <p className="text-xs text-gray-400">This worker can only check public website pages and links. Requests to change pages, contact people, process customers, spend credits, or publish are not supported in this mobile form.</p>
                 <Button type="submit" disabled={assignmentSaving || assignmentText.trim().length < 12} className="w-full bg-brand-yellow text-black hover:bg-brand-yellow/90">
                   {assignmentSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ClipboardList className="mr-2 h-4 w-4" />}
                   Queue Worker Assignment

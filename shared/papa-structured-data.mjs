@@ -28,7 +28,7 @@ function cleanPath(input) {
 }
 
 export function schemaForPapaPage({
-  pathname, canonicalPath = pathname, title, description, course,
+  pathname, canonicalPath = pathname, title, description, course, faq,
 } = {}) {
   const path = cleanPath(pathname);
   const canonical = cleanPath(canonicalPath);
@@ -84,10 +84,15 @@ export function schemaForPapaPage({
     }
   }
   // Real, currently purchasable products only; never include the unfinished book.
-  if (path === "/shop" || path === "/courses") {
-    const items = path === "/courses"
-      ? VERIFIED_PAPA_PRODUCTS.filter((item) => item.format === "audio" || item.format === "video")
-      : VERIFIED_PAPA_PRODUCTS;
+  if (path === "/shop" || path === "/courses" || path === "/") {
+    const items = path === "/"
+      ? VERIFIED_PAPA_PRODUCTS.filter((item) =>
+          (item.format === "audio" && item.name.includes("Module 01")) ||
+          (item.format === "manuscript" && item.name.includes("Module 01")) ||
+          item.format === "bundle" || item.format === "video")
+      : path === "/courses"
+        ? VERIFIED_PAPA_PRODUCTS.filter((item) => item.format === "audio" || item.format === "video")
+        : VERIFIED_PAPA_PRODUCTS;
     const products = items.map((item, index) => ({
       "@type": "Product",
       "@id": SITE + "/shop#product-" + (index + 1),
@@ -107,7 +112,7 @@ export function schemaForPapaPage({
     }));
     graph.push({
       "@type": "ItemList",
-      "@id": SITE + "/shop#available-products",
+      "@id": SITE + (path === "/" ? "/#featured-products" : "/shop#available-products"),
       name: "Available Papa Life digital resources",
       itemListElement: products.map((product, index) => ({
         "@type": "ListItem", position: index + 1, item: {"@id": product["@id"]}
@@ -127,7 +132,16 @@ export function schemaForPapaPage({
       ["Does Papa Life promise reconciliation?", "No. Reconciliation cannot be guaranteed and cannot be forced. Papa Life teaches practical reflection, listening, accountability, and consistency."]
     ]
   };
-  const questions = faqByPath[path];
+  // FAQs must correspond to questions visible on the relevant public page.
+  if (path === "/") {
+    faqByPath["/"] = [
+      ["Will these lessons make my adult child respond?", "No. Reconciliation is never guaranteed. You can work on listening, responsibility, and respecting your adult child’s boundaries."],
+      ["Am I speaking with Brian himself?", "The Digital AI is an optional automated experience, not Brian speaking live. You can explore the lessons without using it."],
+      ["Do I need a membership or appointment?", "No. Each listed digital resource has a one-time price. Purchases use the existing GoHighLevel checkout."],
+      ["What if the lesson is not right for me?", "You may request a full digital-product refund within seven calendar days of purchase. Read the published refund policy."]
+    ];
+  }
+  const questions = faq || faqByPath[path];
   if (questions) graph.push({
     "@type": "FAQPage", "@id": url + "#faq",
     mainEntity: questions.map(([name, text]) => ({

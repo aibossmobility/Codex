@@ -202,7 +202,8 @@ export default function Shop() {
         {catalogError && <div role="alert" className="mb-6 rounded-xl border border-[#b33a32] bg-white p-5 text-center"><p className="font-bold">The product list could not load. Please try again.</p><button type="button" onClick={() => setCatalogRetry((attempt) => attempt + 1)} className="mt-3 rounded-lg bg-[#145b35] px-4 py-2 font-bold text-white">Retry loading products</button></div>}
         <div id="shop-catalog-results" tabIndex={-1} aria-label="Filtered Papa Life products" className="scroll-mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3 focus:outline-none">
           {visible.map((offer) => (
-            <article key={offer.code} className="flex flex-col rounded-xl border-4 border-[#145b35] bg-[#f8f0db] p-6 shadow-sm">
+            <article key={offer.code} className={`flex flex-col rounded-xl border-4 bg-[#f8f0db] p-6 shadow-sm ${offer.code === "curriculum.digital.complete" ? "border-[#b33a32]" : "border-[#145b35]"}`}>
+              {offer.code === "curriculum.digital.complete" && <p className="mb-2 font-black text-[#b33a32]">Recommended if you want all 12 audio lessons</p>}
               <p className="text-xs font-black uppercase tracking-[0.15em] text-[#b33a32]">{offer.format === 'digital' ? 'Audio Lesson' : offer.format === 'manuscript' ? 'Manuscript PDF' : 'Complete Bundle'}</p>
               <h2 className="mt-3 flex-1 text-xl font-extrabold">{offer.format === "digital" && offer.module_number && PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] ? PAPA_LIVE_CHECKOUT_TITLE_OVERRIDES[offer.module_number] : offer.canonical_name}</h2>
               {offer.format === "digital" && offer.module_number && PAPA_LIVE_COURSE_OFFERS[offer.module_number] ? (
@@ -216,6 +217,8 @@ export default function Shop() {
               ) : deliveryReady && PAPA_RESOURCE_CHECKOUTS[offer.code] ? (
                 <>
                   <p className="mt-5 text-2xl font-extrabold">{offer.public_price_display} <span className="text-sm font-medium">one-time</span></p>
+                  {offer.code === "curriculum.digital.complete" && <p className="mt-2 text-sm font-bold text-[#145b35]">Save $100.88 compared with 12 individual $14.99 audio lessons.</p>}
+                  {offer.code === "curriculum.bundle.complete" && <p className="mt-2 text-sm font-bold text-[#145b35]">Save $230.76 compared with purchasing all 24 lessons and manuscripts individually.</p>}
                   <p className="mt-3 text-sm text-[#5b655e]">{offer.format === "manuscript" ? "Download the purchased manuscript PDF from your protected learning library." : offer.code === "curriculum.bundle.complete" ? "All 12 audio lessons and all 12 manuscript PDFs in your protected learning library." : "All 12 audio lessons in your protected learning library."} After payment, check your checkout email for access. No paid membership or subscription required.</p>
                   <a href={PAPA_RESOURCE_CHECKOUTS[offer.code]} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#145b35] px-5 font-extrabold text-white">Purchase — {offer.public_price_display} <ArrowRight className="ml-2 h-4 w-4" /></a>
                   <a href="/refund-policy" className="mt-3 text-sm font-semibold text-[#145b35] underline">7-day refund policy — read before purchase</a>

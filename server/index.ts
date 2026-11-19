@@ -7169,7 +7169,7 @@ async function startServer() {
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/parents-of-adult-children", "/adult-children",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
-    "/start", "/changelog", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
+    "/start", "/changelog", "/papa-life-vs-therapy", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
     "/tuesday-live", "/shop", "/papa-journey", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
   ]);

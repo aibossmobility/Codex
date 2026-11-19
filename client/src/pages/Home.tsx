@@ -174,6 +174,7 @@ export default function Home() {
             <a href="/relationship-assessment" className="papa-house-button-outline">2-Minute Fatherhood Check-In <ArrowRight size={18} aria-hidden="true"/></a>
           </div>
           <p className="mt-3 text-sm">Lessons begin at $14.99 one-time. No membership or appointment. Reconciliation is never guaranteed.</p>
+          <p className="mt-2 text-sm">A small step can be listening without defending, apologizing without pressure, or respecting your adult child's need for space.</p>
         </div>
       </section>
       <div className="papa-house-outdoor-note">A welcoming home for fathers to <strong>read, listen, reflect, and grow</strong>. <a href="/house">Explore the rooms</a> at your own pace.</div>
@@ -211,7 +212,7 @@ export default function Home() {
             </article>
           </div>
           <p className="mt-7 text-center text-sm font-semibold text-[#425047]">
-            Prefer an AI conversation? <a href="/digital-twin" className="font-extrabold text-[#145b35] underline underline-offset-4">Meet Brian's Digital Twin</a> as a separate, optional experience.
+            Prefer an AI conversation? <a href="/digital-twin" className="font-extrabold text-[#145b35] underline underline-offset-4">Meet Brian's Digital AI</a> as a separate, optional experience.
           </p>
         </div>
       </section>
@@ -332,16 +333,20 @@ export default function Home() {
             <div className="mt-9 grid gap-6 lg:grid-cols-3">
               {[
                 { name: "Listen without defending", detail: "When every conversation turns into an explanation, start with Lesson 01: Listening Without Defending.", format: "Individual streaming audio lesson", price: "$14.99 one-time", label: "Buy Lesson 01", href: productCheckout.audio },
-                { name: "Prepare for the next conversation", detail: "All 12 self-paced audio lessons: listening, responsibility, apology, presence, and rebuilding trust one step at a time.", format: "Complete 12-lesson audio program", price: "$79 one-time", label: "Buy All 12 Audio Lessons", href: productCheckout.fullAudio },
+                { name: "Prepare for the next conversation", detail: "All 12 self-paced audio lessons: listening, responsibility, apology, presence, and rebuilding trust one step at a time.", format: "Complete 12-lesson audio program", price: "$79 one-time", saving: "Save $100.88 compared with 12 separate $14.99 audio lessons.", recommended: true, label: "Buy All 12 Audio Lessons", href: productCheckout.fullAudio },
                 { name: "When silence is hard to face", detail: "Wrestling the Silence Away includes 10 short video reflections for fathers of adult children.", format: "10-video collection", price: "$19.99 one-time", label: "Buy the Video Series", href: productCheckout.video },
                 { name: "Read the first lesson at your own pace", detail: "Prefer written lessons? Begin with the Listening Without Defending manuscript PDF.", format: "Downloadable lesson PDF", price: "$14.99 one-time", label: "Buy the Lesson Manuscript", href: productCheckout.pdf },
-                { name: "Listen and read the whole program", detail: "The 12 streaming audio lessons plus all 12 downloadable manuscript PDFs in one purchase.", format: "Complete audio + manuscript bundle", price: "$129 one-time", label: "Buy the Complete Bundle", href: productCheckout.complete },
+                { name: "Listen and read the whole program", detail: "The 12 streaming audio lessons plus all 12 downloadable manuscript PDFs in one purchase.", format: "Complete audio + manuscript bundle", price: "$129 one-time", saving: "Save $230.76 compared with buying 12 audio lessons and 12 manuscripts separately at $14.99 each.", label: "Buy the Complete Bundle", href: productCheckout.complete },
               ].map((offer) => (
-                <article key={offer.name} className="flex flex-col rounded-xl border-2 border-[#145b35] bg-white p-7 shadow-sm">
+                <article key={offer.name} className={`flex flex-col rounded-xl border-2 bg-white p-7 shadow-sm ${"recommended" in offer && offer.recommended ? "border-[#b33a32] ring-2 ring-[#f2c230]" : "border-[#145b35]"}`}>
+                  {"recommended" in offer && offer.recommended && <p className="mb-2 text-sm font-black text-[#b33a32]">Recommended for fathers who want all 12 audio lessons</p>}
                   <p className="text-sm font-black uppercase tracking-wide text-[#145b35]">{offer.format}</p>
                   <h3 className="mt-2 text-2xl font-extrabold">{offer.name}</h3>
                   <p className="mt-3 flex-1 leading-relaxed text-[#425047]">{offer.detail}</p>
+                  <p className="mt-2 text-sm text-[#425047]">For fathers who want to practice one change and carry it into the next conversation.</p>
                   <p className="mt-4 text-2xl font-black text-[#17231c]">{offer.price}</p>
+                  {"saving" in offer && <p className="mt-2 text-sm font-semibold text-[#145b35]">{offer.saving}</p>}
+                  <p className="mt-2 text-sm text-[#425047]">Learn at your own pace. No scheduled session required.</p>
                   <a href={offer.href} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-extrabold text-white hover:bg-[#114629]">
                     {offer.label} <ArrowRight className="h-4 w-4" aria-hidden="true"/>
                   </a>
@@ -349,10 +354,23 @@ export default function Home() {
                 </article>
               ))}
             </div>
+            <p className="mt-4 text-sm text-[#314239]">Not sure which option fits? <a className="font-bold text-[#145b35] underline" href="/papa-life-vs-therapy">Compare self-paced lessons, a book, and professional counseling</a> without pressure to purchase.</p>
             <p className="mt-5 text-sm text-[#314239]">For digital purchases, request a full refund within seven calendar days. <a href="/refund-policy" className="font-bold text-[#145b35] underline">Read the refund policy.</a></p>
             <div className="mt-9 rounded-xl border border-[#e4c669] bg-[#fff8e0] p-6">
               <h3 className="text-xl font-extrabold">More Original Intellectual Property</h3>
               <p className="mt-2 text-[#425047]">Only currently available, verified digital lessons, manuscripts, videos, and bundles are linked for purchase. Unfinished material is not offered for sale.</p>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="papa-common-questions" className="bg-[#fffaf0] py-12">
+          <div className="container max-w-5xl">
+            <h2 id="papa-common-questions" className="text-3xl font-extrabold">Questions before you begin</h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <article><h3 className="font-bold">Will these lessons make my adult child respond?</h3><p>No. Reconciliation is never guaranteed. You can work on listening, responsibility, and respecting your adult child’s boundaries.</p></article>
+              <article><h3 className="font-bold">Am I speaking with Brian himself?</h3><p>The Digital AI is an optional automated experience, not Brian speaking live. You can explore the lessons without using it.</p></article>
+              <article><h3 className="font-bold">Do I need a membership or appointment?</h3><p>No. Each listed digital resource has a one-time price. Purchases use the existing GoHighLevel checkout.</p></article>
+              <article><h3 className="font-bold">What if the lesson is not right for me?</h3><p>You may request a full digital-product refund within seven calendar days of purchase. <a href="/refund-policy" className="font-bold text-[#145b35] underline">Read the policy</a>.</p></article>
             </div>
           </div>
         </section>
@@ -362,6 +380,7 @@ export default function Home() {
             <div className="container">
               <h2 className="text-2xl font-extrabold">Verified experiences</h2>
               {approvedProofCount !== null && <p className="mt-3 font-bold">{approvedProofCount} fathers have completed the Check-In.</p>}
+              <p className="mt-2 text-sm">Published coverage is not a review of these lessons or a promise of results.</p>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 {approvedStories.map((story) => <blockquote key={story.sourceId} className="rounded-xl border border-[#145b35]/25 p-5"><p>“{story.quote}”</p><cite className="mt-3 block text-sm font-bold">{story.firstName}</cite></blockquote>)}
               </div>
@@ -449,6 +468,7 @@ export default function Home() {
             <a href="/privacy-policy" className="hover:text-[#f2c230]">Privacy</a>
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>
             <a href="/refund-policy" className="font-bold text-[#f2c230] hover:underline">Refunds &amp; Cancellations</a>
+            <a href="/papa-life-vs-therapy" className="font-bold text-[#f2c230] hover:underline">Compare support options</a>
             <a href="tel:+15104152098" className="hover:text-[#f2c230]">510.415.2098</a>
           </div>
         </div>

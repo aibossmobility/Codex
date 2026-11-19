@@ -5,6 +5,7 @@ import path from "node:path";
 import { withPapaPageSchema } from "../shared/papa-structured-data.mjs";
 
 const site = "https://papalifecoach.com";
+const familyGuidance = JSON.parse(fs.readFileSync(path.resolve("client/src/content/family-guidance.json"), "utf8"));
 const dist = path.resolve("dist/public");
 const sitemap = fs.readFileSync(path.join(dist, "sitemap.xml"), "utf8");
 const publicPaths = new Set(
@@ -52,6 +53,13 @@ for (const rawPath of publicPaths) {
   }
   const transformed = withPapaPageSchema(html, {
     pathname, canonicalPath, title, description,
+    faq: pathname === "/parents-of-adult-children" ? familyGuidance.parents.questions.map(q => [q.question, q.answer])
+      : pathname === "/adult-children" ? familyGuidance.children.questions.map(q => [q.question, q.answer])
+      : pathname === "/papa-life-vs-therapy" ? [
+          ["Can Papa Life lessons replace therapy?", "No. Papa Life lessons are self-paced education, not treatment. A licensed mental health professional can assess individual circumstances and provide appropriate care."],
+          ["When might a book be enough?", "A book can be useful when you want to learn privately and have time to reflect. It does not respond to your individual situation."],
+          ["What can I do before paying for anything?", "Start with the free 2-Minute Fatherhood Check-In. Notice one pattern in your relationship and choose one respectful step."]
+        ] : undefined,
   });
   if (transformed === html) { skipped++; continue; }
   fs.writeFileSync(file, transformed);

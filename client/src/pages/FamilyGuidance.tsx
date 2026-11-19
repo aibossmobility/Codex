@@ -25,7 +25,12 @@ function FamilyGuidancePage({ audience }: { audience: Audience }) {
 
   return (
     <div className="min-h-screen bg-[#fff9ec] text-[#17231c]">
-      <PageMeta title={guide.pageTitle} description={guide.description} />
+      <PageMeta title={guide.pageTitle} description={guide.description}
+        jsonLd={{ "@context": "https://schema.org", "@type": "FAQPage",
+          mainEntity: guide.questions.map(({question, answer}) => ({
+            "@type": "Question", name: question,
+            acceptedAnswer: { "@type": "Answer", text: answer }
+          })) }} />
       <header className="border-b-4 border-[#b33a32] bg-[#fff0d0]">
         <nav className="container flex min-h-20 flex-wrap items-center justify-between gap-3 py-3" aria-label="Papa Life navigation">
           <a href="/" aria-label="Return to Papa Life homepage"><SiteLogo size="md" /></a>
@@ -146,6 +151,7 @@ function FamilyGuidancePage({ audience }: { audience: Audience }) {
           </div>
         </section>
       </main>
+      <aside className="container mx-auto max-w-5xl px-4 pb-8"><a className="font-bold text-[#145b35] underline" href="/papa-life-vs-therapy">Compare self-paced lessons, professional counseling, and books</a></aside>
       <footer className="bg-[#17231c] px-4 py-7 text-sm text-white/75">
         <div className="container flex max-w-5xl flex-wrap items-center justify-between gap-4">
           <p>© Papa Life · Guidance is educational, not licensed mental health treatment or a guarantee of reconciliation.</p>

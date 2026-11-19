@@ -52,6 +52,22 @@ const pages = [
     ]
   },
   {
+    path: "/papa-life-vs-therapy",
+    title: "Papa Life Lessons vs Therapy vs Books | Compare Support",
+    description: "Compare Papa Life self-paced lessons, a relationship book and professional counseling. Learn what each offers and begin with a free fatherhood check-in.",
+    eyebrow: "Choose support that fits",
+    headline: "Papa Life lessons, therapy, or a book?",
+    intro: "Papa Life lessons are self-paced fatherhood education, not therapy. Counseling offers individualized professional support. Books offer private reflection without tailored guidance.",
+    sections: [
+      ["Self-paced Papa Life lessons", "Audio lessons and written resources cover listening, apology, respect for boundaries and consistent behavior. Choose your own pace. Reconciliation is never guaranteed."],
+      ["Professional counseling", "A qualified mental health professional can assess circumstances and provide individualized support, including when safety or significant distress needs professional attention."],
+      ["A relationship book", "A book can help you learn privately and think about the relationship. It cannot respond to your personal circumstances."],
+      ["Can lessons replace therapy?", "No. Papa Life is education, not individualized treatment or diagnosis."],
+      ["What can I do for free?", "Begin with the 2-Minute Fatherhood Check-In and consider one small respectful next step."]
+    ],
+    relatedLinks: [["Begin the free 2-Minute Check-In", "/marlee-assessment"], ["See current lessons and prices", "/shop"], ["Explore parent guidance", "/parents-of-adult-children"]]
+  },
+  {
     path: "/changelog",
     title: "Papa Life Updates | Brian Keith Hill",
     description: "Dated changes to Papa Life learning resources and customer purchase information from Brian Keith Hill.",
@@ -490,7 +506,7 @@ for (const [audience, publicPath] of [
     intro: guide.intro,
     sections: guide.questions.map((item) => [item.question, item.answer]),
     relatedLinks: [...guide.related.map((link) => [link.label, link.href]),
-      ["Meet Brian's Digital Twin (optional AI experience)", "/digital-twin"],
+      ["Meet Brian's Digital AI (optional AI experience)", "/digital-twin"],
       ["Return to Papa Life home", "/"]],
   });
 }

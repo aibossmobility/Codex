@@ -9,6 +9,14 @@ assert.equal(home["@graph"][0]["@type"],"WebPage");
 assert.equal(home["@graph"][0].publisher["@id"],BASE+"/#organization");
 assert.equal(home["@graph"][0].isPartOf["@id"],BASE+"/#website");
 
+const featured=schemaForPapaPage(opts("/"));
+const featuredProducts=featured["@graph"].filter(x=>x["@type"]==="Product");
+assert.equal(featuredProducts.length,5, "Homepage schema must describe the five real featured offers");
+assert.deepEqual(featuredProducts.map(x=>Number(x.offers.price)).sort((a,b)=>a-b), [14.99,14.99,19.99,79,129]);
+assert(featured["@graph"].some(x=>x["@type"]==="FAQPage"));
+const guidance=schemaForPapaPage({...opts("/parents-of-adult-children"),faq:[["Can I listen?","Yes, when contact is welcome."]]});
+assert.equal(guidance["@graph"].find(x=>x["@type"]==="FAQPage").mainEntity.length,1);
+
 const bio=schemaForPapaPage(opts("/about-brian-keith-hill"));
 assert.deepEqual(bio["@graph"].map(x=>x["@type"]),["AboutPage","Person"]);
 assert.equal(bio["@graph"][0].mainEntity["@id"],BASE+"/about-brian-keith-hill#person");

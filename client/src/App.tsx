@@ -1,3 +1,4 @@
+import PapaSupportComparison from "./pages/PapaSupportComparison";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -65,6 +66,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/changelog" component={PapaChangelog} />
+      <Route path="/papa-life-vs-therapy" component={PapaSupportComparison} />
       <Route path="/parents-of-adult-children" component={ParentsOfAdultChildrenPage} />
       <Route path="/adult-children" component={AdultChildrenPage} />
       <Route path="/house/:room" component={PapaHouse} />
@@ -173,9 +175,7 @@ function ThirtyMinutePapaPromise() {
             <strong> Don't just read to read. Read to act.</strong>
           </p>
         </div>
-        <a href="/courses" className="inline-flex min-h-11 items-center rounded-lg bg-[#145b35] px-5 py-2 font-bold text-white hover:bg-[#0f4227] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#145b35]">
-          Find one lesson →
-        </a>
+
       </div>
     </aside>
   );

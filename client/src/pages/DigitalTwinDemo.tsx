@@ -34,7 +34,7 @@ export default function DigitalTwinDemo() {
   return (
     <div className="papa-house-digital min-h-screen bg-[#2b211b] text-white">
       <PageMeta
-        title="Meet Brian's Digital Twin | Papa Life"
+        title="Meet Brian's Digital AI | Papa Life"
         description="Explore free guided fatherhood help or choose an optional ElevenLabs voice conversation."
       />
 

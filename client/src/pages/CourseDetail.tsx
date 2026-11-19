@@ -95,6 +95,7 @@ export default function CourseDetail() {
             <div className="mb-10">
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium border inline-block mb-4 ${colors.badge}`}>{course.pillar}</span>
               <h1 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-4">{course.title}</h1>
+              <p className="mb-4 text-gray-300">This Papa Life course is a self-paced resource for fathers of adult children.</p>
               {course.description && <p className="text-gray-400 text-lg leading-relaxed">{course.description}</p>}
             </div>
 

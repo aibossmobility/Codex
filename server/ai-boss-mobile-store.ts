@@ -18,6 +18,8 @@ type AiBossNode = {
   capabilities: string[];
 };
 
+type ProjectScope = "papa-life" | "ai-boss-mobility";
+
 type PendingApproval = {
   id: number;
   action_type: string;
@@ -79,15 +81,15 @@ export function getAiBossNodes(db: BetterSqliteDatabase, onlineWindowSeconds = 9
   }));
 }
 
-function getPendingApprovals(db: BetterSqliteDatabase, macOnline: boolean): PendingApproval[] {
+function getPendingApprovals(db: BetterSqliteDatabase, macOnline: boolean, project?: ProjectScope): PendingApproval[] {
   const rows = db.prepare(`
     SELECT id, action_type, target_system, target_ref, requested_outcome,
       authority_level, execution_route, estimated_external_ai_cost_micros, created_at
     FROM executive_actions
-    WHERE status = 'awaiting_approval'
+    WHERE status = 'awaiting_approval' ${project ? "AND project_key = ?" : ""}
     ORDER BY created_at ASC, id ASC
     LIMIT 25
-  `).all() as Array<Record<string, unknown>>;
+  `).all(...(project ? [project] : [])) as Array<Record<string, unknown>>;
   return rows.map((row) => ({
     id: Number(row.id),
     action_type: String(row.action_type),
@@ -102,13 +104,13 @@ function getPendingApprovals(db: BetterSqliteDatabase, macOnline: boolean): Pend
   }));
 }
 
-export function getRecentWorkerReceipts(db: BetterSqliteDatabase) {
+export function getRecentWorkerReceipts(db: BetterSqliteDatabase, project?: ProjectScope) {
   const rows = db.prepare(`
     SELECT id, status, project_key, result_summary, result_json, error_summary,
       action_payload_json, updated_at
-    FROM executive_actions WHERE source_conversation_ref LIKE 'mobile-worker-%'
+    FROM executive_actions WHERE source_conversation_ref LIKE 'mobile-worker-%' ${project ? "AND project_key = ?" : ""}
     ORDER BY id DESC LIMIT 20
-  `).all() as Array<Record<string, unknown>>;
+  `).all(...(project ? [project] : [])) as Array<Record<string, unknown>>;
   return rows.map((row) => {
     let details: any = null; let payload: any = null;
     try { details = JSON.parse(String(row.result_json || "null")); } catch { /* old record */ }
@@ -138,7 +140,7 @@ export function getRecentWorkerReceipts(db: BetterSqliteDatabase) {
   });
 }
 
-export function getAiBossMissionControl(db: BetterSqliteDatabase) {
+export function getAiBossMissionControl(db: BetterSqliteDatabase, project?: ProjectScope) {
   const counts = db.prepare(`
     SELECT
       SUM(CASE WHEN status = 'awaiting_approval' THEN 1 ELSE 0 END) AS awaiting_approval,
@@ -146,21 +148,24 @@ export function getAiBossMissionControl(db: BetterSqliteDatabase) {
       SUM(CASE WHEN status = 'executing' THEN 1 ELSE 0 END) AS executing,
       SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed,
       SUM(CASE WHEN status = 'approved' AND execution_route = 'local' THEN 1 ELSE 0 END) AS local_ready
-    FROM executive_actions
-  `).get() as Record<string, number | null>;
+    FROM executive_actions ${project ? "WHERE project_key = ?" : ""}
+  `).get(...(project ? [project] : [])) as Record<string, number | null>;
   const nodes = getAiBossNodes(db);
   const macOnline = nodes.some((node) => node.node_kind === "mac" && node.online);
   const androidOnline = nodes.some((node) => node.node_kind === "android" && node.online);
+  const captureCondition = project === "papa-life" ? "session_ref LIKE 'father-mobile-%'"
+    : project === "ai-boss-mobility" ? "session_ref LIKE 'boss-mobile-%'"
+    : "(session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%')";
   const openInstructions = (db.prepare(
-    "SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (session_ref LIKE 'mobile-%' OR session_ref LIKE 'boss-mobile-%' OR session_ref LIKE 'father-mobile-%') AND status IN ('active', 'waiting')"
+    `SELECT COUNT(*) AS count FROM executive_conversation_briefs WHERE channel = 'other' AND (${captureCondition}) AND status IN ('active', 'waiting')`
   ).get() as { count: number }).count;
   return {
     nodes,
     mac_online: macOnline,
     android_online: androidOnline,
     active_companion: androidOnline ? "android" : macOnline ? "mac" : null,
-    pending_approvals: getPendingApprovals(db, macOnline),
-    worker_receipts: getRecentWorkerReceipts(db),
+    pending_approvals: getPendingApprovals(db, macOnline, project),
+    worker_receipts: getRecentWorkerReceipts(db, project),
     queue: {
       awaiting_approval: counts.awaiting_approval || 0,
       approved: counts.approved || 0,

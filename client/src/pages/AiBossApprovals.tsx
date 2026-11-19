@@ -60,6 +60,36 @@ export default function AiBossApprovals() {
   const [decidingId, setDecidingId] = useState<number | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
+  useEffect(() => {
+    // The shared public HTML defaults to Papa Life branding.
+    // Keep each private approvals route branded to the business it belongs to.
+    const previousTitle = document.title;
+    document.title = aiBossBrand ? "AI Boss Mobility OS | Approvals" : "Papa Life OS | Approvals";
+    const logo = aiBossBrand
+      ? "https://ai.bossmobilelifecoach.com/images/ai-boss-journey-logo.webp"
+      : "/images/papa-life-approved-20261016.webp";
+    const updates: Array<() => void> = [];
+    const update = (selector: string, attribute: string, value: string) => {
+      const element = document.querySelector<HTMLElement>(selector);
+      if (!element) return;
+      const previous = element.getAttribute(attribute);
+      element.setAttribute(attribute, value);
+      updates.push(() => {
+        if (previous === null) element.removeAttribute(attribute);
+        else element.setAttribute(attribute, previous);
+      });
+    };
+    update('link[rel="manifest"]', "href", aiBossBrand ? "/ai-boss-manifest.webmanifest" : "/papa-life-os-manifest.webmanifest");
+    update('link[rel="icon"]', "href", logo);
+    update('link[rel="apple-touch-icon"]', "href", logo);
+    update('meta[name="apple-mobile-web-app-title"]', "content", aiBossBrand ? "AI Boss OS" : "Papa Life OS");
+    update('meta[name="theme-color"]', "content", aiBossBrand ? "#0e7490" : "#f5c518");
+    return () => {
+      document.title = previousTitle;
+      updates.reverse().forEach(restore => restore());
+    };
+  }, [aiBossBrand]);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {

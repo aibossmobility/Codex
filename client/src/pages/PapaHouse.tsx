@@ -51,7 +51,7 @@ export const papaRooms: Room[] = [
     name: "The Listening Room",
     eyebrow: "Slow down & listen",
     title: "Sometimes hearing is the beginning of healing.",
-    intro: "Settle into a comfortable chair, imagine the headphones on, and discover audio lessons and reflections that encourage wiser conversations and steady presence. You can explore available recordings at your own pace.",
+    intro: "Settle into a comfortable chair and explore audio lessons and reflections. These resources encourage wiser conversations and steady presence. You can explore available recordings at your own pace.",
     image: "/images/papa-life-music-room-approved.png?v=20261022-hq",
     alt: "The approved Papa Life Music Room with the tree logo, smiling visitor and warm doorway",
     action: "Enter the Music Room", href: "/music-room",
@@ -63,7 +63,7 @@ export const papaRooms: Room[] = [
     name: "The Theater",
     eyebrow: "Watch & learn",
     title: "Pull up a chair. There's something worth learning.",
-    intro: "Explore self-guided videos and the Papa Life lesson series without attending a meeting. Preview what is available, choose what interests you, and purchase eligible offerings directly when you are ready.",
+    intro: "Explore self-guided videos and Papa Life lessons at your own pace. No meeting is required. Preview what is available and choose what interests you. Purchase only when you are ready.",
     image: "/images/papa-house-entry.webp",
     alt: "Fathers gathered in a warmly lit home with inviting rooms to learn and connect",
     action: "Explore video lessons", href: "/shop",
@@ -75,7 +75,7 @@ export const papaRooms: Room[] = [
     name: "The Dad Cave",
     eyebrow: "Real questions. Honest reflection.",
     title: "A place where fathers can be real.",
-    intro: "The fatherhood journey can involve silence, setbacks, and hard conversations. Here you can reflect on Presence, Authority, Purpose, and Alignment, explore your next step, or ask the clearly identified Papa Life AI guide for help.",
+    intro: "Fatherhood can involve silence, setbacks, and hard conversations. Reflect on Presence, Authority, Purpose, and Alignment. Explore your next step or ask the clearly identified Papa Life AI guide for help.",
     image: "/images/papa-house-entry.webp",
     alt: "Two men enjoying an honest conversation in an inviting African-inspired home",
     action: "Explore your fatherhood journey", href: "/my-journey",
@@ -87,7 +87,7 @@ export const papaRooms: Room[] = [
     name: "The Resource Room",
     eyebrow: "Make your next step easier",
     title: "Take home something useful.",
-    intro: "Workbooks, original lessons, tools, and resources are here to support the next step you decide to take. Find the learning format that fits, with clear details before any purchase.",
+    intro: "Workbooks, original lessons, and tools can support your next step. Find the learning format that fits, with clear details before any purchase.",
     image: "/images/papa-life-father-adult-son-afternoon.png",
     alt: "A father and an adult son spending time together in a gentle afternoon setting",
     action: "Browse resources", href: "/shop",
@@ -172,7 +172,7 @@ function HouseHall() {
           <div className="papa-house-room-intro">
             <span className="papa-house-kicker">No rush · There is more to discover</span>
             <h2>Every doorway leads somewhere different.</h2>
-            <p>Inside each room you'll find a new atmosphere and a way to explore Papa Life's existing courses, videos, audio, written resources, and fatherhood guidance.</p>
+            <p>Each room offers a different place to explore. Find courses, videos, audio lessons, writing, and fatherhood guidance.</p>
           </div>
           <div className="papa-house-room-grid">{papaRooms.map((room,i)=><RoomCard key={room.slug} room={room} index={i}/>)}</div>
         </section>

@@ -7151,23 +7151,15 @@ async function startServer() {
   });
 
   app.get("/sitemap.xml", (_req, res) => {
-    const base = "https://papalifecoach.com";
-    const staticPaths = [
-      "/", "/site-directory", "/welcome-to-papa-life", "/marlee-assessment",
-      "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
-      "/parents-of-adult-children", "/adult-children",
-      "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill",
-      "/courses", "/start", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/digital-twin",
-      "/resources", "/books", "/podcast", "/shop", "/papa-journey", "/contact",
-      "/privacy-policy", "/terms-of-service", "/refund-policy", "/music-room", "/house",
-      "/house/living-room", "/house/library", "/house/listening-room", "/house/theater",
-      "/house/dad-cave", "/house/resources", "/house/sky-room",
-    ];
+    // Serve the build-time sitemap (with truthful, source-based lastmod values).
+    // Append dynamic published course URLs only if absent from that file.
+    const builtSitemap = path.join(staticPath, "sitemap.xml");
+    if (!fs.existsSync(builtSitemap)) return res.status(503).type("text/plain").send("Sitemap unavailable");
+    const xml = fs.readFileSync(builtSitemap, "utf8");
     const coursePaths = (db.prepare("SELECT id FROM courses WHERE show_in_catalog = 1 ORDER BY sort_order ASC, id ASC").all() as Array<{ id: number }>).map((row) => `/courses/${row.id}`);
-    // Unique canonical URLs; don't claim every page changed today.
-    const urls = Array.from(new Set([...staticPaths, ...coursePaths]));
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((pathname) => `  <url><loc>${base}${pathname}</loc></url>`).join("\n")}\n</urlset>\n`;
-    res.type("application/xml").send(xml);
+    const additions = coursePaths.filter((coursePath) => !xml.includes(`<loc>https://papalifecoach.com${coursePath}</loc>`));
+    const newEntries = additions.map((coursePath) => `  <url><loc>https://papalifecoach.com${coursePath}</loc></url>`).join("\n");
+    res.type("application/xml").send(xml.replace("</urlset>", `${newEntries}${newEntries ? "\n" : ""}</urlset>`));
   });
 
   // Serve public documents at the URL used by the sitemap and canonical.

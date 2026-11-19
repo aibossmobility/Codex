@@ -328,7 +328,7 @@ export default function AiBossMobile() {
   async function captureInstruction(event: FormEvent) {
     event.preventDefault();
     if (!instruction.trim()) return;
-    await saveCapture(instruction, captureMode || "boss");
+    await saveCapture(instruction, captureMode || "father");
   }
 
   return (
@@ -367,11 +367,8 @@ export default function AiBossMobile() {
             <h2 className="text-xl font-bold text-white">What do you need to do?</h2>
             <p className="text-sm text-white/70">You can open this dashboard and review work from your phone or tablet with your Mac off. Only Mac-based workers need it online to finish an assignment.</p>
             <div className="grid gap-2 sm:grid-cols-3">
-              <Button className="min-h-12 bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => {
-                setAssignmentOpen(true);
-                window.setTimeout(() => document.getElementById("assign-worker-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
-              }}><ClipboardList className="mr-2 h-4 w-4" />Check a website</Button>
-              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Review work &amp; approvals</Button>
+              <Button className="min-h-12 bg-brand-yellow text-black hover:bg-brand-yellow/90" onClick={() => document.getElementById("papa-capture")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Users className="mr-2 h-4 w-4" />Remember a fatherhood moment</Button>
+              <Button variant="outline" className="min-h-12 border-white/30" onClick={() => navigate("/papa-life-os/approvals")}><ShieldCheck className="mr-2 h-4 w-4" />Papa Life approvals</Button>
               <Button variant="outline" className="min-h-12 border-white/30" onClick={() => document.getElementById("papa-read-aloud")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Mic className="mr-2 h-4 w-4" />Read text aloud</Button>
             </div>
           </CardContent>
@@ -395,23 +392,17 @@ export default function AiBossMobile() {
         <Card className="border-white/15 bg-[#111]">
           <CardContent className="p-4 text-sm text-white/80">
             <p className="font-semibold text-white">Your first assignment — three steps</p>
-            <p className="mt-1">1. Choose a business and check its website. 2. Review and approve the request. 3. Return to Approvals to see the worker's evidence. Nothing sends messages, spends money, or changes a site.</p>
+            <p className="mt-1">1. Capture a fatherhood conversation or relationship follow-up. 2. Review Papa Life assignments. 3. Use the PAPA framework for the next people-centered step. Website audits are optional.</p>
           </CardContent>
         </Card>
 
         <Card className="border-brand-yellow/30 bg-[#111]">
-          <CardHeader>
-            <CardTitle className="text-white">Recent Owner Updates</CardTitle>
-            <p className="text-sm text-gray-400">As of November 19, 2026 · Read-only briefing, not live support or sales verification. The canonical Google Hub remains the authority.</p>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <p className="text-gray-200"><strong className="text-brand-yellow">Papa Life website:</strong> HeyCatch-driven SEO, navigation and product-clarity improvements have been committed. Live deployment and checkout-to-course access still require separate verification.</p>
-            <p className="text-gray-200"><strong className="text-brand-yellow">Two Learning Paths:</strong> The approved green-sweater introduction with captions and low-volume smooth jazz was added to the websites' code with visitor-controlled playback and no autoplay.</p>
-            <p className="text-gray-200"><strong className="text-brand-yellow">Free AI practice:</strong> Eight public presentation experiences welcome fathers and family allies or entrepreneurs and organization leaders. Keep Papa Life and AI Boss Mobility customer data separate; no mandatory payment, lead capture or sales pitch.</p>
-            <p className="text-gray-200"><strong className="text-brand-yellow">Support still open:</strong> Papa Life HighLevel case #6721620 concerns the blank Orders screen and unverified test purchase-to-access. AI Boss Mobility case #6676266 is separate. Hostinger domain-management review is pending; no DNS or payment changes authorized.</p>
-            <p className="text-gray-200"><strong className="text-brand-yellow">Work and meetings:</strong> Prioritize paid employment and contract opportunities. Elgin Rose meeting: November 19. San Leandro Adult School discussion: November 20. The separate City of San Leandro proposal remains paused.</p>
-            <p className="text-gray-200"><strong className="text-brand-yellow">Knowledge safeguards:</strong> PAPA = Presence → Authority → Purpose → Alignment. Run Your Own Race is an unfinished manuscript, not an active product. No new Papa Life course or pilot launches without a new owner decision.</p>
-            <a className="inline-flex items-center gap-1 text-brand-yellow underline underline-offset-4" href="https://docs.google.com/document/d/1TXkHlLDd-DzrSwF9JbcnK3mdDZw6fFehwgi1xZwDin4/edit" target="_blank" rel="noopener noreferrer">Open current canonical Google Hub <ExternalLink className="h-3.5 w-3.5" /></a>
+          <CardHeader><CardTitle className="text-white">Papa Life priorities</CardTitle><p className="text-sm text-gray-400">People and relationships first. The Google Hub remains authoritative.</p></CardHeader>
+          <CardContent className="space-y-3 text-sm text-white/75">
+            <p><strong className="text-brand-yellow">Fatherhood:</strong> Focus on presence, listening and practical follow-up with fathers of adult children. Nothing sends messages automatically.</p>
+            <p><strong className="text-brand-yellow">Resources:</strong> Use existing Papa Life materials and the PAPA framework. No new courses or programs are launched here.</p>
+            <p><strong className="text-brand-yellow">Access:</strong> The Papa Life website is live; HighLevel checkout-to-course delivery still requires independent verification.</p>
+            <a className="inline-flex items-center gap-1 text-brand-yellow underline underline-offset-4" href="https://docs.google.com/document/d/1TXkHlLDd-DzrSwF9JbcnK3mdDZw6fFehwgi1xZwDin4/edit" target="_blank" rel="noopener noreferrer">Current canonical Google Hub <ExternalLink className="h-3.5 w-3.5" /></a>
           </CardContent>
         </Card>
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
@@ -468,17 +459,17 @@ export default function AiBossMobile() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#111] border-white/10">
+        <Card id="papa-capture" className="bg-[#111] border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">Talk to Papa Life OS</CardTitle>
-            <p className="text-sm text-gray-500">Tell Papa Life OS what you want done from your Android phone. It can store the instruction immediately and route it through the operating system.</p>
+            <CardTitle className="text-white">Remember a fatherhood conversation</CardTitle>
+            <p className="text-sm text-gray-500">Capture a conversation, relationship insight, or personal follow-up. Type on any device, or dictate where the microphone is supported.</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={captureInstruction} className="space-y-3">
-              <Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="Check my Gmail, review my calendar, prepare a follow-up, remember something, or queue work for my Mac…" className="min-h-28 bg-black/50 border-white/10 text-base" />
+              <Textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} placeholder="I spoke with a father about listening to his adult child. I want to remember…" className="min-h-28 bg-black/50 border-white/10 text-base" />
               <div className="grid sm:grid-cols-2 gap-3">
-                <Button type="button" variant="outline" disabled={saving} onClick={() => (listening && captureMode === "boss" ? stopVoice() : startVoice("boss"))} className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10">
-                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "boss" ? "Finish speaking" : "Speak to Papa Life OS"}
+                <Button type="button" variant="outline" disabled={saving} onClick={() => (listening && captureMode === "father" ? stopVoice() : startVoice("father"))} className="border-brand-yellow/40 text-brand-yellow hover:bg-brand-yellow/10">
+                  <Mic2 className="w-4 h-4 mr-2" />{listening && captureMode === "father" ? "Finish speaking" : "Speak fatherhood note"}
                 </Button>
                 <Button type="submit" disabled={saving || !instruction.trim()}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}Send to Papa Life OS</Button>
               </div>
@@ -486,43 +477,20 @@ export default function AiBossMobile() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#111] border-white/10">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-3">
-              <div><p className="text-xs uppercase tracking-widest text-primary">Campaigns & Analytics</p><CardTitle className="mt-1 text-white">Managed by Papa Life OS</CardTitle></div>
-              <BarChart3 className="w-8 h-8 text-primary" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(mission?.campaigns || []).map((campaign) => (
-              <div key={`${campaign.source}-${campaign.campaign_key}`} className="rounded-xl border border-white/10 bg-black/40 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-white">{campaign.display_name}</p>
-                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${campaign.status === "connected" ? "bg-primary/15 text-primary" : campaign.status === "attention" ? "bg-brand-red/15 text-brand-red" : "bg-brand-yellow/15 text-brand-yellow"}`}>{campaign.status}</span>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">{campaign.campaign_key} · Last sync {campaign.last_synced_at}</p>
-                  </div>
-                  {campaign.tracking_url ? <a href={campaign.tracking_url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${campaign.display_name}`}><ExternalLink className="h-4 w-4 text-gray-400" /></a> : null}
-                </div>
-                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <Metric label="Clicks" value={campaign.clicks} />
-                  <Metric label="Enrollments" value={campaign.enrollments} />
-                  <Metric label="Posts" value={campaign.posts_distributed} />
-                  <Metric label="Follow-ups" value={campaign.follow_ups_needed} />
-                </div>
-                {campaign.latest_activity ? <p className="mt-3 text-sm text-gray-400">{campaign.latest_activity}</p> : null}
-              </div>
-            ))}
+        <Card className="border-brand-yellow/20 bg-[#111]">
+          <CardHeader><CardTitle className="text-white">Fatherhood and relationship resources</CardTitle></CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <a href="/papa-framework" className="rounded-lg border border-white/15 p-4 text-brand-yellow underline">PAPA framework</a>
+            <a href="/adult-son-relationship" className="rounded-lg border border-white/15 p-4 text-brand-yellow underline">Adult son relationships</a>
+            <a href="/adult-daughter-relationship" className="rounded-lg border border-white/15 p-4 text-brand-yellow underline">Adult daughter relationships</a>
+            <a href="/courses" className="rounded-lg border border-white/15 p-4 text-brand-yellow underline">Existing Papa Life resources</a>
           </CardContent>
         </Card>
-
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <QuickLink icon={Brain} label="Executive Memory" onClick={() => navigate("/executive-memory")} />
-          <QuickLink icon={ClipboardList} label="AI Boss Work Review" onClick={() => { window.location.href = "/ai-boss-delivery-review"; }} />
+          <QuickLink icon={Users} label="Fatherhood framework" onClick={() => { window.location.href = "/papa-framework"; }} />
+          <QuickLink icon={Brain} label="Digital Brian" onClick={() => navigate("/papa-life-os/digital-twin")} />
           <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />
-          <QuickLink icon={Mail} label="Gmail Operations" onClick={() => navigate("/executive-memory")} />
+          <QuickLink icon={Mail} label="Relationship notes" onClick={() => document.getElementById("papa-capture")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
           <QuickLink icon={CalendarDays} label="Daily Work Reports" onClick={() => navigate("/papa-daily-work-report")} />
         </section>
 

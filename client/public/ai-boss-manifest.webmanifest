@@ -1,14 +1,14 @@
 {
-  "name": "Papa Life OS",
-  "short_name": "Papa Life OS",
+  "name": "AI Boss Mobility OS",
+  "short_name": "AI Boss OS",
   "start_url": "/ai-boss",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#f5c518",
-  "description": "Brian Keith Hill's private Papa Life executive command center",
+  "background_color": "#07121f",
+  "theme_color": "#0e7490",
+  "description": "Brian Keith Hill's private AI Boss Mobility consulting and technology operations dashboard",
   "icons": [
     {
-      "src": "/images/papa-life-approved-20261016.webp",
+      "src": "https://ai.bossmobilelifecoach.com/images/ai-boss-journey-logo.webp",
       "sizes": "any",
       "type": "image/webp",
       "purpose": "any"

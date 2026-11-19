@@ -46,6 +46,9 @@ jobs:
       - name: Run TypeScript check
         run: pnpm check
 
+      - name: Test Papa Life and AI Boss dashboard isolation
+        run: node --import tsx server/ai-boss-brand-scope.test.ts
+
       - name: Test current Papa Life offers
         run: pnpm test:papa-local-offers
 

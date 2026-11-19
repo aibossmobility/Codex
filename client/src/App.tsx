@@ -30,6 +30,7 @@ import Operators from "./pages/Operators";
 import Governance from "./pages/Governance";
 import ExecutiveMemory from "./pages/ExecutiveMemory";
 import AiBossMobile from "./pages/AiBossMobile";
+import AiBossBusinessOS from "./pages/AiBossBusinessOS";
 import AllPages from "./pages/AllPages";
 import DigitalTwinPortal from "./pages/DigitalTwinPortal";
 import SiteDirectory from "./pages/SiteDirectory";
@@ -145,7 +146,7 @@ function Router() {
       <Route path={"/ai-boss/tuesday-live"} component={TuesdayLiveFallback} />
       <Route path={"/ai-boss/all-pages"} component={AllPages} />
       <Route path={"/ai-boss/digital-twin"} component={DigitalTwinPortal} />
-      <Route path={"/ai-boss"} component={AiBossMobile} />
+      <Route path={"/ai-boss"} component={AiBossBusinessOS} />
 
       <Route path={"/all-pages"} component={AllPages} />
       <Route path={"/site-directory"} component={SiteDirectory} />

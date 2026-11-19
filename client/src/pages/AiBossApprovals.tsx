@@ -51,7 +51,10 @@ function formatCost(micros: number) {
 }
 
 export default function AiBossApprovals() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const aiBossBrand = location.startsWith("/ai-boss");
+  const home = aiBossBrand ? "/ai-boss" : "/papa-life-os";
+  const brandName = aiBossBrand ? "AI Boss Mobility" : "Papa Life";
   const [mission, setMission] = useState<Mission | null>(null);
   const [loading, setLoading] = useState(true);
   const [decidingId, setDecidingId] = useState<number | null>(null);
@@ -60,14 +63,14 @@ export default function AiBossApprovals() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiJson<{ mission: Mission }>("/api/admin/ai-boss/mission-control");
+      const data = await apiJson<{ mission: Mission }>("/api/admin/ai-boss/mission-control?project=" + (aiBossBrand ? "ai-boss-mobility" : "papa-life"));
       setMission(data.mission);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Approvals could not be loaded.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [aiBossBrand]);
 
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
@@ -87,7 +90,7 @@ export default function AiBossApprovals() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           decision,
-          note: decision === "approve" ? "Approved from Brian's Android companion." : "Declined from Brian's Android companion.",
+          note: decision === "approve" ? "Owner-approved from " + brandName + " OS." : "Owner-declined from " + brandName + " OS.",
         }),
       });
       toast.success(decision === "approve" ? "Approved." : "Declined.");
@@ -103,9 +106,9 @@ export default function AiBossApprovals() {
     <div className="min-h-screen bg-[#090909] text-white pb-20">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <Button size="icon" variant="ghost" onClick={() => navigate("/papa-life-os")} aria-label="Back to Papa Life OS"><ArrowLeft className="w-4 h-4" /></Button>
+          <Button size="icon" variant="ghost" onClick={() => navigate(home)} aria-label={"Back to " + brandName + " OS"}><ArrowLeft className="w-4 h-4" /></Button>
           <ShieldCheck className="w-6 h-6 text-primary" />
-          <div><h1 className="font-bold leading-tight">Approvals &amp; Worker Results</h1><p className="text-xs text-gray-500">Phone · tablet · desktop</p></div>
+          <div><h1 className="font-bold leading-tight">{brandName} approvals &amp; results</h1><p className="text-xs text-gray-500">Only {brandName} work · Phone · tablet · desktop</p></div>
           <Button size="icon" variant="ghost" className="ml-auto" onClick={() => load()} aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></Button>
         </div>
       </header>
@@ -161,7 +164,7 @@ export default function AiBossApprovals() {
                 <div>External AI cost: <span className="text-white">{formatCost(action.estimated_external_ai_cost_micros)}</span></div>
                 <div>Action #{action.id}</div>
               </div>
-              {action.waits_for_mac ? <p className="rounded-lg border border-yellow-400/20 bg-yellow-400/5 p-3 text-sm text-yellow-100">You can approve this now. AI Boss will keep it waiting until the Mac or required local resource is available.</p> : null}
+              {action.waits_for_mac ? <p className="rounded-lg border border-yellow-400/20 bg-yellow-400/5 p-3 text-sm text-yellow-100">You can approve this now. The secure worker will keep it waiting until the Mac or required local resource is available.</p> : null}
               <div className="grid grid-cols-2 gap-3">
                 <Button variant="outline" disabled={decidingId === action.id} onClick={() => void decide(action.id, "decline")} className="border-red-400/30 text-red-300 hover:bg-red-400/10">{decidingId === action.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}Decline</Button>
                 <Button disabled={decidingId === action.id} onClick={() => void decide(action.id, "approve")}>{decidingId === action.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}Approve</Button>

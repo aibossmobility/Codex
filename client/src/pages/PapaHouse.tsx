@@ -212,6 +212,15 @@ function RoomDetail({ room }: { room: Room }) {
             </div>
           </div>
         </section>
+        {room.slug === "library" && (
+          <section aria-labelledby="library-research-title" className="mx-auto my-10 max-w-5xl rounded-2xl border border-[#d8c69e] bg-[#fff8e9] px-6 py-8 shadow-sm md:px-10">
+            <span className="text-sm font-bold uppercase tracking-wider text-[#145b35]">Library Room · Read & Reflect</span>
+            <h2 id="library-research-title" className="mt-3 text-2xl font-black text-[#17231c] md:text-3xl">The research behind why Papa Life matters</h2>
+            <p className="mt-3 max-w-3xl leading-relaxed text-[#17231c]">Explore the independent scholarship on fathers of adult children, human connection, and family estrangement. Read thoughtfully, consider your own experience, and see how these research areas inform Papa Life's educational mission.</p>
+            <p className="mt-3 text-sm text-[#52604f]">These studies document and explore the field. They do not evaluate or endorse Papa Life's original PAPA framework.</p>
+            <a href="/research-foundation" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#145b35] px-5 py-3 font-bold text-white hover:bg-[#0c472a]">Read the Research Foundation <ArrowRight size={18} aria-hidden="true" /></a>
+          </section>
+        )}
         <section className="papa-house-room-doors">
           <div>
             <span className="papa-house-kicker">Walk a little farther</span>

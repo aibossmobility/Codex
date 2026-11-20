@@ -15,6 +15,7 @@ const navigation = [
   { label: "Find Your Guide", href: "/#family-guidance" },
   { label: "Why Adult Children Pull Away", href: "/why-adult-children-pull-away" },
   { label: "Brian’s Story", href: "#brian-story" },
+  { label: "Research Foundation", href: "/research-foundation" },
   { label: "Start With the Wheel", href: "/#fatherhood-wheel" },
   { label: "Estrangement Help", href: "/father-child-estrangement" },
   { label: "Lessons & Prices", href: "/shop" },

@@ -1,4 +1,5 @@
 import PapaSupportComparison from "./pages/PapaSupportComparison";
+import PapaResearchFoundation from "./pages/PapaResearchFoundation";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -68,6 +69,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path="/changelog" component={PapaChangelog} />
       <Route path="/papa-life-vs-therapy" component={PapaSupportComparison} />
+      <Route path="/research-foundation" component={PapaResearchFoundation} />
       <Route path="/parents-of-adult-children" component={ParentsOfAdultChildrenPage} />
       <Route path="/adult-children" component={AdultChildrenPage} />
       <Route path="/house/:room" component={PapaHouse} />

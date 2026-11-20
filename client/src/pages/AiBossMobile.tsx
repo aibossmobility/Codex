@@ -357,7 +357,7 @@ export default function AiBossMobile() {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-yellow">People · Fathers · Family Connection</p>
             <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Papa Life OS</h2>
             <p className="mt-2 max-w-2xl text-sm text-white/75">Your private home for fatherhood conversations, relationship follow-ups, and the PAPA journey: Presence → Authority → Purpose → Alignment.</p>
-            <a href="/ai-boss" className="mt-3 inline-block text-xs text-white/50 underline">Switch to AI Boss Mobility OS — separate technology dashboard</a>
+            <a href="https://ai.bossmobilelifecoach.com/ai-boss-os" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs text-white/70 underline">Open AI Boss Mobility OS — separate technology dashboard ↗</a>
           </div>
         </section>
         <Card className="border-brand-yellow/30 bg-[#111]">

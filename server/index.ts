@@ -3069,6 +3069,28 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };
   }
 
+  // Public research page must resolve on direct visits, before React hydrates.
+  if (pathname === "/research-foundation") {
+    const page: StaticServerPage = {
+      title: "Research Foundation & Statement of Need | Papa Life",
+      description: "The independent research on adult fatherhood, human connection and parent-adult child estrangement that informs Papa Life's educational mission.",
+      keywords: "fatherhood research, fathers of adult children, adult child estrangement, Papa Life research, Brian Keith Hill",
+      eyebrow: "Papa Life · Read & Reflect",
+      headline: "Research Foundation & Statement of Need",
+      intro: "Fatherhood continues after children become adults. Research helps us understand how relationships change across the adult life course, and why education and reflection matter.",
+      sections: [
+        { heading: "1. Fatherhood in later life", body: "Majeske and colleagues (2026) review scholarship on fathers and adult children, highlighting the continued relevance of these relationships and research gaps in adult fatherhood." },
+        { heading: "2. Human connection and belonging", body: "The Crisis of Connection (2018), co-edited by Pedro Noguera and colleagues, examines empathy, isolation and meaningful relationships across communities." },
+        { heading: "3. Parent–adult child estrangement", body: "Reczek, Stacey and Thomeer (2023) document experiences of estrangement; the estimate that 26% of adult children had experienced father estrangement is not a current prevalence estimate for fathers." },
+        { heading: "Independent research, original education", body: "Papa Life is an original nonclinical educational approach by Brian Keith Hill. These studies were not conducted for Papa Life and do not validate, evaluate, partner with or endorse its PAPA framework or guarantee reconciliation." },
+        { heading: "The PAPA framework", body: "Presence, Authority, Purpose and Alignment guide reflection on listening, personal accountability, family values and consistent action." },
+      ],
+      cta: { label: "Request the institutional research and learning package", href: "mailto:brian@papalifecoach.com?subject=Papa%20Life%20Institutional%20Partnership" },
+    };
+    const citations = '<section aria-label="Independent research references"><h2>View the research</h2><p><a href="https://doi.org/10.1111/jftr.70068">Majeske et al. (2026)</a> · <a href="https://nyupress.org/9781479802784/the-crisis-of-connection/">The Crisis of Connection (2018)</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10254574/">Reczek et al. (2023)</a></p><p><a href="/house/library">Return to the Reading Nook</a></p></section>';
+    return { status: 200, title: page.title, description: page.description, keywords: page.keywords, bodyHtml: serverPageShell(page, citations) };
+  }
+
   // Direct room links must return a usable public 200 response, not a 404.
   if (pathname === "/house" || pathname.startsWith("/house/")) {
     const roomPages: Record<string, {name: string; description: string; destination: string}> = {
@@ -3098,7 +3120,8 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       sections: [{ heading: "Wander at your own pace", body: "Read, listen, reflect, watch lessons and explore original Papa Life resources." }],
       cta: room ? { label: "Explore resources in this room", href: room.destination } : { label: "Browse Resources", href: "/shop" },
     };
-    return {status: 200, title, description, bodyHtml: serverPageShell(page, navigation)};
+    const libraryResearch = slug === "library" ? '<section aria-label="Papa Life Research Foundation"><h2>Research Foundation & Statement of Need</h2><p>Read independent scholarship on fathers of adult children, human connection and estrangement and reflect on the need for Papa Life education.</p><p><a href="/research-foundation">Read Papa Life Research Foundation</a></p></section>' : "";
+    return {status: 200, title, description, bodyHtml: serverPageShell(page, navigation + libraryResearch)};
   }
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();

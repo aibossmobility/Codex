@@ -3214,8 +3214,8 @@ function renderHtmlDocument(template: string, page: ServerRenderedPage, canonica
   // link scrapers can display the homepage title (e.g. "Audio Lessons")
   // instead of the Research Foundation title.
   html = html
-    .replace(/<meta\\b[^>]*\\bproperty=["']og:[^"']+["'][^>]*\\/?>\\s*/gi, "")
-    .replace(/<meta\\b[^>]*\\bname=["']twitter:[^"']+["'][^>]*\\/?>\\s*/gi, "");
+    .replace(/<meta\b[^>]*\bproperty=["']og:[^"']+["'][^>]*\/?>\s*/gi, "")
+    .replace(/<meta\b[^>]*\bname=["']twitter:[^"']+["'][^>]*\/?>\s*/gi, "");
   const socialMeta = `    <link rel="canonical" href="${canonicalUrl}" />\n` +
     `    <meta property="og:title" content="${escapeHtml(page.title)}" />\n` +
     `    <meta property="og:description" content="${escapeHtml(page.description)}" />\n` +

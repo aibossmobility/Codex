@@ -27,8 +27,7 @@ const groups: PageGroup[] = [
     title: "Fatherhood & Journey",
     links: [
       { label: "My Journey", path: "/my-journey" },
-      { label: "Relationship Assessment", path: "/relationship-assessment" },
-      { label: "2-Minute Fatherhood Check-In", path: "/marlee-assessment" },
+      { label: "2-Minute Fatherhood Check-In", path: "/relationship-assessment" },
       { label: "Papa Journey", path: "/papa-journey" },
       { label: "Adult Son Relationship", path: "/adult-son-relationship" },
       { label: "Adult Daughter Relationship", path: "/adult-daughter-relationship" },

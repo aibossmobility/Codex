@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { getFirstTouchAttribution } from "@/lib/attribution";
+import { trackPapaFunnelEvent } from "@/lib/funnel-events";
 
 const relationshipOptions = ["Close—strengthen", "Communication difficult", "Limited contact", "Disconnected", "Unsure"];
 const concernOptions = ["I feel judged", "I feel shut out", "I don’t know what to say", "I’m afraid of making it worse", "I’m not sure"];
@@ -76,6 +77,7 @@ export function FatherEngagementFollowUpForm() {
           event_detail: `Requested Brian review after 2-Minute Fatherhood Check-In · Next step: ${form.preferred_next_step}`,
         }),
       }).catch(() => undefined);
+      trackPapaFunnelEvent("fatherhood_followup_requested");
       setSubmitted(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not submit your request. Please try again.");
@@ -85,7 +87,7 @@ export function FatherEngagementFollowUpForm() {
   };
 
   if (submitted) {
-    return <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-5"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-300" /><div><p className="font-bold text-white">You’re in Brian’s review queue.</p><p className="mt-1 text-sm leading-relaxed text-white/65">Papa Life will use only the follow-up information you chose to share here. Your private reflection scores were not submitted.</p></div></div></div>;
+    return <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-5"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-300" /><div><p className="font-bold text-white">You’re in Brian’s review queue.</p><p className="mt-1 text-sm leading-relaxed text-white/65">Your request was saved for Papa Life follow-up. Your reflection scores were not submitted. You can continue learning now without waiting for a reply.</p><div className="mt-4 flex flex-wrap gap-3"><a href="/courses?from=followup" className="font-bold text-brand-yellow underline">Explore the audio lessons</a><a href="/my-journey?from=followup" className="font-bold text-brand-yellow underline">Continue your journey</a></div></div></div></div>;
   }
 
   const selectClass = "w-full rounded-xl border border-white/15 bg-black/35 px-4 py-3 text-white focus:border-brand-yellow focus:outline-none";

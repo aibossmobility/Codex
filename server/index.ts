@@ -551,6 +551,21 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS papa_institutional_inquiries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    organization TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    interest TEXT NOT NULL,
+    source TEXT,
+    consent_email INTEGER NOT NULL DEFAULT 0,
+    ghl_contact_id TEXT,
+    response_status TEXT NOT NULL DEFAULT 'pending',
+    response_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS notification_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_type TEXT NOT NULL,
@@ -2433,20 +2448,6 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
     noindex: true,
   },
   "/relationship-assessment": {
-    title: "Free Father-Adult Child Relationship Assessment | Papa Life Coach",
-    description:
-      "Take the free relationship assessment and see where things stand with your adult son or daughter.",
-    eyebrow: "Relationship Assessment",
-    headline: "Name the relationship clearly so your next move is intentional.",
-    intro:
-      "The assessment helps fathers stop guessing and start moving with honesty, humility, and practical direction.",
-    sections: [
-      { heading: "Built for fathers", body: "Questions focus on distance, trust, emotional safety, and the changing role with adult children." },
-      { heading: "Practical result", body: "Your result points you toward the Papa Life resources that fit where you are now." },
-    ],
-    cta: { label: "Begin Assessment", href: "/relationship-assessment" },
-  },
-  "/marlee-assessment": {
     title: "2-Minute Fatherhood Check-In | Papa Life",
     description:
       "Where Are You With Your Adult Child? Take the 2-Minute Check-In and identify a practical place to begin rebuilding connection.",
@@ -2458,7 +2459,7 @@ const STATIC_SERVER_PAGES: Record<string, StaticServerPage> = {
       { heading: "A place to begin", body: "Notice how communication feels, where trust may need rebuilding, and what you can begin changing first." },
       { heading: "A practical next step", body: "Use what you notice as a starting point for reflection, a Papa Life conversation, or one small action." },
     ],
-    cta: { label: "Take the 2-Minute Check-In", href: "/marlee-assessment" },
+    cta: { label: "Take the 2-Minute Check-In", href: "/relationship-assessment" },
   },
   "/adult-son-relationship": {
     title: "Adult Son Relationship Help for Fathers | Papa Life Coach",
@@ -4301,6 +4302,76 @@ async function startServer() {
   app.delete("/api/members/:id", requireAuth, (req, res) => {
     db.prepare("DELETE FROM members WHERE id = ?").run(req.params.id);
     res.json({ ok: true });
+  });
+
+  // Institutions need a one-step way to request information on Papa Life itself.
+  // Email is sent once to consenting requesters, never to people who merely view the page.
+  app.post("/api/papa/institutional-inquiry", papaAiRateLimit(4, 15 * 60 * 1000), async (req, res) => {
+    const origin = req.get("origin") || "";
+    if (origin && !["https://papalifecoach.com", "http://localhost:5173", "http://localhost:3000"].includes(origin)) {
+      return res.status(403).json({ ok: false, error: "Use the Papa Life request form." });
+    }
+    if (String(req.body?.website || "").trim()) return res.json({ ok: true, email_status: "not_requested" });
+    const name = String(req.body?.name || "").trim().slice(0, 120);
+    const organization = String(req.body?.organization || "").trim().slice(0, 160);
+    const email = String(req.body?.email || "").trim().toLowerCase().slice(0, 250);
+    const source = String(req.body?.source || "research-foundation").trim().slice(0, 100);
+    const interest = String(req.body?.interest || "resources");
+    const allowedInterests = ["resources", "curriculum", "partnership", "conversation"];
+    if (!name || !organization || !isValidEmail(email) || !allowedInterests.includes(interest) || req.body?.consent_email !== true) {
+      return res.status(400).json({ ok: false, error: "Please enter your name, organization, work email and consent to the requested reply." });
+    }
+    const previous = db.prepare("SELECT id, response_at, response_status FROM papa_institutional_inquiries WHERE email = ?")
+      .get(email) as { id: number; response_at: string | null; response_status: string } | undefined;
+    const recentlySent = previous?.response_at && previous.response_status === "queued" && (Date.now() - Date.parse(previous.response_at) < 24 * 60 * 60 * 1000);
+    db.prepare(`INSERT INTO papa_institutional_inquiries (name, organization, email, interest, source, consent_email)
+      VALUES (?, ?, ?, ?, ?, 1)
+      ON CONFLICT(email) DO UPDATE SET name=excluded.name, organization=excluded.organization,
+        interest=excluded.interest, source=excluded.source, consent_email=1, updated_at=datetime('now')`)
+      .run(name, organization, email, interest, source);
+    if (recentlySent) return res.json({ ok: true, email_status: "already_queued" });
+    // Only the Papa Life sub-account is eligible: never send from an AI Boss agency location.
+    const ghlLocation = process.env.GHL_LOCATION_ID?.trim();
+    const ghlToken = process.env.GHL_API_TOKEN?.trim();
+    let emailStatus = "not_configured";
+    let ghlContactId: string | null = null;
+    if (ghlLocation === "BYx4g32AidgEkTBg7nLQ" && ghlToken) {
+      const base = (process.env.GHL_API_BASE_URL || "https://services.leadconnectorhq.com").replace(/\/$/, "");
+      const postGhl = async (endpoint: string, body: Record<string, unknown>, version = "2021-07-28") => {
+        const response = await fetch(`${base}${endpoint}`, {
+          method: "POST", signal: AbortSignal.timeout(10000),
+          headers: { Authorization: `Bearer ${ghlToken}`, Version: version, Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await response.json().catch(() => ({})) as Record<string, unknown>;
+        if (!response.ok) throw new Error(`GoHighLevel returned HTTP ${response.status} for ${endpoint}`);
+        return data;
+      };
+      try {
+        const contact = await postGhl("/contacts/upsert", {
+          locationId: ghlLocation, firstName: name.split(/\s+/)[0],
+          ...(name.includes(" ") ? { lastName: name.split(/\s+/).slice(1).join(" ") } : {}),
+          email, companyName: organization, source: "PapaLifeCoach.com Institutional Research",
+        });
+        ghlContactId = String((contact.contact as Record<string, unknown> | undefined)?.id || contact.id || contact.contactId || "");
+        if (!ghlContactId) throw new Error("GHL returned no institutional contact ID");
+        await postGhl(`/contacts/${encodeURIComponent(ghlContactId)}/tags`, { tags: ["Papa Life—Institutional Inquiry"] });
+        const personalized = `Hello ${name.split(/\s+/)[0]},\n\nThank you for your interest in Papa Life's resources for fathers of adult children. Here is the research foundation and statement of need you requested:\nhttps://papalifecoach.com/research-foundation\n\nYou can also review existing self-paced lessons and pricing at:\nhttps://papalifecoach.com/shop\n\nIf you'd like the separate two-part institutional review package or to discuss how these resources fit ${organization}, simply reply to this email with what would help your organization. We will coordinate the next step personally.\n\nPapa Life — Fatherhood Transformation Services\nBrian Keith Hill, Founder\n\nYou requested this one-time email through the Papa Life website. No subscription has been created.`;
+        const message = await postGhl("/conversations/messages", {
+          type: "Email", contactId: ghlContactId, emailTo: email,
+          emailFrom: "brian@papalifecoach.com", subject: "Your Papa Life institutional information", message: personalized,
+          status: "pending",
+        }, "v3");
+        emailStatus = message.messageId || message.emailMessageId ? "queued" : "unconfirmed";
+      } catch (error) {
+        console.warn("[papa institutional] CRM or receipt delivery failed:", error instanceof Error ? error.message : "unknown error");
+        emailStatus = "delivery_unavailable";
+      }
+    }
+    db.prepare("UPDATE papa_institutional_inquiries SET ghl_contact_id=?, response_status=?, response_at=? WHERE email=?")
+      .run(ghlContactId, emailStatus, emailStatus === "queued" ? new Date().toISOString() : null, email);
+    void sendAdminNotification({ event_type: "papa_institutional_inquiry", subject: "Papa Life institutional information requested", summary: `A representative of ${organization} requested Papa Life institutional information. Interest: ${interest}. Review the institutional inquiry in Papa Life CRM before discussing terms.`, payload: { interest, email_status: emailStatus } });
+    return res.json({ ok: true, email_status: emailStatus });
   });
 
   // ── Public marketing: course catalog + form schema (no auth) ──────────────
@@ -7198,10 +7269,17 @@ async function startServer() {
     res.type("application/xml").send(xml.replace("</urlset>", `${newEntries}${newEntries ? "\n" : ""}</urlset>`));
   });
 
+  // Legacy GetMarlee route: preserve old shared links without leaving Papa Life.
+  app.get(["/marlee-assessment", "/marlee-assessment/", "/marlee-assessment/index.html", "/assessment", "/assessment/"], (req, res) => {
+    const queryAt = req.originalUrl.indexOf("?");
+    const query = queryAt >= 0 ? req.originalUrl.slice(queryAt) : "";
+    return res.redirect(301, "/relationship-assessment" + query);
+  });
+
   // Serve public documents at the URL used by the sitemap and canonical.
   // Private app/API routes are excluded from this normalization.
   const publicSeoPaths = new Set([
-    "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment", "/marlee-assessment",
+    "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/parents-of-adult-children", "/adult-children",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",

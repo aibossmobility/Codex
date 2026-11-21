@@ -48,7 +48,7 @@ import PapaFirstLesson from "./pages/PapaFirstLesson";
 import PapaDailyWorkReport from "./pages/PapaDailyWorkReport";
 import PapaAiExperience from "./pages/PapaAiExperience";
 import TuesdayLive from "./pages/TuesdayLive";
-import MarleeAssessment from "./pages/MarleeAssessment";
+import RelationshipAssessment from "./pages/RelationshipAssessment";
 import WelcomeToPapaLife from "./pages/WelcomeToPapaLife";
 import PapaLifeOutreach from "./pages/PapaLifeOutreach";
 import DigitalTwinDemo from "./pages/DigitalTwinDemo";
@@ -111,9 +111,9 @@ function Router() {
       <Route path="/join"><Redirect to="/courses" /></Route>
       <Route path={"/papa-journey"}><Redirect to="/" /></Route>
       <Route path="/my-journey" component={FatherJourney} />
-      <Route path="/assessment"><Redirect to="/marlee-assessment" /></Route>
-      <Route path="/relationship-assessment"><Redirect to="/marlee-assessment" /></Route>
-      <Route path="/marlee-assessment" component={MarleeAssessment} />
+      <Route path="/assessment"><Redirect to="/relationship-assessment" /></Route>
+      <Route path="/marlee-assessment"><Redirect to="/relationship-assessment" /></Route>
+      <Route path="/relationship-assessment" component={RelationshipAssessment} />
       <Route path="/adult-son-relationship" component={AdultSonRelationshipPage} />
       <Route path="/adult-daughter-relationship" component={AdultDaughterRelationshipPage} />
       <Route path="/why-adult-children-pull-away" component={WhyAdultChildrenPullAwayPage} />

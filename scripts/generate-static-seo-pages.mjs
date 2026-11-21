@@ -65,7 +65,7 @@ const pages = [
       ["Can lessons replace therapy?", "No. Papa Life is education, not individualized treatment or diagnosis."],
       ["What can I do for free?", "Begin with the 2-Minute Fatherhood Check-In and consider one small respectful next step."]
     ],
-    relatedLinks: [["Begin the free 2-Minute Check-In", "/marlee-assessment"], ["See current lessons and prices", "/shop"], ["Explore parent guidance", "/parents-of-adult-children"]]
+    relatedLinks: [["Begin the free 2-Minute Check-In", "/relationship-assessment"], ["See current lessons and prices", "/shop"], ["Explore parent guidance", "/parents-of-adult-children"]]
   },
   {
     path: "/changelog",
@@ -382,19 +382,6 @@ const pages = [
     sections: [
       ["Start here", "If you are a father trying to reconnect with an adult child, the free assessment is the best first step."],
       ["For broader support", "Use the AI Coach or course catalog to get oriented around resources and next actions."],
-    ],
-  },
-  {
-    path: "/marlee-assessment",
-    title: "2-Minute Fatherhood Check-In | Papa Life",
-    description:
-      "Where Are You With Your Adult Child? Take the 2-Minute Check-In and identify a practical place to begin rebuilding connection.",
-    eyebrow: "2-Minute Fatherhood Check-In",
-    headline: "Where Are You With Your Adult Child?",
-    intro: "Take the 2-Minute Check-In to notice where things stand today and choose an honest, practical next step.",
-    sections: [
-      ["A place to begin", "Notice how communication feels, where trust may need rebuilding, and what you can begin changing first."],
-      ["A practical next step", "Use what you notice as a starting point for reflection, a Papa Life conversation, or one small action."],
     ],
   },
   {

@@ -272,7 +272,7 @@ export function BrianDigitalTwin({ autoOpen = false, className }: { autoOpen?: b
 
                 {relationship.commercial ? (
                   <div className="grid gap-2 sm:grid-cols-2">
-                    <a href="/marlee-assessment" className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-yellow px-3 py-2 text-xs font-extrabold text-black hover:bg-white"><HeartHandshake className="h-4 w-4" />2-Minute Fatherhood Check-In</a>
+                    <a href="/relationship-assessment" className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-yellow px-3 py-2 text-xs font-extrabold text-black hover:bg-white"><HeartHandshake className="h-4 w-4" />2-Minute Fatherhood Check-In</a>
                     <a href="/digital-twin?voice=1" className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-extrabold text-white hover:border-brand-yellow hover:text-brand-yellow"><CalendarCheck className="h-4 w-4" />Open AI Voice Conversation</a>
                   </div>
                 ) : (

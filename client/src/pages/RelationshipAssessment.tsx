@@ -4,9 +4,10 @@ import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { FatherEngagementFollowUpForm } from "@/components/FatherEngagementFollowUpForm";
 import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { trackPapaFunnelEvent } from "@/lib/funnel-events";
 
-type Pillar = "Presence" | "Purpose" | "Authority" | "Alignment";
+type Pillar = "Presence" | "Authority" | "Purpose" | "Alignment";
 
 type Question = {
   id: string;
@@ -39,10 +40,11 @@ const pillarGuidance: Record<Pillar, string> = {
 export default function RelationshipAssessment() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
+  const startedRef = useRef(false);
   const answeredCount = Object.keys(answers).length;
 
   const scores = useMemo(() => {
-    const totals: Record<Pillar, number> = { Presence: 0, Purpose: 0, Authority: 0, Alignment: 0 };
+    const totals: Record<Pillar, number> = { Presence: 0, Authority: 0, Purpose: 0, Alignment: 0 };
     questions.forEach((question) => {
       totals[question.pillar] += answers[question.id] || 0;
     });
@@ -56,12 +58,14 @@ export default function RelationshipAssessment() {
   const handleResults = () => {
     if (answeredCount !== questions.length) return;
     setShowResults(true);
+    trackPapaFunnelEvent("fatherhood_checkin_completed");
     window.setTimeout(() => document.getElementById("assessment-results")?.scrollIntoView({ behavior: "smooth" }), 50);
   };
 
   const reset = () => {
     setAnswers({});
     setShowResults(false);
+    startedRef.current = false;
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -112,7 +116,7 @@ export default function RelationshipAssessment() {
               <p className="mt-2 text-sm text-white/60">Be honest. This is for clarity, not judgment.</p>
             </div>
 
-            {(["Presence", "Purpose", "Authority", "Alignment"] as Pillar[]).map((pillar) => (
+            {(["Presence", "Authority", "Purpose", "Alignment"] as Pillar[]).map((pillar) => (
               <section key={pillar} aria-labelledby={`${pillar.toLowerCase()}-heading`}>
                 <div className="mb-4 flex items-baseline gap-3">
                   <span className="text-3xl font-black text-brand-yellow">{pillar[0]}</span>
@@ -145,7 +149,13 @@ export default function RelationshipAssessment() {
                                       name={question.id}
                                       value={rating}
                                       checked={selected}
-                                      onChange={() => setAnswers((current) => ({ ...current, [question.id]: rating }))}
+                                      onChange={() => {
+                                        if (!startedRef.current) {
+                                          startedRef.current = true;
+                                          trackPapaFunnelEvent("fatherhood_checkin_started");
+                                        }
+                                        setAnswers((current) => ({ ...current, [question.id]: rating }));
+                                      }}
                                       className="sr-only"
                                     />
                                     {rating}
@@ -237,6 +247,15 @@ export default function RelationshipAssessment() {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="mt-8 rounded-xl border border-white/15 bg-white/[0.04] p-6">
+              <h2 className="text-xl font-bold">Prefer to learn privately?</h2>
+              <p className="mt-2 text-white/70">You can keep your answers to yourself and take the next step now. You do not need to give us your contact information.</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a href="/courses?from=check-in" className="inline-flex min-h-12 items-center rounded-full bg-brand-yellow px-5 py-3 font-bold text-black">Explore self-paced lessons →</a>
+                <a href="/papa-framework?from=check-in" className="inline-flex min-h-12 items-center rounded-full border border-white/30 px-5 py-3 font-bold text-white">Learn the PAPA Framework →</a>
+              </div>
+            </div>
 
             <Card className="mt-8 border-brand-yellow/30 bg-brand-yellow/5">
               <CardContent className="p-7 md:p-9">

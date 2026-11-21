@@ -7,8 +7,7 @@ const groups = [
     links: [
       ["Papa Life Home", "/"],
       ["Welcome to Papa Life", "/welcome-to-papa-life"],
-      ["2-Minute Fatherhood Check-In", "/marlee-assessment"],
-      ["Relationship Assessment", "/relationship-assessment"],
+      ["2-Minute Fatherhood Check-In", "/relationship-assessment"],
       ["PAPA Framework", "/papa-framework"],
       ["Father-Friendly Practice", "/father-friendly-practice"],
       ["My Fatherhood Journey", "/my-journey"],

@@ -129,7 +129,7 @@ export default function DigitalTwinDemo() {
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   Start with a practical next step, without pressure.
                 </p>
-                <a href="/marlee-assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
+                <a href="/relationship-assessment" className="mt-4 inline-block font-bold text-[#f2c230] hover:text-white">
                   Start the Check-In
                 </a>
               </div>

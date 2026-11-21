@@ -4,7 +4,7 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { brianKeithHillHeadshot } from "@/lib/site-assets";
 import { ArrowDown, ArrowRight, Check, HeartHandshake, ShieldCheck, X } from "lucide-react";
 
-const joinHref = "/marlee-assessment";
+const joinHref = "/relationship-assessment";
 
 const fitStatements = [
   "My son or daughter rarely calls or responds.",

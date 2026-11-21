@@ -28,9 +28,11 @@ type SavedReport = {
   outcomes: string;
   created_at: string;
   ventures_saved: number;
+  sheets_sync_status?: string;
 };
 
-const localReportsKey = "papa-daily-work-reports";
+type Brand = "papa-life" | "ai-boss-mobility";
+const localReportsKey = (brand: Brand) => "daily-work-reports-" + brand;
 
 const blankFields: ReportFields = {
   outreach: "",
@@ -79,7 +81,7 @@ const sections = [
     accent: "bg-[#e53935]",
     label: "What did you build, fix, or configure in your tech stack?",
     placeholder:
-      "Fixed Make.com scenario, updated GHL pipeline stage, configured ElevenLabs agent with the latest knowledge base...",
+      "Fixed Make.com scenario, updated GHL pipeline stage, updated local reporting automation with the latest knowledge base...",
   },
   {
     key: "coaching",
@@ -111,7 +113,7 @@ const outcomeLabels = [
   "Video / audio content created",
   "Course lesson updated",
   "Master KB updated",
-  "ORACLE / ElevenLabs agent updated",
+  "Mac-based reporting automation verified",
   "Outreach emails / SMS sent",
   "Work report saved to Papa Life OS",
 ];
@@ -126,8 +128,9 @@ function textOrNone(value: string) {
   return value.trim() || "(none logged)";
 }
 
-function buildReportMarkdown(date: string, fields: ReportFields, outcomes: string[]) {
-  return `## Papa Life Daily Work Report - ${date}
+function buildReportMarkdown(date: string, fields: ReportFields, outcomes: string[], brand: Brand) {
+  const title = brand === "papa-life" ? "Papa Life" : "AI Boss Mobility";
+  return `## ${title} Daily Work Report - ${date}
 
 ### 01. Outreach & Engagement
 ${textOrNone(fields.outreach)}
@@ -158,9 +161,10 @@ ${outcomes.length > 0 ? outcomes.map((item) => `- ${item}`).join("\n") : "(none 
 ${textOrNone(fields.win)}`;
 }
 
-function readLocalReports() {
+function readLocalReports(brand: Brand) {
   try {
-    const raw = window.localStorage.getItem(localReportsKey);
+    const raw = window.localStorage.getItem(localReportsKey(brand))
+      ?? (brand === "papa-life" ? window.localStorage.getItem("papa-daily-work-reports") : null);
     const parsed = JSON.parse(raw || "[]");
     return Array.isArray(parsed) ? (parsed as SavedReport[]) : [];
   } catch {
@@ -168,23 +172,24 @@ function readLocalReports() {
   }
 }
 
-function writeLocalReport(date: string, fields: ReportFields, outcomes: string[]) {
-  const current = readLocalReports();
+function writeLocalReport(date: string, fields: ReportFields, outcomes: string[], brand: Brand) {
+  const current = readLocalReports(brand);
   const nextReport: SavedReport = {
     id: Date.now(),
     report_date: date,
-    title: `Papa Life Daily Work Report - ${date}`,
+    title: `${brand === "papa-life" ? "Papa Life" : "AI Boss Mobility"} Daily Work Report - ${date}`,
     win: fields.win || null,
     outcomes: JSON.stringify(outcomes),
     created_at: new Date().toISOString(),
     ventures_saved: 0,
   };
   const next = [nextReport, ...current].slice(0, 30);
-  window.localStorage.setItem(localReportsKey, JSON.stringify(next));
+  window.localStorage.setItem(localReportsKey(brand), JSON.stringify(next));
   return next;
 }
 
 export default function PapaDailyWorkReport() {
+  const [brand, setBrand] = useState<Brand>("papa-life");
   const [date, setDate] = useState(todayInputValue());
   const [fields, setFields] = useState<ReportFields>(blankFields);
   const [outcomes, setOutcomes] = useState<string[]>([]);
@@ -195,14 +200,14 @@ export default function PapaDailyWorkReport() {
   const [isLoading, setIsLoading] = useState(true);
 
   const reportMarkdown = useMemo(
-    () => buildReportMarkdown(date, fields, outcomes),
-    [date, fields, outcomes]
+    () => buildReportMarkdown(date, fields, outcomes, brand),
+    [date, fields, outcomes, brand]
   );
 
 async function loadReports() {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/admin/papa-daily-work-reports");
+      const res = await fetch("/api/admin/papa-daily-work-reports?brand=" + encodeURIComponent(brand));
       if (res.status === 401) {
         setError("Please log in first, then return to this report page.");
         setReports([]);
@@ -214,32 +219,20 @@ async function loadReports() {
       setReports(json.reports || []);
       setError("");
     } catch (e: any) {
-      setReports(readLocalReports());
+      setReports(readLocalReports(brand));
       setError("");
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function saveThroughEngagementBridge() {
-    const res = await fetch("/api/engagement", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: "brian@bossmobility.net",
-        event_type: "papa_daily_work_report",
-        event_detail: reportMarkdown,
-      }),
-    });
-    const json = await res.json();
-    if (!res.ok || !json.ok) {
-      throw new Error(json.error || "Unable to save through website activity log.");
-    }
-  }
 
   useEffect(() => {
+    setFields(blankFields);
+    setOutcomes([]);
+    setMessage("");
     loadReports();
-  }, []);
+  }, [brand]);
 
   function updateField(key: keyof ReportFields, value: string) {
     setFields((current) => ({ ...current, [key]: value }));
@@ -271,6 +264,7 @@ async function loadReports() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reportDate: date,
+          brand,
           fields,
           outcomes,
           markdown: reportMarkdown,
@@ -282,24 +276,19 @@ async function loadReports() {
         throw new Error("Please log in first, then return to save this report.");
       }
       if (!res.ok || !json.ok) throw new Error(json.error || "Unable to save report.");
-      setMessage("Saved to Papa Life OS. No outside journal service was contacted.");
+      setMessage(json.googleSheetsSynced
+        ? "Saved to Papa Life OS and verified in Google Sheets."
+        : "Saved privately to Papa Life OS; queued for the Mac to copy to Google Sheets.");
       await loadReports();
     } catch (e: any) {
       if (String(e?.message || "").toLowerCase().includes("log in")) {
         setError(e.message);
       } else {
-        const localReports = writeLocalReport(date, fields, outcomes);
+        const localReports = writeLocalReport(date, fields, outcomes, brand);
         setReports(localReports);
-        try {
-          await saveThroughEngagementBridge();
-          setMessage(
-            "Saved to the website activity log and saved in this browser. The dedicated report table will be available when the website connection is restored."
-          );
-        } catch {
-          setMessage(
-            "Saved in this browser. The dedicated report table will be available when the website connection is restored."
-          );
-        }
+        setMessage(
+          "Saved only in this browser because the authenticated website save failed. Not sent to the public activity log or Google Sheets."
+        );
       }
     } finally {
       setIsSaving(false);
@@ -316,10 +305,10 @@ async function loadReports() {
             </div>
             <div>
               <h1 className="font-sans text-2xl font-black uppercase tracking-wide text-white sm:text-3xl">
-                Papa Life Daily Work Report
+                {brand === "papa-life" ? "Papa Life Daily Work Report" : "AI Boss Mobility Daily Work Report"}
               </h1>
               <p className="mt-1 text-sm font-semibold tracking-wide text-[#f9a825]">
-                Brian Keith Hill - Papa Life Coach
+                Brian Keith Hill - Executive Operations
               </p>
             </div>
           </div>
@@ -330,6 +319,18 @@ async function loadReports() {
 
         <div className="mb-6 h-1 rounded bg-gradient-to-r from-[#e53935] via-[#f9a825] to-[#388e3c]" />
 
+        <section className="mb-4 flex flex-wrap gap-3" aria-label="Choose which service's report to complete">
+          <button type="button" onClick={() => setBrand("papa-life")}
+            aria-pressed={brand === "papa-life"}
+            className={`rounded px-5 py-3 text-sm font-bold ${brand === "papa-life" ? "bg-[#388e3c] text-white" : "bg-white text-black"}`}>
+            Papa Life / Fatherhood
+          </button>
+          <button type="button" onClick={() => setBrand("ai-boss-mobility")}
+            aria-pressed={brand === "ai-boss-mobility"}
+            className={`rounded px-5 py-3 text-sm font-bold ${brand === "ai-boss-mobility" ? "bg-[#e53935] text-white" : "bg-white text-black"}`}>
+            AI Boss Mobility Consulting
+          </button>
+        </section>
         <section className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-[#f9a825] px-5 py-3">
           <label
             className="flex items-center gap-2 text-sm font-black uppercase tracking-wide"
@@ -478,6 +479,18 @@ async function loadReports() {
           </button>
         </div>
 
+        <section className="mt-8 rounded-sm bg-[#171717] p-5 text-white">
+          <h2 className="text-xl font-black">Private Executive Reporting Hub</h2>
+          <p className="mt-2 text-sm text-white/70">
+            Papa Life and AI Boss Mobility records are separate. Private briefings require your authenticated admin session.
+            They are not shared with public AI services.
+          </p>
+          <p className="mt-3 text-sm font-medium">
+            Website reports are synced to the private Google workbook by your Mac after it connects.
+            No private Google tokens are stored on this website.
+          </p>
+        </section>
+
         <section className="mt-8 rounded-sm bg-white p-5 shadow-lg shadow-black/30">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -508,7 +521,7 @@ async function loadReports() {
                   <article key={report.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h3 className="font-black text-black">{report.title}</h3>
-                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
+                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">{["synced_mac", "synced"].includes(report.sheets_sync_status || "") ? "Google Sheets verified" : "Saved to site; awaiting Mac"}</span>
                     </div>
                     {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
                     {reportOutcomes.length > 0 && (

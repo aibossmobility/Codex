@@ -4344,7 +4344,12 @@ async function startServer() {
           body: JSON.stringify(body),
         });
         const data = await response.json().catch(() => ({})) as Record<string, unknown>;
-        if (!response.ok) throw new Error(`GoHighLevel returned HTTP ${response.status} for ${endpoint}`);
+        if (!response.ok) {
+          const details = String(data.message || data.error || JSON.stringify(data.errors || {}))
+            .replace(/[^\s]+@[^\s]+/g, "[email]")
+            .replace(/\b\+?\d[\d\s().-]{7,}\d\b/g, "[number]");
+          throw new Error(`GoHighLevel returned HTTP ${response.status} for ${endpoint}: ${details.slice(0, 280)}`);
+        }
         return data;
       };
       try {
@@ -4355,7 +4360,21 @@ async function startServer() {
         });
         ghlContactId = String((contact.contact as Record<string, unknown> | undefined)?.id || contact.id || contact.contactId || "");
         if (!ghlContactId) throw new Error("GHL returned no institutional contact ID");
-        await postGhl(`/contacts/${encodeURIComponent(ghlContactId)}/tags`, { tags: ["Papa Life—Institutional Inquiry"] });
+        try {
+                  await postGhl(`/contacts/${encodeURIComponent(ghlContactId)}/tags`, { tags: ["Papa Life—Institutional Inquiry"] });
+                } catch (tagError) {
+                  console.warn("[papa institutional] tag sync unavailable:", tagError instanceof Error ? tagError.message : "unknown");
+                }
+                try {
+                  await postGhl(`/contacts/${encodeURIComponent(ghlContactId)}/tasks`, {
+                    title: "Papa Life institutional inquiry — review",
+                    body: "An organization requested Papa Life institutional information. Review the contact and coordinate the two-part package if requested.",
+                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                    completed: false,
+                  });
+                } catch (taskError) {
+                  console.warn("[papa institutional] task sync unavailable:", taskError instanceof Error ? taskError.message : "unknown");
+                }
         const personalized = `Hello ${name.split(/\s+/)[0]},\n\nThank you for your interest in Papa Life's resources for fathers of adult children. Here is the research foundation and statement of need you requested:\nhttps://papalifecoach.com/research-foundation\n\nYou can also review existing self-paced lessons and pricing at:\nhttps://papalifecoach.com/shop\n\nIf you'd like the separate two-part institutional review package or to discuss how these resources fit ${organization}, simply reply to this email with what would help your organization. We will coordinate the next step personally.\n\nPapa Life — Fatherhood Transformation Services\nBrian Keith Hill, Founder\n\nYou requested this one-time email through the Papa Life website. No subscription has been created.`;
         const message = await postGhl("/conversations/messages", {
           type: "Email", contactId: ghlContactId, emailTo: email,

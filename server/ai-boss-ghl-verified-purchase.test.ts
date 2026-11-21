@@ -19,7 +19,7 @@ try{
   const txid="transaction_000000"+i;const oid="order_000000000000"+i;
   const tx={_id:txid,altId:AI_BOSS_LOCATION,altType:"location",liveMode:true,status:"succeeded",entityType:"order",entityId:oid,amount:money[i]/100,currency:"USD",contactId:"contact",createdAt:"2026-10-30T17:30:00Z"};
   const order={_id:oid,altId:AI_BOSS_LOCATION,altType:"location",liveMode:true,status:"completed",amount:money[i]/100,currency:"USD",contactId:"contact",contactSnapshot:{email:"customer@example.com"},amountSummary:{subtotal:money[i]/100},items:[{product:{_id:maps[i].productId},price:{_id:maps[i].priceId,type:"one_time",amount:money[i]/100},qty:1}]};
-  const mock=async (url:RequestInfo|URL)=>({ok:true,json:async()=>String(url).includes("/transactions/")?tx:order}) as any;
+  const mock=async (url:RequestInfo|URL)=>{\n    const u=new URL(String(url));\n    assert.equal(u.searchParams.get("locationId"),AI_BOSS_LOCATION);\n    assert.equal(u.searchParams.get("altId"),AI_BOSS_LOCATION);\n    assert.equal(u.searchParams.get("altType"),"location");\n    return {ok:true,json:async()=>String(url).includes("/transactions/")?tx:order} as any;\n  };
   const response=await verifyAndPrepareAiBossPurchase({db,intakeId:intake.intakeId,transactionId:txid,apiToken:"a_valid_scoped_test_credential",approvedPrices:maps,privateDir:dir,fetchImpl:mock as typeof fetch});
   assert(response.verified);assert(response.draftCreated);assert(response.structureChecksPassed);assert.equal(response.delivered,false);assert.equal(response.additionalAiCostUsd,0);
   assert.equal(findCustomerIntakeByToken(db,intake.intakeId,intake.privateStatusToken)?.state,"working");

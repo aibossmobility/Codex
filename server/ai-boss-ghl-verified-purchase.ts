@@ -39,7 +39,11 @@ export async function verifyAndPrepareAiBossPurchase(args:{
  if(config.length!==1||config[0].cents!==row.expected_cents)throw Error("Service price mapping mismatch");
  const fetchImpl=args.fetchImpl||fetch;
  async function get(resource:string){
-  const r=await fetchImpl("https://services.leadconnectorhq.com"+resource,{
+  const url=new URL("https://services.leadconnectorhq.com"+resource);
+  url.searchParams.set("locationId",AI_BOSS_LOCATION);
+  url.searchParams.set("altId",AI_BOSS_LOCATION);
+  url.searchParams.set("altType","location");
+  const r=await fetchImpl(url,{
    headers:{Authorization:"Bearer "+apiToken,Version:"v3","Content-Type":"application/json"},signal:AbortSignal.timeout(15000)});
   if(!r.ok)throw Error("GoHighLevel payment lookup failed HTTP "+r.status);
   const body=await r.json() as any;

@@ -4378,7 +4378,10 @@ async function startServer() {
         const personalized = `Hello ${name.split(/\s+/)[0]},\n\nThank you for your interest in Papa Life's resources for fathers of adult children. Here is the research foundation and statement of need you requested:\nhttps://papalifecoach.com/research-foundation\n\nYou can also review existing self-paced lessons and pricing at:\nhttps://papalifecoach.com/shop\n\nIf you'd like the separate two-part institutional review package or to discuss how these resources fit ${organization}, simply reply to this email with what would help your organization. We will coordinate the next step personally.\n\nPapa Life — Fatherhood Transformation Services\nBrian Keith Hill, Founder\n\nYou requested this one-time email through the Papa Life website. No subscription has been created.`;
         const message = await postGhl("/conversations/messages", {
           type: "Email", contactId: ghlContactId, emailTo: email,
-          emailFrom: "brian@papalifecoach.com", subject: "Your Papa Life institutional information", message: personalized,
+          emailFrom: "brian@papalifecoach.com", subject: "Your Papa Life institutional information",
+          message: personalized,
+          // HighLevel Email channel rejected the text-only payload as empty (HTTP 422).
+          html: `<p>${personalized.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")}</p>`,
           status: "pending",
         }, "v3");
         emailStatus = message.messageId || message.emailMessageId ? "queued" : "unconfirmed";

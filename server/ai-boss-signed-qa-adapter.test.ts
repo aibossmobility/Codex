@@ -36,8 +36,8 @@ function makeReport(jobId:string,passed=true){
    passed,observed:passed?"HTTP 200 with verified CRM contact":"HTTP 500 and missing CRM contact",
    evidenceRef:"qa-evidence:sha256:"+sha(passed?"observed true":"observed false"),
    responseSha256:sha(passed?"observed true":"observed false")}],
-  allChecksPass:passed,customerAccepted:false,backupVerified:false,
-  authorizesInvoice:false,sendsInvoice:false,identityAuthenticated:false
+  allChecksPass:passed,customerAccepted:false as const,backupVerified:false as const,
+  authorizesInvoice:false as const,sendsInvoice:false as const,identityAuthenticated:false as const
  };
  return {...base,reportSha256:sha(JSON.stringify(base))};
 }

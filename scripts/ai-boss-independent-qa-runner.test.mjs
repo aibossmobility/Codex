@@ -5,7 +5,7 @@ import http from "node:http";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import {runIndependentQa,criteriaSha256,writeQaReport,signQaReport} from "./ai-boss-independent-qa-runner.mjs";
+import {runIndependentQa,criteriaSha256,writeQaReport,signQaReport,pinnedQaLookup} from "./ai-boss-independent-qa-runner.mjs";
 
 const sha=x=>createHash("sha256").update(x).digest("hex");
 const scopeSha=sha("signed authorized scope fixture");
@@ -132,4 +132,12 @@ test("only separate QA Ed25519 private key signs the exact run version",async()=
   assert.equal(edVerify(null,Buffer.from(JSON.stringify(changed)),publicKey,Buffer.from(signed.signatureBase64,"base64")),false);
   assert.throws(()=>signQaReport({...r,authorizesInvoice:true},privateKey));
  }finally{await f.close();}
+});
+
+test("pinned HTTPS DNS callback returns the address shape requested by Node",async()=>{
+ const lookup=pinnedQaLookup("93.184.215.14",4);
+ const single=await new Promise((resolve,reject)=>lookup("example.com",{},(err,address,family)=>err?reject(err):resolve({address,family})));
+ assert.deepEqual(single,{address:"93.184.215.14",family:4});
+ const all=await new Promise((resolve,reject)=>lookup("example.com",{all:true},(err,addresses)=>err?reject(err):resolve(addresses)));
+ assert.deepEqual(all,[{address:"93.184.215.14",family:4}]);
 });

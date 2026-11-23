@@ -7,7 +7,7 @@
  */
 import fs from "node:fs/promises";
 import {createReadStream} from "node:fs";
-import {createHash,randomUUID} from "node:crypto";
+import {createHash,randomUUID,sign as edSign} from "node:crypto";
 import path from "node:path";
 import {promises as dns} from "node:dns";
 import {isIP} from "node:net";
@@ -82,7 +82,8 @@ async function readOnlyHttp(url,fixture){
  });
 }
 function validate(input,opts){
- if(!input||input.version!==1||!safeId(input.serviceCode)||
+ if(!input||input.version!==1||!Number.isSafeInteger(input.buildVersion)||input.buildVersion<1||
+  !safeId(input.serviceCode)||
   !safeId(input.orderReference)||!actorOk(input.builderActor)||
   !actorOk(opts.qaActor)||opts.qaActor===input.builderActor||
   !hashOk(input.scopeSha256)||!hashOk(input.artifactSha256)||
@@ -158,6 +159,7 @@ export async function runIndependentQa(input,opts){
  }
  const base={schemaVersion:1,runId:randomUUID(),startedAt,finishedAt:new Date().toISOString(),
   orderReference:input.orderReference,serviceCode:input.serviceCode,
+  buildVersion:input.buildVersion,
   scopeSha256:input.scopeSha256,criteriaSha256:opts.expectedCriteriaSha256,
   artifactSha256:input.artifactSha256,
   qaActor:opts.qaActor,builderActor:input.builderActor,
@@ -173,4 +175,19 @@ export async function writeQaReport(report,outdir){
  const file=path.join(outdir,"ai-boss-qa-"+report.runId+".json");
  await fs.writeFile(file,JSON.stringify(report,null,2)+"\n",{flag:"wx",mode:0o600});
  return file;
+}
+
+/** Only a separately controlled QA worker should possess the Ed25519 private key.
+ * Store its PUBLIC key in the final-invoice gate service. Unsigned reports
+ * can be inspected but must never be used to authorize a final invoice.
+ */
+export function signQaReport(report,qaPrivateKey){
+ if(!report||report.schemaVersion!==1||!hashOk(report.reportSha256)||
+   report.authorizesInvoice!==false||report.customerAccepted!==false||
+   report.backupVerified!==false||report.identityAuthenticated!==false||
+   !qaPrivateKey)throw Error("Only bounded QA reports may be signed");
+ const {reportSha256,...base}=report;
+ if(digest(JSON.stringify(base))!==reportSha256)throw Error("QA report content changed");
+ const signature=edSign(null,Buffer.from(JSON.stringify(report)),qaPrivateKey);
+ return {algorithm:"Ed25519",report,signatureBase64:signature.toString("base64")};
 }

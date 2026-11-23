@@ -30,13 +30,23 @@ const current=(db:Database.Database,id:string)=>db.prepare(
  "SELECT g.*,j.brand,j.state,j.customer_email,j.product_code,j.payment_evidence "+
  "FROM ai_boss_half_down_gates g JOIN customer_fulfillment_jobs j ON j.id=g.job_id WHERE g.job_id=?"
  ).get(id) as any;
-function eligible(g:any){
+function hasSignedQaProof(db:Database.Database,g:any){
+ if(!g||!g.qa_sha)return false;
+ const exists=db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='ai_boss_signed_qa_gate_proofs'").get();
+ if(!exists)return false;
+ const latest=latestEvent(db,g.job_id,"independent_qa_passed");
+ if(!latest)return false;
+ return !!db.prepare("SELECT run_id FROM ai_boss_signed_qa_gate_proofs WHERE job_id=? AND build_version=? AND gate_qa_sha=? AND reviewer=? AND qa_event_id=? LIMIT 1")
+  .get(g.job_id,g.version,g.qa_sha,g.qa_actor,latest);
+}
+function eligible(db:Database.Database,g:any){
  return !!g&&g.brand==="ai-boss-mobility"&&g.state==="production_ready"&&
   Number.isSafeInteger(g.version)&&g.version>0&&hashOk(g.artifact_sha)&&hashOk(g.scope_sha)&&
   hashOk(g.qa_sha)&&g.qa_all_passed===1&&g.qa_actor&&g.qa_actor!==g.builder_actor&&
   g.backup_sha===g.artifact_sha&&g.backup_ref&&g.backup_restore_ref&&
   g.backup_actor&&g.backup_actor!==g.builder_actor&&
   g.customer_decision==="pending"&&!g.invoice_auth_ref&&
+  hasSignedQaProof(db,g)&&
   String(g.signature_ref).startsWith("verified_signature:")&&
   String(g.payment_evidence).startsWith("verified_ghl:")&&
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.customer_email);
@@ -57,7 +67,7 @@ export function issueHalfDownAcceptanceInvitation(db:Database.Database,input:{
   throw Error("Trusted preview proof and bounded lifetime required");
  return db.transaction(()=>{
   const g=current(db,input.jobId);
-  if(!eligible(g))throw Error("Signed paid independently tested and backed-up version required");
+  if(!eligible(db,g))throw Error("Signed paid independently tested and backed-up version required");
   const qaEvent=latestEvent(db,input.jobId,"independent_qa_passed");
   const backupEvent=latestEvent(db,input.jobId,"backup_recovered_and_hash_verified");
   if(!qaEvent||!backupEvent)throw Error("Recorded independent QA and restored backup events required");
@@ -84,7 +94,7 @@ function tokenLookup(db:Database.Database,token:string,now:number):Invite|null{
  if(!i||i.consumed_at!==null||i.revoked_at!==null||i.expires_at<=now||
   !timingSafeEqual(Buffer.from(i.token_hash,"hex"),Buffer.from(hashed,"hex")))return null;
  const g=current(db,i.job_id);
- if(!eligible(g)||g.version!==i.version||g.artifact_sha!==i.artifact_sha||
+ if(!eligible(db,g)||g.version!==i.version||g.artifact_sha!==i.artifact_sha||
   g.scope_sha!==i.scope_sha||g.qa_sha!==i.qa_sha||
   g.backup_sha!==i.backup_sha||g.customer_email.toLowerCase()!==i.customer_email||
   latestEvent(db,i.job_id,"independent_qa_passed")!==i.qa_event_id||

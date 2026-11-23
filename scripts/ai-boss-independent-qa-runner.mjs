@@ -87,6 +87,7 @@ function validate(input,opts){
   !actorOk(opts.qaActor)||opts.qaActor===input.builderActor||
   !hashOk(input.scopeSha256)||!hashOk(input.artifactSha256)||
   input.scopeSha256!==opts.expectedScopeSha256||
+  input.artifactSha256!==opts.expectedArtifactSha256||
   !Array.isArray(input.criteria)||input.criteria.length<1||input.criteria.length>50||
   !Array.isArray(opts.allowOrigins)||opts.allowOrigins.length>12||
   !Array.isArray(opts.allowOrigins)||opts.allowOrigins.some(x=>!validOrigin(x,opts.fixture===true))||

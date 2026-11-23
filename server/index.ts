@@ -6,6 +6,7 @@ import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-route
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
 import { installAiBossCustomerIntakeRoutes } from "./ai-boss-customer-intake-routes";
+import { installAiBossAcceptanceRoutes } from "./ai-boss-customer-acceptance-routes";
 import { evaluateAiBossScope } from "./ai-boss-scope-evaluation";
 import { pollAiBossPaidOrders } from "./ai-boss-paid-order-poller";
 import { getApprovedAiBossPrices } from "./ai-boss-ghl-price-discovery";
@@ -4078,6 +4079,9 @@ async function startServer() {
   });
 
   installAiBossCustomerIntakeRoutes(app, db, fixedServicePrivateDir);
+  // Fail closed until the protected signature, verified payment, customer
+  // preview and email-link delivery adapters are verified end to end.
+  installAiBossAcceptanceRoutes(app, db, process.env.AI_BOSS_ACCEPTANCE_PORTAL_ENABLED === "true");
   // No metered LLM calls, no checkout activation, no webhook subscription fees.
   // Runs only with an explicitly scoped AI Boss credential and all five approved GHL price IDs.
   // Every candidate is reverified directly against its provider transaction and order.

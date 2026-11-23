@@ -62,7 +62,13 @@ async function readOnlyHttp(url,fixture){
  return await new Promise((resolve,reject)=>{
   const client=u.protocol==="https:"?https:http;
   const req=client.request(u,{method:"GET",timeout:7000,
-   lookup:(hostname,options,callback)=>callback(null,address,family),
+   lookup:(hostname,options,callback)=>{
+    // Node may ask for all addresses (autoSelectFamily); keep only the
+    // already-validated pinned address and return the requested shape.
+    if(typeof options==="function"){callback=options;options={};}
+    if(options?.all)callback(null,[{address,family}]);
+    else callback(null,address,family);
+   },
    headers:{Accept:"text/plain, application/json, text/html", "User-Agent":"AI-Boss-Independent-QA/1"},
    maxHeaderSize:16384},res=>{
     if((res.statusCode||0)>=300&&(res.statusCode||0)<400){

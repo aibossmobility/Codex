@@ -9,7 +9,7 @@
     "prestart": "node scripts/ensure-current-papa-life-build.mjs && node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
-    "check": "tsc --noEmit && pnpm test:worker-assignments && pnpm test:ai-boss-pwa-scope && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay && pnpm test:no-legacy-sales && pnpm test:reviewed-delivery && pnpm test:papa-conversations && pnpm test:papa-outreach && pnpm test:half-down-gate",
+    "check": "tsc --noEmit && pnpm test:worker-assignments && pnpm test:ai-boss-pwa-scope && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay && pnpm test:no-legacy-sales && pnpm test:reviewed-delivery && pnpm test:papa-conversations && pnpm test:papa-outreach && pnpm test:half-down-gate && pnpm test:half-down-backup",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
     "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
     "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
@@ -42,7 +42,8 @@
     "test:papa-conversations": "node --import tsx server/papa-conversations.test.ts",
     "test:papa-outreach": "node --import tsx server/papa-outreach-daily.test.ts",
     "test:seo": "node scripts/test-papa-structured-data.mjs",
-    "test:half-down-gate": "node --import tsx server/ai-boss-half-down-quality-gate.test.ts"
+    "test:half-down-gate": "node --import tsx server/ai-boss-half-down-quality-gate.test.ts",
+    "test:half-down-backup": "node --test scripts/verify-ai-boss-independent-backup.test.mjs"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

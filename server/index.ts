@@ -6,6 +6,7 @@ import { installReviewedDeliveryRoutes } from "./ai-boss-reviewed-delivery-route
 import { installGhlDigitalSales } from "./ghl-digital-sales";
 import { getFreeAgentAudit, selectVerifiedFreeAgent } from "./free-agent-capability-catalog";
 import { installAiBossCustomerIntakeRoutes } from "./ai-boss-customer-intake-routes";
+import { evaluateAiBossScope } from "./ai-boss-scope-evaluation";
 import { pollAiBossPaidOrders } from "./ai-boss-paid-order-poller";
 import { getApprovedAiBossPrices } from "./ai-boss-ghl-price-discovery";
 import { parseAiBossPriceMap, verifyAndPrepareAiBossPurchase } from "./ai-boss-ghl-verified-purchase";
@@ -5351,16 +5352,32 @@ async function startServer() {
       }
       const ghlCredentials = { token: aiBossToken, locationId: aiBossLocationId, source: "env" as const };
 
+      // AI Boss-only scope classification. Customer input is untrusted; the
+      // website's conservative preflight is never upgraded by the model.
+      // This classification has no authorization to invoice, charge or build.
+      const estimate = (body.estimate && typeof body.estimate === "object" ? body.estimate : {}) as Record<string, unknown>;
+      const websiteScope = (body.qualification && typeof body.qualification === "object" ? body.qualification : {}) as Record<string, unknown>;
+      const aiScope = String(estimate.offerId || "") === "service-13"
+        ? await evaluateAiBossScope({
+            preflightStatus: String(websiteScope.status || "clarification_required"),
+            need,
+            apiKey: process.env.OPENAI_API_KEY,
+            model: String(process.env.AI_BOSS_SCOPE_MODEL || "gpt-4o-mini"),
+          })
+        : null;
+
       const [firstName, ...lastNameParts] = name.split(/\s+/).filter(Boolean);
       const tags = [
         "aiboss-website-inquiry",
         "aiboss-inquiry-demo",
+        aiScope ? `aiboss-scope-${aiScope.status.replace(/_/g,"-")}` : "",
         pathKey ? `aiboss-path-${pathKey}` : "",
       ].filter(Boolean);
 
       const sourceParts = [
         "AI Boss Mobility Website",
         pathKey ? `Path: ${pathKey}` : "",
+        aiScope ? `Scope: ${aiScope.status} (${aiScope.origin})` : "",
         organization ? `Org: ${organization}` : "",
         need ? `Need: ${need.slice(0, 180)}` : "",
       ].filter(Boolean);
@@ -5410,6 +5427,7 @@ async function startServer() {
         ok: true,
         contact_id: contactId,
         trigger_tag: "aiboss-inquiry-demo",
+        scope_classification: aiScope ? { status: aiScope.status, origin: aiScope.origin } : null,
         queued: true,
         estimate_pipeline_confirmed: estimateOpportunity?.ok === true,
         estimate_note_saved: estimateNote?.ok === true,

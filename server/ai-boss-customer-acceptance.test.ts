@@ -157,3 +157,18 @@ test("unsigned QA result must not authorize a customer acceptance link",()=>{
  backup(s);
  assert.throws(()=>invite(s),/Signed paid/);
 });
+
+test("new independent backup event invalidates an old link even with identical bytes",()=>{
+ const s=ready(),i=invite(s);
+ backup(s);
+ assert.equal(getHalfDownAcceptancePreview(s.db,i.token,when+2000),null);
+});
+test("unsigned QA added after signed run invalidates previously authenticated invite",()=>{
+ const s=ready(),i=invite(s);
+ recordHalfDownQa(s.db,{jobId:s.id,artifactSha,qaActor:"independent-qa-agent",
+  tests:[{criterionId:"consent",expected:criteria[0].expectation,passed:true,
+    observed:"Unsigned replay of earlier passing QA data",
+    evidenceRef:"qa-evidence:sha256:"+sha("unsigned-after-signed")}]});
+ assert.equal(getHalfDownAcceptancePreview(s.db,i.token,when+2000),null);
+ assert.throws(()=>invite(s),/Signed paid/);
+});

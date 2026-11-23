@@ -42,8 +42,10 @@ function testFetch(opts:{document?:any;transaction?:any;order?:any;paymentStatus
    assert.equal(u.searchParams.get("altType"),"location");
    return {ok:(opts.paymentStatus||200)<400,status:opts.paymentStatus||200,json:async()=>opts.transaction||tx};
   }
-  if(u.pathname.includes("/payments/orders/"))
+  if(u.pathname.includes("/payments/orders/")){
+   assert.equal(u.searchParams.get("altId"),location);
    return {ok:true,status:200,json:async()=>opts.order||order};
+  }
   if(u.pathname==="/proposals/document"){
    assert.equal(u.searchParams.get("locationId"),location);
    assert.equal(init.headers.Authorization,"Bearer "+docToken);

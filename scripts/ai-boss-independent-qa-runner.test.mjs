@@ -76,18 +76,18 @@ test("signed-scope criteria mismatch and builder-as-reviewer are rejected",async
  try{
   const input=inputs(f.origin);
   const p=opts(input,f.origin);
-  assert.throws(()=>runIndependentQa({...input,scopeSha256:sha("different")},p),/Trusted signed scope/);
-  assert.throws(()=>runIndependentQa(input,{...p,qaActor:"builder-agent"}),/Trusted signed scope/);
+  await assert.rejects(()=>runIndependentQa({...input,scopeSha256:sha("different")},p),/Trusted signed scope/);
+  await assert.rejects(()=>runIndependentQa(input,{...p,qaActor:"builder-agent"}),/Trusted signed scope/);
   const changed=inputs(f.origin);
   changed.criteria[0].check.contains="ANOTHER_RESPONSE";
-  assert.throws(()=>runIndependentQa(changed,p),/Acceptance criteria differ/);
+  await assert.rejects(()=>runIndependentQa(changed,p),/Acceptance criteria differ/);
  }finally{await f.close();}
 });
 test("unapproved network origin is blocked before any GET",async()=>{
  const f=await fixture();
  try{
   const input=inputs(f.origin);
-  assert.throws(()=>runIndependentQa(input,{...opts(input,f.origin),allowOrigins:[]}),/not approved/);
+  await assert.rejects(()=>runIndependentQa(input,{...opts(input,f.origin),allowOrigins:[]}),/not approved/);
  }finally{await f.close();}
 });
 test("checks the real content of an authorized local file; refuses escapes",async()=>{

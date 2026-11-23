@@ -135,7 +135,7 @@ async function runCheck(c,opts){
  if(!st.isFile()||st.isSymbolicLink()||st.size<1||st.size>40_000_000)
   throw Error("Invalid artifact file");
  const computed=await fileSha256(c.check.path);
- return {passed:computed===c.check.sha256&&computed===opts.artifactSha256,
+ return {passed:computed===c.check.sha256&&computed===opts.expectedArtifactSha256,
   observed:"Artifact file "+st.size+" bytes, SHA-256 "+computed,
   responseSha256:computed};
 }

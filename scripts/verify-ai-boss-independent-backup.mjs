@@ -57,7 +57,7 @@ export async function verifyIndependentBackup({sourcePath,backupDirectory,restor
  await fsp.writeFile(manifestPath,JSON.stringify(proof,null,2)+"\n",{flag:"wx",mode:0o600});
  return {...proof,manifestPath};
 }
-if(process.argv[1] && path.resolve(process.argv[1])===path.resolve(new URL(import.meta.url).pathname)){
+if(process.argv[1] && fs.realpathSync(process.argv[1])===fs.realpathSync(new URL(import.meta.url))){
  const [sourcePath,backupDirectory,restoreDirectory,label]=process.argv.slice(2);
  verifyIndependentBackup({sourcePath,backupDirectory,restoreDirectory,label})
  .then(result=>{process.stdout.write(JSON.stringify(result,null,2)+"\n");})

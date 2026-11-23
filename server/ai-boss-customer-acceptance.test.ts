@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import {createHash} from "node:crypto";
+import {createHash,generateKeyPairSync,randomUUID,sign as edSign} from "node:crypto";
 import {test} from "node:test";
 import Database from "better-sqlite3";
 import {registerVerifiedCustomerOrder,advanceCustomerJob} from "./customer-fulfillment-ledger";
 import {enrollHalfDownOrder,recordHalfDownBuild,recordHalfDownQa,
  verifyHalfDownRestoredBackup,halfDownFinalInvoiceDecision} from "./ai-boss-half-down-quality-gate";
+import {recordSignedHalfDownQa} from "./ai-boss-signed-qa-adapter";
 import {initHalfDownAcceptance,issueHalfDownAcceptanceInvitation,
  getHalfDownAcceptancePreview,submitHalfDownCustomerResponse} from "./ai-boss-customer-acceptance";
 const sha=(b:string|Buffer)=>createHash("sha256").update(b).digest("hex");
@@ -33,10 +34,26 @@ function build(s:ReturnType<typeof setup>,shaValue=artifactSha){
   primaryRef:"git:private-client-build-v1",builderActor:"ai-builder-service"});
 }
 function qa(s:ReturnType<typeof setup>,passed=true){
- return recordHalfDownQa(s.db,{jobId:s.id,artifactSha,qaActor:"independent-qa-agent",
-  tests:[{criterionId:"consent",expected:criteria[0].expectation,passed,
+ const g=s.db.prepare("SELECT version,service_code FROM ai_boss_half_down_gates WHERE job_id=?").get(s.id) as any;
+ const evidenceSha=sha(passed?"passed":"failed");
+ const base={
+  schemaVersion:1,runId:randomUUID(),startedAt:new Date(when).toISOString(),
+  finishedAt:new Date(when+2000).toISOString(),orderReference:s.id,
+  serviceCode:g.service_code,buildVersion:g.version,scopeSha256:scopeSha,
+  criteriaSha256:sha(JSON.stringify(criteria)),artifactSha256:artifactSha,
+  builderActor:"ai-builder-service",qaActor:"independent-qa-agent",
+  checks:[{criterionId:"consent",expected:criteria[0].expectation,passed,
    observed:passed?"Test inbound delivery succeeded":"Test inbound delivery failed",
-   evidenceRef:"qa-evidence:sha256:"+sha(passed?"passed":"failed")}]});
+   evidenceRef:"qa-evidence:sha256:"+evidenceSha,responseSha256:evidenceSha}],
+  allChecksPass:passed,customerAccepted:false as const,backupVerified:false as const,
+  authorizesInvoice:false as const,sendsInvoice:false as const,identityAuthenticated:false as const
+ };
+ const report={...base,reportSha256:sha(JSON.stringify(base))};
+ const {publicKey,privateKey}=generateKeyPairSync("ed25519");
+ return recordSignedHalfDownQa(s.db,s.id,{
+  algorithm:"Ed25519",report,
+  signatureBase64:edSign(null,Buffer.from(JSON.stringify(report)),privateKey).toString("base64")
+ },publicKey.export({type:"spki",format:"pem"}).toString());
 }
 function backup(s:ReturnType<typeof setup>){
  return verifyHalfDownRestoredBackup(s.db,{jobId:s.id,artifactSha,
@@ -129,4 +146,14 @@ test("other brand, failed QA and unverified preview receipt cannot issue invitat
  assert.throws(()=>invite(ai),/Signed paid/);
  assert.throws(()=>issueHalfDownAcceptanceInvitation(ai.db,{jobId:ai.id,
   previewEvidenceRef:"https://random-site.example/preview",timeMs:when}),/preview proof/);
+});
+
+test("unsigned QA result must not authorize a customer acceptance link",()=>{
+ const s=setup();enroll(s);build(s);
+ recordHalfDownQa(s.db,{jobId:s.id,artifactSha,qaActor:"independent-qa-agent",
+  tests:[{criterionId:"consent",expected:criteria[0].expectation,passed:true,
+    observed:"Fake direct QA result without independent cryptographic proof",
+    evidenceRef:"qa-evidence:sha256:"+sha("unsigned")}]});
+ backup(s);
+ assert.throws(()=>invite(s),/Signed paid/);
 });

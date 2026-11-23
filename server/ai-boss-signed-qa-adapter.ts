@@ -81,6 +81,13 @@ export function recordSignedHalfDownQa(db:Database.Database,jobId:string,
     criterionId:c.criterionId,expected:c.expected,passed:c.passed,
     observed:c.observed,evidenceRef:c.evidenceRef
    }))});
+  // Bind the cryptographically signed report to the exact gate QA digest.
+  // Direct, unsigned QA updates cannot satisfy downstream customer acceptance.
+  db.exec("CREATE TABLE IF NOT EXISTS ai_boss_signed_qa_gate_proofs ("+
+   "run_id TEXT PRIMARY KEY,job_id TEXT NOT NULL,build_version INTEGER NOT NULL,"+
+   "gate_qa_sha TEXT NOT NULL,report_sha TEXT NOT NULL,reviewer TEXT NOT NULL)");
+  db.prepare("INSERT INTO ai_boss_signed_qa_gate_proofs(run_id,job_id,build_version,gate_qa_sha,report_sha,reviewer) VALUES(?,?,?,?,?,?)")
+   .run(report.runId,jobId,g.version,result.qaSha,report.reportSha256,report.qaActor);
   db.prepare("INSERT INTO ai_boss_signed_qa_runs(run_id,job_id,build_version,report_sha,reviewer) VALUES(?,?,?,?,?)")
    .run(report.runId,jobId,g.version,report.reportSha256,report.qaActor);
   return {jobId,runId:report.runId,allChecksPass:result.allChecksPass,

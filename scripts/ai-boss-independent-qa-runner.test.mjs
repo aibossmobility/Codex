@@ -13,7 +13,7 @@ const artifact=Buffer.from("Signed test deliverable: customer-approved mock vers
 const artifactSha=sha(artifact);
 const base={version:1,orderReference:"internal-order-qa",serviceCode:"service-13",
  scopeSha256:scopeSha,artifactSha256:artifactSha,builderActor:"builder-agent"};
-const options={expectedScopeSha256:scopeSha,qaActor:"separate-qa-agent",
+const options={expectedScopeSha256:scopeSha,expectedArtifactSha256:artifactSha,qaActor:"separate-qa-agent",
  fixture:true,allowOrigins:[]};
 
 async function fixture(){

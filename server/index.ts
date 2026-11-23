@@ -5427,7 +5427,7 @@ async function startServer() {
         ok: true,
         contact_id: contactId,
         trigger_tag: "aiboss-inquiry-demo",
-        scope_classification: aiScope ? { status: aiScope.status, origin: aiScope.origin } : null,
+        scope_classification: aiScope ? { status: aiScope.status, origin: aiScope.origin, reason: aiScope.reason, questions: aiScope.questions } : null,
         queued: true,
         estimate_pipeline_confirmed: estimateOpportunity?.ok === true,
         estimate_note_saved: estimateNote?.ok === true,

@@ -9,7 +9,7 @@
     "prestart": "node scripts/ensure-current-papa-life-build.mjs && node scripts/recover-sqlite-wal.mjs",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
-    "check": "tsc --noEmit && pnpm test:worker-assignments && pnpm test:ai-boss-pwa-scope && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay && pnpm test:no-legacy-sales && pnpm test:reviewed-delivery && pnpm test:papa-conversations && pnpm test:papa-outreach && pnpm test:half-down-gate && pnpm test:half-down-backup && pnpm test:ai-boss-independent-runner && pnpm test:ai-boss-signed-qa && pnpm test:ai-boss-acceptance",
+    "check": "tsc --noEmit && pnpm test:worker-assignments && pnpm test:ai-boss-pwa-scope && pnpm test:youtube-growth && pnpm test:youtube-connector && pnpm test:instruction-router && pnpm test:android-sms-relay && pnpm test:no-legacy-sales && pnpm test:reviewed-delivery && pnpm test:papa-conversations && pnpm test:papa-outreach && pnpm test:half-down-gate && pnpm test:half-down-backup && pnpm test:ai-boss-independent-runner && pnpm test:ai-boss-signed-qa && pnpm test:ai-boss-acceptance && pnpm test:ai-boss-acceptance-routes",
     "test:human-impact": "node --import tsx server/human-impact-store.test.ts",
     "test:executive-memory": "node --import tsx server/executive-memory-store.test.ts",
     "test:action-queue": "node --import tsx server/executive-action-queue-store.test.ts",
@@ -46,7 +46,8 @@
     "test:half-down-backup": "node --test scripts/verify-ai-boss-independent-backup.test.mjs",
     "test:ai-boss-independent-runner": "node --test scripts/ai-boss-independent-qa-runner.test.mjs",
     "test:ai-boss-signed-qa": "node --import tsx server/ai-boss-signed-qa-adapter.test.ts",
-    "test:ai-boss-acceptance": "node --import tsx server/ai-boss-customer-acceptance.test.ts"
+    "test:ai-boss-acceptance": "node --import tsx server/ai-boss-customer-acceptance.test.ts",
+    "test:ai-boss-acceptance-routes": "node --import tsx server/ai-boss-customer-acceptance-routes.test.ts"
   },
   "dependencies": {
     "@heycatch/sdk": "^0.7.0",

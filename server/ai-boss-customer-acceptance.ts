@@ -10,18 +10,22 @@ const sha=(s:string)=>createHash("sha256").update(s).digest("hex");
 const hashOk=(s:any)=>typeof s==="string"&&/^[a-f0-9]{64}$/.test(s);
 type Decision="accepted"|"changes_requested";
 type Invite={id:string;job_id:string;version:number;artifact_sha:string;scope_sha:string;
- qa_sha:string;backup_sha:string;customer_email:string;token_hash:string;
+ qa_sha:string;backup_sha:string;qa_event_id:string;backup_event_id:string;customer_email:string;token_hash:string;
  expires_at:number;consumed_at:number|null;revoked_at:number|null;preview_ref:string};
 export function initHalfDownAcceptance(db:Database.Database){
  initHalfDownGate(db);
  db.exec("CREATE TABLE IF NOT EXISTS ai_boss_acceptance_invitations ("+
   "id TEXT PRIMARY KEY,job_id TEXT NOT NULL REFERENCES ai_boss_half_down_gates(job_id),"+
   "version INTEGER NOT NULL,artifact_sha TEXT NOT NULL,scope_sha TEXT NOT NULL,"+
-  "qa_sha TEXT NOT NULL,backup_sha TEXT NOT NULL,customer_email TEXT NOT NULL,"+
+  "qa_sha TEXT NOT NULL,backup_sha TEXT NOT NULL,qa_event_id TEXT NOT NULL,backup_event_id TEXT NOT NULL,customer_email TEXT NOT NULL,"+
   "token_hash TEXT NOT NULL UNIQUE,expires_at INTEGER NOT NULL,"+
   "consumed_at INTEGER,revoked_at INTEGER,preview_ref TEXT NOT NULL,created_at INTEGER NOT NULL);"+
   "CREATE INDEX IF NOT EXISTS idx_ai_boss_invite_job ON ai_boss_acceptance_invitations(job_id,version);");
 }
+const latestEvent=(db:Database.Database,id:string,kind:string)=>{
+ const row=db.prepare("SELECT id FROM ai_boss_half_down_events WHERE job_id=? AND kind=? ORDER BY rowid DESC LIMIT 1").get(id,kind) as {id:string}|undefined;
+ return row?.id||null;
+};
 const current=(db:Database.Database,id:string)=>db.prepare(
  "SELECT g.*,j.brand,j.state,j.customer_email,j.product_code,j.payment_evidence "+
  "FROM ai_boss_half_down_gates g JOIN customer_fulfillment_jobs j ON j.id=g.job_id WHERE g.job_id=?"
@@ -54,14 +58,17 @@ export function issueHalfDownAcceptanceInvitation(db:Database.Database,input:{
  return db.transaction(()=>{
   const g=current(db,input.jobId);
   if(!eligible(g))throw Error("Signed paid independently tested and backed-up version required");
+  const qaEvent=latestEvent(db,input.jobId,"independent_qa_passed");
+  const backupEvent=latestEvent(db,input.jobId,"backup_recovered_and_hash_verified");
+  if(!qaEvent||!backupEvent)throw Error("Recorded independent QA and restored backup events required");
   const token=randomBytes(32).toString("base64url"),id=randomUUID();
   db.prepare("UPDATE ai_boss_acceptance_invitations SET revoked_at=? "+
    "WHERE job_id=? AND revoked_at IS NULL AND consumed_at IS NULL").run(now,input.jobId);
   db.prepare("INSERT INTO ai_boss_acceptance_invitations ("+
-   "id,job_id,version,artifact_sha,scope_sha,qa_sha,backup_sha,customer_email,"+
-   "token_hash,expires_at,preview_ref,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)")
+   "id,job_id,version,artifact_sha,scope_sha,qa_sha,backup_sha,qa_event_id,backup_event_id,customer_email,"+
+   "token_hash,expires_at,preview_ref,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
    .run(id,input.jobId,g.version,g.artifact_sha,g.scope_sha,g.qa_sha,g.backup_sha,
-    g.customer_email.toLowerCase(),sha(token),now+hours*3600000,
+    qaEvent,backupEvent,g.customer_email.toLowerCase(),sha(token),now+hours*3600000,
     input.previewEvidenceRef,now);
   return {inviteId:id,token,sendOnlyTo:g.customer_email,
    expiresAt:new Date(now+hours*3600000).toISOString(),version:g.version,
@@ -79,7 +86,9 @@ function tokenLookup(db:Database.Database,token:string,now:number):Invite|null{
  const g=current(db,i.job_id);
  if(!eligible(g)||g.version!==i.version||g.artifact_sha!==i.artifact_sha||
   g.scope_sha!==i.scope_sha||g.qa_sha!==i.qa_sha||
-  g.backup_sha!==i.backup_sha||g.customer_email.toLowerCase()!==i.customer_email)return null;
+  g.backup_sha!==i.backup_sha||g.customer_email.toLowerCase()!==i.customer_email||
+  latestEvent(db,i.job_id,"independent_qa_passed")!==i.qa_event_id||
+  latestEvent(db,i.job_id,"backup_recovered_and_hash_verified")!==i.backup_event_id)return null;
  return i;
 }
 export function getHalfDownAcceptancePreview(db:Database.Database,token:string,now=Date.now()){

@@ -5343,7 +5343,7 @@ async function startServer() {
 
       // This AI Boss-only bridge must never fall back to Papa Life's generic CRM
       // credentials. A successful intake acknowledgment must target AI Boss.
-      const aiBossToken = String(process.env.AI_BOSS_GHL_API_TOKEN || "").trim();
+      const aiBossToken = String(process.env.AI_BOSS_GHL_INTAKE_TOKEN || "").trim();
       const aiBossLocationId = String(process.env.AI_BOSS_GHL_LOCATION_ID || "").trim();
       if (!aiBossToken || aiBossLocationId !== "qJ83IIaK5y2ZPHzLfGG1") {
         console.error("[ai-boss-intake] dedicated AI Boss CRM credentials missing or location mismatch");

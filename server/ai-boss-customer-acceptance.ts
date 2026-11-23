@@ -109,7 +109,7 @@ export function getHalfDownAcceptancePreview(db:Database.Database,token:string,n
  return {inviteId:i.id,serviceCode:g.service_code,version:i.version,
   artifactSha256:i.artifact_sha,scopeSha256:i.scope_sha,
   criteria:criteria.map(c=>({id:c.id,expectation:c.expectation,passed:true})),
-  qaReportSha256:i.qa_sha,backupRestoreVerified:true,
+  qaGateSha256:i.qa_sha,backupRestoreVerified:true,
   previewEvidenceRef:i.preview_ref,remainingBalanceCents:g.deposit_cents,
   amountDueNowCents:0,customerAccepted:false,invoiceSent:false};
 }

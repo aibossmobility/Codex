@@ -85,6 +85,8 @@ export async function verifyAiBossHalfDownProviderOrder(args:{
   tx.paymentProvider.type!==a.authorizedPaymentProvider)
   throw Error("Exact live, nonrefunded, one-time 50% deposit transaction not verified");
  const orderUrl=new URL("https://services.leadconnectorhq.com/payments/orders/"+encodeURIComponent(a.orderId));
+ orderUrl.searchParams.set("locationId",AI_BOSS_LOCATION);
+ orderUrl.searchParams.set("altId",AI_BOSS_LOCATION);
  const order=await retrieve(orderUrl);
  if(!loc(order)||!live(order)||order.status!=="completed"||
   (order._id||order.id)!==a.orderId||

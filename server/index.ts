@@ -5341,10 +5341,15 @@ async function startServer() {
         return res.status(400).json({ ok: false, error: "Name and valid email are required" });
       }
 
-      const ghlCredentials = resolveGhlCredentials(db);
-      if (!ghlCredentials) {
-        return res.status(503).json({ ok: false, error: "GoHighLevel is not configured" });
+      // This AI Boss-only bridge must never fall back to Papa Life's generic CRM
+      // credentials. A successful intake acknowledgment must target AI Boss.
+      const aiBossToken = String(process.env.AI_BOSS_GHL_API_TOKEN || "").trim();
+      const aiBossLocationId = String(process.env.AI_BOSS_GHL_LOCATION_ID || "").trim();
+      if (!aiBossToken || aiBossLocationId !== "qJ83IIaK5y2ZPHzLfGG1") {
+        console.error("[ai-boss-intake] dedicated AI Boss CRM credentials missing or location mismatch");
+        return res.status(503).json({ ok: false, error: "AI Boss CRM routing is not configured" });
       }
+      const ghlCredentials = { token: aiBossToken, locationId: aiBossLocationId, source: "env" as const };
 
       const [firstName, ...lastNameParts] = name.split(/\s+/).filter(Boolean);
       const tags = [

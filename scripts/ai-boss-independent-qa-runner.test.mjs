@@ -1,17 +1,17 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {createHash} from "node:crypto";
+import {createHash,generateKeyPairSync,verify as edVerify} from "node:crypto";
 import http from "node:http";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import {runIndependentQa,criteriaSha256,writeQaReport} from "./ai-boss-independent-qa-runner.mjs";
+import {runIndependentQa,criteriaSha256,writeQaReport,signQaReport} from "./ai-boss-independent-qa-runner.mjs";
 
 const sha=x=>createHash("sha256").update(x).digest("hex");
 const scopeSha=sha("signed authorized scope fixture");
 const artifact=Buffer.from("Signed test deliverable: customer-approved mock version one.");
 const artifactSha=sha(artifact);
-const base={version:1,orderReference:"internal-order-qa",serviceCode:"service-13",
+const base={version:1,buildVersion:1,orderReference:"internal-order-qa",serviceCode:"service-13",
  scopeSha256:scopeSha,artifactSha256:artifactSha,builderActor:"builder-agent"};
 const options={expectedScopeSha256:scopeSha,expectedArtifactSha256:artifactSha,qaActor:"separate-qa-agent",
  fixture:true,allowOrigins:[]};
@@ -117,4 +117,19 @@ test("reports are persisted without granting invoice or customer acceptance",asy
   assert.equal(persisted.identityAuthenticated,false);
   await assert.rejects(()=>writeQaReport(report,{x:1}),/path/i);
  }finally{await f.close();await fs.rm(dir,{recursive:true,force:true});}
+});
+
+test("only separate QA Ed25519 private key signs the exact run version",async()=>{
+ const f=await fixture();
+ try{
+  const input=inputs(f.origin);
+  const r=await runIndependentQa(input,opts(input,f.origin));
+  const {publicKey,privateKey}=generateKeyPairSync("ed25519");
+  const signed=signQaReport(r,privateKey);
+  assert.equal(signed.algorithm,"Ed25519");
+  assert.equal(edVerify(null,Buffer.from(JSON.stringify(r)),publicKey,Buffer.from(signed.signatureBase64,"base64")),true);
+  const changed={...r,allChecksPass:!r.allChecksPass};
+  assert.equal(edVerify(null,Buffer.from(JSON.stringify(changed)),publicKey,Buffer.from(signed.signatureBase64,"base64")),false);
+  assert.throws(()=>signQaReport({...r,authorizesInvoice:true},privateKey));
+ }finally{await f.close();}
 });

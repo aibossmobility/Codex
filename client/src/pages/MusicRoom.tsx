@@ -32,6 +32,7 @@ export default function MusicRoom() {
         <div className="container max-w-4xl py-12 sm:py-20">
           <p className="mb-5 text-sm font-bold uppercase tracking-widest text-[#f3d16d]">Papa Life Music Room</p>
           <h1 className="max-w-3xl font-serif text-4xl leading-tight sm:text-6xl">Brian Keith Hill’s AI Album of 2026</h1>
+          <p className="mt-4 text-base text-white">Songs primarily written and arranged by Brian Hill and Bill Whitley.</p>
           <p className="mt-5 text-lg text-[#f3d16d]">To my family, whom I love deeply.</p>
         </div>
       </header>

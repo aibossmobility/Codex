@@ -15,7 +15,7 @@ const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]
   ["Do You Want to Find Your GPS? (Suno version)", "gps-suno.mp3"],
   ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
-  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Arrangement by William Whitley · Lyrics by Brian Hill"],
+  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
 ];
 
 const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en"));
@@ -32,6 +32,15 @@ export default function MusicRoom() {
         <div className="container max-w-4xl py-12 sm:py-20">
           <p className="mb-5 text-sm font-bold uppercase tracking-widest text-[#f3d16d]">Papa Life Music Room</p>
           <h1 className="max-w-3xl font-serif text-4xl leading-tight sm:text-6xl">Brian Keith Hill’s AI Album of 2026</h1>
+          <p className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-base text-white">
+            <span><strong>Bill Whitley</strong> — Music</span>
+            <span><strong>Brian Hill</strong> — Lyrics</span>
+          </p>
+          <p className="mt-4 max-w-prose leading-relaxed text-white">
+            Our friendship is rooted in music and in our faith. We’re brothers in Christ
+            and fathers of adult children. We love making music together, and we love
+            helping, encouraging, and supporting people.
+          </p>
           <p className="mt-5 text-lg text-[#f3d16d]">To my family, whom I love deeply.</p>
         </div>
       </header>

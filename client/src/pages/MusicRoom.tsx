@@ -15,7 +15,7 @@ const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]
   ["Do You Want to Find Your GPS? (Suno version)", "gps-suno.mp3"],
   ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
-  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Arrangement by William Whitley · Lyrics by Brian Hill"],
+  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
 ];
 
 const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en"));
@@ -32,7 +32,10 @@ export default function MusicRoom() {
         <div className="container max-w-4xl py-12 sm:py-20">
           <p className="mb-5 text-sm font-bold uppercase tracking-widest text-[#f3d16d]">Papa Life Music Room</p>
           <h1 className="max-w-3xl font-serif text-4xl leading-tight sm:text-6xl">Brian Keith Hill’s AI Album of 2026</h1>
-          <p className="mt-4 text-base text-white">Songs primarily written and arranged by Brian Hill and Bill Whitley.</p>
+          <p className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-base text-white">
+            <span><strong>Bill Whitley</strong> — Music</span>
+            <span><strong>Brian Hill</strong> — Lyrics</span>
+          </p>
           <p className="mt-5 text-lg text-[#f3d16d]">To my family, whom I love deeply.</p>
         </div>
       </header>
@@ -44,6 +47,9 @@ export default function MusicRoom() {
               <div className="min-w-0">
                 <h2 className="font-serif text-2xl">{file === "more-than-you-know-20fac5a1.m4a" ? <a href="https://suno.com/s/F3KLsacmWiM20NEs" className="underline underline-offset-4">{title}</a> : title}</h2>
                 <p className="mb-3 mt-1 text-sm">{credit ?? "Brian Keith Hill"}</p>
+                {file === "foadc-da7743c6.m4a" && (
+                  <p className="mb-3 text-sm">Bill and Brian are both fathers of adult children.</p>
+                )}
                 <audio className="w-full" controls preload="none" aria-label={title} src={"/music-room/album-2026/" + file}
                   onPlay={event => document.querySelectorAll("main audio").forEach(player => {
                     if (player instanceof HTMLAudioElement && player !== event.currentTarget) player.pause();

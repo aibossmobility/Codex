@@ -1,8 +1,9 @@
+import albumLyrics from "@/content/music-room-lyrics.json";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { HouseTrail } from "./PapaHouse";
 
-const tracks: ReadonlyArray<readonly [string, string, string?]> = [
+const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]> = [
   ["Your Purpose Lives On In Us", "your-purpose.m4a"],
   ["Believe, Encourage, and Live", "believe-encourage-live.m4a"],
   ["Fathers of Adult Children (Very Slow Ballad)", "foadc-ballad.m4a"],
@@ -43,6 +44,19 @@ export default function MusicRoom() {
                   onPlay={event => document.querySelectorAll("main audio").forEach(player => {
                     if (player instanceof HTMLAudioElement && player !== event.currentTarget) player.pause();
                   })} />
+                <details className="mt-3">
+                  <summary className="w-fit cursor-pointer py-2 font-semibold text-[#21472a]">
+                    Lyrics<span className="sr-only"> for {title}</span>
+                  </summary>
+                  <div className="mt-2 max-w-prose border-l-2 border-[#c6cbbf] pl-4 leading-relaxed">
+                    {albumLyrics[file].split("\n").map((line, lineIndex) => {
+                      const section = line.match(/^\[(.*)\]$|^\*\*(.*)\*\*$/);
+                      return section
+                        ? <p key={lineIndex} className="mb-1 mt-4 font-semibold">{section[1] ?? section[2]}</p>
+                        : <p key={lineIndex} className="min-h-[0.6em]">{line}</p>;
+                    })}
+                  </div>
+                </details>
               </div>
             </li>
           ))}

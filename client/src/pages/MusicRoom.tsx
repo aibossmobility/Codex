@@ -36,6 +36,11 @@ export default function MusicRoom() {
             <span><strong>Bill Whitley</strong> — Music</span>
             <span><strong>Brian Hill</strong> — Lyrics</span>
           </p>
+          <p className="mt-4 max-w-prose leading-relaxed text-white">
+            Our friendship is rooted in music and in our faith. We’re brothers in Christ
+            and fathers of adult children. We love making music together, and we love
+            helping, encouraging, and supporting people.
+          </p>
           <p className="mt-5 text-lg text-[#f3d16d]">To my family, whom I love deeply.</p>
         </div>
       </header>
@@ -47,9 +52,6 @@ export default function MusicRoom() {
               <div className="min-w-0">
                 <h2 className="font-serif text-2xl">{file === "more-than-you-know-20fac5a1.m4a" ? <a href="https://suno.com/s/F3KLsacmWiM20NEs" className="underline underline-offset-4">{title}</a> : title}</h2>
                 <p className="mb-3 mt-1 text-sm">{credit ?? "Brian Keith Hill"}</p>
-                {file === "foadc-da7743c6.m4a" && (
-                  <p className="mb-3 text-sm">Bill and Brian are both fathers of adult children.</p>
-                )}
                 <audio className="w-full" controls preload="none" aria-label={title} src={"/music-room/album-2026/" + file}
                   onPlay={event => document.querySelectorAll("main audio").forEach(player => {
                     if (player instanceof HTMLAudioElement && player !== event.currentTarget) player.pause();

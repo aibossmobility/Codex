@@ -3058,15 +3058,12 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   // successful, indexable server response instead of the generic 404 shell.
   if (pathname === "/music-room") {
     const page: StaticServerPage = {
-      title: "The Music Room | Original Songs, Lyrics & Stories | Papa Life",
-      description: "Listen free to original songs and spoken-word recordings by Brian Keith Hill, read the lyric guide, and discover his community contributions.",
-      eyebrow: "Papa Life · Music & Spoken Word",
-      headline: "Welcome to the Music Room.",
-      intro: "Come in, listen to Fathers of Adult Children and its alternate arrangement, read along, and explore the stories behind Brian Keith Hill’s music.",
-      sections: [
-        { heading: "Listen and read along", body: "Two Fathers of Adult Children recordings are available to play without charge. The working lyric guide is displayed beside the music." },
-        { heading: "My Community Contributions", body: "Explore the community service, teaching, creative work and Black Men Speak history that shaped the songs and Papa Life." },
-      ],
+      title: "Brian Keith Hill’s AI Album of 2026 | Papa Life Music Room",
+      description: "Listen to Brian Keith Hill’s original music and selected AI-assisted recordings in the Papa Life Music Room.",
+      eyebrow: "Papa Life Music Room",
+      headline: "Brian Keith Hill’s AI Album of 2026",
+      intro: "To my family, whom I love deeply.",
+      sections: [],
       cta: { label: "Start listening free", href: "/music-room#listen" },
     };
     return { status: 200, title: page.title, description: page.description, bodyHtml: serverPageShell(page) };

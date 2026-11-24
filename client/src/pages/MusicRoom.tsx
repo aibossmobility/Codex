@@ -15,7 +15,7 @@ const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]
   ["Do You Want to Find Your GPS? (Suno version)", "gps-suno.mp3"],
   ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
-  ["Fathers of Adult Children (Brian Keith Hill AI Voice)", "foadc-da7743c6.m4a", "Arrangement by William Whitley · Lyrics by Brian Hill"],
+  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Arrangement by William Whitley · Lyrics by Brian Hill"],
 ];
 
 export default function MusicRoom() {

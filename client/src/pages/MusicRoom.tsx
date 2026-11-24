@@ -18,6 +18,8 @@ const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]
   ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Arrangement by William Whitley · Lyrics by Brian Hill"],
 ];
 
+const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en"));
+
 export default function MusicRoom() {
   return (
     <main className="min-h-screen bg-[#f8f4e8] text-[#16251b]">
@@ -35,7 +37,7 @@ export default function MusicRoom() {
       </header>
       <section id="listen" aria-label="Album tracks" className="container max-w-4xl py-8">
         <ol className="divide-y divide-[#c6cbbf]">
-          {tracks.map(([title, file, credit], index) => (
+          {tracksByTitle.map(([title, file, credit], index) => (
             <li key={file} className="grid gap-3 py-6 sm:grid-cols-[2rem_1fr]">
               <span aria-hidden="true" className="font-mono text-sm text-[#556353]">{String(index + 1).padStart(2, "0")}</span>
               <div className="min-w-0">

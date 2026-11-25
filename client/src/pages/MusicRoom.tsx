@@ -16,10 +16,10 @@ const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]
   ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
   ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
-  ["Your Purpose Lives On (New Suno version)", "purpose-e27fed7f.mp3"],
-  ["God Above (Version 1)", "god-above-60e62206.m4a"],
-  ["God Above (Version 2)", "god-above-f75554a5.m4a"],
-  ["You Are God Above", "you-are-god-above-b370237f.mp3"],
+  ["Your Purpose Lives On — Version 3", "purpose-e27fed7f.mp3"],
+  ["God Above 1", "god-above-60e62206.m4a"],
+  ["God Above 2", "god-above-f75554a5.m4a"],
+  ["You Are God Above 3", "you-are-god-above-b370237f.mp3"],
 ];
 
 const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en"));

@@ -1,3 +1,4 @@
+import PersonalAlbumPlayer from "@/components/PersonalAlbumPlayer";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { Activity, BarChart3, Brain, CalendarDays, CheckCircle2, ClipboardList, CircleAlert, Clock3, ExternalLink, Laptop, Loader2, Mail, Mic, Mic2, RefreshCw, Send, ShieldCheck, Smartphone, Users } from "lucide-react";
@@ -360,6 +361,7 @@ export default function AiBossMobile() {
             <a href="https://ai.bossmobilelifecoach.com/ai-boss-os" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs text-white/70 underline">Open AI Boss Mobility OS — separate technology dashboard ↗</a>
           </div>
         </section>
+        <PersonalAlbumPlayer brand="papa" />
         <Card className="border-brand-yellow/30 bg-[#111]">
           <CardContent className="space-y-3 p-4 sm:p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Start here</p>

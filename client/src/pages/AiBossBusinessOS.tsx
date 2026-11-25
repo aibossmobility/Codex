@@ -1,3 +1,4 @@
+import PersonalAlbumPlayer from "@/components/PersonalAlbumPlayer";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { Activity, BriefcaseBusiness, CheckCircle2, ClipboardCheck, ExternalLink, Globe2, Laptop, Loader2, Mic2, RefreshCw, Send, ShieldCheck, Smartphone, Wrench } from "lucide-react";
@@ -219,6 +220,7 @@ export default function AiBossBusinessOS() {
           </div>
         </header>
 
+        <PersonalAlbumPlayer brand="ai" />
         {installHelpOpen && !installed && (
           <Card className="border-cyan-400/30 bg-[#101e2d]">
             <CardContent className="p-4 text-sm text-slate-200">

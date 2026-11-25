@@ -158,32 +158,6 @@ function Router() {
   );
 }
 
-function ThirtyMinutePapaPromise() {
-  const [location] = useLocation();
-  const path = location.replace(/\/$/, "") || "/";
-  const privatePrefixes = [
-    "/login", "/member-login", "/member-activate", "/member-forgot-password",
-    "/member-reset-password", "/portal", "/crm", "/dashboard", "/admin",
-    "/papa-life-os", "/ai-boss", "/strategist", "/operators", "/governance",
-    "/executive-memory", "/theme-matrix", "/all-pages"
-  ];
-  if (privatePrefixes.some((prefix) => path === prefix || path.startsWith(prefix + "/"))) return null;
-  return (
-    <aside aria-label="Papa Life thirty-minute action promise" className="w-full border-b border-[#d9aa21] bg-[#fff0bc] px-4 py-3 text-[#17231c]">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-        <div className="max-w-3xl">
-          <p className="text-lg font-black leading-tight md:text-xl">Don't spend more than 30 minutes here.</p>
-          <p className="mt-1 text-sm leading-snug md:text-base">
-            Choose one concern. Read or listen with purpose. Leave with one practical next step.
-            <strong> Don't just read to read. Read to act.</strong>
-          </p>
-        </div>
-
-      </div>
-    </aside>
-  );
-}
-
 function GlobalPapaAiWidget() {
   const [location] = useLocation();
   const path = location.replace(/\/$/, "") || "/";
@@ -227,7 +201,6 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
-          <ThirtyMinutePapaPromise />
           <Router />
           <PublicCopyrightStrip />
           <PrivateCopyrightStrip />

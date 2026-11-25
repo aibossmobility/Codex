@@ -4,25 +4,25 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { HouseTrail } from "./PapaHouse";
 
 const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]> = [
-  ["Your Purpose Lives On In Us", "your-purpose.m4a"],
   ["Believe, Encourage, and Live", "believe-encourage-live.m4a"],
-  ["Fathers of Adult Children (Very Slow Ballad)", "foadc-ballad.m4a"],
-  ["Dad’s Love (Slow Ballad)", "dads-love.m4a"],
-  ["Do You Want to Find Your GPS? (AI Mix)", "find-your-gps.m4a"],
-  ["Dream and Pray (Second AI Mix)", "dream-and-pray.m4a", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
-  ["Your Purpose Lives On (Suno version)", "purpose-suno.mp3"],
-  ["Dream and Pray (First Mix)", "dream-first-suno.mp3", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
-  ["Do You Want to Find Your GPS? (Suno version)", "gps-suno.mp3"],
-  ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
-  ["Fathers of Adult Children", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
-  ["Your Purpose Lives On — Version 3", "purpose-e27fed7f.mp3"],
+  ["Dad’s Love (Slow Ballad)", "dads-love.m4a"],
+  ["Do You Want to Find Your GPS? 1", "find-your-gps.m4a"],
+  ["Do You Want to Find Your GPS? 2", "gps-suno.mp3"],
+  ["Dream and Pray 1", "dream-first-suno.mp3", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
+  ["Dream and Pray 2", "dream-and-pray.m4a", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
+  ["Fathers of Adult Children 1", "foadc-ballad.m4a"],
+  ["Fathers of Adult Children 2", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
   ["God Above 1", "god-above-60e62206.m4a"],
   ["God Above 2", "god-above-f75554a5.m4a"],
+  ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
   ["You Are God Above 3", "you-are-god-above-b370237f.mp3"],
+  ["Your Purpose Lives On 1", "your-purpose.m4a"],
+  ["Your Purpose Lives On 2", "purpose-suno.mp3"],
+  ["Your Purpose Lives On 3", "purpose-e27fed7f.mp3"],
 ];
 
-const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en"));
+const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en", { numeric: true, sensitivity: "base" }));
 
 export default function MusicRoom() {
   return (

@@ -4,23 +4,23 @@ import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { HouseTrail } from "./PapaHouse";
 
-const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string?]> = [
-  ["Believe, Encourage, and Live", "believe-encourage-live.m4a"],
-  ["Black Men Speak", "black-men-speak.mp3", "Brian Keith Hill & Bill Whitley"],
-  ["Dad’s Love (Slow Ballad)", "dads-love.m4a"],
-  ["Do You Want to Find Your GPS? 1", "find-your-gps.m4a"],
-  ["Do You Want to Find Your GPS? 2", "gps-suno.mp3"],
-  ["Dream and Pray 1", "dream-first-suno.mp3", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
-  ["Dream and Pray 2", "dream-and-pray.m4a", "Lyrics by Brian Keith Hill · Music by William (Bill) Whitley"],
-  ["Fathers of Adult Children 1", "foadc-ballad.m4a"],
-  ["Fathers of Adult Children 2", "foadc-da7743c6.m4a", "Bill Whitley — Music and arrangement · Brian Hill — Lyrics"],
-  ["God Above 1", "god-above-60e62206.m4a"],
-  ["God Above 2", "god-above-f75554a5.m4a"],
-  ["More Than You Know", "more-than-you-know-20fac5a1.m4a"],
-  ["You Are God Above 3", "you-are-god-above-b370237f.mp3"],
-  ["Your Purpose Lives On 1", "your-purpose.m4a"],
-  ["Your Purpose Lives On 2", "purpose-suno.mp3"],
-  ["Your Purpose Lives On 3", "purpose-e27fed7f.mp3"],
+const tracks: ReadonlyArray<readonly [string, keyof typeof albumLyrics, string]> = [
+  ["Believe, Encourage, and Live", "believe-encourage-live.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Black Men Speak", "black-men-speak.mp3", "Lyrics: Brian Hill · Music / arrangement: William Whitley"],
+  ["Dad’s Love (Slow Ballad)", "dads-love.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Do You Want to Find Your GPS? 1", "find-your-gps.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Do You Want to Find Your GPS? 2", "gps-suno.mp3", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Dream and Pray 1", "dream-first-suno.mp3", "Lyrics: Brian Hill · Music / arrangement: William Whitley"],
+  ["Dream and Pray 2", "dream-and-pray.m4a", "Lyrics: Brian Hill · Music / arrangement: William Whitley"],
+  ["Fathers of Adult Children 1", "foadc-ballad.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Fathers of Adult Children 2", "foadc-da7743c6.m4a", "Lyrics: Brian Hill · Music / arrangement: William Whitley"],
+  ["God Above 1", "god-above-60e62206.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["God Above 2", "god-above-f75554a5.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["More Than You Know", "more-than-you-know-20fac5a1.m4a", "Lyrics: Brian Hill · Music / arrangement: William Whitley"],
+  ["You Are God Above 3", "you-are-god-above-b370237f.mp3", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Your Purpose Lives On 1", "your-purpose.m4a", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Your Purpose Lives On 2", "purpose-suno.mp3", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
+  ["Your Purpose Lives On 3", "purpose-e27fed7f.mp3", "Lyrics: Brian Hill · Music / arrangement: Brian Hill & Suno AI"],
 ];
 
 const tracksByTitle = [...tracks].sort(([first], [second]) => first.localeCompare(second, "en", { numeric: true, sensitivity: "base" }));
@@ -74,13 +74,14 @@ export default function MusicRoom() {
           <p className="mb-5 text-sm font-bold uppercase tracking-widest text-[#f3d16d]">Papa Life Music Room</p>
           <h1 className="max-w-3xl font-serif text-4xl leading-tight sm:text-6xl">Brian Keith Hill’s AI Album of 2026</h1>
           <p className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-base text-white">
-            <span><strong>Bill Whitley</strong> — Music</span>
-            <span><strong>Brian Hill</strong> — Lyrics</span>
+            <span><strong>Music &amp; arrangements</strong> — William Whitley or Brian Hill with Suno AI, as credited per track</span>
+            <span><strong>Brian Hill</strong> — Lyrics on all 16 recordings</span>
           </p>
           <p className="mt-4 max-w-prose leading-relaxed text-white">
-            Our friendship is rooted in music and in our faith. We’re brothers in Christ
-            and fathers of adult children. We love making music together, and we love
-            helping, encouraging, and supporting people.
+            William (Bill) Whitley and Brian Hill share a friendship rooted in music and faith.
+            We’re brothers in Christ and fathers of adult children, and we love helping,
+            encouraging, and supporting people. This album includes our collaborations
+            alongside Brian’s recordings arranged with Suno AI.
           </p>
           <p className="mt-5 text-lg text-[#f3d16d]">To my family, whom I love deeply.</p>
         </div>
@@ -102,7 +103,7 @@ export default function MusicRoom() {
                 {isPlaying ? "Now playing" : "Selected track"} · {trackNumber(currentIndex)} / {tracksByTitle.length}
               </p>
               <p className="mt-1 text-lg font-semibold">{currentTitle}</p>
-              <p className="mt-1 text-sm text-white/80">{currentCredit ?? "Brian Keith Hill"}</p>
+              <p className="mt-1 text-sm text-white/80">{currentCredit}</p>
               <audio ref={audioRef} controls preload="none" aria-label="Album audio player" className="mt-3 w-full"
                 src={audioPath(tracksByTitle[0][1])}
                 onPlay={() => { setIsPlaying(true); setStatus(""); }}
@@ -123,13 +124,13 @@ export default function MusicRoom() {
             </div>
           </div>
           <ol aria-label="Album tracklist" className="divide-y divide-[#e4e8df] sm:grid sm:grid-cols-2 sm:divide-y-0">
-            {tracksByTitle.map(([title, file], index) => (
+            {tracksByTitle.map(([title, file, credit], index) => (
               <li key={file} className="min-w-0 sm:border-b sm:border-[#e4e8df]">
                 <button type="button" aria-label={`Play track ${index + 1}: ${title}`} aria-current={currentIndex === index ? "true" : undefined}
                   onClick={() => playTrack(index)}
                   className={`flex min-h-11 w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#f3f5ee] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#21472a] ${currentIndex === index ? "bg-[#e4eddf] font-semibold" : ""}`}>
                   <span className="w-6 shrink-0 font-mono text-[#556353]">{trackNumber(index)}</span>
-                  <span className="min-w-0 flex-1">{title}</span>
+                  <span className="min-w-0 flex-1"><span className="block">{title}</span><span className="mt-0.5 block text-xs font-normal text-[#556353]">{credit}</span></span>
                   <span aria-hidden="true" className="shrink-0 text-[#21472a]">{currentIndex === index && isPlaying ? "♫" : "▶"}</span>
                 </button>
               </li>
@@ -161,7 +162,7 @@ export default function MusicRoom() {
                   </div>
                   <div id={`lyric-${index}`} hidden={openLyric !== index} className="mb-4 ml-2 max-w-prose border-l-2 border-[#c6cbbf] pl-4 leading-relaxed">
                     {openLyric === index && <>
-                      <p className="mb-3 text-sm text-[#556353]">{credit ?? "Brian Keith Hill"}</p>
+                      <p className="mb-3 text-sm text-[#556353]">{credit}</p>
                       {file === "more-than-you-know-20fac5a1.m4a" && <a href="https://suno.com/s/F3KLsacmWiM20NEs" className="text-sm underline">Original Suno recording</a>}
                       {albumLyrics[file].split("\n").map((line, lineIndex) => {
                         const section = line.match(/^\[(.*)\]$|^\*\*(.*)\*\*$/);

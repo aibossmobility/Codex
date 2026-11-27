@@ -59,6 +59,11 @@ const sourceForPath = (pathname) => {
   if (pathname === "/music-room") return "client/src/pages/MusicRoom.tsx";
   if (pathname === "/digital-twin") return "client/src/pages/DigitalTwinDemo.tsx";
   if (pathname === "/courses/11") return "client/src/pages/CourseDetail.tsx";
+  if (pathname === "/start") return "client/src/pages/PapaStart.tsx";
+  if (pathname === "/papa-first-lesson") return "client/src/pages/PapaFirstLesson.tsx";
+  if (pathname === "/father-friendly-practice") return "client/public/father-friendly-practice/index.html";
+  if (pathname === "/adult-children") return "client/src/content/family-guidance.json";
+  if (pathname === "/relationship-assessment") return "client/src/content/papa-seo-audit-overrides.json";
   if (pathname.startsWith("/house")) return "client/src/pages/PapaHouse.tsx";
   if (pathname === "/site-directory") return "client/src/pages/SiteDirectory.tsx";
   if (pathname === "/shop") return "client/src/pages/Shop.tsx";
@@ -79,12 +84,13 @@ const preservedLastmod = new Map(
 );
 function lastModified(pathname) {
   const source = sourceForPath(pathname);
-  const sources = source ? [source] : ["scripts/generate-static-seo-pages.mjs"];
+  const lastKnown = preservedLastmod.get(url(pathname)) || "";
+  if (!source) return lastKnown;
   try {
     // %cs comes from the commit touching the source, not the deployment time.
-    const sourceDate = execFileSync("git", ["log", "-1", "--format=%cs", "--", ...sources], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-    return sourceDate || preservedLastmod.get(url(pathname)) || "";
-  } catch { return preservedLastmod.get(url(pathname)) || ""; }
+    const sourceDate = execFileSync("git", ["log", "-1", "--format=%cs", "--", source], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return sourceDate > lastKnown ? sourceDate : lastKnown;
+  } catch { return lastKnown; }
 }
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([pathname, changefreq, priority]) => `  <url>\n    <loc>${url(pathname)}</loc>${lastModified(pathname) ? `\n    <lastmod>${lastModified(pathname)}</lastmod>` : ""}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
 

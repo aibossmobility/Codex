@@ -1,3 +1,5 @@
+import PapaAuditSupportGuide from "./pages/PapaAuditSupportGuide";
+import { supportGuides } from "./content/papa-support-guides.json";
 import PapaSupportComparison from "./pages/PapaSupportComparison";
 import PapaResearchFoundation from "./pages/PapaResearchFoundation";
 import { Toaster } from "@/components/ui/sonner";
@@ -68,6 +70,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/changelog" component={PapaChangelog} />
+      {supportGuides.map((guide) => <Route key={guide.path} path={guide.path} component={PapaAuditSupportGuide} />)}
       <Route path="/papa-life-vs-therapy" component={PapaSupportComparison} />
       <Route path="/research-foundation" component={PapaResearchFoundation} />
       <Route path="/parents-of-adult-children" component={ParentsOfAdultChildrenPage} />

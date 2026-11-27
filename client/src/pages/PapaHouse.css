@@ -113,3 +113,24 @@
 .papa-house-journey main{background:radial-gradient(circle at 85% 10%,#f7d79888,transparent 43%)}
 .papa-house-course{background:radial-gradient(ellipse at 86% 10%,#573722,#211c18 68%)!important}
 .papa-house-course header{background:#34231c!important;border-bottom:2px solid #e1ac4c!important}
+
+@media (max-width: 480px) {
+  .papa-house-outdoor-inner {
+    min-height: auto;
+    padding: 2rem 1.25rem;
+  }
+
+  .papa-house-outdoor-inner h1 {
+    font-size: 2.15rem;
+    line-height: 1.12;
+  }
+
+  .papa-house-outdoor-inner p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .papa-house-outdoor-actions {
+    margin-top: 1rem;
+  }
+}

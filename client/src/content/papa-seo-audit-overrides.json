@@ -1,6 +1,6 @@
 {
   "titles": {
-    "/": "Audio Lessons for Fathers of Adult Children | Papa Life",
+    "/": "Audio Lessons for Fathers Whose Adult Child Has Gone Quiet",
     "/adult-daughter-relationship": "Adult Daughter Relationship Help for Fathers | Papa Life",
     "/parents-of-adult-children": "Parents of Adult Children: Guidance and Support",
     "/adult-children": "Adult Children: Communication and Boundaries",
@@ -8,18 +8,17 @@
     "/father-child-estrangement": "Father-Child Estrangement: What Fathers Can Do",
     "/papa-intro": "Start with the Heart of Papa Life | Introduction",
     "/shop": "Available Papa Life Lessons, Videos and Manuscripts",
-    "/contact": "Reach Out for Fatherhood Support | Papa Life",
+    "/contact": "Contact Papa Life for Fatherhood Support",
     "/music-room": "Brian Keith Hill’s AI Album of 2026 | Papa Life Music Room",
     "/house/theater": "The Theater: Watch and Learn | Papa Life",
-    "/relationship-assessment": "Where Are You With Your Adult Child? | Check-In",
+    "/relationship-assessment": "Where Are You With Your Adult Child? | Papa Life",
     "/father-friendly-practice": "Father-Friendly Practice for Adult-Child Relationships",
     "/ai-coach": "Papa Life AI Coach: Guidance for Fathers",
-    "/start": "Begin Where You Are Today | Papa Life",
-    "/papa-first-lesson": "Papa First Lesson: Listen Before You Correct",
+    "/start": "Start Your Fatherhood Journey | Papa Life",
+    "/papa-first-lesson": "From Distance to Reconnection | First Lesson",
     "/resources": "Papa Life Resources: Choose Your Next Step",
-    "/books": "Written Guidance for Fathers of Adult Children",
-    "/podcast": "Papa Life Podcast: Listen and Find Your Next Step",
-    "/papa-journey": "Papa Journey: Guided Fatherhood Steps",
+    "/books": "Papa Life Books and Written Guidance for Fathers",
+    "/podcast": "Papa Life Podcast for Fathers of Adult Children",
     "/house": "Explore the Papa Life House and Its Resources"
   },
   "descriptions": {
@@ -42,11 +41,10 @@
     "/parents-of-adult-children": "Guidance for parents of adult children facing silence, changing boundaries or hard conversations. Explore ways to listen, take responsibility and reconnect.",
     "/adult-children": "Guidance for adult sons and daughters navigating difficult relationships with parents, including communication, emotional safety and healthy boundaries.",
     "/digital-twin": "Talk with Brian Keith Hill's clearly identified digital AI guide to explore Papa Life lessons, fatherhood resources and practical next steps at your pace.",
-    "/books": "Explore Brian Keith Hill's written guidance for fathers of adult children. Learn about available manuscripts and resources without pressure to purchase.",
-    "/papa-journey": "The Papa Journey offers fathers of adult children a way to reflect on Presence, Authority, Purpose and Alignment and choose practical next steps."
+    "/books": "Explore Brian Keith Hill's written guidance for fathers of adult children. Learn about available manuscripts and resources without pressure to purchase."
   },
   "definitions": {
-    "/resources": "Papa Life resources are self-paced tools for reflection and growth in relationships with adult children.",
+    "/resources": "The Papa Life resource center is a place to find tools for repairing relationships with adult children.",
     "/house": "The Papa Life House is a guided collection of rooms for listening, learning and reflecting at your own pace.",
     "/house/living-room": "The Living Room is a place to begin reflecting on fatherhood without pressure.",
     "/house/library": "The Reading Nook is Papa Life's space for written learning and thoughtful reflection.",
@@ -55,10 +53,83 @@
     "/house/dad-cave": "The Dad Cave is a place for honest reflection on fatherhood, responsibility and connection.",
     "/house/resources": "The Resource Room is a place to find learning tools for your next step.",
     "/house/sky-room": "The Sky Room is a space to reflect on purpose and the choices ahead.",
-    "/site-directory": "The Papa Life Site Directory is a list of public resources and guidance pages.",
+    "/site-directory": "The Papa Life Site Directory is a guide to public pages for fathers of adult children.",
     "/welcome-to-papa-life": "Papa Life is a fatherhood resource center for fathers of adult sons and daughters.",
-    "/start": "Start Your Fatherhood Journey is a guide to the first steps offered by Papa Life.",
+    "/start": "Start Your Fatherhood Journey is a guide to choosing your first Papa Life lesson or resource.",
     "/digital-twin": "Brian's Digital AI is an optional automated guide to Papa Life resources and lessons.",
-    "/podcast": "Papa Life podcast material is audio guidance for fathers reflecting on adult-child relationships."
+    "/podcast": "The Papa Life Podcast is a collection of conversations about faith, fatherhood, and relationships with adult children.",
+    "/courses/11": "From Distance to Reconnection is a self-paced course for fathers who want to rebuild trust with their adult children."
+  },
+  "headlines": {
+    "/relationship-assessment": "Where Are You With Your Adult Child?",
+    "/father-friendly-practice": "Father-Friendly Practice for Adult-Child Relationships",
+    "/ai-coach": "Papa Life AI Coach",
+    "/contact": "Contact Papa Life",
+    "/adult-children": "Adult Children: Communication and Boundaries",
+    "/start": "Start Your Fatherhood Journey",
+    "/papa-first-lesson": "From Distance to Reconnection",
+    "/resources": "Papa Life Resources",
+    "/books": "Papa Life Books and Written Guidance",
+    "/podcast": "Papa Life Podcast",
+    "/house": "Explore the Papa Life House",
+    "/house/theater": "The Theater: Watch and Learn"
+  },
+  "relatedLinks": {
+    "/resources": [
+      [
+        "Books and written guidance",
+        "/books"
+      ],
+      [
+        "Papa Life Podcast",
+        "/podcast"
+      ],
+      [
+        "From Distance to Reconnection course",
+        "/courses/11"
+      ]
+    ],
+    "/books": [
+      [
+        "Papa Life Reading Nook",
+        "/house/library"
+      ],
+      [
+        "Papa Life Podcast",
+        "/podcast"
+      ],
+      [
+        "From Distance to Reconnection course",
+        "/courses/11"
+      ]
+    ],
+    "/podcast": [
+      [
+        "Papa Life Listening Room",
+        "/house/listening-room"
+      ],
+      [
+        "Books and written guidance",
+        "/books"
+      ],
+      [
+        "From Distance to Reconnection course",
+        "/courses/11"
+      ]
+    ],
+    "/courses/11": [
+      [
+        "Try the first lesson",
+        "/papa-first-lesson"
+      ],
+      [
+        "Books and written guidance",
+        "/books"
+      ],
+      [
+        "Papa Life Podcast",
+        "/podcast"
+      ]
+    ]
   }
 }

@@ -421,7 +421,7 @@ export default function Strategist() {
                 className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-6 rounded-full font-bold shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-all hover:scale-105"
                 asChild
               >
-                <a href="/papa-journey">
+                <a href="/start">
                   Begin Your Journey <ArrowRight className="ml-2 h-5 w-5" />
                 </a>
               </Button>

@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
+import { PapaRelatedResources } from "@/components/PapaRelatedResources";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import {
@@ -803,6 +805,10 @@ function HeroPromoPanel({ statusLabel }: { statusLabel: string }) {
 
 export default function PapaAiExperience() {
   const [location] = useLocation();
+  const pagePath = location === "/books" || location === "/podcast" || location === "/resources"
+    || location === "/contact" ? location : "/ai-coach";
+  const relatedPath = pagePath === "/books" || pagePath === "/podcast" || pagePath === "/resources"
+    ? pagePath : null;
   const [activeMode, setActiveMode] = useState<Mode>(() => currentModeFromPath(location));
   const [status, setStatus] = useState<{ live_ai_enabled?: boolean; provider?: string; inactive_message?: string }>({});
 
@@ -826,6 +832,7 @@ export default function PapaAiExperience() {
   return (
     <div className="papa-house-ai min-h-screen bg-[#261f19] text-white">
       <PageMeta
+        canonicalPath={pagePath}
         title="Papa Life AI Coach | Biblical Fatherhood Coaching"
         description="Ask the Papa Life AI Coach for practical, biblical guidance for fathers of adult children. Includes assessment, resources, prayer, Bible study, Tuesday Live support, and course guidance."
         keywords="Papa Life AI Coach, fathers of adult children, biblical fatherhood coaching, PAPA Framework, fatherhood assessment"
@@ -846,17 +853,23 @@ export default function PapaAiExperience() {
       <HouseTrail current="Papa Life AI & Resources" />
 
       <main>
+        {(pagePath === "/books" || pagePath === "/podcast") && (
+          <nav aria-label="Breadcrumb" className="container pt-4 text-sm">
+            <a href="/">Home</a> / <a href="/resources">Papa Life Resources</a> / {auditSEO.headlines[pagePath]}
+          </nav>
+        )}
         <section className="border-b border-white/10 bg-gradient-to-b from-white/[0.04] to-black py-12 md:py-18">
           <div className="container">
             <div className="grid gap-8 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
               <div>
                 <Badge className="bg-brand-yellow text-black">Papa Life AI Experience</Badge>
                 <h1 className="mt-5 max-w-4xl text-4xl font-extrabold md:text-6xl">
-                  Coaching, assessment, prayer, and resources in Brian Keith Hill's Papa Life voice.
+                  {auditSEO.headlines[pagePath]}
                 </h1>
                 <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/68 md:text-xl">
-                  Fathers can ask real questions, find the next resource, prepare for Tuesday Live, receive
-                  biblical encouragement, and take the PAPA assessment without getting lost.
+                  {pagePath === "/podcast" || pagePath === "/resources"
+                    ? auditSEO.definitions[pagePath]
+                    : auditSEO.descriptions[pagePath]}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a
@@ -974,6 +987,7 @@ export default function PapaAiExperience() {
             })}
           </div>
         </section>
+        {relatedPath && <div className="container"><PapaRelatedResources pathname={relatedPath} /></div>}
       </main>
     </div>
   );

@@ -63,7 +63,7 @@ export default function FatherFriendlyPractice() {
         <div className="container py-14 md:py-20">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Father-Friendly Practice</p>
           <h1 className="mt-4 max-w-5xl text-4xl font-extrabold leading-tight md:text-6xl">
-            Fathers should be seen, welcomed, supported, and expected to participate.
+            Father-Friendly Practice for Adult-Child Relationships
           </h1>
           <p className="mt-6 max-w-4xl text-lg leading-relaxed text-white/80 md:text-xl">
             Papa Life serves fathers whose children are adults. We use the Alameda County Fathers Corps Father-Friendly Principles as a practical local benchmark for how we design services, communicate with fathers, build resources, and work with community partners.

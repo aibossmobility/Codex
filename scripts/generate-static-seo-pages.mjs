@@ -385,18 +385,6 @@ const pages = [
     ],
   },
   {
-    path: "/papa-journey",
-    title: "Papa Journey | Papa Life Coach",
-    description: "A guided Papa Life journey for fathers rebuilding connection with adult children.",
-    eyebrow: "Papa Journey",
-    headline: "Move from awareness into a guided fatherhood path.",
-    intro: "The Papa Journey helps fathers work through relationship distance with structure, reflection, coaching, and next steps.",
-    sections: [
-      ["PAPA pillars", "Presence, Authority, Purpose, and Alignment organize the path."],
-      ["Continue steadily", "Use the journey to build consistency and repair-oriented habits over time."],
-    ],
-  },
-  {
     path: "/papa-intro",
     title: "Papa Life Intro Video",
     description: "Introductory video for the Papa Life fatherhood path.",
@@ -501,6 +489,7 @@ const homepage = pages.find((page) => page.path === "/");
 homepage.relatedLinks = [
   ["Guidance for Parents of Adult Children", "/parents-of-adult-children"],
   ["Guidance for Adult Children", "/adult-children"],
+  ["Fatherhood Resources", "/resources"],
   ...(homepage.relatedLinks || []),
 ];
 
@@ -525,13 +514,14 @@ for (const page of pages) {
     if (extra.relatedLinks) page.relatedLinks = extra.relatedLinks;
   }
   if (!page.relatedLinks?.length) page.relatedLinks = defaultLinks.filter(([, href]) => href !== page.path);
+  if (auditSEO.headlines[page.path]) page.headline = auditSEO.headlines[page.path];
+  if (auditSEO.relatedLinks[page.path]) page.relatedLinks = auditSEO.relatedLinks[page.path];
   if (auditTitles[page.path]) page.title = auditTitles[page.path];
   if (auditDescriptions[page.path]) page.description = auditDescriptions[page.path];
   if (auditDefinitions[page.path] && !page.intro.startsWith(auditDefinitions[page.path])) {
     page.intro = `${auditDefinitions[page.path]} ${page.intro}`;
   }
   if (page.path === "/papa-framework") page.title = "The PAPA Framework for Fathers of Adult Children | Papa Life";
-  if (page.path === "/relationship-assessment") page.title = "2-Minute Fatherhood Check-In | Papa Life";
 }
 
 function escapeHtml(value) {
@@ -545,6 +535,9 @@ function escapeHtml(value) {
 }
 
 function bodyHtml(page) {
+  const breadcrumb = auditSEO.relatedLinks[page.path] && page.path !== "/resources"
+    ? '<nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/resources">Papa Life resources</a> / ' + escapeHtml(page.headline) + '</nav>'
+    : "";
   const related = page.relatedLinks?.length
     ? `<section style="margin-top: 42px; padding: 24px; border: 1px solid #3f3f46; border-radius: 18px; background: #111113;">
         <h2>Continue from here</h2>
@@ -556,6 +549,7 @@ function bodyHtml(page) {
   return `
     <main id="server-prerender" style="font-family: Inter, Arial, sans-serif; background: #050505; color: #f8fafc; min-height: 100vh; padding: 64px 20px;">
       <article style="max-width: 920px; margin: 0 auto;">
+        ${breadcrumb}
         <p style="color: #f6c74a; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">${escapeHtml(page.eyebrow)}</p>
         <h1 style="font-size: clamp(2.25rem, 6vw, 4.75rem); line-height: 1.02; margin: 18px 0;">${escapeHtml(page.headline)}</h1>
         <p style="font-size: 1.2rem; line-height: 1.7; color: #d4d4d8; max-width: 800px;">${escapeHtml(page.intro)}</p>

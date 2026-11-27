@@ -1,3 +1,4 @@
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogoStacked } from "@/components/SiteLogo";
 
@@ -61,7 +62,7 @@ export default function SiteDirectory() {
           <a href="/" aria-label="Papa Life home"><SiteLogoStacked size="sm" /></a>
           <div>
             <h1 className="text-2xl font-bold">Papa Life Site Directory</h1>
-            <p className="text-sm text-gray-400">The Papa Life Site Directory is a list of public resources and guidance pages.</p>
+            <p className="text-sm text-gray-400">{auditSEO.definitions["/site-directory"]}</p>
           </div>
         </div>
       </header>

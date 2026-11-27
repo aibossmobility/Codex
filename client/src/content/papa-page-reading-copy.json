@@ -1,0 +1,18 @@
+{
+  "directory": [
+    "Choose a guide based on what is happening in your relationship with your adult child.",
+    "Use the check-in if you want to reflect before deciding what to do next.",
+    "Browse the learning resources when you are ready for a lesson, a recording or something to read."
+  ],
+  "rooms": {
+    "house": "Choose a room based on what would help today. You can read, listen to a recording, watch a lesson, or find a question worth sitting with.",
+    "living-room": "Begin with the Awareness Wheel if you are unsure where to start. It gives you a way to name what is happening in your relationship.",
+    "library": "Explore Brian Keith Hill’s writings and manuscripts, including Run Your Own Race, at your own pace. The resource shop lists available materials and their current prices.",
+    "listening-room": "Listen to original music, audio lessons, or reflections from Papa Life. You can return to the recordings whenever you want to listen again.",
+    "theater": "Browse videos you can watch on your own schedule. Choose a lesson that speaks to the situation you are working through.",
+    "dad-cave": "Reflect on how you show up when silence, setbacks, or hard conversations come up. Consider what Presence, Authority, Purpose, and Alignment might look like in your situation.",
+    "resources": "Browse workbooks, written resources, and audio lessons for fathers of adult children. Choose the format that fits the way you learn.",
+    "sky-room": "Run Your Own Race invites you to think about your story, your choices, and your purpose. Explore Brian Keith Hill’s original work when you are ready for another perspective."
+  },
+  "course": "From Distance to Reconnection is a self-paced course with twelve audio lessons for fathers of adult children. The lessons cover listening, apologizing, respecting boundaries, and rebuilding trust over time."
+}

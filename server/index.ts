@@ -1,4 +1,5 @@
 import { installPapaConversationRoutes } from "./papa-conversations";
+import readingCopy from "../client/src/content/papa-page-reading-copy.json";
 import auditSEO from "../client/src/content/papa-seo-audit-overrides.json";
 import { withPapaPageSchema } from "../shared/papa-structured-data.mjs";
 import { installPapaOutreachDailyRoutes } from "./papa-outreach-daily";
@@ -2983,8 +2984,10 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     lessons.length > 0
       ? `<ol>${lessons
           .map(
-            (lesson) =>
-              `<li><strong>${escapeHtml(lesson.title)}</strong>${lesson.duration_minutes ? ` (${Number(lesson.duration_minutes)} min)` : ""}${lesson.description ? `<br><span>${escapeHtml(lesson.description)}</span>` : ""}</li>`
+            (lesson) => {
+              const summary = lesson.description;
+              return `<li><strong>${escapeHtml(lesson.title)}</strong>${lesson.duration_minutes ? ` (${Number(lesson.duration_minutes)} min)` : ""}${summary ? `<p>${escapeHtml(summary)}</p>` : ""}</li>`;
+            }
           )
           .join("")}</ol>`
       : "<p>No lessons are listed for this course yet.</p>"
@@ -2998,7 +3001,7 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     eyebrow: course.pillar || "Course",
     headline: course.title,
     intro:
-      (courseId === 11 && course.title === "From Distance to Reconnection" ? auditSEO.definitions["/courses/11"] : course.description) ||
+      (courseId === 11 && course.title === "From Distance to Reconnection" ? readingCopy.course : course.description) ||
       "Lesson videos and materials are available after you sign in to the member portal. This page is a preview of the curriculum.",
     sections: [{ heading: "Member access", body: "Sign in to the member portal to watch lesson videos and track progress." }],
     cta: { label: "Sign in to watch", href: "/member-login" },
@@ -3124,16 +3127,16 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     const description = (auditSEO.descriptions as Record<string, string>)[pathname]
       ?? "Step into Papa Life's welcoming home, with rooms for books, audio, video, fatherhood conversations, and resources.";
     const roomLinks = Object.entries(roomPages).map(([key, value]) =>
-      '<a href="/house/' + key + '">' + escapeHtml(value.name) + "</a>"
-    ).join(" · ");
-    const navigation = '<nav aria-label="Explore Papa Life rooms"><h2>Explore the rooms</h2><p>' + roomLinks + '</p></nav>';
+      '<li><a href="/house/' + key + '">' + escapeHtml(value.name) + '</a></li>'
+    ).join("");
+    const navigation = '<nav aria-label="Explore Papa Life rooms"><h2>Explore the rooms</h2><ul>' + roomLinks + '</ul></nav>';
     const page: StaticServerPage = {
       title,
       description,
       eyebrow: room ? "Papa Life · Make yourself at home" : "Papa Life · Come Inside",
       headline: (auditSEO.headlines as Record<string, string>)[pathname] ?? room?.name ?? "Explore the Papa Life House",
       intro: (auditSEO.definitions as Record<string, string>)[pathname] ?? description,
-      sections: [{ heading: "Wander at your own pace", body: "Read, listen, reflect, watch lessons and explore original Papa Life resources." }],
+      sections: [{ heading: "Wander at your own pace", body: (readingCopy.rooms as Record<string, string>)[slug || "house"] }],
       cta: room ? { label: "Explore resources in this room", href: room.destination } : { label: "Browse Resources", href: "/shop" },
     };
     const libraryResearch = slug === "library" ? '<section aria-label="Papa Life Research Foundation"><h2>Research Foundation & Statement of Need</h2><p>Read independent scholarship on fathers of adult children, human connection and estrangement and reflect on the need for Papa Life education.</p><p><a href="/research-foundation">Read Papa Life Research Foundation</a></p></section>' : "";

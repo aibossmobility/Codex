@@ -1,5 +1,5 @@
 import { PapaRelatedResources } from "@/components/PapaRelatedResources";
-import auditSEO from "@/content/papa-seo-audit-overrides.json";
+import readingCopy from "@/content/papa-page-reading-copy.json";
 import { HouseTrail } from "./PapaHouse";
 import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { useEffect, useState } from "react";
@@ -98,13 +98,13 @@ export default function CourseDetail() {
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium border inline-block mb-4 ${colors.badge}`}>{course.pillar}</span>
               <h1 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-4">{course.title}</h1>
               <p className="mb-4 text-gray-300">{course.id === 11 && course.title === "From Distance to Reconnection"
-                ? auditSEO.definitions["/courses/11"]
+                ? readingCopy.course
                 : "This Papa Life course is a self-paced resource for fathers of adult children."}</p>
               {course.description && <p className="text-gray-400 text-lg leading-relaxed">{course.description}</p>}
             </div>
 
             <div className="rounded-2xl border border-brand-yellow/20 bg-brand-yellow/5 px-5 py-4 mb-10 text-sm text-brand-yellow">
-              This is a preview of a Papa Life learning resource. Approved purchase details, payment and access will be handled through GoHighLevel; no checkout happens here.
+              This is a preview of a Papa Life learning resource. GoHighLevel handles the purchase details, payment, and access to the full course.
             </div>
 
             <h2 className="font-heading text-lg font-bold text-white mb-4 flex items-center gap-2">

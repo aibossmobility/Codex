@@ -1,3 +1,4 @@
+import readingCopy from "@/content/papa-page-reading-copy.json";
 import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogoStacked } from "@/components/SiteLogo";
@@ -67,6 +68,9 @@ export default function SiteDirectory() {
         </div>
       </header>
       <main className="mx-auto max-w-3xl space-y-6 p-4 py-8">
+        <div className="space-y-2 text-gray-300">
+          {readingCopy.directory.map((sentence) => <p key={sentence}>{sentence}</p>)}
+        </div>
         {groups.map((group) => (
           <section key={group.title} className="rounded-2xl border border-white/10 bg-[#111] p-4">
             <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-yellow">{group.title}</h2>

@@ -28,7 +28,7 @@ const groups: PageGroup[] = [
     links: [
       { label: "My Journey", path: "/my-journey" },
       { label: "2-Minute Fatherhood Check-In", path: "/relationship-assessment" },
-      { label: "Papa Journey", path: "/papa-journey" },
+      { label: "Start Your Fatherhood Journey", path: "/start" },
       { label: "Adult Son Relationship", path: "/adult-son-relationship" },
       { label: "Adult Daughter Relationship", path: "/adult-daughter-relationship" },
       { label: "Why Adult Children Pull Away", path: "/why-adult-children-pull-away" },

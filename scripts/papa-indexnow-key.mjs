@@ -1,0 +1,1 @@
+export const indexNowKey = "7d6b5b72f4c14f6eb9d9e58c4cc21f73";

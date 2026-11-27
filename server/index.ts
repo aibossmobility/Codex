@@ -1,4 +1,5 @@
 import { installPapaConversationRoutes } from "./papa-conversations";
+import auditSEO from "../client/src/content/papa-seo-audit-overrides.json";
 import { withPapaPageSchema } from "../shared/papa-structured-data.mjs";
 import { installPapaOutreachDailyRoutes } from "./papa-outreach-daily";
 import { installPapaAiBossOwnerSso } from "./papa-ai-boss-sso";
@@ -2892,8 +2893,15 @@ function notFoundServerPage(): ServerRenderedPage {
 }
 
 function staticServerPage(pathname: string): ServerRenderedPage | null {
-  const page = STATIC_SERVER_PAGES[pathname];
-  if (!page) return null;
+  const original = STATIC_SERVER_PAGES[pathname];
+  if (!original) return null;
+  const page = {
+    ...original,
+    title: (auditSEO.titles as Record<string, string>)[pathname] ?? original.title,
+    description: (auditSEO.descriptions as Record<string, string>)[pathname] ?? original.description,
+    headline: (auditSEO.headlines as Record<string, string>)[pathname] ?? original.headline,
+    intro: (auditSEO.definitions as Record<string, string>)[pathname] ?? original.intro,
+  };
   return {
     status: 200,
     title: page.title,
@@ -2965,6 +2973,12 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     )
     .all(courseId) as Array<{ id: number; title: string; description: string | null; duration_minutes: number | null; content_type: string | null }>;
 
+  const relatedLinks = courseId === 11 ? auditSEO.relatedLinks["/courses/11"] : [];
+  const relatedHtml = relatedLinks.length ? '<section><h2>Related fatherhood resources</h2><ul>' +
+    relatedLinks.map(([label, href]) => '<li><a href="' + escapeHtml(href) + '">' + escapeHtml(label) + '</a></li>').join("") +
+    '</ul></section>' : "";
+  const breadcrumbs = '<nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/courses">Courses</a> / ' +
+    escapeHtml(course.title) + '</nav>';
   const lessonHtml = `<section><h2>Lessons (${lessons.length})</h2>${
     lessons.length > 0
       ? `<ol>${lessons
@@ -2984,7 +2998,7 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     eyebrow: course.pillar || "Course",
     headline: course.title,
     intro:
-      course.description ||
+      (courseId === 11 && course.title === "From Distance to Reconnection" ? auditSEO.definitions["/courses/11"] : course.description) ||
       "Lesson videos and materials are available after you sign in to the member portal. This page is a preview of the curriculum.",
     sections: [{ heading: "Member access", body: "Sign in to the member portal to watch lesson videos and track progress." }],
     cta: { label: "Sign in to watch", href: "/member-login" },
@@ -2994,7 +3008,7 @@ function courseDetailServerPage(courseId: number): ServerRenderedPage {
     status: 200,
     title: page.title,
     description: page.description,
-    bodyHtml: serverPageShell(page, lessonHtml),
+    bodyHtml: serverPageShell(page, breadcrumbs + lessonHtml + relatedHtml),
     courseSchema: {
       name: course.title,
       description: course.description || `Preview the ${course.title} Papa Life course and its lesson plan for fathers of adult children.`,
@@ -3045,10 +3059,10 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
   if (pathname === "/digital-twin") {
     const page: StaticServerPage = {
       title: "Meet Brian’s Digital Twin | Papa Life",
-      description: "Speak with Brian Keith Hill’s Papa Life AI using your microphone.",
+      description: auditSEO.descriptions["/digital-twin"],
       eyebrow: "Papa Life",
       headline: "Talk with Brian’s Papa Life Digital Twin",
-      intro: "Start a voice conversation for practical Papa Life guidance grounded in Presence, Authority, Purpose, and Alignment.",
+      intro: auditSEO.definitions["/digital-twin"],
       sections: [],
       cta: { label: "Explore Papa Life Courses", href: "/courses" },
     };
@@ -3105,8 +3119,10 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
     const slug = pathname === "/house" ? "" : pathname.slice("/house/".length);
     const room = slug ? roomPages[slug] : null;
     if (slug && !room) return notFoundServerPage();
-    const title = room ? room.name + " | Papa Life House" : "Welcome Inside | Explore the Papa Life House";
-    const description = room?.description || "Step into Papa Life's welcoming home, with rooms for books, audio, video, fatherhood conversations, and resources.";
+    const title = (auditSEO.titles as Record<string, string>)[pathname]
+      ?? (room ? room.name + " | Papa Life House" : "Welcome Inside | Explore the Papa Life House");
+    const description = (auditSEO.descriptions as Record<string, string>)[pathname]
+      ?? "Step into Papa Life's welcoming home, with rooms for books, audio, video, fatherhood conversations, and resources.";
     const roomLinks = Object.entries(roomPages).map(([key, value]) =>
       '<a href="/house/' + key + '">' + escapeHtml(value.name) + "</a>"
     ).join(" · ");
@@ -3115,8 +3131,8 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       title,
       description,
       eyebrow: room ? "Papa Life · Make yourself at home" : "Papa Life · Come Inside",
-      headline: room ? room.name : "Make yourself at home.",
-      intro: description,
+      headline: (auditSEO.headlines as Record<string, string>)[pathname] ?? room?.name ?? "Explore the Papa Life House",
+      intro: (auditSEO.definitions as Record<string, string>)[pathname] ?? description,
       sections: [{ heading: "Wander at your own pace", body: "Read, listen, reflect, watch lessons and explore original Papa Life resources." }],
       cta: room ? { label: "Explore resources in this room", href: room.destination } : { label: "Browse Resources", href: "/shop" },
     };
@@ -7322,6 +7338,12 @@ async function startServer() {
     return res.redirect(301, "/relationship-assessment" + query);
   });
 
+  // Retire the old journey URL at the server as well as in the client router.
+  app.get(["/papa-journey", "/papa-journey/", "/papa-journey/index.html"], (req, res) => {
+    const queryAt = req.originalUrl.indexOf("?");
+    return res.redirect(301, "/" + (queryAt < 0 ? "" : req.originalUrl.slice(queryAt)));
+  });
+
   // Serve public documents at the URL used by the sitemap and canonical.
   // Private app/API routes are excluded from this normalization.
   const publicSeoPaths = new Set([
@@ -7330,7 +7352,7 @@ async function startServer() {
     "/parents-of-adult-children", "/adult-children",
     "/why-adult-children-pull-away", "/father-child-estrangement", "/about-brian-keith-hill", "/courses",
     "/start", "/changelog", "/papa-life-vs-therapy", "/papa-first-lesson", "/papa-intro", "/ai-coach", "/resources", "/books", "/podcast", "/tuesday",
-    "/tuesday-live", "/shop", "/papa-journey", "/contact",
+    "/tuesday-live", "/shop", "/contact",
     "/papa-life-master-knowledge-center", "/privacy-policy", "/terms-of-service", "/refund-policy",
   ]);
   app.use((req, res, next) => {

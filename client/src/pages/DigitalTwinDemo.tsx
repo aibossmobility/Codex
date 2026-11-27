@@ -65,7 +65,7 @@ export default function DigitalTwinDemo() {
                 Meet Brian Keith Hill
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 md:text-xl">
-                Choose a free starting point below. Live voice is optional and may use ElevenLabs credits; the recorded introduction does not start a voice session.
+                Brian's Digital AI is an optional automated guide to Papa Life resources and lessons. Choose a free starting point below. Live voice is optional and may use ElevenLabs credits; the recorded introduction does not start a voice session.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">

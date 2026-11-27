@@ -462,6 +462,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-5 text-sm font-semibold text-white/75">
+            <a href="/resources" className="hover:text-[#f2c230]">Fatherhood Resources</a>
             <a href="/site-directory" className="hover:text-[#f2c230]">Site Directory</a>
             <a href="/changelog" className="hover:text-[#f2c230]">Updates</a>
             <a href="/father-friendly-practice" className="hover:text-[#f2c230]">Father-Friendly Practice</a>

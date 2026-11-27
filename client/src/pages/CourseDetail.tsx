@@ -1,3 +1,5 @@
+import { PapaRelatedResources } from "@/components/PapaRelatedResources";
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import { HouseTrail } from "./PapaHouse";
 import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { useEffect, useState } from "react";
@@ -95,7 +97,9 @@ export default function CourseDetail() {
             <div className="mb-10">
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium border inline-block mb-4 ${colors.badge}`}>{course.pillar}</span>
               <h1 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-4">{course.title}</h1>
-              <p className="mb-4 text-gray-300">This Papa Life course is a self-paced resource for fathers of adult children.</p>
+              <p className="mb-4 text-gray-300">{course.id === 11 && course.title === "From Distance to Reconnection"
+                ? auditSEO.definitions["/courses/11"]
+                : "This Papa Life course is a self-paced resource for fathers of adult children."}</p>
               {course.description && <p className="text-gray-400 text-lg leading-relaxed">{course.description}</p>}
             </div>
 
@@ -147,6 +151,7 @@ export default function CourseDetail() {
             </div>
           </>
         )}
+        {course?.id === 11 && !loading && <PapaRelatedResources pathname="/courses/11" />}
       </main>
       <CurriculumUseNotice />
     </div>

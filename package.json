@@ -42,6 +42,7 @@
     "test:papa-conversations": "node --import tsx server/papa-conversations.test.ts",
     "test:papa-outreach": "node --import tsx server/papa-outreach-daily.test.ts",
     "test:seo": "node scripts/test-papa-structured-data.mjs",
+    "seo:indexnow": "node scripts/submit-papa-indexnow.mjs",
     "test:half-down-gate": "node --import tsx server/ai-boss-half-down-quality-gate.test.ts",
     "test:half-down-backup": "node --test scripts/verify-ai-boss-independent-backup.test.mjs",
     "test:ai-boss-independent-runner": "node --test scripts/ai-boss-independent-qa-runner.test.mjs",

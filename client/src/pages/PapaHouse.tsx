@@ -39,7 +39,7 @@ export const papaRooms: Room[] = [
     name: "The Reading Nook",
     eyebrow: "Books & written wisdom",
     title: "Take a seat. Find a new perspective.",
-    intro: "This is a quiet corner for thoughtful reading. Explore Papa Life's original writings, manuscripts, and learning resources. Run Your Own Race is part of this story; available items and prices are shown in the resource shop.",
+    intro: "This is a quiet corner for thoughtful reading. Explore Papa Life's original writings, manuscripts, and learning resources. Run Your Own Race is part of that work. The resource shop lists available items and prices.",
     image: "/images/papa-forest-book.webp",
     alt: "Brian Keith Hill's Run Your Own Race book cover with green forest and African-inspired motifs",
     action: "Browse written resources", href: "/shop",
@@ -63,7 +63,7 @@ export const papaRooms: Room[] = [
     name: "The Theater",
     eyebrow: "Watch & learn",
     title: "Pull up a chair. There's something worth learning.",
-    intro: "Explore self-guided videos and Papa Life lessons at your own pace. No meeting is required. Preview what is available and choose what interests you. Purchase only when you are ready.",
+    intro: "Explore self-guided videos and Papa Life lessons at your own pace. Preview the available material and choose a lesson you want to revisit.",
     image: "/images/papa-house-entry.webp",
     alt: "Fathers gathered in a warmly lit home with inviting rooms to learn and connect",
     action: "Explore video lessons", href: "/shop",
@@ -87,7 +87,7 @@ export const papaRooms: Room[] = [
     name: "The Resource Room",
     eyebrow: "Make your next step easier",
     title: "Take home something useful.",
-    intro: "Workbooks, original lessons, and tools can support your next step. Find the learning format that fits, with clear details before any purchase.",
+    intro: "Workbooks, original lessons, and tools can support your next step. Review each resource and choose a format that fits how you learn.",
     image: "/images/papa-life-father-adult-son-afternoon.png",
     alt: "A father and an adult son spending time together in a gentle afternoon setting",
     action: "Browse resources", href: "/shop",
@@ -99,7 +99,7 @@ export const papaRooms: Room[] = [
     name: "The Sky Room",
     eyebrow: "Room to see beyond today",
     title: "There is a path ahead that belongs to you.",
-    intro: "Take in the open sky and the wider horizon behind Run Your Own Race. This bright room is a reminder that your story, decisions, and purpose matter. Discover Brian Keith Hill's original work and choose your next step.",
+    intro: "Take in the open sky and the wider horizon behind Run Your Own Race. This bright room is a reminder that your story, decisions, and purpose matter. Explore Brian Keith Hill’s original work and take time to decide what comes next.",
     image: "/images/papa-sky-book.webp",
     alt: "Run Your Own Race book cover with Brian Keith Hill, a blue sky, mountains, and an African savanna landscape",
     action: "Explore original works", href: "/shop",
@@ -163,7 +163,7 @@ function HouseHall() {
           <div className="papa-house-hall-shade" aria-hidden="true"/>
           <div className="papa-house-hall-content">
             <span className="papa-house-kicker">Papa Life · Welcome inside</span>
-            <h1 id="papa-house-hall-title">Make yourself <em>at home.</em></h1>
+            <h1 id="papa-house-hall-title">{auditSEO.headlines["/house"]}</h1>
             <p>{auditSEO.definitions["/house"]} There is room here to read, listen, reflect, and find something that speaks to your next chapter. Wander at your own pace.</p>
             <a href="#choose-room" className="papa-house-button">Choose a room <ArrowRight size={20} aria-hidden="true"/></a>
           </div>
@@ -201,7 +201,7 @@ function RoomDetail({ room }: { room: Room }) {
           </div>
           <div className="papa-house-detail-content">
             <span className="papa-house-kicker">{room.eyebrow}</span>
-            <h1>{room.title}</h1>
+            <h1>{room.slug === "theater" ? auditSEO.headlines["/house/theater"] : room.title}</h1>
             {Object.prototype.hasOwnProperty.call(auditSEO.definitions, "/house/" + room.slug) && (
               <p className="mb-3 font-medium">{(auditSEO.definitions as Record<string, string>)["/house/" + room.slug]}</p>
             )}

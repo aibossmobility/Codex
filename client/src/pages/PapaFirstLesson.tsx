@@ -1,3 +1,5 @@
+import { PageMeta } from "@/components/PageMeta";
+import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import { useEffect, useState } from "react";
 import { CurriculumUseNotice } from "@/components/CopyrightNotices";
 import { Link } from "wouter";
@@ -63,6 +65,7 @@ export default function PapaFirstLesson() {
       <main className="flex-1 container max-w-3xl mx-auto px-4 py-10 md:py-14 space-y-10">
         <div className="space-y-4 text-gray-200 leading-relaxed border border-primary/25 bg-primary/5 rounded-2xl p-6 md:p-8">
           <p className="text-brand-yellow text-xs uppercase tracking-widest font-bold">For Fathers of Adult Children · Start Here</p>
+          <PageMeta title={auditSEO.titles["/papa-first-lesson"]} description={auditSEO.descriptions["/papa-first-lesson"]} canonicalPath="/papa-first-lesson" />
           <h1 className="text-white font-heading font-bold text-3xl md:text-4xl leading-tight">
             From Distance to Reconnection
           </h1>

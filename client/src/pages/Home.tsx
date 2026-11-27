@@ -1,3 +1,5 @@
+import { tracksByTitle } from "@/content/music-room-tracks";
+import { supportGuides } from "@/content/papa-support-guides.json";
 import { PageMeta } from "@/components/PageMeta";
 import { SiteLogo } from "@/components/SiteLogo";
 import { HouseTrail } from "./PapaHouse";
@@ -63,8 +65,11 @@ const wheelSteps = [
 ] as const;
 
 export default function Home() {
+  const [trackIndex, setTrackIndex] = useState(0);
+  const [trackTitle, trackFile, trackCredit] = tracksByTitle[trackIndex];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [relationshipSignal, setRelationshipSignal] = useState<"red" | "yellow" | "green">("yellow");
+  const proofCount = approvedProofCount();
   const shopHref = "/shop";
   const wheelHref = "/#fatherhood-wheel";
 
@@ -174,7 +179,20 @@ export default function Home() {
             <a href="/shop" className="papa-house-button">Explore the Lessons <ArrowRight size={20} aria-hidden="true"/></a>
             <a href="/relationship-assessment" className="papa-house-button-outline">2-Minute Fatherhood Check-In <ArrowRight size={18} aria-hidden="true"/></a>
           </div>
+          <p className="mt-3 text-sm"><a className="font-bold underline" href="#listen-free">Come for the music. Stay for the encouragement. Choose a song. All {tracksByTitle.length} are free.</a></p>
+          <div id="listen-free" className="mt-3 scroll-mt-4 rounded-xl bg-[#fffaf0] p-4 text-[#17231c]">
+            <label htmlFor="home-song" className="block text-sm font-bold">Choose a song</label>
+            <select id="home-song" className="mt-1 min-h-11 w-full rounded border border-[#145b35] px-2" value={trackIndex} onChange={(event) => setTrackIndex(Number(event.target.value))}>
+              {tracksByTitle.map(([title, file], index) => <option key={file} value={index}>{title}</option>)}
+            </select>
+            <audio key={trackFile} controls preload="none" aria-label={trackTitle} className="mt-2 w-full" src={"/music-room/album-2026/" + trackFile} />
+            <p className="mt-2 text-sm">{trackCredit}</p>
+            <p className="text-sm">Music and arrangements include work by William (Bill) Whitley, as credited by track.</p>
+            <a className="text-sm font-bold underline" href="/house/listening-room">Explore the Listening Room</a>
+          </div>
           <p className="mt-3 text-sm">Lessons begin at $14.99 one-time. No membership or appointment. Reconciliation is never guaranteed.</p>
+          {proofCount && <p className="mt-2 text-sm font-bold">{proofCount.count} {proofCount.label} as of {proofCount.updatedOn}.</p>}
+          <p className="mt-2 text-sm">These lessons focus on relationships with sons and daughters who are already adults.</p>
           <p className="mt-2 text-sm">A small step can be listening without defending, apologizing without pressure, or respecting your adult child's need for space.</p>
         </div>
       </section>
@@ -246,7 +264,7 @@ export default function Home() {
                     onClick={() => showRecommendations(step.signal)}
                     aria-controls="fatherhood-recommendations"
                     style={{top: step.top, left: step.left}}
-                    className="absolute z-10 flex min-h-10 w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg border-2 border-[#f2c230] bg-[#17231c] px-1 py-2 text-center text-white shadow-lg hover:bg-[#145b35] focus:outline-none focus:ring-4 focus:ring-[#f2c230]"
+                    className="absolute z-10 flex min-h-11 w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-lg border-2 border-[#f2c230] bg-[#17231c] px-1 py-2 text-center text-white shadow-lg hover:bg-[#145b35] focus:outline-none focus:ring-4 focus:ring-[#f2c230]"
                     aria-label={"Step " + (index + 1) + ": " + step.label + ". View suggested products"}
                   >
                     <span className="text-[10px] font-black text-[#f2c230] sm:text-xs">{"STEP " + (index + 1)}</span>
@@ -355,7 +373,16 @@ export default function Home() {
                 </article>
               ))}
             </div>
+            <figure className="mt-6 rounded-xl border border-[#145b35]/25 bg-white p-5 text-[#17231c]">
+              <figcaption className="font-bold">Listening Without Defending · Example reflection</figcaption>
+              <p className="mt-2">“When my adult child tells me how something felt, I can listen before I explain. I can say, ‘I want to understand what that was like for you.’”</p>
+              <p className="mt-2">You may feel guilt or shame about what happened. Listening first is one way to become safer to talk to.</p>
+              <a className="mt-2 inline-block font-bold underline" href="/papa-first-lesson">Explore the first lesson</a>
+            </figure>
             <p className="mt-4 text-sm text-[#314239]">Not sure which option fits? <a className="font-bold text-[#145b35] underline" href="/papa-life-vs-therapy">Compare self-paced lessons, a book, and professional counseling</a> without pressure to purchase.</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {supportGuides.map((guide) => <li key={guide.path}><a className="font-bold text-[#145b35] underline" href={guide.path}>{guide.headline}</a></li>)}
+            </ul>
             <p className="mt-5 text-sm text-[#314239]">For digital purchases, request a full refund within seven calendar days. <a href="/refund-policy" className="font-bold text-[#145b35] underline">Read the refund policy.</a></p>
             <div className="mt-9 rounded-xl border border-[#e4c669] bg-[#fff8e0] p-6">
               <h3 className="text-xl font-extrabold">More Original Intellectual Property</h3>
@@ -376,15 +403,18 @@ export default function Home() {
           </div>
         </section>
 
-        {(approvedStories.length > 0 || approvedProofCount !== null || approvedExternalMentions.length > 0) && (
+        {(approvedStories.length > 0 || approvedExternalMentions.length > 0) && (
           <section aria-label="Verified Papa Life experiences and recognition" className="bg-[#fffaf0] py-10">
             <div className="container">
-              <h2 className="text-2xl font-extrabold">Verified experiences</h2>
-              {approvedProofCount !== null && <p className="mt-3 font-bold">{approvedProofCount} fathers have completed the Check-In.</p>}
+              <h2 className="text-2xl font-extrabold">{approvedStories.length ? "Verified experiences" : "Interviews and coverage"}</h2>
+              {approvedStories.length > 0 && <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {approvedStories.map((story) => <figure key={story.sourceId} className="rounded-xl border border-[#145b35]/25 p-5">
+                  <img src={story.photo} alt={story.firstName} width={56} height={56} loading="lazy" className="rounded-full object-cover" />
+                  <blockquote className="mt-3">“{story.quote}”</blockquote>
+                  <figcaption className="mt-3 text-sm"><strong>{story.firstName}</strong> · {story.context}</figcaption>
+                </figure>)}
+              </div>}
               <p className="mt-2 text-sm">Published coverage is not a review of these lessons or a promise of results.</p>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                {approvedStories.map((story) => <blockquote key={story.sourceId} className="rounded-xl border border-[#145b35]/25 p-5"><p>“{story.quote}”</p><cite className="mt-3 block text-sm font-bold">{story.firstName}</cite></blockquote>)}
-              </div>
               <div className="mt-3 flex flex-wrap gap-4">
                 {approvedExternalMentions.map((mention) => <a key={mention.url} href={mention.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[#145b35] underline">{mention.label} · {mention.date}</a>)}
               </div>
@@ -424,6 +454,7 @@ export default function Home() {
         <section id="brian-story" aria-labelledby="creator-heading" className="bg-[#17231c] py-14 text-white md:py-18">
           <div className="container grid items-center gap-7 md:grid-cols-[1.5fr_1fr]">
             <div>
+              <img src="/images/brian-keith-hill.png" alt="Brian Keith Hill, founder of Papa Life" width={112} height={112} loading="lazy" className="mb-4 aspect-square rounded-xl object-cover" />
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f2c230]">Meet the Creator</p>
               <h2 id="creator-heading" className="mt-3 text-3xl font-extrabold md:text-4xl">Original Works by Brian Keith Hill</h2>
               <p className="mt-4 max-w-3xl text-lg leading-relaxed text-white/80">Papa Life is a fatherhood resource center sharing Brian's original ideas, teaching, audio lessons, and written works for fathers of adult children. The goal is to make his knowledge accessible without requiring an appointment or personal meeting.</p>
@@ -471,6 +502,7 @@ export default function Home() {
             <a href="/terms-of-service" className="hover:text-[#f2c230]">Terms</a>
             <a href="/refund-policy" className="font-bold text-[#f2c230] hover:underline">Refunds &amp; Cancellations</a>
             <a href="/papa-life-vs-therapy" className="font-bold text-[#f2c230] hover:underline">Compare support options</a>
+            {supportGuides.map((guide) => <a key={guide.path} href={guide.path} className="font-bold text-[#f2c230] hover:underline">{guide.shortTitle}</a>)}
             <a href="tel:+15104152098" className="hover:text-[#f2c230]">510.415.2098</a>
           </div>
         </div>

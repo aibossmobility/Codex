@@ -485,11 +485,24 @@ for (const [audience, publicPath] of [
       ["Return to Papa Life home", "/"]],
   });
 }
+const { supportGuides } = JSON.parse(fs.readFileSync("client/src/content/papa-support-guides.json", "utf8"));
+pages.push(...supportGuides.map((guide) => ({
+  ...guide,
+  eyebrow: "Papa Life",
+  relatedLinks: [
+    ["Try the 2-Minute Fatherhood Check-In", "/relationship-assessment"],
+    ["Explore lessons and prices", "/shop"],
+    ["Read the 7-day refund policy", "/refund-policy"],
+  ],
+})));
 const homepage = pages.find((page) => page.path === "/");
 homepage.relatedLinks = [
   ["Guidance for Parents of Adult Children", "/parents-of-adult-children"],
   ["Guidance for Adult Children", "/adult-children"],
   ["Fatherhood Resources", "/resources"],
+  ["Listen to all 16 songs free", "/#listen-free"],
+  ["Explore the Listening Room", "/house/listening-room"],
+  ...supportGuides.map((guide) => [guide.shortTitle, guide.path]),
   ...(homepage.relatedLinks || []),
 ];
 
@@ -535,6 +548,7 @@ function escapeHtml(value) {
 }
 
 function bodyHtml(page) {
+  const music = page.path === "/" ? '<section id="listen-free"><h2>Choose a song. All 16 are free.</h2><p>Come for the music. Stay for the encouragement. Lyrics by Brian Hill. Music and arrangements are credited by track, including William (Bill) Whitley.</p><a href="/house/listening-room">Explore the Listening Room</a></section>' : "";
   const breadcrumb = auditSEO.relatedLinks[page.path] && page.path !== "/resources"
     ? '<nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/resources">Papa Life resources</a> / ' + escapeHtml(page.headline) + '</nav>'
     : "";
@@ -553,6 +567,7 @@ function bodyHtml(page) {
         <p style="color: #f6c74a; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">${escapeHtml(page.eyebrow)}</p>
         <h1 style="font-size: clamp(2.25rem, 6vw, 4.75rem); line-height: 1.02; margin: 18px 0;">${escapeHtml(page.headline)}</h1>
         <p style="font-size: 1.2rem; line-height: 1.7; color: #d4d4d8; max-width: 800px;">${escapeHtml(page.intro)}</p>
+        ${music}
         <div style="display: grid; gap: 28px; margin-top: 42px;">
           ${page.sections
             .map(([heading, body]) => `<section><h2>${escapeHtml(heading)}</h2><p style="line-height:1.8;color:#d4d4d8;">${escapeHtml(body)}</p></section>`)

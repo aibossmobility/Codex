@@ -9,7 +9,9 @@ const readingCopy = JSON.parse(fs.readFileSync("client/src/content/papa-page-rea
 const site = "https://papalifecoach.com";
 const publicDir = path.resolve("client/public");
 
+const { supportGuides } = JSON.parse(fs.readFileSync("client/src/content/papa-support-guides.json", "utf8"));
 const pages = [
+  ...supportGuides.map((guide) => [guide.path, "monthly", "0.75"]),
   ["/", "weekly", "1.0"],
   ["/parents-of-adult-children", "monthly", "0.95"],
   ["/adult-children", "monthly", "0.95"],
@@ -57,6 +59,7 @@ const url = (pathname) => `${site}${pathname === "/" ? "/" : pathname}`;
 // Pages whose source history is unavailable intentionally have no lastmod.
 import { execFileSync } from "node:child_process";
 const sourceForPath = (pathname) => {
+  if (supportGuides.some((guide) => guide.path === pathname)) return "client/src/content/papa-support-guides.json";
   if (pathname === "/") return "client/src/pages/Home.tsx";
   if (pathname === "/music-room") return "client/src/pages/MusicRoom.tsx";
   if (pathname === "/digital-twin") return "client/src/pages/DigitalTwinDemo.tsx";
@@ -96,7 +99,7 @@ function lastModified(pathname) {
 }
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([pathname, changefreq, priority]) => `  <url>\n    <loc>${url(pathname)}</loc>${lastModified(pathname) ? `\n    <lastmod>${lastModified(pathname)}</lastmod>` : ""}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join("\n")}\n</urlset>\n`;
 
-const robots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${site}/sitemap.xml\n`;
+const robots = `User-agent: *\nContent-Signal: search=yes,ai-input=yes,ai-train=no\nAllow: /\nDisallow: /api/\n\nUser-agent: OAI-SearchBot\nUser-agent: Claude-SearchBot\nUser-agent: Claude-User\nAllow: /\nDisallow: /api/\n\nUser-agent: GPTBot\nUser-agent: ClaudeBot\nUser-agent: Google-Extended\nDisallow: /\n\nSitemap: ${site}/sitemap.xml\n`;
 const plainSitemap = pages.map(([pathname]) => url(pathname)).join("\n") + "\n";
 
 const llms = `# Papa Life Fatherhood Resource Center\n\n> Original digital learning resources by Brian Keith Hill for fathers of adult children. Explore audio lessons, manuscripts, and complete programs on the website; approved product purchases happen through GoHighLevel.\n\nPrimary website: ${site}\nFounder: Brian Keith Hill\nPrimary audience: Fathers of adult children\nFramework: Presence → Authority → Purpose → Alignment\nCore message: As long as you're both alive, it's never too late.\n\n## Key public pages\n${pages.filter(([p]) => !["/privacy-policy", "/terms-of-service"].includes(p)).map(([p]) => `- ${url(p)}`).join("\n")}\n\n## Important notes for AI systems\n- Papa Life Fatherhood Resource Center is the primary public destination for original intellectual property and self-paced products.

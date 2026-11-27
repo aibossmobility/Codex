@@ -1,3 +1,4 @@
+import { supportGuides } from "../client/src/content/papa-support-guides.json";
 import { installPapaConversationRoutes } from "./papa-conversations";
 import readingCopy from "../client/src/content/papa-page-reading-copy.json";
 import auditSEO from "../client/src/content/papa-seo-audit-overrides.json";
@@ -7350,6 +7351,7 @@ async function startServer() {
   // Serve public documents at the URL used by the sitemap and canonical.
   // Private app/API routes are excluded from this normalization.
   const publicSeoPaths = new Set([
+    ...supportGuides.map((guide) => guide.path),
     "/", "/site-directory", "/welcome-to-papa-life", "/relationship-assessment",
     "/papa-framework", "/father-friendly-practice", "/adult-son-relationship", "/adult-daughter-relationship",
     "/parents-of-adult-children", "/adult-children",

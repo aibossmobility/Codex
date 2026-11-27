@@ -4,6 +4,8 @@ import { indexNowKey } from "./papa-indexnow-key.mjs";
 
 const auditSEO = JSON.parse(fs.readFileSync("client/src/content/papa-seo-audit-overrides.json", "utf8"));
 
+const readingCopy = JSON.parse(fs.readFileSync("client/src/content/papa-page-reading-copy.json", "utf8"));
+
 const site = "https://papalifecoach.com";
 const publicDir = path.resolve("client/public");
 
@@ -125,7 +127,8 @@ const siteDirectory = `<!doctype html>
 </head><body><main>
 <h1>Papa Life Site Directory</h1>
 <p>${auditSEO.definitions["/site-directory"]}</p>
-<ul>${directoryLinks}</ul>
+${readingCopy.directory.map((sentence) => "<p>" + sentence + "</p>").join("\n")}
+<nav aria-label="Public Papa Life pages"><ul>${directoryLinks}</ul></nav>
 </main></body></html>`;
 
 const llmsFull = `${llms}\n## What Papa Life offers\n- Interactive Awareness Wheel and product recommendations\n- PAPA Framework: Presence, Authority, Purpose, Alignment\n- 12 original audio lessons, written manuscripts, and complete programs\n- Brian’s Digital AI for product discovery and explanation\n- Original books, music and spoken word as cleared and released\n- Approved purchases, payment, and product access through GoHighLevel only\n\n## Entity identity\nPapa Life is a fatherhood resource center for original learning materials and intellectual property created by Brian Keith Hill in San Leandro, California. It serves fathers of adult sons and daughters through self-paced digital products rather than subscriptions, appointments, or founder-dependent coaching.\n`;

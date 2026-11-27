@@ -2,6 +2,7 @@ import { Link, useRoute } from "wouter";
 import { ArrowLeft, ArrowRight, BookOpen, Headphones, Home, MessageCircleHeart, Play, Sun, Compass, ShoppingBag } from "lucide-react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { PageMeta } from "@/components/PageMeta";
+import readingCopy from "@/content/papa-page-reading-copy.json";
 import auditSEO from "@/content/papa-seo-audit-overrides.json";
 import "./PapaHouse.css";
 
@@ -27,7 +28,7 @@ export const papaRooms: Room[] = [
     name: "The Living Room",
     eyebrow: "A place to feel welcome",
     title: "You belong here, just as you are.",
-    intro: "Find a comfortable place to begin. Papa Life is for fathers of adult children who want to listen better, take responsibility, and grow toward reconnection. There is no pressure to have every answer today.",
+    intro: readingCopy.rooms["living-room"],
     image: "/images/papa-house-entry.webp",
     alt: "A welcoming home with men speaking together in a comfortably furnished living room",
     action: "Begin with the Awareness Wheel", href: "/#fatherhood-wheel",
@@ -39,7 +40,7 @@ export const papaRooms: Room[] = [
     name: "The Reading Nook",
     eyebrow: "Books & written wisdom",
     title: "Take a seat. Find a new perspective.",
-    intro: "This is a quiet corner for thoughtful reading. Explore Papa Life's original writings, manuscripts, and learning resources. Run Your Own Race is part of that work. The resource shop lists available items and prices.",
+    intro: readingCopy.rooms["library"],
     image: "/images/papa-forest-book.webp",
     alt: "Brian Keith Hill's Run Your Own Race book cover with green forest and African-inspired motifs",
     action: "Browse written resources", href: "/shop",
@@ -51,7 +52,7 @@ export const papaRooms: Room[] = [
     name: "The Listening Room",
     eyebrow: "Slow down & listen",
     title: "Sometimes hearing is the beginning of healing.",
-    intro: "Settle into a comfortable chair and explore audio lessons and reflections. These resources encourage wiser conversations and steady presence. You can explore available recordings at your own pace.",
+    intro: readingCopy.rooms["listening-room"],
     image: "/images/papa-life-music-room-approved.png?v=20261022-hq",
     alt: "The approved Papa Life Music Room with the tree logo, smiling visitor and warm doorway",
     action: "Enter the Music Room", href: "/music-room",
@@ -63,7 +64,7 @@ export const papaRooms: Room[] = [
     name: "The Theater",
     eyebrow: "Watch & learn",
     title: "Pull up a chair. There's something worth learning.",
-    intro: "Explore self-guided videos and Papa Life lessons at your own pace. Preview the available material and choose a lesson you want to revisit.",
+    intro: readingCopy.rooms["theater"],
     image: "/images/papa-house-entry.webp",
     alt: "Fathers gathered in a warmly lit home with inviting rooms to learn and connect",
     action: "Explore video lessons", href: "/shop",
@@ -75,7 +76,7 @@ export const papaRooms: Room[] = [
     name: "The Dad Cave",
     eyebrow: "Real questions. Honest reflection.",
     title: "A place where fathers can be real.",
-    intro: "Fatherhood can involve silence, setbacks, and hard conversations. Reflect on Presence, Authority, Purpose, and Alignment. Explore your next step or ask the clearly identified Papa Life AI guide for help.",
+    intro: readingCopy.rooms["dad-cave"],
     image: "/images/papa-house-entry.webp",
     alt: "Two men enjoying an honest conversation in an inviting African-inspired home",
     action: "Explore your fatherhood journey", href: "/my-journey",
@@ -87,7 +88,7 @@ export const papaRooms: Room[] = [
     name: "The Resource Room",
     eyebrow: "Make your next step easier",
     title: "Take home something useful.",
-    intro: "Workbooks, original lessons, and tools can support your next step. Review each resource and choose a format that fits how you learn.",
+    intro: readingCopy.rooms["resources"],
     image: "/images/papa-life-father-adult-son-afternoon.png",
     alt: "A father and an adult son spending time together in a gentle afternoon setting",
     action: "Browse resources", href: "/shop",
@@ -99,7 +100,7 @@ export const papaRooms: Room[] = [
     name: "The Sky Room",
     eyebrow: "Room to see beyond today",
     title: "There is a path ahead that belongs to you.",
-    intro: "Take in the open sky and the wider horizon behind Run Your Own Race. This bright room is a reminder that your story, decisions, and purpose matter. Explore Brian Keith Hill’s original work and take time to decide what comes next.",
+    intro: readingCopy.rooms["sky-room"],
     image: "/images/papa-sky-book.webp",
     alt: "Run Your Own Race book cover with Brian Keith Hill, a blue sky, mountains, and an African savanna landscape",
     action: "Explore original works", href: "/shop",
@@ -164,7 +165,7 @@ function HouseHall() {
           <div className="papa-house-hall-content">
             <span className="papa-house-kicker">Papa Life · Welcome inside</span>
             <h1 id="papa-house-hall-title">{auditSEO.headlines["/house"]}</h1>
-            <p>{auditSEO.definitions["/house"]} There is room here to read, listen, reflect, and find something that speaks to your next chapter. Wander at your own pace.</p>
+            <p>{auditSEO.definitions["/house"]} {readingCopy.rooms.house}</p>
             <a href="#choose-room" className="papa-house-button">Choose a room <ArrowRight size={20} aria-hidden="true"/></a>
           </div>
         </section>

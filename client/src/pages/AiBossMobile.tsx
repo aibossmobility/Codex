@@ -492,7 +492,7 @@ export default function AiBossMobile() {
           <QuickLink icon={Brain} label="Digital Brian" onClick={() => navigate("/papa-life-os/digital-twin")} />
           <QuickLink icon={ShieldCheck} label="Approvals & Queue" onClick={() => navigate("/papa-life-os/approvals")} />
           <QuickLink icon={Mail} label="Relationship notes" onClick={() => document.getElementById("papa-capture")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
-          <QuickLink icon={CalendarDays} label="Daily Work Reports" onClick={() => navigate("/papa-daily-work-report")} />
+          <QuickLink icon={CalendarDays} label="Work Reports · Day, Week, Month" onClick={() => navigate("/papa-daily-work-report")} />
         </section>
 
         <p className="text-center text-xs text-gray-600">Cloud/direct work can continue while the Mac is off. Local work waits safely for the Mac node to return.</p>

@@ -1,0 +1,449 @@
+{
+  "/house/living-room": {
+    "title": "Living Room",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/theater",
+        "Theater"
+      ],
+      [
+        "/house/dad-cave",
+        "Dad Cave"
+      ],
+      [
+        "/house/listening-room",
+        "Listening Room"
+      ]
+    ]
+  },
+  "/house/theater": {
+    "title": "Theater",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/dad-cave",
+        "Dad Cave"
+      ],
+      [
+        "/house/resources",
+        "Resource Room"
+      ],
+      [
+        "/house/living-room",
+        "Living Room"
+      ]
+    ]
+  },
+  "/house/dad-cave": {
+    "title": "Dad Cave",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/resources",
+        "Resource Room"
+      ],
+      [
+        "/house/sky-room",
+        "Sky Room"
+      ],
+      [
+        "/house/theater",
+        "Theater"
+      ]
+    ]
+  },
+  "/house/resources": {
+    "title": "Resource Room",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/sky-room",
+        "Sky Room"
+      ],
+      [
+        "/house/library",
+        "Reading Nook"
+      ],
+      [
+        "/house/dad-cave",
+        "Dad Cave"
+      ]
+    ]
+  },
+  "/house/sky-room": {
+    "title": "Sky Room",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/library",
+        "Reading Nook"
+      ],
+      [
+        "/house/listening-room",
+        "Listening Room"
+      ],
+      [
+        "/house/resources",
+        "Resource Room"
+      ]
+    ]
+  },
+  "/house/library": {
+    "title": "Reading Nook",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/listening-room",
+        "Listening Room"
+      ],
+      [
+        "/house/living-room",
+        "Living Room"
+      ],
+      [
+        "/house/sky-room",
+        "Sky Room"
+      ]
+    ]
+  },
+  "/house/listening-room": {
+    "title": "Listening Room",
+    "hub": [
+      "/house",
+      "Papa Life House"
+    ],
+    "links": [
+      [
+        "/house/living-room",
+        "Living Room"
+      ],
+      [
+        "/house/theater",
+        "Theater"
+      ],
+      [
+        "/house/library",
+        "Reading Nook"
+      ]
+    ]
+  },
+  "/house": {
+    "title": "Papa Life House",
+    "hub": null,
+    "links": [
+      [
+        "/house/living-room",
+        "Living Room"
+      ],
+      [
+        "/house/theater",
+        "Theater"
+      ],
+      [
+        "/house/dad-cave",
+        "Dad Cave"
+      ],
+      [
+        "/house/resources",
+        "Resource Room"
+      ],
+      [
+        "/house/sky-room",
+        "Sky Room"
+      ],
+      [
+        "/house/library",
+        "Reading Nook"
+      ],
+      [
+        "/house/listening-room",
+        "Listening Room"
+      ]
+    ]
+  },
+  "/welcome-to-papa-life": {
+    "title": "Welcome to Papa Life",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/start",
+        "Start your fatherhood journey"
+      ],
+      [
+        "/papa-intro",
+        "Introduction to Papa Life"
+      ],
+      [
+        "/papa-first-lesson",
+        "Try the first lesson"
+      ],
+      [
+        "/house",
+        "Explore the Papa Life House"
+      ]
+    ]
+  },
+  "/start": {
+    "title": "Start your fatherhood journey",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/papa-intro",
+        "Introduction to Papa Life"
+      ],
+      [
+        "/ai-coach",
+        "Papa Life AI guide"
+      ],
+      [
+        "/welcome-to-papa-life",
+        "Welcome to Papa Life"
+      ]
+    ]
+  },
+  "/papa-intro": {
+    "title": "Introduction to Papa Life",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/ai-coach",
+        "Papa Life AI guide"
+      ],
+      [
+        "/papa-life-vs-therapy",
+        "Compare support options"
+      ],
+      [
+        "/start",
+        "Start your fatherhood journey"
+      ]
+    ]
+  },
+  "/ai-coach": {
+    "title": "Papa Life AI guide",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/papa-life-vs-therapy",
+        "Compare support options"
+      ],
+      [
+        "/papa-first-lesson",
+        "Try the first lesson"
+      ],
+      [
+        "/papa-intro",
+        "Introduction to Papa Life"
+      ]
+    ]
+  },
+  "/papa-life-vs-therapy": {
+    "title": "Compare support options",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/papa-first-lesson",
+        "Try the first lesson"
+      ],
+      [
+        "/welcome-to-papa-life",
+        "Welcome to Papa Life"
+      ],
+      [
+        "/ai-coach",
+        "Papa Life AI guide"
+      ]
+    ]
+  },
+  "/papa-first-lesson": {
+    "title": "Try the first lesson",
+    "hub": [
+      "/resources",
+      "Fatherhood resources"
+    ],
+    "links": [
+      [
+        "/welcome-to-papa-life",
+        "Welcome to Papa Life"
+      ],
+      [
+        "/start",
+        "Start your fatherhood journey"
+      ],
+      [
+        "/papa-life-vs-therapy",
+        "Compare support options"
+      ]
+    ]
+  },
+  "/resources": {
+    "title": "Fatherhood resources",
+    "hub": null,
+    "links": [
+      [
+        "/welcome-to-papa-life",
+        "Welcome to Papa Life"
+      ],
+      [
+        "/start",
+        "Start your fatherhood journey"
+      ],
+      [
+        "/papa-intro",
+        "Introduction to Papa Life"
+      ],
+      [
+        "/ai-coach",
+        "Papa Life AI guide"
+      ],
+      [
+        "/papa-life-vs-therapy",
+        "Compare support options"
+      ],
+      [
+        "/papa-first-lesson",
+        "Try the first lesson"
+      ]
+    ]
+  },
+  "/father-friendly-practice": {
+    "title": "Father-Friendly Practice",
+    "hub": [
+      "/about-brian-keith-hill",
+      "About Brian Keith Hill"
+    ],
+    "links": [
+      [
+        "/changelog",
+        "Papa Life updates"
+      ],
+      [
+        "/privacy-policy",
+        "Privacy policy"
+      ],
+      [
+        "/contact",
+        "Contact Papa Life"
+      ]
+    ]
+  },
+  "/changelog": {
+    "title": "Papa Life updates",
+    "hub": [
+      "/about-brian-keith-hill",
+      "About Brian Keith Hill"
+    ],
+    "links": [
+      [
+        "/privacy-policy",
+        "Privacy policy"
+      ],
+      [
+        "/contact",
+        "Contact Papa Life"
+      ],
+      [
+        "/father-friendly-practice",
+        "Father-Friendly Practice"
+      ]
+    ]
+  },
+  "/privacy-policy": {
+    "title": "Privacy policy",
+    "hub": [
+      "/about-brian-keith-hill",
+      "About Brian Keith Hill"
+    ],
+    "links": [
+      [
+        "/contact",
+        "Contact Papa Life"
+      ],
+      [
+        "/father-friendly-practice",
+        "Father-Friendly Practice"
+      ],
+      [
+        "/changelog",
+        "Papa Life updates"
+      ]
+    ]
+  },
+  "/contact": {
+    "title": "Contact Papa Life",
+    "hub": [
+      "/about-brian-keith-hill",
+      "About Brian Keith Hill"
+    ],
+    "links": [
+      [
+        "/father-friendly-practice",
+        "Father-Friendly Practice"
+      ],
+      [
+        "/changelog",
+        "Papa Life updates"
+      ],
+      [
+        "/privacy-policy",
+        "Privacy policy"
+      ]
+    ]
+  },
+  "/about-brian-keith-hill": {
+    "title": "About Brian Keith Hill",
+    "hub": null,
+    "links": [
+      [
+        "/father-friendly-practice",
+        "Father-Friendly Practice"
+      ],
+      [
+        "/changelog",
+        "Papa Life updates"
+      ],
+      [
+        "/privacy-policy",
+        "Privacy policy"
+      ],
+      [
+        "/contact",
+        "Contact Papa Life"
+      ]
+    ]
+  }
+}

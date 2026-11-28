@@ -44,25 +44,21 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/house</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/living-room</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/library</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/listening-room</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
@@ -74,25 +70,21 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/house/theater</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/dad-cave</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/resources</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/house/sky-room</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
@@ -170,13 +162,11 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/books</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/podcast</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -188,13 +178,11 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/resources</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://papalifecoach.com/contact</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.60</priority>
   </url>
@@ -218,7 +206,6 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/ai-coach</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -236,7 +223,6 @@
   </url>
   <url>
     <loc>https://papalifecoach.com/relationship-assessment</loc>
-    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>

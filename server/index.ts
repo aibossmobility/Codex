@@ -1,3 +1,4 @@
+import { renderPapaTopicLinks } from "../shared/papa-topic-links.mjs";
 import { supportGuides } from "../client/src/content/papa-support-guides.json";
 import { installPapaConversationRoutes } from "./papa-conversations";
 import readingCopy from "../client/src/content/papa-page-reading-copy.json";
@@ -2909,7 +2910,7 @@ function staticServerPage(pathname: string): ServerRenderedPage | null {
     title: page.title,
     description: page.description,
     keywords: page.keywords,
-    bodyHtml: serverPageShell(page),
+    bodyHtml: serverPageShell(page, renderPapaTopicLinks(pathname, escapeHtml)),
     noindex: page.noindex,
   };
 }
@@ -3141,7 +3142,7 @@ function renderServerPage(rawUrl: string): ServerRenderedPage {
       cta: room ? { label: "Explore resources in this room", href: room.destination } : { label: "Browse Resources", href: "/shop" },
     };
     const libraryResearch = slug === "library" ? '<section aria-label="Papa Life Research Foundation"><h2>Research Foundation & Statement of Need</h2><p>Read independent scholarship on fathers of adult children, human connection and estrangement and reflect on the need for Papa Life education.</p><p><a href="/research-foundation">Read Papa Life Research Foundation</a></p></section>' : "";
-    return {status: 200, title, description, bodyHtml: serverPageShell(page, navigation + libraryResearch)};
+    return {status: 200, title, description, bodyHtml: serverPageShell(page, navigation + libraryResearch + renderPapaTopicLinks(pathname, escapeHtml))};
   }
   if (pathname === "/404") return notFoundServerPage();
   if (pathname === "/courses" || pathname === "/media-library") return coursesServerPage();

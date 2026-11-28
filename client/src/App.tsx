@@ -1,3 +1,4 @@
+import { PapaTopicLinks } from "@/components/PapaTopicLinks";
 import PapaAuditSupportGuide from "./pages/PapaAuditSupportGuide";
 import { supportGuides } from "./content/papa-support-guides.json";
 import PapaSupportComparison from "./pages/PapaSupportComparison";
@@ -232,6 +233,7 @@ function App() {
           <Toaster />
           <PapaWelcomeBanner />
           <Router />
+          <PapaTopicLinks />
           <PublicCopyrightStrip />
           <PrivateCopyrightStrip />
           <GlobalBookingButton />

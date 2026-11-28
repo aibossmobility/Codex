@@ -358,99 +358,23 @@ export default function PapaDailyWorkReport() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] px-4 py-8 text-[#0a0a0a]">
       <div className="mx-auto max-w-5xl">
-        <header className="border-l-[6px] border-[#e53935] bg-[#0a0a0a] px-5 py-6 sm:px-7">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-[#e53935] font-sans text-xl font-black tracking-wide text-white">
-              PL
-            </div>
-            <div>
-              <h1 className="font-sans text-2xl font-black uppercase tracking-wide text-white sm:text-3xl">
-                Papa Life Daily Work Report
-              </h1>
-              <p className="mt-1 text-sm font-semibold tracking-wide text-[#f9a825]">
-                Brian Keith Hill - Papa Life Coach
-              </p>
-            </div>
+        <header className="mb-5 overflow-hidden rounded-2xl border border-brand-yellow/40 bg-[#111]">
+          <div className="bg-white p-3 sm:p-5">
+            <img src="/images/papa-life-approved-20261016.webp"
+              alt="Papa Life — fathers, family and relationship restoration"
+              className="mx-auto max-h-64 w-full object-contain" />
           </div>
-          <p className="mt-4 border-t border-white/15 pt-4 text-sm italic text-white/70">
-            "As long as you're both alive, it's never too late."
-          </p>
+          <div className="p-5 sm:p-7">
+            <a href="/papa-life-os" className="text-xs font-bold text-brand-yellow underline">Papa Life OS</a>
+            <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Papa Life Daily Work Report</h1>
+            <p className="mt-1 text-sm text-white/75">Brian Keith Hill · Papa Life Coach</p>
+            <p className="mt-4 text-sm italic text-white/70">"As long as you're both alive, it's never too late."</p>
+          </div>
         </header>
+        <a href="#saved-work-reports" className="mb-5 inline-block text-sm font-semibold text-brand-yellow underline">
+          View saved reports by day, week, or month
+        </a>
 
-        <div className="mb-6 h-1 rounded bg-gradient-to-r from-[#e53935] via-[#f9a825] to-[#388e3c]" />
-
-        <section className="mb-6 rounded-sm bg-white p-5 shadow-lg shadow-black/30">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-wide text-[#e53935]">
-                Owner View
-              </p>
-              <h2 className="text-xl font-black text-black">Saved Work Reports</h2>
-            </div>
-            <button
-              type="button"
-              onClick={() => setRefresh(current => current + 1)}
-              className="inline-flex items-center gap-2 rounded-sm border border-black px-3 py-2 text-xs font-black uppercase tracking-wide"
-            >
-              <RefreshCcw className="h-3.5 w-3.5" />
-              Refresh
-            </button>
-          </div>
-
-          <div className="mb-4 flex flex-wrap items-end gap-3">
-            <label className="grid gap-1 text-sm font-semibold">
-              Report period
-              <select className="rounded border border-black px-2 py-1.5" value={period}
-                onChange={event => setPeriod(event.target.value)}>
-                <option value="day">Day</option>
-                <option value="week">Week</option>
-                <option value="month">Month</option>
-              </select>
-            </label>
-            <label className="grid gap-1 text-sm font-semibold">
-              Report date
-              <input className="rounded border border-black px-2 py-1.5" type="date" value={historyDate}
-                onChange={event => setHistoryDate(event.target.value)} />
-            </label>
-            <p className="text-sm text-[#444]" aria-live="polite">{reportRangeLabel(dates)}</p>
-          </div>
-          {historyMessage && <p role="status" className="mb-3 text-sm text-[#444]">{historyMessage}</p>}
-          {historyMessage.startsWith("Please log in") ? (
-            <a className="text-sm underline" href="/login">Open login</a>
-          ) : !dates.length ? (
-            <p className="text-sm text-[#444]">Choose a report date.</p>
-          ) : isLoading ? (
-            <p className="text-sm text-[#444]">Loading saved reports…</p>
-          ) : visibleReports.length === 0 ? (
-            <p className="text-sm text-[#444]">No saved reports for this period.</p>
-          ) : (
-            <div className="divide-y divide-[#ddd]">
-              {visibleReports.map((report) => {
-                const reportOutcomes = safeParseOutcomes(report.outcomes);
-                return (
-                  <article key={report.id} className="py-4 first:pt-0 last:pb-0">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-black text-black">{report.title}</h3>
-                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
-                    </div>
-                    {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
-                    {reportOutcomes.length > 0 && (
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#777]">
-                        {reportOutcomes.length} outcome{reportOutcomes.length === 1 ? "" : "s"} checked
-                      </p>
-                    )}
-                    {report.markdown && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer text-sm font-semibold">View report details</summary>
-                        <p className="mt-2 whitespace-pre-wrap break-words text-sm text-[#444]">{report.markdown}</p>
-                      </details>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
 
         <section className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-[#f9a825] px-5 py-3">
           <label
@@ -458,7 +382,7 @@ export default function PapaDailyWorkReport() {
             htmlFor="report-date"
           >
             <CalendarDays className="h-4 w-4" />
-            New daily report date
+            Report Date
           </label>
           <input
             id="report-date"
@@ -601,6 +525,78 @@ export default function PapaDailyWorkReport() {
         </div>
 
 
+        <section id="saved-work-reports" className="mt-8 rounded-2xl border border-brand-yellow/30 bg-[#111] p-5 text-white">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-wide text-brand-yellow">
+                Owner View
+              </p>
+              <h2 className="text-xl font-black text-white">Saved Work Reports</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRefresh(current => current + 1)}
+              className="inline-flex items-center gap-2 rounded-sm border border-brand-yellow/40 px-3 py-2 text-xs font-black uppercase tracking-wide"
+            >
+              <RefreshCcw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <label className="grid gap-1 text-sm font-semibold">
+              Report period
+              <select className="rounded border border-brand-yellow/40 bg-[#111] px-2 py-1.5" value={period}
+                onChange={event => setPeriod(event.target.value)}>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </label>
+            <label className="grid gap-1 text-sm font-semibold">
+              Report date
+              <input className="rounded border border-brand-yellow/40 bg-[#111] px-2 py-1.5" type="date" style={{ colorScheme: "dark" }} value={historyDate}
+                onChange={event => setHistoryDate(event.target.value)} />
+            </label>
+            <p className="text-sm text-white/75" aria-live="polite">{reportRangeLabel(dates)}</p>
+          </div>
+          {historyMessage && <p role="status" className="mb-3 text-sm text-white/75">{historyMessage}</p>}
+          {historyMessage.startsWith("Please log in") ? (
+            <a className="text-sm underline" href="/login">Open login</a>
+          ) : !dates.length ? (
+            <p className="text-sm text-white/75">Choose a report date.</p>
+          ) : isLoading ? (
+            <p className="text-sm text-white/75">Loading saved reports…</p>
+          ) : visibleReports.length === 0 ? (
+            <p className="text-sm text-white/75">No saved reports for this period.</p>
+          ) : (
+            <div className="divide-y divide-white/15">
+              {visibleReports.map((report) => {
+                const reportOutcomes = safeParseOutcomes(report.outcomes);
+                return (
+                  <article key={report.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="font-black text-white">{report.title}</h3>
+                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
+                    </div>
+                    {report.win && <p className="mt-2 text-sm text-white/75">Win: {report.win}</p>}
+                    {reportOutcomes.length > 0 && (
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-white/70">
+                        {reportOutcomes.length} outcome{reportOutcomes.length === 1 ? "" : "s"} checked
+                      </p>
+                    )}
+                    {report.markdown && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-sm font-semibold">View report details</summary>
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm text-white/75">{report.markdown}</p>
+                      </details>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );

@@ -28,6 +28,7 @@ type SavedReport = {
   outcomes: string;
   created_at: string;
   ventures_saved: number;
+  markdown?: string;
 };
 
 const localReportsKey = "papa-daily-work-reports";
@@ -116,10 +117,40 @@ const outcomeLabels = [
   "Work report saved to Papa Life OS",
 ];
 
-function todayInputValue() {
-  const now = new Date();
-  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
+function pacificToday() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(new Date());
+  return ["year", "month", "day"].map(key => parts.find(part => part.type === key)?.value).join("-");
+}
+
+function reportDates(date: string, period: string) {
+  const selected = new Date(date + "T00:00:00Z");
+  if (!Number.isFinite(selected.getTime()) || selected.toISOString().slice(0, 10) !== date) return [];
+  const start = new Date(selected);
+  const end = new Date(selected);
+  if (period === "week") {
+    const daysFromMonday = (selected.getUTCDay() + 6) % 7;
+    start.setUTCDate(selected.getUTCDate() - daysFromMonday);
+    end.setUTCDate(selected.getUTCDate() + 6 - daysFromMonday);
+  }
+  if (period === "month") {
+    start.setUTCDate(1);
+    end.setUTCMonth(selected.getUTCMonth() + 1, 0);
+  }
+  const dates = [];
+  for (const day = new Date(start); day <= end; day.setUTCDate(day.getUTCDate() + 1)) {
+    dates.push(day.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+function reportRangeLabel(dates: string[]) {
+  if (!dates.length) return "";
+  const format = new Intl.DateTimeFormat("en-US", {dateStyle: "medium", timeZone: "UTC"});
+  const start = new Date(dates[0] + "T00:00:00Z");
+  const end = new Date(dates[dates.length - 1] + "T00:00:00Z");
+  return format.formatRange(start, end) + " (Pacific time)";
 }
 
 function textOrNone(value: string) {
@@ -178,6 +209,7 @@ function writeLocalReport(date: string, fields: ReportFields, outcomes: string[]
     outcomes: JSON.stringify(outcomes),
     created_at: new Date().toISOString(),
     ventures_saved: 0,
+    markdown: buildReportMarkdown(date, fields, outcomes),
   };
   const next = [nextReport, ...current].slice(0, 30);
   window.localStorage.setItem(localReportsKey, JSON.stringify(next));
@@ -185,7 +217,11 @@ function writeLocalReport(date: string, fields: ReportFields, outcomes: string[]
 }
 
 export default function PapaDailyWorkReport() {
-  const [date, setDate] = useState(todayInputValue());
+  const [date, setDate] = useState(pacificToday());
+  const [historyDate, setHistoryDate] = useState(pacificToday);
+  const [period, setPeriod] = useState("day");
+  const [refresh, setRefresh] = useState(0);
+  const [historyMessage, setHistoryMessage] = useState("");
   const [fields, setFields] = useState<ReportFields>(blankFields);
   const [outcomes, setOutcomes] = useState<string[]>([]);
   const [reports, setReports] = useState<SavedReport[]>([]);
@@ -199,27 +235,44 @@ export default function PapaDailyWorkReport() {
     [date, fields, outcomes]
   );
 
-async function loadReports() {
+  const dates = useMemo(() => reportDates(historyDate, period), [historyDate, period]);
+
+  useEffect(() => {
+    if (!dates.length) return;
+    const controller = new AbortController();
+    const start = dates[0];
+    const end = dates[dates.length - 1];
     setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/papa-daily-work-reports");
-      if (res.status === 401) {
-        setError("Please log in first, then return to this report page.");
-        setReports([]);
-        return;
+    setHistoryMessage("");
+
+    async function loadReports() {
+      try {
+        const query = new URLSearchParams({ start, end });
+        const res = await fetch("/api/admin/papa-daily-work-reports?" + query, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        if (res.status === 401) {
+          setReports([]);
+          setHistoryMessage("Please log in to view saved reports.");
+          return;
+        }
+        const json = await res.json();
+        if (controller.signal.aborted) return;
+        if (!res.ok || !json.ok) throw new Error("Unable to load reports.");
+        setReports(json.reports || []);
+      } catch {
+        if (controller.signal.aborted) return;
+        setReports(readLocalReports());
+        setHistoryMessage("The saved report service is unavailable. Showing reports saved in this browser.");
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
       }
-      const text = await res.text();
-      const json = JSON.parse(text);
-      if (!res.ok || !json.ok) throw new Error(json.error || "Unable to load reports.");
-      setReports(json.reports || []);
-      setError("");
-    } catch (e: any) {
-      setReports(readLocalReports());
-      setError("");
-    } finally {
-      setIsLoading(false);
     }
-  }
+
+    void loadReports();
+    return () => controller.abort();
+  }, [dates, refresh]);
+
+  const visibleReports = reports.filter(report => dates.includes(report.report_date));
 
   async function saveThroughEngagementBridge() {
     const res = await fetch("/api/engagement", {
@@ -237,10 +290,6 @@ async function loadReports() {
     }
   }
 
-  useEffect(() => {
-    loadReports();
-  }, []);
-
   function updateField(key: keyof ReportFields, value: string) {
     setFields((current) => ({ ...current, [key]: value }));
   }
@@ -254,7 +303,7 @@ async function loadReports() {
   }
 
   function clearForm() {
-    setDate(todayInputValue());
+    setDate(pacificToday());
     setFields(blankFields);
     setOutcomes([]);
     setMessage("");
@@ -283,7 +332,7 @@ async function loadReports() {
       }
       if (!res.ok || !json.ok) throw new Error(json.error || "Unable to save report.");
       setMessage("Saved to Papa Life OS. No outside journal service was contacted.");
-      await loadReports();
+      setRefresh(current => current + 1);
     } catch (e: any) {
       if (String(e?.message || "").toLowerCase().includes("log in")) {
         setError(e.message);
@@ -330,13 +379,86 @@ async function loadReports() {
 
         <div className="mb-6 h-1 rounded bg-gradient-to-r from-[#e53935] via-[#f9a825] to-[#388e3c]" />
 
+        <section className="mb-6 rounded-sm bg-white p-5 shadow-lg shadow-black/30">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-wide text-[#e53935]">
+                Owner View
+              </p>
+              <h2 className="text-xl font-black text-black">Saved Work Reports</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRefresh(current => current + 1)}
+              className="inline-flex items-center gap-2 rounded-sm border border-black px-3 py-2 text-xs font-black uppercase tracking-wide"
+            >
+              <RefreshCcw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <label className="grid gap-1 text-sm font-semibold">
+              Report period
+              <select className="rounded border border-black px-2 py-1.5" value={period}
+                onChange={event => setPeriod(event.target.value)}>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </label>
+            <label className="grid gap-1 text-sm font-semibold">
+              Report date
+              <input className="rounded border border-black px-2 py-1.5" type="date" value={historyDate}
+                onChange={event => setHistoryDate(event.target.value)} />
+            </label>
+            <p className="text-sm text-[#444]" aria-live="polite">{reportRangeLabel(dates)}</p>
+          </div>
+          {historyMessage && <p role="status" className="mb-3 text-sm text-[#444]">{historyMessage}</p>}
+          {historyMessage.startsWith("Please log in") ? (
+            <a className="text-sm underline" href="/login">Open login</a>
+          ) : !dates.length ? (
+            <p className="text-sm text-[#444]">Choose a report date.</p>
+          ) : isLoading ? (
+            <p className="text-sm text-[#444]">Loading saved reports…</p>
+          ) : visibleReports.length === 0 ? (
+            <p className="text-sm text-[#444]">No saved reports for this period.</p>
+          ) : (
+            <div className="divide-y divide-[#ddd]">
+              {visibleReports.map((report) => {
+                const reportOutcomes = safeParseOutcomes(report.outcomes);
+                return (
+                  <article key={report.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="font-black text-black">{report.title}</h3>
+                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
+                    </div>
+                    {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
+                    {reportOutcomes.length > 0 && (
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#777]">
+                        {reportOutcomes.length} outcome{reportOutcomes.length === 1 ? "" : "s"} checked
+                      </p>
+                    )}
+                    {report.markdown && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-sm font-semibold">View report details</summary>
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm text-[#444]">{report.markdown}</p>
+                      </details>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
         <section className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-[#f9a825] px-5 py-3">
           <label
             className="flex items-center gap-2 text-sm font-black uppercase tracking-wide"
             htmlFor="report-date"
           >
             <CalendarDays className="h-4 w-4" />
-            Report Date
+            New daily report date
           </label>
           <input
             id="report-date"
@@ -478,50 +600,7 @@ async function loadReports() {
           </button>
         </div>
 
-        <section className="mt-8 rounded-sm bg-white p-5 shadow-lg shadow-black/30">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-wide text-[#e53935]">
-                Owner View
-              </p>
-              <h2 className="text-xl font-black text-black">Recent Saved Reports</h2>
-            </div>
-            <button
-              type="button"
-              onClick={loadReports}
-              className="inline-flex items-center gap-2 rounded-sm border border-black px-3 py-2 text-xs font-black uppercase tracking-wide"
-            >
-              <RefreshCcw className="h-3.5 w-3.5" />
-              Refresh
-            </button>
-          </div>
 
-          {isLoading ? (
-            <p className="text-sm text-[#444]">Loading recent reports...</p>
-          ) : reports.length === 0 ? (
-            <p className="text-sm text-[#444]">No reports saved yet.</p>
-          ) : (
-            <div className="divide-y divide-[#ddd]">
-              {reports.map((report) => {
-                const reportOutcomes = safeParseOutcomes(report.outcomes);
-                return (
-                  <article key={report.id} className="py-4 first:pt-0 last:pb-0">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-black text-black">{report.title}</h3>
-                      <span className="rounded-sm bg-[#e8f5e9] px-2 py-1 text-xs font-bold text-[#1b5e20]">Saved report</span>
-                    </div>
-                    {report.win && <p className="mt-2 text-sm text-[#444]">Win: {report.win}</p>}
-                    {reportOutcomes.length > 0 && (
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#777]">
-                        {reportOutcomes.length} outcome{reportOutcomes.length === 1 ? "" : "s"} checked
-                      </p>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
       </div>
     </main>
   );

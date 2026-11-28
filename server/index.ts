@@ -3659,7 +3659,27 @@ async function startServer() {
 
   // ── Protected: Papa Life daily work reports ───────────────────────────────
 
-  app.get("/api/admin/papa-daily-work-reports", requireAuth, (_req, res) => {
+  app.get("/api/admin/papa-daily-work-reports", requireAuth, (req, res) => {
+    const { start, end } = req.query;
+    if (start !== undefined || end !== undefined) {
+      const validDate = (day: unknown): day is string => {
+        if (typeof day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+        const date = new Date(day + "T00:00:00Z");
+        return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === day;
+      };
+      if (!validDate(start) || !validDate(end) || start > end ||
+          Date.parse(end) - Date.parse(start) > 30 * 86400000) {
+        return res.status(400).json({ ok: false, error: "Invalid report date range." });
+      }
+      const reports = db.prepare(
+        `SELECT id, report_date, title, outcomes, win, markdown, ventures_saved, created_at
+         FROM papa_daily_work_reports
+         WHERE report_date BETWEEN ? AND ?
+         ORDER BY report_date DESC, created_at DESC, id DESC`
+      ).all(start, end);
+      res.set("Cache-Control", "private, no-store");
+      return res.json({ ok: true, reports });
+    }
     const reports = db
       .prepare(
         `SELECT id, report_date, title, outcomes, win, ventures_saved, created_at

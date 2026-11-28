@@ -14,6 +14,7 @@ import { useState } from "react";
 import { approvedStories, approvedProofCount, approvedExternalMentions } from "@/content/papa-trust-signals";
 
 const navigation = [
+  { label: "Papa Life House", href: "/house" },
   { label: "Find Your Guide", href: "/#family-guidance" },
   { label: "Why Adult Children Pull Away", href: "/why-adult-children-pull-away" },
   { label: "Brian’s Story", href: "#brian-story" },

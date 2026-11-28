@@ -1,3 +1,4 @@
+import { renderPapaTopicLinks } from "../shared/papa-topic-links.mjs";
 // Deployment sync: ensure Railway production builds current canonical homepage copy.
 import fs from "node:fs";
 import path from "node:path";
@@ -499,6 +500,7 @@ const homepage = pages.find((page) => page.path === "/");
 homepage.relatedLinks = [
   ["Guidance for Parents of Adult Children", "/parents-of-adult-children"],
   ["Guidance for Adult Children", "/adult-children"],
+  ["Papa Life House", "/house"],
   ["Fatherhood Resources", "/resources"],
   ["Listen to all 16 songs free", "/#listen-free"],
   ["Explore the Listening Room", "/house/listening-room"],
@@ -549,7 +551,8 @@ function escapeHtml(value) {
 
 function bodyHtml(page) {
   const music = page.path === "/" ? '<section id="listen-free"><h2>Choose a song. All 16 are free.</h2><p>Come for the music. Stay for the encouragement. Lyrics by Brian Hill. Music and arrangements are credited by track, including William (Bill) Whitley.</p><a href="/house/listening-room">Explore the Listening Room</a></section>' : "";
-  const breadcrumb = auditSEO.relatedLinks[page.path] && page.path !== "/resources"
+  const topicLinks = renderPapaTopicLinks(page.path, escapeHtml);
+  const breadcrumb = !topicLinks && auditSEO.relatedLinks[page.path] && page.path !== "/resources"
     ? '<nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/resources">Papa Life resources</a> / ' + escapeHtml(page.headline) + '</nav>'
     : "";
   const related = page.relatedLinks?.length
@@ -574,6 +577,7 @@ function bodyHtml(page) {
             .join("")}
         </div>
         ${related}
+        ${topicLinks}
       </article>
     </main>`;
 }
@@ -650,3 +654,10 @@ for (const page of pages) {
 }
 
 console.log(`Generated ${pages.length} static SEO pages in ${publicDir}`);
+
+const practiceFile = path.join(publicDir, "father-friendly-practice", "index.html");
+const practiceHtml = fs.readFileSync(practiceFile, "utf8");
+fs.writeFileSync(practiceFile, practiceHtml.replace(
+  "</main>",
+  renderPapaTopicLinks("/father-friendly-practice", escapeHtml) + "</main>"
+));

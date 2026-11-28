@@ -68,13 +68,9 @@ const sourceForPath = (pathname) => {
   if (pathname === "/papa-first-lesson") return "client/src/pages/PapaFirstLesson.tsx";
   if (pathname === "/father-friendly-practice") return "client/public/father-friendly-practice/index.html";
   if (pathname === "/adult-children") return "client/src/content/family-guidance.json";
-  if (pathname === "/relationship-assessment") return "client/src/content/papa-seo-audit-overrides.json";
-  if (pathname.startsWith("/house")) return "client/src/pages/PapaHouse.tsx";
   if (pathname === "/site-directory") return "client/src/pages/SiteDirectory.tsx";
   if (pathname === "/shop") return "client/src/pages/Shop.tsx";
   if (pathname === "/courses") return "client/src/pages/Courses.tsx";
-  if (["/resources", "/books", "/podcast", "/ai-coach", "/contact"].includes(pathname))
-    return "client/src/pages/PapaAiExperience.tsx";
   if (pathname === "/welcome-to-papa-life") return "client/src/pages/WelcomeToPapaLife.tsx";
   if (pathname === "/my-journey") return "client/src/pages/FatherJourney.tsx";
   return null;
@@ -87,7 +83,14 @@ const preservedLastmod = new Map(
   [...committedSitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/g)]
     .map((match) => [match[1], match[2]])
 );
+// Only restore dates for these pages from verified page-level editorial history.
+const sharedSourceDates = new Set([
+  "/relationship-assessment", "/house", "/house/living-room", "/house/library",
+  "/house/listening-room", "/house/theater", "/house/dad-cave", "/house/resources",
+  "/house/sky-room", "/resources", "/books", "/podcast", "/ai-coach", "/contact",
+]);
 function lastModified(pathname) {
+  if (sharedSourceDates.has(pathname)) return "";
   const source = sourceForPath(pathname);
   const lastKnown = preservedLastmod.get(url(pathname)) || "";
   if (!source) return lastKnown;
